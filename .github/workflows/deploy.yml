@@ -51,7 +51,6 @@ jobs:
 
     - name: setup terraform
       uses: hashicorp/setup-terraform@v2
-      working-directory: ./terraform/nonprod
       with:
         terraform_version: 1.4.2
         terraform_wrapper: false
