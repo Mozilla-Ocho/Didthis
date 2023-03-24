@@ -125,9 +125,9 @@ output "gcr_service_url" {
   value = module.appserver_main.service_url
 }
 
-output "public_ip_address" {
-  value = module.lb_main.public_ip_address
-}
+# output "public_ip_address" {
+#   value = module.lb_main.public_ip_address
+# }
 
 # output "dns_records_lb" {
 #   value = module.lb_main.dns_records
