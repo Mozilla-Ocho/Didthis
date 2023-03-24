@@ -5,6 +5,9 @@ on:
     branches:
       - releases/nonprod
 
+env:
+  TF_VAR_docker_images_tag: ${{github.sha}}
+
 jobs:
   terraform:
     name: Terraform
@@ -12,7 +15,6 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ./terraform/nonprod
 
     permissions:
       contents: 'read'
@@ -22,33 +24,51 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: setup
-      uses: hashicorp/setup-terraform@v2
-      with:
-        terraform_version: 1.4.2
-        terraform_wrapper: false
-
-    - id: auth
-      name: Authenticate to Google Cloud
+    - name: auth to gcp
       uses: google-github-actions/auth@v1
       with:
         credentials_json: ${{ secrets.TF_PROVISIONER_SVC_ACCOUNT_KEY_JSON }}
         service_account: 'terraform-provisioner@moz-fx-future-products-nonprod.iam.gserviceaccount.com'
 
-    - run: terraform init
+    - name: init cloud sdk
+      uses: google-github-actions/setup-gcloud@v1
 
-    - id: plan
+    - name: auth docker
+      run: gcloud auth configure-docker
+
+    - name: pull latest image for cache
+      continue-on-error: true
+      # XXX dynamic path
+      run: docker pull us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:latest
+
+    - name: build and push image
+      # DRY_r4703 docker name and paths
+      # XXX dynamic path
+      run: |-
+        docker build --file=dockerfiles/appserver --target appserver_prod -t us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:${{ github.sha }} -t us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:latest --cache-from us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:latest .
+        docker push us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:${{ github.sha }}
+        docker push us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:latest
+
+    - name: setup terraform
+      uses: hashicorp/setup-terraform@v2
+      working-directory: ./terraform/nonprod
+      with:
+        terraform_version: 1.4.2
+        terraform_wrapper: false
+
+    - name: terraform init
+      working-directory: ./terraform/nonprod
+      run: terraform init
+
+    - name: terraform plan
+      working-directory: ./terraform/nonprod
       run: terraform plan -no-color -input=false -out=tfplan
-      # env:
-      #   GOOGLE_CREDENTIALS: ${{ secrets.TF_PROVISIONER_SVC_ACCOUNT_KEY_JSON }}
 
-    - id: apply
+    - name: terraform apply
+      working-directory: ./terraform/nonprod
       run: terraform apply -no-color -input=false tfplan
-      # env:
-      #   GOOGLE_CREDENTIALS: ${{ secrets.TF_PROVISIONER_SVC_ACCOUNT_KEY_JSON }}
 
-    - id: outputs
+    - name: terraform outputs
+      working-directory: ./terraform/nonprod
       run: terraform output
-      # env:
-      #   GOOGLE_CREDENTIALS: ${{ secrets.TF_PROVISIONER_SVC_ACCOUNT_KEY_JSON }}
 

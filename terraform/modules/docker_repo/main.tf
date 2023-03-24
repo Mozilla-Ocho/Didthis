@@ -19,6 +19,6 @@ resource "google_artifact_registry_repository" "docker_repo" {
 }
 
 output "images_path_with_slash" {
-  # DRY_r4703 docker repo1 name and paths
+  # DRY_r4703 docker repo name and paths
   value = "${var.region}-docker.pkg.dev/${var.gcp_project_id}/${google_artifact_registry_repository.docker_repo.repository_id}/"
 }

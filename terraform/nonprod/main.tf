@@ -9,6 +9,10 @@
 # terraform init -backend-config="bucket=$BUCKET_TF_STATE"
 # per https://spacelift.io/blog/github-actions-terraform
 
+variable "docker_images_tag" {
+  type = string
+}
+
 locals {
   region = "us-central1"
   app_name = "boilertest1" # XXX must be unique within a gcp project to avoid collision, must work as a subdomain (alphanumeric and dashes, no spaces or underscores)
@@ -20,7 +24,6 @@ locals {
   db_deletion_protection = false
   use_dummy_appserver = true # set true when first standing up the terraform resources
   lb_cert_domain_change_increment_outage = 1 # bump when domains in the ssl certificate change, THIS CAUSES AN OUTAGE XXX
-  docker_images_tag = "todo" # XXX
 } 
 
 terraform {
@@ -95,7 +98,7 @@ module "appserver_main" {
   use_dummy_appserver = local.use_dummy_appserver
   region = local.region
   images_path_with_slash = module.docker_repo.images_path_with_slash
-  docker_images_tag = local.docker_images_tag # XXX
+  docker_images_tag = var.docker_images_tag
   # db_host = module.db.private_ip_address
   # db_name = module.db.db_name
   # db_user = module.db.db_user
