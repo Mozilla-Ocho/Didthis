@@ -44,6 +44,7 @@ jobs:
     - name: build and push image
       # DRY_r4703 docker name and paths
       # XXX dynamic path
+      # this is failing due to permission errors on pushing... why?
       run: |-
         docker build --file=dockerfiles/appserver --target appserver_prod -t us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:${{ github.sha }} -t us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:latest --cache-from us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:latest .
         docker push us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:${{ github.sha }}
