@@ -1,4 +1,4 @@
-name: 'deploy terraform - nonprod'
+name: deploy terraform - nonprod
 
 on:
   push:
@@ -20,7 +20,7 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-    - uses: 'actions/checkout@v3'
+    - uses: actions/checkout@v3
 
     - name: setup
       uses: hashicorp/setup-terraform@v2
@@ -29,9 +29,9 @@ jobs:
         terraform_wrapper: false
 
     # https://github.com/google-github-actions/auth
-    - id: 'auth'
-      name: 'Authenticate to Google Cloud'
-      uses: 'google-github-actions/auth@v1'
+    - id: auth
+      name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
       with:
         credentials_json: ${{ secrets.TF_PROVISIONER_SVC_ACCOUNT_KEY_JSON }}
         service_account: 'my-service-account@my-project.iam.gserviceaccount.com'
@@ -39,5 +39,10 @@ jobs:
     - run: terraform init
 
     - id: plan
-      run: terraform plan -no-color -input=false
+      run: terraform plan -no-color -input=false -out=tfplan
 
+    - id: apply
+      run: terraform apply -no-color -input=false tfplan
+
+    - id: outputs
+      run: terraform output
