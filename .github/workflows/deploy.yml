@@ -14,9 +14,9 @@ jobs:
         shell: bash
         working-directory: ./terraform/nonprod
 
-    # permissions:
-    #   contents: 'read'
-    #   id-token: 'write'
+    permissions:
+      contents: 'read'
+      id-token: 'write'
 
     runs-on: ubuntu-latest
     steps:
@@ -28,28 +28,27 @@ jobs:
         terraform_version: 1.4.2
         terraform_wrapper: false
 
-    # https://github.com/google-github-actions/auth
-    # - id: auth
-    #   name: Authenticate to Google Cloud
-    #   uses: google-github-actions/auth@v1
-    #   with:
-    #     credentials_json: ${{ secrets.TF_PROVISIONER_SVC_ACCOUNT_KEY_JSON }}
-    #     service_account: 'my-service-account@my-project.iam.gserviceaccount.com'
+    - id: auth
+      name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ secrets.TF_PROVISIONER_SVC_ACCOUNT_KEY_JSON }}
+        service_account: 'terraform-provisioner@moz-fx-future-products-nonprod.iam.gserviceaccount.com'
 
     - run: terraform init
 
     - id: plan
       run: terraform plan -no-color -input=false -out=tfplan
-      env:
-        GOOGLE_CREDENTIALS: ${{ secrets.TF_PROVISIONER_SVC_ACCOUNT_KEY_JSON }}
+      # env:
+      #   GOOGLE_CREDENTIALS: ${{ secrets.TF_PROVISIONER_SVC_ACCOUNT_KEY_JSON }}
 
     - id: apply
       run: terraform apply -no-color -input=false tfplan
-      env:
-        GOOGLE_CREDENTIALS: ${{ secrets.TF_PROVISIONER_SVC_ACCOUNT_KEY_JSON }}
+      # env:
+      #   GOOGLE_CREDENTIALS: ${{ secrets.TF_PROVISIONER_SVC_ACCOUNT_KEY_JSON }}
 
     - id: outputs
       run: terraform output
-      env:
-        GOOGLE_CREDENTIALS: ${{ secrets.TF_PROVISIONER_SVC_ACCOUNT_KEY_JSON }}
+      # env:
+      #   GOOGLE_CREDENTIALS: ${{ secrets.TF_PROVISIONER_SVC_ACCOUNT_KEY_JSON }}
 

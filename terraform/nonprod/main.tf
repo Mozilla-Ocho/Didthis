@@ -40,7 +40,6 @@ provider "google" {
   project = local.gcp_project_id
   region = local.region
   zone    = "us-central1-b"
-  impersonate_service_account = "terraform-provisioner@moz-fx-future-products-prod.iam.gserviceaccount.com" # XXX
 }
 
 module "gcp_apis" {
