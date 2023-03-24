@@ -57,7 +57,7 @@ module "vpc" {
 
 # module "db" {
 #   source = "../modules/db"
-#   db_name = "pgmain"
+#   db_name = "${local.app_name}-pgmain"
 #   region = local.region
 #   vpc_id = module.vpc.vpc_id
 #   depends_on = [module.vpc, module.gcp_apis]
@@ -65,6 +65,7 @@ module "vpc" {
 
 # module "db_proxy" {
 #   source = "../modules/db_proxy"
+#   app_name  = local.app_name
 #   gcp_project_id = local.gcp_project_id
 #   vpc_id = module.vpc.vpc_id
 #   db_connection_name = module.db.connection_name
@@ -78,7 +79,7 @@ module "docker_repo" {
   source = "../modules/docker_repo"
   region = local.region
   gcp_project_id = local.gcp_project_id
-  repository_id = "repo1" # XXX
+  repository_id = "${local.app_name}-repo1"
   depends_on = [module.gcp_apis]
 }
 
@@ -90,7 +91,7 @@ module "docker_repo" {
 
 module "appserver_main" {
   source = "../modules/gcr_appserver"
-  name = "appserver-main"
+  name = "${local.app_name}-appserver-main"
   use_dummy_appserver = local.use_dummy_appserver
   region = local.region
   images_path_with_slash = module.docker_repo.images_path_with_slash
@@ -112,6 +113,7 @@ module "appserver_main" {
 
 # module "lb_main" {
 #   source = "../modules/lb"
+#   prefix = local.app_name
 #   name = "main"
 #   region = local.region
 #   gcr_service_name = module.appserver_main.service_name

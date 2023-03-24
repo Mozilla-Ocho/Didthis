@@ -1,7 +1,7 @@
 # {{{ load balancer
 # https://cloud.google.com/blog/topics/developers-practitioners/serverless-load-balancing-terraform-hard-way
 
-variable "prefix" {
+variable "app_name" {
   default = ""
   type = string
 }
@@ -25,11 +25,11 @@ variable "lb_cert_domain_change_increment_outage" {
 }
 
 resource "google_compute_global_address" "lb" {
-  name = "${var.prefix}${var.name}-lb-ip"
+  name = "${var.app_name}-${var.name}-lb-ip"
 }
 
 resource "google_compute_region_network_endpoint_group" "cloudrun_appserver" {
-  name                  = "${var.prefix}${var.name}-neg-appserver"
+  name                  = "${var.app_name}-${var.name}-neg-appserver"
   network_endpoint_type = "SERVERLESS"
   region                = var.region
   cloud_run {
@@ -38,7 +38,7 @@ resource "google_compute_region_network_endpoint_group" "cloudrun_appserver" {
 }
 
 resource "google_compute_backend_service" "cloudrun_appserver" {
-  name      = "${var.prefix}${var.name}-backend-appserver"
+  name      = "${var.app_name}-${var.name}-backend-appserver"
   protocol  = "HTTP"
   port_name = "http"
   timeout_sec = 30
@@ -48,13 +48,13 @@ resource "google_compute_backend_service" "cloudrun_appserver" {
 }
 
 resource "google_compute_url_map" "default" {
-  name            = "${var.prefix}${var.name}-urlmap-default"
+  name            = "${var.app_name}-${var.name}-urlmap-default"
   default_service = google_compute_backend_service.cloudrun_appserver.id
   # don't need any specific mappings, just send it all to the default
 }
 
 resource "google_compute_url_map" "https_redirect" {
-  name            = "${var.prefix}${var.name}-urlmap-https-redir"
+  name            = "${var.app_name}-${var.name}-urlmap-https-redir"
   default_url_redirect {
     https_redirect         = true
     redirect_response_code = "MOVED_PERMANENTLY_DEFAULT"
@@ -75,7 +75,7 @@ resource "google_compute_managed_ssl_certificate" "default" {
   # you can see it here:
   # gcloud compute ssl-certificates list
   # gcloud compute ssl-certificates describe main-lb-cert
-  name = "${var.prefix}${var.name}-lb-cert-${var.lb_cert_domain_change_increment_outage}"
+  name = "${var.app_name}-${var.name}-lb-cert-${var.lb_cert_domain_change_increment_outage}"
   managed {
     domains = var.domains
   }
@@ -93,14 +93,14 @@ resource "google_compute_managed_ssl_certificate" "default" {
 }
 
 resource "google_compute_target_http_proxy" "default" {
-  name   = "${var.prefix}${var.name}-http-proxy"
+  name   = "${var.app_name}-${var.name}-http-proxy"
   # url_map = google_compute_url_map.default.id
   # actually always just issue a redirect:
   url_map = google_compute_url_map.https_redirect.id
 }
 
 resource "google_compute_target_https_proxy" "default" {
-  name   = "${var.prefix}${var.name}-https-proxy"
+  name   = "${var.app_name}-${var.name}-https-proxy"
   url_map          = google_compute_url_map.default.id
   ssl_certificates = [
     google_compute_managed_ssl_certificate.default.id
@@ -108,14 +108,14 @@ resource "google_compute_target_https_proxy" "default" {
 }
 
 resource "google_compute_global_forwarding_rule" "http_proxy" {
-  name   = "${var.prefix}${var.name}-fwd-rule-http"
+  name   = "${var.app_name}-${var.name}-fwd-rule-http"
   target = google_compute_target_http_proxy.default.id
   port_range = "80"
   ip_address = google_compute_global_address.lb.address
 }
 
 resource "google_compute_global_forwarding_rule" "https_proxy" {
-  name   = "${var.prefix}${var.name}-fwd-rule-https"
+  name   = "${var.app_name}-${var.name}-fwd-rule-https"
   target = google_compute_target_https_proxy.default.id
   port_range = "443"
   ip_address = google_compute_global_address.lb.address

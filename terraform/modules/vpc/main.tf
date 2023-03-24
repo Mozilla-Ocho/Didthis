@@ -78,7 +78,7 @@ resource "google_compute_global_address" "private_ip_alloc" {
   # i'm not sure if this should be called "google-managed-services-default" but
   # it is what is used in the tutorial. is this a special value? other examples
   # of this sort of setup use a name like "private-ip-alloc" or similar.
-  name          = "google-managed-services-default"
+  name          = "priv-ip-alloc-${var.vpc_name}"
   purpose       = "VPC_PEERING"
   address_type  = "INTERNAL"
   prefix_length = 20 # 16 vs 20 does it matter?
@@ -132,7 +132,7 @@ output "vpc_access_connector_name" {
 # see doc/db_proxy.md
 
 resource "google_compute_firewall" "allow_ssh" {
-  name        = "allow-ssh"
+  name        = "${var.vpc_name}-allow-ssh"
   description = "Allow SSH traffic to any instance tagged with 'ssh-enabled'"
   network     = google_compute_network.vpc.id
   direction   = "INGRESS"

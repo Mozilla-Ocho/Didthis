@@ -1,5 +1,9 @@
 # largely based on https://github.com/ryboe/private-ip-cloud-sql-db
 
+variable "app_name" {
+  type = string
+}
+
 variable "project_id" {
   type = string
 }
@@ -40,7 +44,7 @@ resource "google_service_account_key" "key" {
 }
 
 resource "google_compute_instance" "db_proxy" {
-  name                      = "dbproxy6"
+  name                      = "${var.app_name}-dbproxy"
   description               = <<-EOT
     A public-facing instance that proxies traffic to the database. This allows
     the db to only have a private IP address, but still be reachable from
