@@ -1,0 +1,66 @@
+# --------------------------------------------------------------
+# base image, shared for dev+prod
+# --------------------------------------------------------------
+
+FROM node:18-buster as appserver_base
+
+# general apt update
+RUN apt-get update && apt-get install -qq -y build-essential --fix-missing --no-install-recommends
+
+# postgres 14 client
+RUN apt-get install -qq -y gnupg2 lsb-release
+RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" | tee /etc/apt/sources.list.d/pgdg.list
+RUN apt-get update
+RUN apt-get install -y postgresql-client-14
+
+# pm2 is a utility for process monitoring and restarting, we wrap node with it
+# in dev we also use it to watch for changes to the source and restart node.
+RUN yarn global add pm2
+
+# other utils
+RUN apt-get install -qq -y vim jq
+
+# appserver code is gonna be installed in /appserver
+WORKDIR /appserver
+
+
+# --------------------------------------------------------------
+# dev image
+# --------------------------------------------------------------
+
+FROM appserver_base as appserver_dev
+
+ENV NODE_ENV=development
+
+# --------------------------------------------------------------
+# prod image
+# --------------------------------------------------------------
+
+FROM appserver_base as appserver_prod
+
+ENV NODE_ENV=production
+
+# copy package.json and yarn.lock files in and do yarn installs. we do this
+# before copying the code in to optimize for docker layer caching.
+COPY appserver/package.json /appserver/package.json
+COPY appserver/yarn.lock /appserver/yarn.lock
+RUN yarn install
+COPY client/package.json /client/package.json
+COPY client/yarn.lock /client/yarn.lock
+WORKDIR /client
+RUN yarn install
+
+# copy full code in
+COPY appserver /appserver
+
+# build client bundles
+# todo - add this back once we have a react app
+# WORKDIR /client
+# RUN yarn build
+
+WORKDIR /appserver
+# run-time must set these env vars:
+# PORT (for nodejs to listen on)
+CMD yarn start
+

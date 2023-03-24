@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+
+  appserver:
+    build:
+      context: '.'
+      dockerfile: dockerfiles/appserver
+      target: appserver_dev
+    networks:
+      - allhosts
+    volumes:
+      - ./appserver:/appserver
+    working_dir: /appserver
+    command: yarn start
+    environment:
+      PORT: 3000
+    ports:
+      - "3000:3000"
+
+networks:
+  allhosts:
+
