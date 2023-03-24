@@ -1,0 +1,43 @@
+name: 'deploy terraform - nonprod'
+
+on:
+  push:
+    branches:
+      - releases/nonprod
+
+jobs:
+  terraform:
+    name: Terraform
+    environment: nonprod
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./terraform/nonprod
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    runs-on: ubuntu-latest
+    steps:
+    - uses: 'actions/checkout@v3'
+
+    - name: setup
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.4.2
+        terraform_wrapper: false
+
+    # https://github.com/google-github-actions/auth
+    - id: 'auth'
+      name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v1'
+      with:
+        credentials_json: ${{ secrets.TF_PROVISIONER_SVC_ACCOUNT_KEY_JSON }}
+        service_account: 'my-service-account@my-project.iam.gserviceaccount.com'
+
+    - run: terraform init
+
+    - id: plan
+      run: terraform plan -no-color -input=false
+

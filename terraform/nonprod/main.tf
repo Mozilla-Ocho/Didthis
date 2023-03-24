@@ -1,3 +1,14 @@
+# XXX i can move a number of these values into github secrets and then pass
+# them into as args.  this way the boilerplate can remain generic, and the
+# github secrets define the particulars.
+#
+# as in:
+# env:
+#  BUCKET_TF_STATE: ${{ secrets.BUCKET_TF_STATE}}
+# then can do
+# terraform init -backend-config="bucket=$BUCKET_TF_STATE"
+# per https://spacelift.io/blog/github-actions-terraform
+
 locals {
   region = "us-central1"
   app_name = "boilertest1" # XXX must be unique within a gcp project to avoid collision, must work as a subdomain (alphanumeric and dashes, no spaces or underscores)
