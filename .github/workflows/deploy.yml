@@ -27,17 +27,28 @@ jobs:
       run: echo "IMAGE_TAG=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
 
     - name: construct .tfvars
+      env:
+        APP_NAME: ${{vars.APP_NAME}}
+        AUTOSCALING_MAX: ${{vars.AUTOSCALING_MAX || "2"}}
+        AUTOSCALING_MIN: ${{vars.AUTOSCALING_MIN || "5"}}
+        DB_DELETION_PROTECTION: ${{vars.DB_DELETION_PROTECTION || "true"}}
+        DB_TIER: ${{vars.DB_TIER || "db-g1-small"}}
+        GCP_PROJECT_ID: ${{vars.GCP_PROJECT_ID}}
+        GCP_PROJECT_NUMBER: ${{vars.GCP_PROJECT_NUMBER}}
+        IMAGE_TAG: ${{vars.IMAGE_TAG}}
+        REGION: ${{vars.REGION || "us-central1"}}
+        USE_DUMMY_APPSERVER: ${{vars.USE_DUMMY_APPSERVER}}
       run: |-
-        echo 'app_name="${{vars.APP_NAME}}"' >> .tfvars
-        echo 'autoscaling_max="${{vars.AUTOSCALING_MAX || "5"}}"' >> .tfvars
-        echo 'autoscaling_min="${{vars.AUTOSCALING_MIN || "2"}}"' >> .tfvars
-        echo 'db_deletion_protection=${{vars.DB_DELETION_PROTECTION || "true"}}' >> .tfvars
-        echo 'db_tier="${{vars.DB_TIER || "db-g1-small" }}"' >> .tfvars
-        echo 'gcp_project_id="${{vars.GCP_PROJECT_ID}}"' >> .tfvars
-        echo 'gcp_project_number="${{vars.GCP_PROJECT_NUMBER}}"' >> .tfvars
-        echo 'image_tag="${{env.IMAGE_TAG}}"' >> .tfvars
-        echo 'region="${{vars.GCP_REGION}}"' >> .tfvars
-        echo 'use_dummy_appserver=${{vars.USE_DUMMY_APPSERVER || "false"}}' >> .tfvars
+        echo "app_name=$APP_NAME" >> .tfvars
+        echo "autoscaling_max=$AUTOSCALING_MAX" >> .tfvars
+        echo "autoscaling_min=$AUTOSCALING_MIN" >> .tfvars
+        echo "db_deletion_protection=$DB_DELETION_PROTECTION" >> .tfvars
+        echo "db_tier=$DB_TIER" >> .tfvars
+        echo "gcp_project_id=$GCP_PROJECT_ID" >> .tfvars
+        echo "gcp_project_number=$GCP_PROJECT_NUMBER" >> .tfvars
+        echo "image_tag=$IMAGE_TAG" >> .tfvars
+        echo "region=$GCP_REGION" >> .tfvars
+        echo "use_dummy_appserver=$USE_DUMMY_APPSERVER" >> .tfvars
         cat .tfvars
 
     - name: auth to gcp
