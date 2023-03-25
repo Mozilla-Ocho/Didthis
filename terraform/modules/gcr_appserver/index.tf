@@ -1,10 +1,13 @@
-# needs services:
-# - run_api
-
 variable "name" {
-  # the name of the cloud run service
   type = string
 }
+variable "app_name" {
+  type = string
+}
+locals {
+  full_name = "${var.app_name}-${var.name}"
+}
+
 variable "use_dummy_appserver" {
   # if true, full_image_name is not used and instead a dummy hello world
   # appserver is installed instead.
@@ -55,7 +58,7 @@ variable "vpc_access_connector_name" {
 }
 
 resource "google_cloud_run_service" "appserver" {
-  name = var.name
+  name = local.full_name
   location = var.region
 
   # sometimes during carefully managed deployments, we don't want terraform to
@@ -94,7 +97,7 @@ resource "google_cloud_run_service" "appserver" {
     }
     metadata {
       # this name should match that in revision_name below
-      name = var.use_dummy_appserver ? "${var.name}-hello" : "${var.name}-${var.image_tag}"
+      name = var.use_dummy_appserver ? "${local.full_name}-hello" : "${local.full_name}-${var.image_tag}"
       # annotations can be found here
       # https://cloud.google.com/run/docs/reference/rest/v1/RevisionTemplate
       annotations = {
@@ -112,7 +115,7 @@ resource "google_cloud_run_service" "appserver" {
 
   traffic {
     percent       = 100
-    revision_name = var.use_dummy_appserver ? "${var.name}-hello" : "${var.name}-${var.image_tag}"
+    revision_name = var.use_dummy_appserver ? "${local.full_name}-hello" : "${local.full_name}-${var.image_tag}"
   }
 
   timeouts {
@@ -138,5 +141,5 @@ output "service_url" {
   value = google_cloud_run_service.appserver.status[0].url
 }
 output "image_deployed" {
-  value = var.use_dummy_appserver ? "${var.name}-hello" : "${var.image_basename}:${var.image_tag}"
+  value = var.use_dummy_appserver ? "${local.full_name}-hello" : "${var.image_basename}:${var.image_tag}"
 }

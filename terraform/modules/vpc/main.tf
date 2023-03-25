@@ -16,7 +16,7 @@ variable "region" {
   type = string
 }
 
-variable "vpc_name" {
+variable "app_name" {
   type = string
 }
 
@@ -28,10 +28,14 @@ variable "gcp_project_number" {
   type = string
 }
 
+locals {
+  vpc_name = "vpc-${var.app_name}"
+}
+
 # {{{ vpc itself
 
 resource "google_compute_network" "vpc" {
-  name                    = var.vpc_name
+  name                    = local.vpc_name
   auto_create_subnetworks = "true"
 }
 
@@ -49,13 +53,13 @@ output "vpc_id" {
 # from cloud run instances.
 
 resource "google_compute_router" "router" {
-  name    = "${var.vpc_name}-nat-router"
+  name    = "${local.vpc_name}-nat-router"
   region  = var.region
   network = google_compute_network.vpc.id
 }
 
 resource "google_compute_router_nat" "nat" {
-  name                               = "${var.vpc_name}-nat"
+  name                               = "${local.vpc_name}-nat"
   router                             = google_compute_router.router.name
   region                             = google_compute_router.router.region
   // we could allocate a static ip or be more specific here, but we don't care,
@@ -78,7 +82,7 @@ resource "google_compute_global_address" "private_ip_alloc" {
   # i'm not sure if this should be called "google-managed-services-default" but
   # it is what is used in the tutorial. is this a special value? other examples
   # of this sort of setup use a name like "private-ip-alloc" or similar.
-  name          = "priv-ip-alloc-${var.vpc_name}"
+  name          = "priv-ip-alloc-${local.vpc_name}"
   purpose       = "VPC_PEERING"
   address_type  = "INTERNAL"
   prefix_length = 20 # 16 vs 20 does it matter?
@@ -113,7 +117,7 @@ resource "google_project_iam_member" "sqlclient_role_for_compute_svc_account" {
 # https://codelabs.developers.google.com/connecting-to-private-cloudsql-from-cloud-run#4
 resource "google_vpc_access_connector" "connector" {
   # to be used in the cloud run service's annotations
-  name          = "${var.vpc_name}-con"
+  name          = "${local.vpc_name}-con"
   ip_cidr_range = "10.8.0.0/28"
   # note that the gcp guide on connecting cloud run to cloud sql in a vpc sets
   # up using the default vpc network but we have created one and are using that.
@@ -132,7 +136,7 @@ output "vpc_access_connector_name" {
 # see doc/db_proxy.md
 
 resource "google_compute_firewall" "allow_ssh" {
-  name        = "${var.vpc_name}-allow-ssh"
+  name        = "${local.vpc_name}-allow-ssh"
   description = "Allow SSH traffic to any instance tagged with 'ssh-enabled'"
   network     = google_compute_network.vpc.id
   direction   = "INGRESS"

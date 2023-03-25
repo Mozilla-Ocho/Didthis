@@ -52,7 +52,7 @@ module "gcp_apis" {
 
 module "vpc" {
   source = "../modules/vpc"
-  vpc_name = "vpc-${local.app_name}"
+  app_name = local.app_name
   region = local.region
   gcp_project_id = local.gcp_project_id
   gcp_project_number = local.gcp_project_number
@@ -83,7 +83,7 @@ module "docker_repo" {
   source = "../modules/docker_repo"
   region = local.region
   gcp_project_id = local.gcp_project_id
-  repository_id = "${local.app_name}-repo1"
+  app_name = local.app_name
   depends_on = [module.gcp_apis]
 }
 
@@ -95,7 +95,8 @@ module "docker_repo" {
 
 module "appserver_main" {
   source = "../modules/gcr_appserver"
-  name = "${local.app_name}-appserver-main"
+  app_name = local.app_name
+  name = "appserver-main"
   use_dummy_appserver = local.use_dummy_appserver
   image_basename = "appserver"
   image_tag = var.image_tag
