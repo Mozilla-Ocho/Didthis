@@ -111,7 +111,7 @@ resource "google_cloud_run_service" "appserver" {
 
   traffic {
     percent       = 100
-    revision_name = var.use_dummy_appserver ? "${var.name}-hello" : "${var.name}-${var.image_basename}-${var.image_tag}"
+    revision_name = var.use_dummy_appserver ? "${var.name}-hello" : "${var.name}-${var.image_tag}"
   }
 
   timeouts {
