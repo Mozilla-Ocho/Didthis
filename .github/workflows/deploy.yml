@@ -47,15 +47,15 @@ jobs:
         REGION: ${{vars.REGION || 'us-central1'}}
         USE_DUMMY_APPSERVER: ${{vars.USE_DUMMY_APPSERVER}}
       run: |-
-        echo "app_name=$APP_NAME" >> .tfvars
+        echo "app_name=\"$APP_NAME\"" >> .tfvars
         echo "autoscaling_max=$AUTOSCALING_MAX" >> .tfvars
         echo "autoscaling_min=$AUTOSCALING_MIN" >> .tfvars
         echo "db_deletion_protection=$DB_DELETION_PROTECTION" >> .tfvars
-        echo "db_tier=$DB_TIER" >> .tfvars
-        echo "gcp_project_id=$GCP_PROJECT_ID" >> .tfvars
-        echo "gcp_project_number=$GCP_PROJECT_NUMBER" >> .tfvars
-        echo "image_tag=$IMAGE_TAG" >> .tfvars
-        echo "region=$REGION" >> .tfvars
+        echo "db_tier=\"$DB_TIER\"" >> .tfvars
+        echo "gcp_project_id=\"$GCP_PROJECT_ID\"" >> .tfvars
+        echo "gcp_project_number=\"$GCP_PROJECT_NUMBER\"" >> .tfvars
+        echo "image_tag=\"$IMAGE_TAG\"" >> .tfvars
+        echo "region=\"$REGION\"" >> .tfvars
         echo "use_dummy_appserver=$USE_DUMMY_APPSERVER" >> .tfvars
         cat .tfvars
         mv .tfvars ${{env.TF_FOLDER}}/.tfvars
