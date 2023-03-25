@@ -93,7 +93,8 @@ resource "google_cloud_run_service" "appserver" {
       }
     }
     metadata {
-      name = var.name
+      # this name should match that in revision_name below
+      name = var.use_dummy_appserver ? "${var.name}-hello" : "${var.name}-${var.image_tag}"
       # annotations can be found here
       # https://cloud.google.com/run/docs/reference/rest/v1/RevisionTemplate
       annotations = {
