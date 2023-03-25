@@ -24,7 +24,7 @@ jobs:
     # https://stackoverflow.com/a/64195658
     # and https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
     - name: construct docker image tag from git sha
-      run: echo "TF_VAR_docker_images_tag=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
+      run: echo "TF_VAR_image_tag=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
 
     - name: auth to gcp
       uses: google-github-actions/auth@v1
@@ -49,8 +49,8 @@ jobs:
       # DRY_r4703 docker name and paths
       # XXX use vars
       run: |-
-        docker build --file=dockerfiles/appserver --target appserver_prod -t us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:${{ env.TF_VAR_docker_images_tag }} -t us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:latest --cache-from us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:latest .
-        docker push us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:${{ env.TF_VAR_docker_images_tag }}
+        docker build --file=dockerfiles/appserver --target appserver_prod -t us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:${{ env.TF_VAR_image_tag }} -t us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:latest --cache-from us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:latest .
+        docker push us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:${{ env.TF_VAR_image_tag }}
         docker push us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:latest
 
     - name: setup terraform

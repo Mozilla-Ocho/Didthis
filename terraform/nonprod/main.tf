@@ -9,7 +9,7 @@
 # terraform init -backend-config="bucket=$BUCKET_TF_STATE"
 # per https://spacelift.io/blog/github-actions-terraform
 
-variable "docker_images_tag" {
+variable "image_tag" {
   type = string
 }
 
@@ -97,9 +97,11 @@ module "appserver_main" {
   source = "../modules/gcr_appserver"
   name = "${local.app_name}-appserver-main"
   use_dummy_appserver = local.use_dummy_appserver
+  image_basename = "appserver"
+  image_tag = var.image_tag
+  image_path_with_slash = module.docker_repo.image_path_with_slash
   region = local.region
-  images_path_with_slash = module.docker_repo.images_path_with_slash
-  docker_images_tag = var.docker_images_tag
+
   # db_host = module.db.private_ip_address
   # db_name = module.db.db_name
   # db_user = module.db.db_user

@@ -3,8 +3,9 @@ const app = express();
 
 app.get('/', (req, res) => {
   console.log(`Received a request.`);
+  let response = 'Appserver hello world!'
   res.send(
-    `Appserver hello world!`
+    `Appserver hello world! current image tag = ${process.env.IMAGE_TAG || 'none'}`
   );
 });
 

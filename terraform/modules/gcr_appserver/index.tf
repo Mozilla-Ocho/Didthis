@@ -1,21 +1,30 @@
 # needs services:
 # - run_api
 
-# XXX separate name and image name
 variable "name" {
+  # the name of the cloud run service
+  type = string
+}
+variable "use_dummy_appserver" {
+  # if true, full_image_name is not used and instead a dummy hello world
+  # appserver is installed instead.
+  type = bool
+}
+variable "image_basename" {
+  # e.g. appserver
+  type = string
+}
+variable "image_path_with_slash" {
+  # e.g. us-east1-docker.pkg.dev/my-project/my-repo/
+  # must include trailing slash
+  type = string
+}
+variable "image_tag" {
+  # e.g. the 7-char git short sha
   type = string
 }
 variable "region" {
   type = string
-}
-variable "images_path_with_slash" {
-  type = string
-}
-variable "docker_images_tag" {
-  type = string
-}
-variable "use_dummy_appserver" {
-  type = bool
 }
 variable "db_host" {
   default = ""
@@ -60,7 +69,11 @@ resource "google_cloud_run_service" "appserver" {
   template {
     spec {
       containers {
-        image = var.use_dummy_appserver ? "us-docker.pkg.dev/cloudrun/container/hello:latest" : "${var.images_path_with_slash}appserver:${var.docker_images_tag}"
+        image = var.use_dummy_appserver ? "us-docker.pkg.dev/cloudrun/container/hello:latest" : "${var.image_path_with_slash}${var.image_basename}:${var.image_tag}"
+        env {
+          name  = "IMAGE_TAG"
+          value = var.image_tag
+        }
         env {
           name  = "DB_HOST"
           value = var.db_host
@@ -80,7 +93,7 @@ resource "google_cloud_run_service" "appserver" {
       }
     }
     metadata {
-      name = var.use_dummy_appserver ? "${var.name}-hello" : "${var.name}-${var.docker_images_tag}"
+      name = var.name
       # annotations can be found here
       # https://cloud.google.com/run/docs/reference/rest/v1/RevisionTemplate
       annotations = {
@@ -98,7 +111,7 @@ resource "google_cloud_run_service" "appserver" {
 
   traffic {
     percent       = 100
-    revision_name = var.use_dummy_appserver ? "${var.name}-hello" : "${var.name}-${var.docker_images_tag}"
+    revision_name = var.use_dummy_appserver ? "${var.name}-hello" : "${var.name}-${var.image_basename}-${var.image_tag}"
   }
 
   timeouts {
@@ -124,5 +137,5 @@ output "service_url" {
   value = google_cloud_run_service.appserver.status[0].url
 }
 output "image_deployed" {
-  value = var.use_dummy_appserver ? "${var.name}-hello" : "${var.name}-${var.docker_images_tag}"
+  value = var.use_dummy_appserver ? "${var.name}-hello" : "${var.image_basename}:${var.image_tag}"
 }
