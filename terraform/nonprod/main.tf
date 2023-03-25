@@ -33,9 +33,9 @@ terraform {
     google = "~> 4.33"
   }
   backend "gcs" {
-    # XXX must be globally unique, and unique for the app, and must be created in advance
-    # XXX document creation config: us, standard data, no public access, versioning enabled with 10 versions and 7d retention
-    bucket  = "tfstate-x92n3dj12-boilertest1"
+    # XXX document creation of bucket: us, standard data, no public access, versioning enabled with 10 versions and 7d retention, then set in github environment vars as BACKEND_TF_STATE_BUCKET
+    # note that a bucket value is required here and is passed in from the
+    # github action terraform init step via command line argument.
     prefix  = "terraform/state"
   }
 }

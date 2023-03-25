@@ -61,7 +61,7 @@ jobs:
 
     - name: terraform init
       working-directory: ./terraform/nonprod
-      run: terraform init
+      run: terraform init --backend-config="bucket=${{vars.BACKEND_TF_STATE_BUCKET}}"
 
     - name: terraform plan
       working-directory: ./terraform/nonprod
