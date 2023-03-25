@@ -17,7 +17,6 @@ variable "db_name" {
   type = string
 }
 variable "db_tier" {
-  default = "db-g1-small"
   type = string
 }
 variable "region" {
@@ -28,7 +27,6 @@ variable "vpc_id" {
 }
 variable "db_deletion_protection" {
   # XXX add this to a teardown howto (need to set false first)
-  default = true
   type = string
 }
 

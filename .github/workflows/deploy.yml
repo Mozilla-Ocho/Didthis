@@ -23,8 +23,22 @@ jobs:
 
     # https://stackoverflow.com/a/64195658
     # and https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-environment-variable
-    - name: construct docker image tag from git sha
-      run: echo "TF_VAR_image_tag=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
+    - name: construct short docker image tag from git sha
+      run: echo "IMAGE_TAG=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
+
+    - name: construct .tfvars
+      run: |-
+        echo 'app_name="${{vars.APP_NAME}}"' >> .tfvars
+        echo 'autoscaling_max="${{vars.AUTOSCALING_MAX || "5"}}"' >> .tfvars
+        echo 'autoscaling_min="${{vars.AUTOSCALING_MIN || "2"}}"' >> .tfvars
+        echo 'db_deletion_protection=${{vars.DB_DELETION_PROTECTION || "true"}}' >> .tfvars
+        echo 'db_tier="${{vars.DB_TIER || "db-g1-small" }}"' >> .tfvars
+        echo 'gcp_project_id="${{vars.GCP_PROJECT_ID}}"' >> .tfvars
+        echo 'gcp_project_number="${{vars.GCP_PROJECT_NUMBER}}"' >> .tfvars
+        echo 'image_tag="${{env.IMAGE_TAG}}"' >> .tfvars
+        echo 'region="${{vars.GCP_REGION}}"' >> .tfvars
+        echo 'use_dummy_appserver=${{vars.USE_DUMMY_APPSERVER || "false"}}' >> .tfvars
+        cat .tfvars
 
     - name: auth to gcp
       uses: google-github-actions/auth@v1
@@ -49,8 +63,8 @@ jobs:
       # DRY_r4703 docker name and paths
       # XXX use vars
       run: |-
-        docker build --file=dockerfiles/appserver --target appserver_prod -t us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:${{ env.TF_VAR_image_tag }} -t us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:latest --cache-from us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:latest .
-        docker push us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:${{ env.TF_VAR_image_tag }}
+        docker build --file=dockerfiles/appserver --target appserver_prod -t us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:${{ env.IMAGE_TAG }} -t us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:latest --cache-from us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:latest .
+        docker push us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:${{ env.IMAGE_TAG }}
         docker push us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:latest
 
     - name: setup terraform
@@ -65,14 +79,14 @@ jobs:
 
     - name: terraform plan
       working-directory: ./terraform/nonprod
-      run: terraform plan -no-color -input=false -out=tfplan
+      run: terraform plan -no-color -input=false -out=tfplan -var-file=.tfvars
 
     - name: terraform apply
       working-directory: ./terraform/nonprod
-      run: terraform apply -no-color -input=false tfplan
+      run: terraform apply -no-color -input=false -var-file=.tfvars tfplan
 
     - name: terraform outputs
       working-directory: ./terraform/nonprod
-      run: terraform output
+      run: terraform output -var-file=.tfvars
 
 
