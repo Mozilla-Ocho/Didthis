@@ -35,7 +35,7 @@ jobs:
         DB_TIER: ${{vars.DB_TIER || 'db-g1-small'}}
         GCP_PROJECT_ID: ${{vars.GCP_PROJECT_ID}}
         GCP_PROJECT_NUMBER: ${{vars.GCP_PROJECT_NUMBER}}
-        IMAGE_TAG: ${{vars.IMAGE_TAG}}
+        IMAGE_TAG: ${{env.IMAGE_TAG}}
         REGION: ${{vars.REGION || 'us-central1'}}
         USE_DUMMY_APPSERVER: ${{vars.USE_DUMMY_APPSERVER}}
       run: |-
@@ -47,7 +47,7 @@ jobs:
         echo "gcp_project_id=$GCP_PROJECT_ID" >> .tfvars
         echo "gcp_project_number=$GCP_PROJECT_NUMBER" >> .tfvars
         echo "image_tag=$IMAGE_TAG" >> .tfvars
-        echo "region=$GCP_REGION" >> .tfvars
+        echo "region=$REGION" >> .tfvars
         echo "use_dummy_appserver=$USE_DUMMY_APPSERVER" >> .tfvars
         cat .tfvars
 
