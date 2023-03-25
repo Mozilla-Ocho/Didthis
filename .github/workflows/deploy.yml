@@ -34,17 +34,18 @@ jobs:
       uses: google-github-actions/setup-gcloud@v1
 
     - name: auth docker
+      # note: it's important to have the regional domain here for auth to succeed
+      # XXX use location var
       run: gcloud auth configure-docker us-central1-docker.pkg.dev
 
     - name: pull latest image for cache
       continue-on-error: true
-      # XXX dynamic path
+      # XXX use vars
       run: docker pull us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:latest
 
     - name: build and push image
       # DRY_r4703 docker name and paths
-      # XXX dynamic path
-      # this is failing due to permission errors on pushing... why?
+      # XXX use vars
       run: |-
         docker build --file=dockerfiles/appserver --target appserver_prod -t us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:${{ github.sha }} -t us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:latest --cache-from us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:latest .
         docker push us-central1-docker.pkg.dev/moz-fx-future-products-nonprod/boilertest1-repo1/appserver:${{ github.sha }}

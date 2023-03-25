@@ -13,6 +13,7 @@ variable "docker_images_tag" {
   type = string
 }
 
+# XXX move this to separate file for easier version control / merges
 locals {
   region = "us-central1"
   app_name = "boilertest1" # XXX must be unique within a gcp project to avoid collision, must work as a subdomain (alphanumeric and dashes, no spaces or underscores)
@@ -22,7 +23,7 @@ locals {
   gcp_project_number = "984891837435" # XXX
   db_tier = "db-g1-small"
   db_deletion_protection = false
-  use_dummy_appserver = true # set true when first standing up the terraform resources
+  use_dummy_appserver = false # set true when first standing up the terraform resources
   lb_cert_domain_change_increment_outage = 1 # bump when domains in the ssl certificate change, THIS CAUSES AN OUTAGE XXX
 } 
 
@@ -127,6 +128,10 @@ module "appserver_main" {
 
 output "gcr_service_url" {
   value = module.appserver_main.service_url
+}
+
+output "gcr_image_deployed" {
+  value = module.appserver_main.image_deployed
 }
 
 # output "public_ip_address" {

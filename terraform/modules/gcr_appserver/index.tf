@@ -1,6 +1,7 @@
 # needs services:
 # - run_api
 
+# XXX separate name and image name
 variable "name" {
   type = string
 }
@@ -121,4 +122,7 @@ output "service_name" {
 }
 output "service_url" {
   value = google_cloud_run_service.appserver.status[0].url
+}
+output "image_deployed" {
+  value = var.use_dummy_appserver ? "${var.name}-hello" : "${var.name}-${var.docker_images_tag}"
 }
