@@ -34,7 +34,7 @@ jobs:
       uses: google-github-actions/setup-gcloud@v1
 
     - name: auth docker
-      run: gcloud auth configure-docker
+      run: gcloud auth configure-docker us-central1-docker.pkg.dev
 
     - name: pull latest image for cache
       continue-on-error: true
