@@ -103,10 +103,10 @@ jobs:
 
     - name: terraform apply
       working-directory: ${{env.TF_FOLDER}}
-      run: terraform apply -no-color -input=false -var-file=.tfvars tfplan
+      run: terraform apply -no-color -input=false tfplan
 
     - name: terraform outputs
       working-directory: ${{env.TF_FOLDER}}
-      run: terraform output -var-file=.tfvars
+      run: terraform output
 
 
