@@ -37,9 +37,8 @@ terraform {
     google = "~> 4.33"
   }
   backend "gcs" {
-    # XXX document creation of bucket: us, standard data, no public access, versioning enabled with 10 versions and 7d retention, then set in github environment vars as BACKEND_TF_STATE_BUCKET
     # note that a bucket value is required here and is passed in from the
-    # github action terraform init step via command line argument.
+    # github action terraform init step via a command line argument.
     prefix  = "terraform/state"
   }
 }

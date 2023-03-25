@@ -5,7 +5,7 @@ app.get('/', (req, res) => {
   console.log(`Received a request.`);
   let response = 'Appserver hello world!'
   res.send(
-    `Appserver hello world! current image tag = ${process.env.IMAGE_TAG || 'none'}`
+    `Appserver hello world! IMAGE_TAG=${process.env.IMAGE_TAG || ''}, NODE_ENV=${process.env.NODE_ENV || ''}`
   );
 });
 
