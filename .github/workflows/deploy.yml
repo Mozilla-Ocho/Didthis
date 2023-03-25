@@ -29,14 +29,14 @@ jobs:
     - name: construct .tfvars
       env:
         APP_NAME: ${{vars.APP_NAME}}
-        AUTOSCALING_MAX: ${{vars.AUTOSCALING_MAX || "2"}}
-        AUTOSCALING_MIN: ${{vars.AUTOSCALING_MIN || "5"}}
-        DB_DELETION_PROTECTION: ${{vars.DB_DELETION_PROTECTION || "true"}}
-        DB_TIER: ${{vars.DB_TIER || "db-g1-small"}}
+        AUTOSCALING_MAX: ${{vars.AUTOSCALING_MAX || '2'}}
+        AUTOSCALING_MIN: ${{vars.AUTOSCALING_MIN || '5'}}
+        DB_DELETION_PROTECTION: ${{vars.DB_DELETION_PROTECTION || 'true'}}
+        DB_TIER: ${{vars.DB_TIER || 'db-g1-small'}}
         GCP_PROJECT_ID: ${{vars.GCP_PROJECT_ID}}
         GCP_PROJECT_NUMBER: ${{vars.GCP_PROJECT_NUMBER}}
         IMAGE_TAG: ${{vars.IMAGE_TAG}}
-        REGION: ${{vars.REGION || "us-central1"}}
+        REGION: ${{vars.REGION || 'us-central1'}}
         USE_DUMMY_APPSERVER: ${{vars.USE_DUMMY_APPSERVER}}
       run: |-
         echo "app_name=$APP_NAME" >> .tfvars
