@@ -118,6 +118,7 @@ module "appserver_main" {
   db_name = var.flag_use_db ? module.db[0].db_name : ""
   db_user = var.flag_use_db ? module.db[0].db_user : ""
   db_pass = var.flag_use_db ? module.db[0].db_pass : ""
+  vpc_access_connector_id = module.vpc.vpc_access_connector_id
   vpc_access_connector_name = module.vpc.vpc_access_connector_name
   autoscaling_min = var.autoscaling_min
   autoscaling_max = var.autoscaling_max

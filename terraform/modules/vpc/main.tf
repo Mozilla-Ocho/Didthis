@@ -126,6 +126,10 @@ resource "google_vpc_access_connector" "connector" {
   region        = var.region
 }
 
+output "vpc_access_connector_id" {
+  value = google_vpc_access_connector.connector.id
+}
+
 output "vpc_access_connector_name" {
   value = google_vpc_access_connector.connector.name
 }

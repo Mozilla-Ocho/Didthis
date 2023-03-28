@@ -59,6 +59,9 @@ variable "autoscaling_max" {
 variable "vpc_access_connector_name" {
   type = string
 }
+variable "vpc_access_connector_id" {
+  type = string
+}
 
 resource "google_cloud_run_v2_job" "default" {
   name = "${local.full_name}-migrate"
@@ -102,6 +105,10 @@ resource "google_cloud_run_v2_job" "default" {
           name = "FLAG_USE_DB"
           value = var.flag_use_db ? "true" : "false"
         }
+      }
+      vpc_access {
+        connector = var.vpc_access_connector_id
+        egress = "ALL_TRAFFIC"
       }
     }
   }
