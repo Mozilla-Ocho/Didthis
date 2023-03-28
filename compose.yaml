@@ -12,7 +12,7 @@ services:
     volumes:
       - ./appserver:/appserver
     working_dir: /appserver
-    command: yarn start_dev
+    command: yarn dev
     environment:
       PORT: 3000
       DATABASE_URL: "postgresql://devuser:devdummypass@pgserver:5432/devdb?schema=public"

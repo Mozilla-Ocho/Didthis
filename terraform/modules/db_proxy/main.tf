@@ -29,7 +29,7 @@ variable "db_pass" {
 }
 
 resource "google_service_account" "account" {
-  account_id  = "cloud-sql-proxy"
+  account_id  = "${var.app_name}-cloud-sql-proxy"
   description = "The service account used by Cloud SQL Proxy to connect to the db"
 }
 

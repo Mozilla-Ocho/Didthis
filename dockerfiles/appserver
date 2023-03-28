@@ -54,7 +54,9 @@ COPY appserver /appserver
 
 WORKDIR /appserver
 
-# the prisma client must be generated on each build?!?! # XXX make sure i'm not crazy...
+# the actual application prisma client must be generated, it's not something
+# that is pulled in from npm. see
+# https://www.prisma.io/docs/concepts/components/prisma-client/working-with-prismaclient/generating-prisma-client
 RUN npx prisma generate
 
 # run-time must set these env vars:
