@@ -76,6 +76,11 @@ resource "google_cloud_run_service" "appserver" {
     spec {
       containers {
         image = var.flag_use_dummy_appserver ? "us-docker.pkg.dev/cloudrun/container/hello:latest" : "${var.image_path_with_slash}${var.image_basename}:${var.image_tag}"
+        resources {
+          limits = {
+            memory = "2048Mi"
+          }
+        }
         env {
           name  = "IMAGE_TAG"
           value = var.image_tag
