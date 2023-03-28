@@ -13,6 +13,9 @@ variable "flag_use_dummy_appserver" {
   # appserver is installed instead.
   type = bool
 }
+variable "flag_use_db" {
+  type = bool
+}
 variable "image_basename" {
   # e.g. appserver
   type = string
