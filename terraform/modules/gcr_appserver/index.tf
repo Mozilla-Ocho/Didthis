@@ -63,57 +63,6 @@ variable "vpc_access_connector_id" {
   type = string
 }
 
-resource "google_cloud_run_v2_job" "default" {
-  name = "${local.full_name}-migrate"
-  location = var.region
-  template {
-    template {
-      containers {
-        image = var.flag_use_dummy_appserver ? "us-docker.pkg.dev/cloudrun/container/hello:latest" : "${var.image_path_with_slash}${var.image_basename}:${var.image_tag}"
-        command = ["npx","prisma","migrate","deploy"]
-        env {
-          name  = "IMAGE_TAG"
-          value = var.image_tag
-        }
-        env {
-          name  = "DB_HOST"
-          value = var.db_host
-        }
-        env {
-          name = "DB_NAME"
-          value = var.db_name
-        }
-        env {
-          name = "DB_USER"
-          value = var.db_user
-        }
-        env {
-          name = "DB_PASS"
-          value = var.db_pass
-        }
-        env {
-          # prisma wants the values in this format
-          name = "DATABASE_URL"
-          value = "postgresql://${var.db_user}:${var.db_pass}@${var.db_host}/${var.db_name}?schema=public"
-        }
-        env {
-          # psql cli can't handle the schema queryparam so make this version available too.
-          name = "DATABASE_URL_NO_QS"
-          value = "postgresql://${var.db_user}:${var.db_pass}@${var.db_host}/${var.db_name}"
-        }
-        env {
-          name = "FLAG_USE_DB"
-          value = var.flag_use_db ? "true" : "false"
-        }
-      }
-      vpc_access {
-        connector = var.vpc_access_connector_id
-        egress = "ALL_TRAFFIC"
-      }
-    }
-  }
-}
-
 resource "google_cloud_run_service" "appserver" {
   name = local.full_name
   location = var.region
@@ -204,6 +153,108 @@ resource "google_cloud_run_service_iam_member" "run_all_users" {
   member   = "allUsers"
   depends_on = [google_cloud_run_service.appserver]
 }
+
+resource "google_cloud_run_v2_job" "default" {
+  name = "${local.full_name}-seed"
+  location = var.region
+  template {
+    template {
+      containers {
+        image = var.flag_use_dummy_appserver ? "us-docker.pkg.dev/cloudrun/container/hello:latest" : "${var.image_path_with_slash}${var.image_basename}:${var.image_tag}"
+        command = ["npx","prisma","db","seed"]
+        env {
+          name  = "IMAGE_TAG"
+          value = var.image_tag
+        }
+        env {
+          name  = "DB_HOST"
+          value = var.db_host
+        }
+        env {
+          name = "DB_NAME"
+          value = var.db_name
+        }
+        env {
+          name = "DB_USER"
+          value = var.db_user
+        }
+        env {
+          name = "DB_PASS"
+          value = var.db_pass
+        }
+        env {
+          # prisma wants the values in this format
+          name = "DATABASE_URL"
+          value = "postgresql://${var.db_user}:${var.db_pass}@${var.db_host}/${var.db_name}?schema=public"
+        }
+        env {
+          # psql cli can't handle the schema queryparam so make this version available too.
+          name = "DATABASE_URL_NO_QS"
+          value = "postgresql://${var.db_user}:${var.db_pass}@${var.db_host}/${var.db_name}"
+        }
+        env {
+          name = "FLAG_USE_DB"
+          value = var.flag_use_db ? "true" : "false"
+        }
+      }
+      vpc_access {
+        connector = var.vpc_access_connector_id
+        egress = "ALL_TRAFFIC"
+      }
+    }
+  }
+}
+resource "google_cloud_run_v2_job" "default" {
+  name = "${local.full_name}-migrate"
+  location = var.region
+  template {
+    template {
+      containers {
+        image = var.flag_use_dummy_appserver ? "us-docker.pkg.dev/cloudrun/container/hello:latest" : "${var.image_path_with_slash}${var.image_basename}:${var.image_tag}"
+        command = ["npx","prisma","migrate","deploy"]
+        env {
+          name  = "IMAGE_TAG"
+          value = var.image_tag
+        }
+        env {
+          name  = "DB_HOST"
+          value = var.db_host
+        }
+        env {
+          name = "DB_NAME"
+          value = var.db_name
+        }
+        env {
+          name = "DB_USER"
+          value = var.db_user
+        }
+        env {
+          name = "DB_PASS"
+          value = var.db_pass
+        }
+        env {
+          # prisma wants the values in this format
+          name = "DATABASE_URL"
+          value = "postgresql://${var.db_user}:${var.db_pass}@${var.db_host}/${var.db_name}?schema=public"
+        }
+        env {
+          # psql cli can't handle the schema queryparam so make this version available too.
+          name = "DATABASE_URL_NO_QS"
+          value = "postgresql://${var.db_user}:${var.db_pass}@${var.db_host}/${var.db_name}"
+        }
+        env {
+          name = "FLAG_USE_DB"
+          value = var.flag_use_db ? "true" : "false"
+        }
+      }
+      vpc_access {
+        connector = var.vpc_access_connector_id
+        egress = "ALL_TRAFFIC"
+      }
+    }
+  }
+}
+
 
 output "service_name" {
   value = google_cloud_run_service.appserver.name
