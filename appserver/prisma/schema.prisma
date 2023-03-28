@@ -3,6 +3,10 @@
 
 generator client {
   provider = "prisma-client-js"
+  # i am getting segfaults on GCP cloud run. not sure why, this issue suggests
+  # switching from the library (default) to the binary prisma engine
+  # https://github.com/prisma/prisma/issues/10649
+  engineType = "binary"
 }
 
 datasource db {
