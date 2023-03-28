@@ -1,19 +1,24 @@
 const express = require('express');
 const app = express();
 const escapeHtml = require('escape-html')
-const { PrismaClient } = require('@prisma/client');
+// const { PrismaClient } = require('@prisma/client');
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
 app.get('/', async (req, res) => {
   console.log(`Received a request.`);
   
   let queryResult
-  try {
-    queryResult =  await prisma.DummyRecord.findMany()
-  } catch(e) {
-    queryResult = {"error":e,"message":e.message}
-  }
+  // if (process.env.FLAG_USE_DB === 'true') {
+  //   try {
+  //     queryResult =  await prisma.DummyRecord.findMany()
+  //   } catch(e) {
+  //     queryResult = {"error":e,"message":e.message}
+  //   }
+  // } else {
+  //   queryResult = "db flag is disabled"
+  // }
+  queryResult = "prisma problems"
 
   res.send(
     `<html><body>

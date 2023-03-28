@@ -108,6 +108,7 @@ module "appserver_main" {
   source = "../modules/gcr_appserver"
   app_name = var.app_name
   name = "appserver-main"
+  flag_use_db = var.flag_use_db
   flag_use_dummy_appserver = var.flag_use_dummy_appserver
   image_basename = "appserver"
   image_tag = var.image_tag

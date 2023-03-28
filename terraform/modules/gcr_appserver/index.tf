@@ -103,6 +103,10 @@ resource "google_cloud_run_service" "appserver" {
           name = "DATABASE_URL_NO_QS"
           value = "postgresql://${var.db_user}:${var.db_pass}@${var.db_host}/${var.db_name}"
         }
+        env {
+          name = "FLAG_USE_DB"
+          value = var.flag_use_db ? "true" : "false"
+        }
       }
     }
     metadata {
