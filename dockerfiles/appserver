@@ -33,6 +33,8 @@ FROM appserver_base as appserver_dev
 
 ENV NODE_ENV=development
 
+CMD yarn dev
+
 # --------------------------------------------------------------
 # prod image
 # --------------------------------------------------------------

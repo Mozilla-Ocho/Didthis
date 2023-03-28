@@ -12,12 +12,37 @@ services:
     volumes:
       - ./appserver:/appserver
     working_dir: /appserver
-    command: yarn start
+    command: yarn start_dev
     environment:
       PORT: 3000
+      DATABASE_URL: "postgresql://devuser:devdummypass@pgserver:5432/devdb?schema=public"
+      DATABASE_URL_NO_QS: "postgresql://devuser:devdummypass@pgserver:5432/devdb"
     ports:
       - "3000:3000"
+    depends_on:
+      pgserver:
+        condition: service_healthy
+
+  pgserver:
+    image: "postgres:14"
+    networks:
+      - allhosts
+    environment:
+      POSTGRES_USER: devuser
+      POSTGRES_DB: devdb
+      POSTGRES_PASSWORD: devdummypass
+    ports:
+      - '5432:5432'
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devuser -d devdb"]
+      interval: 4s
+      timeout: 4s
+      retries: 20
 
 networks:
   allhosts:
 
+volumes:
+  dbdata:

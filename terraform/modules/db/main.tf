@@ -36,8 +36,8 @@ variable "db_deletion_protection" {
 
 resource "random_password" "maindbpass" {
   length           = 16
-  special          = true
-  override_special = "!#$%&*()-_=+[]{}<>:?"
+  # no special chars, makes it easier to compose into a DATABASE_URL
+  special          = false
 }
 
 # }}}

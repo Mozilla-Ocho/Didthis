@@ -1,11 +1,30 @@
 const express = require('express');
 const app = express();
+const escapeHtml = require('escape-html')
+const { PrismaClient } = require('@prisma/client');
 
-app.get('/', (req, res) => {
+const prisma = new PrismaClient();
+
+app.get('/', async (req, res) => {
   console.log(`Received a request.`);
-  let response = 'Appserver hello world!'
+  
+  let queryResult
+  try {
+    queryResult =  await prisma.DummyRecord.findMany()
+  } catch(e) {
+    queryResult = {"error":e,"message":e.message}
+  }
+
   res.send(
-    `Appserver hello world! IMAGE_TAG=${process.env.IMAGE_TAG || ''}, NODE_ENV=${process.env.NODE_ENV || ''}`
+    `<html><body>
+      <h1>Appserver hello world</h1>
+      <p>some env vars:</p>
+      <p>NODE_ENV=${escapeHtml(process.env.NODE_ENV || '(none)')}</p>
+      <p>IMAGE_TAG=${escapeHtml(process.env.IMAGE_TAG || '(none)')}</p>
+      <p>a db query:</p>
+      <p>${escapeHtml(JSON.stringify(queryResult))}</p>
+     </body></html>
+    `
   );
 });
 

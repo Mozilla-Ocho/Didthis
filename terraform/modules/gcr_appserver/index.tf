@@ -93,6 +93,16 @@ resource "google_cloud_run_service" "appserver" {
           name = "DB_PASS"
           value = var.db_pass
         }
+        env {
+          # prisma wants the values in this format
+          name = "DATABASE_URL"
+          value = "postgresql://${var.db_user}:${var.db_pass}@${var.db_host}/${var.db_name}?schema=public"
+        }
+        env {
+          # psql cli can't handle the schema queryparam so make this version available too.
+          name = "DATABASE_URL_NO_QS"
+          value = "postgresql://${var.db_user}:${var.db_pass}@${var.db_host}/${var.db_name}"
+        }
       }
     }
     metadata {

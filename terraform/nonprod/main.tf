@@ -62,27 +62,27 @@ module "vpc" {
   depends_on = [module.gcp_apis]
 }
 
-# module "db" {
-#   source = "../modules/db"
-#   db_name = "${var.app_name}-pgmain"
-#   db_tier = var.db_tier
-#   region = var.region
-#   vpc_id = module.vpc.vpc_id
-#   db_deletion_protection = var.db_deletion_protection
-#   depends_on = [module.vpc, module.gcp_apis]
-# }
+module "db" {
+  source = "../modules/db"
+  db_name = "${var.app_name}-pgmain"
+  db_tier = var.db_tier
+  region = var.region
+  vpc_id = module.vpc.vpc_id
+  db_deletion_protection = var.db_deletion_protection
+  depends_on = [module.vpc, module.gcp_apis]
+}
 
-# module "db_proxy" {
-#   source = "../modules/db_proxy"
-#   app_name  = var.app_name
-#   gcp_project_id = var.gcp_project_id
-#   vpc_id = module.vpc.vpc_id
-#   db_connection_name = module.db.connection_name
-#   db_user = module.db.db_user
-#   db_name = module.db.db_name
-#   db_pass = module.db.db_pass
-#   depends_on = [module.gcp_apis]
-# }
+module "db_proxy" {
+  source = "../modules/db_proxy"
+  app_name  = var.app_name
+  gcp_project_id = var.gcp_project_id
+  vpc_id = module.vpc.vpc_id
+  db_connection_name = module.db.connection_name
+  db_user = module.db.db_user
+  db_name = module.db.db_name
+  db_pass = module.db.db_pass
+  depends_on = [module.gcp_apis]
+}
 
 module "docker_repo" {
   source = "../modules/docker_repo"
@@ -107,11 +107,10 @@ module "appserver_main" {
   image_tag = var.image_tag
   image_path_with_slash = module.docker_repo.image_path_with_slash
   region = var.region
-
-  # db_host = module.db.private_ip_address
-  # db_name = module.db.db_name
-  # db_user = module.db.db_user
-  # db_pass = module.db.db_pass
+  db_host = module.db.private_ip_address
+  db_name = module.db.db_name
+  db_user = module.db.db_user
+  db_pass = module.db.db_pass
   vpc_access_connector_name = module.vpc.vpc_access_connector_name
   autoscaling_min = var.autoscaling_min
   autoscaling_max = var.autoscaling_max
