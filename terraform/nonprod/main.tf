@@ -14,7 +14,7 @@ variable "gcp_project_number" {
   # this is still a string
   type = string
 }
-variable "use_dummy_appserver" {
+variable "flag_use_dummy_appserver" {
   # set true when first standing up the terraform resources
   type = bool
 }
@@ -29,6 +29,9 @@ variable "db_deletion_protection" {
 }
 variable "db_tier" {
   type = string
+}
+variable "flag_use_db" {
+  type = bool
 }
 
 terraform {
@@ -63,6 +66,8 @@ module "vpc" {
 }
 
 module "db" {
+  # XXX add to initial docs that this can take ~15min to create the first time
+  count = var.flag_use_db ? 1 : 0
   source = "../modules/db"
   db_name = "${var.app_name}-pgmain"
   db_tier = var.db_tier
@@ -73,14 +78,15 @@ module "db" {
 }
 
 module "db_proxy" {
+  count = var.flag_use_db ? 1 : 0
   source = "../modules/db_proxy"
   app_name  = var.app_name
   gcp_project_id = var.gcp_project_id
   vpc_id = module.vpc.vpc_id
-  db_connection_name = module.db.connection_name
-  db_user = module.db.db_user
-  db_name = module.db.db_name
-  db_pass = module.db.db_pass
+  db_connection_name = module.db[0].connection_name
+  db_user = module.db[0].db_user
+  db_name = module.db[0].db_name
+  db_pass = module.db[0].db_pass
   depends_on = [module.gcp_apis]
 }
 
@@ -102,22 +108,22 @@ module "appserver_main" {
   source = "../modules/gcr_appserver"
   app_name = var.app_name
   name = "appserver-main"
-  use_dummy_appserver = var.use_dummy_appserver
+  flag_use_dummy_appserver = var.flag_use_dummy_appserver
   image_basename = "appserver"
   image_tag = var.image_tag
   image_path_with_slash = module.docker_repo.image_path_with_slash
   region = var.region
-  db_host = module.db.private_ip_address
-  db_name = module.db.db_name
-  db_user = module.db.db_user
-  db_pass = module.db.db_pass
+  db_host = var.flag_use_db ? module.db[0].private_ip_address : ""
+  db_name = var.flag_use_db ? module.db[0].db_name : ""
+  db_user = var.flag_use_db ? module.db[0].db_user : ""
+  db_pass = var.flag_use_db ? module.db[0].db_pass : ""
   vpc_access_connector_name = module.vpc.vpc_access_connector_name
   autoscaling_min = var.autoscaling_min
   autoscaling_max = var.autoscaling_max
   depends_on = [
     module.gcp_apis,
     module.docker_repo,
-    # module.db,
+    module.db[0],
     module.vpc
   ]
 }
@@ -149,8 +155,8 @@ output "gcr_image_deployed" {
 #   value = module.lb_main.dns_records
 # }
 
-# output "db_proxy_public_ip" {
-#   value = module.db_proxy.public_ip
-# }
+output "db_proxy_public_ip" {
+  value = var.flag_use_db ? module.db_proxy[0].public_ip : "none"
+}
 
 

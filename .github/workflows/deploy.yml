@@ -39,22 +39,24 @@ jobs:
         AUTOSCALING_MIN: ${{vars.AUTOSCALING_MIN || '5'}}
         DB_DELETION_PROTECTION: ${{vars.DB_DELETION_PROTECTION || 'true'}}
         DB_TIER: ${{vars.DB_TIER || 'db-g1-small'}}
+        FLAG_USE_DB: ${{vars.FLAG_USE_DB}}
+        FLAG_USE_DUMMY_APPSERVER: ${{vars.FLAG_USE_DUMMY_APPSERVER}}
         GCP_PROJECT_ID: ${{vars.GCP_PROJECT_ID}}
         GCP_PROJECT_NUMBER: ${{vars.GCP_PROJECT_NUMBER}}
         IMAGE_TAG: ${{env.IMAGE_TAG}}
         REGION: ${{vars.REGION || 'us-central1'}}
-        USE_DUMMY_APPSERVER: ${{vars.USE_DUMMY_APPSERVER}}
       run: |-
         echo "app_name=\"$APP_NAME\"" >> .tfvars
         echo "autoscaling_max=$AUTOSCALING_MAX" >> .tfvars
         echo "autoscaling_min=$AUTOSCALING_MIN" >> .tfvars
         echo "db_deletion_protection=$DB_DELETION_PROTECTION" >> .tfvars
         echo "db_tier=\"$DB_TIER\"" >> .tfvars
+        echo "flag_use_dummy_appserver=$FLAG_USE_DUMMY_APPSERVER" >> .tfvars
+        echo "flag_use_db=$FLAG_USE_DB" >> .tfvars
         echo "gcp_project_id=\"$GCP_PROJECT_ID\"" >> .tfvars
         echo "gcp_project_number=\"$GCP_PROJECT_NUMBER\"" >> .tfvars
         echo "image_tag=\"$IMAGE_TAG\"" >> .tfvars
         echo "region=\"$REGION\"" >> .tfvars
-        echo "use_dummy_appserver=$USE_DUMMY_APPSERVER" >> .tfvars
         cat .tfvars
         mv .tfvars ${{env.TF_FOLDER}}/.tfvars
 
