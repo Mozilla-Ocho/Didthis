@@ -4,7 +4,7 @@ variable "app_name" {
   type = string
 }
 
-variable "project_id" {
+variable "gcp_project_id" {
   type = string
 }
 
@@ -34,7 +34,7 @@ resource "google_service_account" "account" {
 }
 
 resource "google_project_iam_member" "role" {
-  project = var.project_id
+  project = var.gcp_project_id
   role    = "roles/cloudsql.editor"
   member  = "serviceAccount:${google_service_account.account.email}"
 }
