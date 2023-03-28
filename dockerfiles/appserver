@@ -55,7 +55,7 @@ COPY appserver /appserver
 WORKDIR /appserver
 
 # the prisma client must be generated on each build?!?! # XXX make sure i'm not crazy...
-npx prisma generate
+RUN npx prisma generate
 
 # run-time must set these env vars:
 # PORT (for nodejs to listen on)
