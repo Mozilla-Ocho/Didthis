@@ -154,8 +154,8 @@ resource "google_cloud_run_service_iam_member" "run_all_users" {
   depends_on = [google_cloud_run_service.appserver]
 }
 
-resource "google_cloud_run_v2_job" "default" {
-  name = "${local.full_name}-seed"
+resource "google_cloud_run_v2_job" "db-seed" {
+  name = "${local.full_name}-db-seed"
   location = var.region
   template {
     template {
@@ -204,8 +204,8 @@ resource "google_cloud_run_v2_job" "default" {
     }
   }
 }
-resource "google_cloud_run_v2_job" "default" {
-  name = "${local.full_name}-migrate"
+resource "google_cloud_run_v2_job" "db-migrate" {
+  name = "${local.full_name}-db-migrate"
   location = var.region
   template {
     template {
