@@ -108,7 +108,7 @@ resource "google_cloud_run_service" "appserver" {
         }
         env {
           name = "FLAG_USE_DB"
-          value = var.flag_use_db ? "enabled" : "disabled"
+          value = var.flag_use_db ? "true" : "false"
         }
       }
     }
