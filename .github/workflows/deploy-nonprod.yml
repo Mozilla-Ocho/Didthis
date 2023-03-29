@@ -7,8 +7,8 @@ on:
 
 jobs:
   call-deploy:
-    environment: nonprod
     uses: ./.github/workflows/deploy.yml
+    environment: nonprod
     with:
       REGION: ${{ vars.REGION }}
       GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
