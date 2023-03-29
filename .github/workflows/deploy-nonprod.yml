@@ -1,0 +1,22 @@
+name: deploy to nonprod env
+
+on:
+  push:
+    branches:
+      - releases/nonprod
+
+jobs:
+  call-deploy:
+    environment: nonprod
+    uses: ./.github/workflows/deploy.yml
+    with:
+      REGION: ${{ vars.REGION }}
+      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      APP_NAME: ${{ vars.APP_NAME }}
+      TF_BACKEND_STATE_BUCKET: ${{ vars.TF_BACKEND_STATE_BUCKET }}
+      TF_VARS_FILE: ${{ vars.TF_VARS_FILE }}
+    secrets:
+      TF_PROVISIONER_SVC_ACCOUNT_NAME: ${{ secrets.TF_PROVISIONER_SVC_ACCOUNT_NAME }}
+      TF_PROVISIONER_SVC_ACCOUNT_KEY_JSON: ${{ secrets.TF_PROVISIONER_SVC_ACCOUNT_KEY_JSON }}
+
+
