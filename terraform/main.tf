@@ -1,7 +1,7 @@
 variable "app_name" {
   type = string
 }
-variable "image_tag" {
+variable "env_name" {
   type = string
 }
 variable "region" {
@@ -11,18 +11,13 @@ variable "gcp_project_id" {
   type = string
 }
 variable "gcp_project_number" {
-  # this is still a string
-  type = string
+  type = string # it's a number in practice but a string in these configs
 }
 variable "flag_use_dummy_appserver" {
-  # set true when first standing up the terraform resources
   type = bool
 }
-variable "autoscaling_min" {
-  type = number
-}
-variable "autoscaling_max" {
-  type = number
+variable "flag_use_db" {
+  type = bool
 }
 variable "db_deletion_protection" {
   type = bool
@@ -30,8 +25,16 @@ variable "db_deletion_protection" {
 variable "db_tier" {
   type = string
 }
-variable "flag_use_db" {
-  type = bool
+variable "autoscaling_min" {
+  type = number
+}
+variable "autoscaling_max" {
+  type = number
+}
+variable "image_tag" {
+  # this var is not defined in the vars file, it's passed in at runtime via the
+  # CLI in the github action job because it changes for each run.
+  type = string
 }
 
 terraform {
@@ -40,8 +43,8 @@ terraform {
     google = "~> 4.33"
   }
   backend "gcs" {
-    # note that a bucket value is required here and is passed in from the
-    # github action terraform init step via a command line argument.
+    # note that a bucket value is required here but is passed in from the
+    # terraform init step via a command line argument.
     prefix  = "terraform/state"
   }
 }
@@ -53,11 +56,11 @@ provider "google" {
 }
 
 module "gcp_apis" {
-  source = "../modules/gcp_apis"
+  source = "modules/gcp_apis"
 }
 
 module "vpc" {
-  source = "../modules/vpc"
+  source = "modules/vpc"
   app_name = var.app_name
   region = var.region
   gcp_project_id = var.gcp_project_id
@@ -66,9 +69,8 @@ module "vpc" {
 }
 
 module "db" {
-  # XXX add to initial docs that this can take ~15min to create the first time
   count = var.flag_use_db ? 1 : 0
-  source = "../modules/db"
+  source = "modules/db"
   db_name = "${var.app_name}-pgmain"
   db_tier = var.db_tier
   region = var.region
@@ -79,7 +81,7 @@ module "db" {
 
 module "db_proxy" {
   count = var.flag_use_db ? 1 : 0
-  source = "../modules/db_proxy"
+  source = "modules/db_proxy"
   app_name  = var.app_name
   gcp_project_id = var.gcp_project_id
   vpc_id = module.vpc.vpc_id
@@ -91,7 +93,7 @@ module "db_proxy" {
 }
 
 module "docker_repo" {
-  source = "../modules/docker_repo"
+  source = "modules/docker_repo"
   region = var.region
   gcp_project_id = var.gcp_project_id
   app_name = var.app_name
@@ -99,15 +101,16 @@ module "docker_repo" {
 }
 
 # module "firebase" {
-#   source = "../modules/firebase"
+#   source = "modules/firebase"
 #   gcp_project_id = var.gcp_project_id
 #   depends_on = [module.gcp_apis]
 # }
 
 module "appserver_main" {
-  source = "../modules/gcr_appserver"
+  source = "modules/gcr_appserver"
   app_name = var.app_name
-  name = "appserver-main"
+  env_name = var.env_name
+  svc_name = "appserver"
   flag_use_db = var.flag_use_db
   flag_use_dummy_appserver = var.flag_use_dummy_appserver
   image_basename = "appserver"
@@ -131,7 +134,7 @@ module "appserver_main" {
 }
 
 # module "lb_main" {
-#   source = "../modules/lb"
+#   source = "modules/lb"
 #   prefix = var.app_name
 #   name = "main"
 #   region = var.region
@@ -160,5 +163,4 @@ output "gcr_image_deployed" {
 output "db_proxy_public_ip" {
   value = var.flag_use_db ? module.db_proxy[0].public_ip : "none"
 }
-
 

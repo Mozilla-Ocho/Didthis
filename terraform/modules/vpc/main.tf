@@ -1,7 +1,3 @@
-# the following apis must be enabled
-# - vpcaccess
-# - servicenetworking
-
 # NOTE ON DELETION:
 # XXX discuss this in a teardown doc
 # there is currently a bug in gcp that prevents deletion of a vpc when dangling

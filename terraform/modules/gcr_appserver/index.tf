@@ -1,16 +1,17 @@
-variable "name" {
+variable "svc_name" {
+  # the key role for the cloud run service in the architecture e.g. "appserver"
   type = string
 }
 variable "app_name" {
   type = string
 }
-locals {
-  full_name = "${var.app_name}-${var.name}"
+variable "env_name" {
+  type = string
 }
-
+locals {
+  full_name = "${var.app_name}-${var.env_name}-${var.svc_name}"
+}
 variable "flag_use_dummy_appserver" {
-  # if true, full_image_name is not used and instead a dummy hello world
-  # appserver is installed instead.
   type = bool
 }
 variable "flag_use_db" {
@@ -26,7 +27,6 @@ variable "image_path_with_slash" {
   type = string
 }
 variable "image_tag" {
-  # e.g. the 7-char git short sha
   type = string
 }
 variable "region" {
@@ -63,6 +63,59 @@ variable "vpc_access_connector_id" {
   type = string
 }
 
+locals {
+  # the cloud run server, and all the jobs, all get the same env vars. keep it
+  # DRY by using terraform dynamic blocks.
+  common_env_var_defs = [
+    {
+      name  = "APP_NAME"
+      value = var.app_name
+    },
+    {
+      name  = "SVC_NAME"
+      value = var.svc_name
+    },
+    {
+      name  = "ENV_NAME"
+      value = var.env_name
+    },
+    {
+      name  = "IMAGE_TAG"
+      value = var.image_tag
+    },
+    {
+      name  = "DB_HOST"
+      value = var.db_host
+    },
+    {
+      name = "DB_NAME"
+      value = var.db_name
+    },
+    {
+      name = "DB_USER"
+      value = var.db_user
+    },
+    {
+      name = "DB_PASS"
+      value = var.db_pass
+    },
+    {
+      # prisma wants the values in this format
+      name = "DATABASE_URL"
+      value = "postgresql://${var.db_user}:${var.db_pass}@${var.db_host}/${var.db_name}?schema=public"
+    },
+    {
+      # psql cli can't handle the schema queryparam so make this version available too.
+      name = "DATABASE_URL_NO_QS"
+      value = "postgresql://${var.db_user}:${var.db_pass}@${var.db_host}/${var.db_name}"
+    },
+    {
+      name = "FLAG_USE_DB"
+      value = var.flag_use_db ? "true" : "false"
+    }
+  ]
+}
+
 resource "google_cloud_run_service" "appserver" {
   name = local.full_name
   location = var.region
@@ -79,39 +132,13 @@ resource "google_cloud_run_service" "appserver" {
     spec {
       containers {
         image = var.flag_use_dummy_appserver ? "us-docker.pkg.dev/cloudrun/container/hello:latest" : "${var.image_path_with_slash}${var.image_basename}:${var.image_tag}"
-        env {
-          name  = "IMAGE_TAG"
-          value = var.image_tag
-        }
-        env {
-          name  = "DB_HOST"
-          value = var.db_host
-        }
-        env {
-          name = "DB_NAME"
-          value = var.db_name
-        }
-        env {
-          name = "DB_USER"
-          value = var.db_user
-        }
-        env {
-          name = "DB_PASS"
-          value = var.db_pass
-        }
-        env {
-          # prisma wants the values in this format
-          name = "DATABASE_URL"
-          value = "postgresql://${var.db_user}:${var.db_pass}@${var.db_host}/${var.db_name}?schema=public"
-        }
-        env {
-          # psql cli can't handle the schema queryparam so make this version available too.
-          name = "DATABASE_URL_NO_QS"
-          value = "postgresql://${var.db_user}:${var.db_pass}@${var.db_host}/${var.db_name}"
-        }
-        env {
-          name = "FLAG_USE_DB"
-          value = var.flag_use_db ? "true" : "false"
+        dynamic "env" {
+          for_each local.common_env_var_defs
+          iterator = item
+          content {
+            name = item.value.name
+            value = item.value.value
+          }
         }
       }
     }
@@ -162,39 +189,13 @@ resource "google_cloud_run_v2_job" "db-seed" {
       containers {
         image = var.flag_use_dummy_appserver ? "us-docker.pkg.dev/cloudrun/container/hello:latest" : "${var.image_path_with_slash}${var.image_basename}:${var.image_tag}"
         command = ["npx","prisma","db","seed"]
-        env {
-          name  = "IMAGE_TAG"
-          value = var.image_tag
-        }
-        env {
-          name  = "DB_HOST"
-          value = var.db_host
-        }
-        env {
-          name = "DB_NAME"
-          value = var.db_name
-        }
-        env {
-          name = "DB_USER"
-          value = var.db_user
-        }
-        env {
-          name = "DB_PASS"
-          value = var.db_pass
-        }
-        env {
-          # prisma wants the values in this format
-          name = "DATABASE_URL"
-          value = "postgresql://${var.db_user}:${var.db_pass}@${var.db_host}/${var.db_name}?schema=public"
-        }
-        env {
-          # psql cli can't handle the schema queryparam so make this version available too.
-          name = "DATABASE_URL_NO_QS"
-          value = "postgresql://${var.db_user}:${var.db_pass}@${var.db_host}/${var.db_name}"
-        }
-        env {
-          name = "FLAG_USE_DB"
-          value = var.flag_use_db ? "true" : "false"
+        dynamic "env" {
+          for_each local.common_env_var_defs
+          iterator = item
+          content {
+            name = item.value.name
+            value = item.value.value
+          }
         }
       }
       vpc_access {
@@ -212,39 +213,13 @@ resource "google_cloud_run_v2_job" "db-migrate" {
       containers {
         image = var.flag_use_dummy_appserver ? "us-docker.pkg.dev/cloudrun/container/hello:latest" : "${var.image_path_with_slash}${var.image_basename}:${var.image_tag}"
         command = ["npx","prisma","migrate","deploy"]
-        env {
-          name  = "IMAGE_TAG"
-          value = var.image_tag
-        }
-        env {
-          name  = "DB_HOST"
-          value = var.db_host
-        }
-        env {
-          name = "DB_NAME"
-          value = var.db_name
-        }
-        env {
-          name = "DB_USER"
-          value = var.db_user
-        }
-        env {
-          name = "DB_PASS"
-          value = var.db_pass
-        }
-        env {
-          # prisma wants the values in this format
-          name = "DATABASE_URL"
-          value = "postgresql://${var.db_user}:${var.db_pass}@${var.db_host}/${var.db_name}?schema=public"
-        }
-        env {
-          # psql cli can't handle the schema queryparam so make this version available too.
-          name = "DATABASE_URL_NO_QS"
-          value = "postgresql://${var.db_user}:${var.db_pass}@${var.db_host}/${var.db_name}"
-        }
-        env {
-          name = "FLAG_USE_DB"
-          value = var.flag_use_db ? "true" : "false"
+        dynamic "env" {
+          for_each local.common_env_var_defs
+          iterator = item
+          content {
+            name = item.value.name
+            value = item.value.value
+          }
         }
       }
       vpc_access {

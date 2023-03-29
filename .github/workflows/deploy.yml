@@ -1,17 +1,13 @@
-name: deploy terraform - nonprod
+name: deploy terraform
 
 on:
   push:
     branches:
-      - releases/nonprod
-
-env:
-  TF_FOLDER: ./terraform/nonprod
+      - releases/*
 
 jobs:
   terraform:
     name: Terraform
-    environment: nonprod
     defaults:
       run:
         shell: bash
@@ -32,34 +28,6 @@ jobs:
       env:
         CONCATENATED: ${{format('{0}-docker.pkg.dev/{1}/{2}-repo1', vars.REGION, vars.GCP_PROJECT_ID, vars.APP_NAME)}}
 
-    - name: construct .tfvars
-      env:
-        APP_NAME: ${{vars.APP_NAME}}
-        AUTOSCALING_MAX: ${{vars.AUTOSCALING_MAX || '2'}}
-        AUTOSCALING_MIN: ${{vars.AUTOSCALING_MIN || '5'}}
-        DB_DELETION_PROTECTION: ${{vars.DB_DELETION_PROTECTION || 'true'}}
-        DB_TIER: ${{vars.DB_TIER || 'db-g1-small'}}
-        FLAG_USE_DB: ${{vars.FLAG_USE_DB}}
-        FLAG_USE_DUMMY_APPSERVER: ${{vars.FLAG_USE_DUMMY_APPSERVER}}
-        GCP_PROJECT_ID: ${{vars.GCP_PROJECT_ID}}
-        GCP_PROJECT_NUMBER: ${{vars.GCP_PROJECT_NUMBER}}
-        IMAGE_TAG: ${{env.IMAGE_TAG}}
-        REGION: ${{vars.REGION || 'us-central1'}}
-      run: |-
-        echo "app_name=\"$APP_NAME\"" >> .tfvars
-        echo "autoscaling_max=$AUTOSCALING_MAX" >> .tfvars
-        echo "autoscaling_min=$AUTOSCALING_MIN" >> .tfvars
-        echo "db_deletion_protection=$DB_DELETION_PROTECTION" >> .tfvars
-        echo "db_tier=\"$DB_TIER\"" >> .tfvars
-        echo "flag_use_dummy_appserver=$FLAG_USE_DUMMY_APPSERVER" >> .tfvars
-        echo "flag_use_db=$FLAG_USE_DB" >> .tfvars
-        echo "gcp_project_id=\"$GCP_PROJECT_ID\"" >> .tfvars
-        echo "gcp_project_number=\"$GCP_PROJECT_NUMBER\"" >> .tfvars
-        echo "image_tag=\"$IMAGE_TAG\"" >> .tfvars
-        echo "region=\"$REGION\"" >> .tfvars
-        cat .tfvars
-        mv .tfvars ${{env.TF_FOLDER}}/.tfvars
-
     - name: auth to gcp
       uses: google-github-actions/auth@v1
       with:
@@ -75,7 +43,7 @@ jobs:
 
     - name: pull latest image for cache
       continue-on-error: true
-      run: docker pull ${{vars.REGION}}-docker.pkg.dev/${{vars.GCP_PROJECT_ID}}/${{vars.APP_NAME}}-repo1/appserver:latest
+      run: docker pull $IMAGE_PATH/appserver:latest
 
     - name: build and push image
       run: |-
@@ -90,19 +58,19 @@ jobs:
         terraform_wrapper: false
 
     - name: terraform init
-      working-directory: ${{env.TF_FOLDER}}
-      run: terraform init --backend-config="bucket=${{vars.BACKEND_TF_STATE_BUCKET}}"
+      working-directory: ./terraform
+      run: terraform init --backend-config="bucket=${{vars.TF_BACKEND_STATE_BUCKET}}"
 
     - name: terraform plan
-      working-directory: ${{env.TF_FOLDER}}
-      run: terraform plan -no-color -input=false -out=tfplan -var-file=.tfvars
+      working-directory: ./terraform
+      run: terraform plan -no-color -input=false -out=tfplan -var-file=${{vars.TF_VARS_FILE}} -var="image_tag=$IMAGE_TAG"
 
     - name: terraform apply
-      working-directory: ${{env.TF_FOLDER}}
+      working-directory: ./terraform
       run: terraform apply -no-color -input=false tfplan
 
     - name: terraform outputs
-      working-directory: ${{env.TF_FOLDER}}
+      working-directory: ./terraform
       run: terraform output
 
 
