@@ -133,7 +133,7 @@ resource "google_cloud_run_service" "appserver" {
       containers {
         image = var.flag_use_dummy_appserver ? "us-docker.pkg.dev/cloudrun/container/hello:latest" : "${var.image_path_with_slash}${var.image_basename}:${var.image_tag}"
         dynamic "env" {
-          for_each local.common_env_var_defs
+          for_each = local.common_env_var_defs
           iterator = item
           content {
             name = item.value.name
@@ -190,7 +190,7 @@ resource "google_cloud_run_v2_job" "db-seed" {
         image = var.flag_use_dummy_appserver ? "us-docker.pkg.dev/cloudrun/container/hello:latest" : "${var.image_path_with_slash}${var.image_basename}:${var.image_tag}"
         command = ["npx","prisma","db","seed"]
         dynamic "env" {
-          for_each local.common_env_var_defs
+          for_each = local.common_env_var_defs
           iterator = item
           content {
             name = item.value.name
@@ -214,7 +214,7 @@ resource "google_cloud_run_v2_job" "db-migrate" {
         image = var.flag_use_dummy_appserver ? "us-docker.pkg.dev/cloudrun/container/hello:latest" : "${var.image_path_with_slash}${var.image_basename}:${var.image_tag}"
         command = ["npx","prisma","migrate","deploy"]
         dynamic "env" {
-          for_each local.common_env_var_defs
+          for_each = local.common_env_var_defs
           iterator = item
           content {
             name = item.value.name
