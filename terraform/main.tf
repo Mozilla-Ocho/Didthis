@@ -56,11 +56,11 @@ provider "google" {
 }
 
 module "gcp_apis" {
-  source = "modules/gcp_apis"
+  source = "./modules/gcp_apis"
 }
 
 module "vpc" {
-  source = "modules/vpc"
+  source = "./modules/vpc"
   app_name = var.app_name
   region = var.region
   gcp_project_id = var.gcp_project_id
@@ -70,7 +70,7 @@ module "vpc" {
 
 module "db" {
   count = var.flag_use_db ? 1 : 0
-  source = "modules/db"
+  source = "./modules/db"
   db_name = "${var.app_name}-pgmain"
   db_tier = var.db_tier
   region = var.region
@@ -81,7 +81,7 @@ module "db" {
 
 module "db_proxy" {
   count = var.flag_use_db ? 1 : 0
-  source = "modules/db_proxy"
+  source = "./modules/db_proxy"
   app_name  = var.app_name
   gcp_project_id = var.gcp_project_id
   vpc_id = module.vpc.vpc_id
@@ -93,7 +93,7 @@ module "db_proxy" {
 }
 
 module "docker_repo" {
-  source = "modules/docker_repo"
+  source = "./modules/docker_repo"
   region = var.region
   gcp_project_id = var.gcp_project_id
   app_name = var.app_name
@@ -101,13 +101,13 @@ module "docker_repo" {
 }
 
 # module "firebase" {
-#   source = "modules/firebase"
+#   source = "./modules/firebase"
 #   gcp_project_id = var.gcp_project_id
 #   depends_on = [module.gcp_apis]
 # }
 
 module "appserver_main" {
-  source = "modules/gcr_appserver"
+  source = "./modules/gcr_appserver"
   app_name = var.app_name
   env_name = var.env_name
   svc_name = "appserver"
@@ -134,7 +134,7 @@ module "appserver_main" {
 }
 
 # module "lb_main" {
-#   source = "modules/lb"
+#   source = "./modules/lb"
 #   prefix = var.app_name
 #   name = "main"
 #   region = var.region
