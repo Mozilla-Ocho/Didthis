@@ -6,19 +6,7 @@ name: deploy terraform
 on:
   workflow_call:
     inputs:
-      REGION:
-        required: true
-        type: string
-      GCP_PROJECT_ID:
-        required: true
-        type: string
-      APP_NAME:
-        required: true
-        type: string
-      TF_BACKEND_STATE_BUCKET:
-        required: true
-        type: string
-      TF_VARS_FILE:
+      attach_environment:
         required: true
         type: string
 
@@ -34,6 +22,7 @@ jobs:
       id-token: 'write'
 
     runs-on: ubuntu-latest
+    environment: ${{inputs.attach_environment}}
     steps:
     - uses: actions/checkout@v3
 
@@ -43,7 +32,7 @@ jobs:
     - name: construct docker image path
       run: echo "IMAGE_PATH=${CONCATENATED}" >> $GITHUB_ENV
       env:
-        CONCATENATED: ${{format('{0}-docker.pkg.dev/{1}/{2}-repo1', inputs.REGION, inputs.GCP_PROJECT_ID, inputs.APP_NAME)}}
+        CONCATENATED: ${{format('{0}-docker.pkg.dev/{1}/{2}-repo1', vars.REGION, vars.GCP_PROJECT_ID, vars.APP_NAME)}}
 
     - name: auth to gcp
       uses: google-github-actions/auth@v1
@@ -56,7 +45,7 @@ jobs:
 
     - name: auth docker
       # note: it's important to have the regional domain here for auth to succeed
-      run: gcloud auth configure-docker ${{inputs.REGION}}-docker.pkg.dev
+      run: gcloud auth configure-docker ${{vars.REGION}}-docker.pkg.dev
 
     - name: pull latest image for cache
       continue-on-error: true
@@ -76,11 +65,11 @@ jobs:
 
     - name: terraform init
       working-directory: ./terraform
-      run: terraform init --backend-config="bucket=${{inputs.TF_BACKEND_STATE_BUCKET}}"
+      run: terraform init --backend-config="bucket=${{vars.TF_BACKEND_STATE_BUCKET}}"
 
     - name: terraform plan
       working-directory: ./terraform
-      run: terraform plan -no-color -input=false -out=tfplan -var-file=${{inputs.TF_VARS_FILE}} -var="image_tag=$IMAGE_TAG"
+      run: terraform plan -no-color -input=false -out=tfplan -var-file=${{vars.TF_VARS_FILE}} -var="image_tag=$IMAGE_TAG"
 
     - name: terraform apply
       working-directory: ./terraform
