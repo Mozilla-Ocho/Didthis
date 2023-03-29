@@ -1,14 +1,13 @@
-name: deploy terraform
+name: deploy terraform nonprod # REF
 
-# this is a reusable workflow called by workflows that pertain to specific
-# environments.
+# this file is duplicated per environment. please keep them in sync except
+# where the specific environment is referenced per REF comments
+# see doc/workflow-dry-issue.md
 
 on:
-  workflow_call:
-    inputs:
-      attach_environment:
-        required: true
-        type: string
+  push:
+    branches:
+      - releases/nonprod # REF
 
 jobs:
   terraform:
@@ -17,12 +16,12 @@ jobs:
       run:
         shell: bash
 
-    # permissions:
-    #   contents: 'read'
-    #   id-token: 'write'
+    permissions:
+      contents: 'read'
+      id-token: 'write'
 
     runs-on: ubuntu-latest
-    environment: ${{inputs.attach_environment}}
+    environment: nonprod # REF
     steps:
     - uses: actions/checkout@v3
 
