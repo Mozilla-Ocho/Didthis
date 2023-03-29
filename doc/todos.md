@@ -1,5 +1,8 @@
-- db proxy needs local util script to find the IP addr and connect the right
-  way
+- create a couple example secrets the appserver might need.
+- how can react build use per-environment vars?
+- try using this possibly simpler approach for getting access to prod db shell.
+  https://cloud.google.com/compute/docs/connect/ssh-using-bastion-host
+  otherwise, bring over the db proxy stuff from graceland.
 - switch to workload identity federation, more secure and controllable than
   long-lived service account credentials
 - reduce privileges of service account to editor

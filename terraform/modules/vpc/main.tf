@@ -1,11 +1,11 @@
 # NOTE ON DELETION:
-# XXX discuss this in a teardown doc
 # there is currently a bug in gcp that prevents deletion of a vpc when dangling
 # resources from cloud run or other services are not totally cleaned up, which
-# is beyond my control. so don't be surprised if terraform fails to delete the
-# vpc as the final step. in this case, i just remove it from terraform state
-# and ensure that the next vpc i create has a different identifier.
-# https://issuetracker.google.com/issues/186792016?pli=1
+# is beyond our control. it is not a terraform issue; the vpcs cannot be
+# deleted by any means (CLI or admin web UI) except for deleting the entire
+# parent project. see https://issuetracker.google.com/issues/186792016?pli=1
+# since terraform can't delete it, sometimes it is useful to just remove it
+# from state entirely:
 # terraform state rm module.vpc.google_compute_network.vpc
 
 variable "region" {
@@ -44,9 +44,8 @@ output "vpc_id" {
 # {{{ cloud run instances egress through the vpc (see
 # "run.googleapis.com/vpc-access-egress" = "all-traffic" in the cloud run
 # service annotations) so we need nat in the vpc so that they can access the
-# internet. added this initially for supporting the url meta fetching feature
-# but it will be needed for any external api/service integration originating
-# from cloud run instances.
+# internet. needed for any external api/service integration originating from
+# cloud run instances.
 
 resource "google_compute_router" "router" {
   name    = "${local.vpc_name}-nat-router"
@@ -75,13 +74,10 @@ resource "google_compute_router_nat" "nat" {
 # {{{ vpc connection to db
 
 resource "google_compute_global_address" "private_ip_alloc" {
-  # i'm not sure if this should be called "google-managed-services-default" but
-  # it is what is used in the tutorial. is this a special value? other examples
-  # of this sort of setup use a name like "private-ip-alloc" or similar.
   name          = "priv-ip-alloc-${local.vpc_name}"
   purpose       = "VPC_PEERING"
   address_type  = "INTERNAL"
-  prefix_length = 20 # 16 vs 20 does it matter?
+  prefix_length = 20
   network       = google_compute_network.vpc.id
 }
 
@@ -132,8 +128,8 @@ output "vpc_access_connector_name" {
 
 # }}}
 
-# {{{ open firewall to ssh for resources tagged ssh-enabled (db proxy)
-# see doc/db_proxy.md
+# {{{ open firewall to ssh for resources tagged ssh-enabled (the db proxy jump
+# host) see doc/db-proxy.md
 
 resource "google_compute_firewall" "allow_ssh" {
   name        = "${local.vpc_name}-allow-ssh"
