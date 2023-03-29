@@ -1,0 +1,80 @@
+name: deploy terraform prod # REF
+
+# this file is duplicated per environment. please keep them in sync except
+# where the specific environment is referenced per REF comments
+# see doc/workflow-dry-issue.md
+
+on:
+  push:
+    branches:
+      - releases/prod # REF
+
+jobs:
+  terraform:
+    name: Terraform
+    defaults:
+      run:
+        shell: bash
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    runs-on: ubuntu-latest
+    environment: prod # REF
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: construct short docker image tag from git sha
+      run: echo "IMAGE_TAG=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
+
+    - name: construct docker image path
+      run: echo "IMAGE_PATH=${CONCATENATED}" >> $GITHUB_ENV
+      env:
+        CONCATENATED: ${{format('{0}-docker.pkg.dev/{1}/{2}-repo1', vars.REGION, vars.GCP_PROJECT_ID, vars.APP_NAME)}}
+
+    - name: auth to gcp
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{secrets.TF_PROVISIONER_SVC_ACCOUNT_KEY_JSON}}
+        service_account: ${{secrets.TF_PROVISIONER_SVC_ACCOUNT_NAME}}
+
+    - name: init cloud sdk
+      uses: google-github-actions/setup-gcloud@v1
+
+    - name: auth docker
+      # note: it's important to have the regional domain here for auth to succeed
+      run: gcloud auth configure-docker ${{vars.REGION}}-docker.pkg.dev
+
+    - name: pull latest image for cache
+      continue-on-error: true
+      run: docker pull $IMAGE_PATH/appserver:latest
+
+    - name: build and push image
+      run: |-
+        docker build --file=dockerfiles/appserver --target appserver_prod -t $IMAGE_PATH/appserver:$IMAGE_TAG -t $IMAGE_PATH/appserver:latest --cache-from $IMAGE_PATH/appserver:latest .
+        docker push $IMAGE_PATH/appserver:$IMAGE_TAG
+        docker push $IMAGE_PATH/appserver:latest
+
+    - name: setup terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.4.2
+        terraform_wrapper: false
+
+    - name: terraform init
+      working-directory: ./terraform
+      run: terraform init --backend-config="bucket=${{vars.TF_BACKEND_STATE_BUCKET}}"
+
+    - name: terraform plan
+      working-directory: ./terraform
+      run: terraform plan -no-color -input=false -out=tfplan -var-file=${{vars.TF_VARS_FILE}} -var="image_tag=$IMAGE_TAG"
+
+    - name: terraform apply
+      working-directory: ./terraform
+      run: terraform apply -no-color -input=false tfplan
+
+    - name: terraform outputs
+      working-directory: ./terraform
+      run: terraform output
+
