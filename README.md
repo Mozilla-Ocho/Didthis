@@ -1,8 +1,8 @@
 # Innovation Studio boilerplate app template
 
-This boilerplate repo is still under initial development. We are exercising the
-process of rapidly spinning up a reproducible application stack, see
-docs/system-archictecture.png for the current architecture.
+This boilerplate repo is still under heavy initial development. We are
+exercising the process of rapidly spinning up a reproducible application stack,
+see doc/system-archictecture.png for the current architecture.
 
 Goals:
 - Minimize technical effort that isn't germane to the ideas we want to test
@@ -14,7 +14,7 @@ Goals:
     normalized conventions
 - Serve also as a solid foundation for production MVPs and eventual GA releases
   - Moco-friendly stack: GCP-based, built on best practices with generic
-    primitives, not reliant on third parties
+    primitives, not reliant on third parties (e.g. heroku)
   - Flexible, minimal, modular architecture that can replace or include new
     components as needed (alternate backends, cloud functions, A/B testing,
     CDNs, etc)
