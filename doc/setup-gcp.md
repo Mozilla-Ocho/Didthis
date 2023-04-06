@@ -1,5 +1,5 @@
+TODO- flesh this out, this is an outline.
 
-TODO things to cover:
 - getting gcp project and access from SRE, get id and number from gui
 - enable some apis: the IAM API, what else?
 - creating storage bucket (us, standard data, no public access, versioning

@@ -1,7 +1,9 @@
+TODO- flesh this out, this is an outline.
+
 secrets go in github environment secrets and are accessed in the deploy
 workflow, handed as-needed to processes such as terraform.
 
-todo
-- create a couple example secrets the appserver might need and get them
-  available to nodejs
+adding gcp environment secrets (per environment)
+
+adding dev box secrets (todo: we need a workflow here)
 
