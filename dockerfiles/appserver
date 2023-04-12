@@ -63,7 +63,7 @@ WORKDIR /appserver
 RUN npx prisma generate
 
 # build next.js app in production mode
-RUN next build
+RUN yarn next build
 
 # run-time must set these env vars:
 # PORT (for nodejs to listen on)
