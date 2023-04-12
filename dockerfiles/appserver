@@ -57,11 +57,6 @@ COPY appserver /appserver
 
 WORKDIR /appserver
 
-# the actual application prisma client must be generated, it's not something
-# that is pulled in from npm. see
-# https://www.prisma.io/docs/concepts/components/prisma-client/working-with-prismaclient/generating-prisma-client
-RUN npx prisma generate
-
 # build next.js app in production mode
 RUN yarn next build
 

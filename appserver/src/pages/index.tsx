@@ -1,5 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+import knex from "@/knex";
 
 export default function Home({ dbResult }: { dbResult: string }) {
   return (
@@ -16,7 +15,7 @@ export async function getServerSideProps() {
   let dbResult;
   if (process.env.FLAG_USE_DB === "true") {
     try {
-      dbResult = await prisma.DummyRecord.findMany();
+      dbResult = await knex('dummy_records').first();
       dbResult = JSON.stringify(dbResult);
     } catch (e: unknown) {
       dbResult = `db error: ${String(e)}`;

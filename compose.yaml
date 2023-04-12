@@ -16,8 +16,7 @@ services:
     env_file: env-dev
     environment:
       PORT: 3000
-      DATABASE_URL: "postgresql://devuser:devdummypass@pgserver:5432/devdb?schema=public"
-      DATABASE_URL_NO_QS: "postgresql://devuser:devdummypass@pgserver:5432/devdb"
+      DATABASE_URL: "postgresql://devuser:devdummypass@pgserver:5432/devdb"
     ports:
       - "3000:3000"
     depends_on:

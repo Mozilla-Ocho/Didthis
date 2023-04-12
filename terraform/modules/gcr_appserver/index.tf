@@ -100,13 +100,7 @@ locals {
       value = var.db_pass
     },
     {
-      # prisma wants the values in this format
       name = "DATABASE_URL"
-      value = "postgresql://${var.db_user}:${var.db_pass}@${var.db_host}/${var.db_name}?schema=public"
-    },
-    {
-      # psql cli can't handle the schema queryparam so make this version available too.
-      name = "DATABASE_URL_NO_QS"
       value = "postgresql://${var.db_user}:${var.db_pass}@${var.db_host}/${var.db_name}"
     },
     {
@@ -188,7 +182,7 @@ resource "google_cloud_run_v2_job" "db-seed" {
     template {
       containers {
         image = var.flag_use_dummy_appserver ? "us-docker.pkg.dev/cloudrun/container/hello:latest" : "${var.image_path_with_slash}${var.image_basename}:${var.image_tag}"
-        command = ["npx","prisma","db","seed"]
+        command = ["yarn","knex","seed:run"]
         dynamic "env" {
           for_each = local.common_env_var_defs
           iterator = item
@@ -212,7 +206,7 @@ resource "google_cloud_run_v2_job" "db-migrate" {
     template {
       containers {
         image = var.flag_use_dummy_appserver ? "us-docker.pkg.dev/cloudrun/container/hello:latest" : "${var.image_path_with_slash}${var.image_basename}:${var.image_tag}"
-        command = ["npx","prisma","migrate","deploy"]
+        command = ["yarn","knex","migrate:latest"]
         dynamic "env" {
           for_each = local.common_env_var_defs
           iterator = item
