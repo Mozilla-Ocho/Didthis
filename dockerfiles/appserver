@@ -62,6 +62,9 @@ WORKDIR /appserver
 # https://www.prisma.io/docs/concepts/components/prisma-client/working-with-prismaclient/generating-prisma-client
 RUN npx prisma generate
 
+# build next.js app in production mode
+RUN next build
+
 # run-time must set these env vars:
 # PORT (for nodejs to listen on)
 CMD yarn start
