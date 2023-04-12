@@ -1,0 +1,3 @@
+APP_NAME=tfboilerplate
+ENV_NAME=dev
+FLAG_USE_DB=true

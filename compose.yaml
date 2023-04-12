@@ -13,6 +13,7 @@ services:
       - ./appserver:/appserver
     working_dir: /appserver
     command: yarn dev
+    env_file: env-dev
     environment:
       PORT: 3000
       DATABASE_URL: "postgresql://devuser:devdummypass@pgserver:5432/devdb?schema=public"

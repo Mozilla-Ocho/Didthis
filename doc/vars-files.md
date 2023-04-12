@@ -4,9 +4,13 @@ these variables are used in terraform configuration:
 heavily. stick to alphanumeric lowercase only. it's available as `APP_NAME` env
 var inside containers.
 
+todo: this var is duplicated in env-dev file
+
 `env_name` is the github environment, aka "nonprod" or "prod" or "test" or
 whatever. it's used to help name and identify resources, as well as provided
 as the `ENV_NAME` environment var inside containers.
+
+todo: this var is duplicated in env-dev file
 
 `gcp_project_id` is a string containing the gcp project id.
 
@@ -26,6 +30,8 @@ max count of cloud run instances for cloud run's managed autoscaling feature.
 `flag_use_db` is boolean, true to provision a database and related resources.
 note that adding a database increases cost, and also on initial creation can
 take up to 15 minutes to provision.
+
+todo: this var is duplicated in env-dev file
 
 `db_deletion_protection` if the db is enabled, this will prevent it from being
 destroyed until this flag is turned off.

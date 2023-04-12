@@ -1,22 +1,27 @@
 {
-  "name": "tf-boilerplate-gha",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "appserver",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "start": "yarn && pm2-runtime index.js",
-    "dev": "yarn && pm2-runtime --watch index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
-  "prisma": {
-    "seed": "node prisma/seed.js"
-  },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "@prisma/client": "4.11.0",
-    "escape-html": "^1.0.3",
-    "express": "^4.18.2",
-    "prisma": "^4.11.0"
+    "@prisma/client": "^4.12.0",
+    "@types/node": "18.15.11",
+    "@types/react": "18.0.34",
+    "@types/react-dom": "18.0.11",
+    "autoprefixer": "10.4.14",
+    "eslint": "8.38.0",
+    "eslint-config-next": "13.3.0",
+    "next": "13.3.0",
+    "postcss": "8.4.21",
+    "prisma": "^4.12.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "tailwindcss": "3.3.1",
+    "typescript": "5.0.4"
   }
 }
