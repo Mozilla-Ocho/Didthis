@@ -16,7 +16,7 @@ export async function getServerSideProps() {
   if (process.env.FLAG_USE_DB === "true") {
     try {
       dbResult = await knex('dummy_records').first();
-      dbResult = JSON.stringify(dbResult);
+      dbResult = dbResult ? JSON.stringify(dbResult) : 'no rows found';
     } catch (e: unknown) {
       dbResult = `db error: ${String(e)}`;
     }
