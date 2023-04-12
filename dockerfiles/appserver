@@ -21,6 +21,9 @@ RUN yarn global add pm2
 # other utils
 RUN apt-get install -qq -y vim jq
 
+# disable next telemetry signalling across the board.
+ENV NEXT_TELEMETRY_DISABLED=1
+
 # appserver code is gonna be installed in /appserver
 WORKDIR /appserver
 

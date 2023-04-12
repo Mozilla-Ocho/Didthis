@@ -2,6 +2,7 @@ We are tracking this project in our Notion workspace, where the high-level
 planning and todos are. This list serves as a scratchpad for more weedy
 technical details, not in any priority order.
 
+- use pm2 in prod (lost this when i added nextjs)
 - create a couple example secrets the appserver might need and get them
   available to nodejs
 - how can react build use per-environment vars?
