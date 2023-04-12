@@ -1,6 +1,4 @@
-import type { Knex } from "knex";
-
-const config: { [key: string]: Knex.Config } = {
+const config = {
   client: "pg",
   connection: process.env.DATABASE_URL,
 };
