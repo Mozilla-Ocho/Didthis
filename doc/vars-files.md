@@ -31,11 +31,13 @@ take up to 15 minutes to provision.
 
 note: this var is duplicated in env-dev file and in terraform vars.
 
-`flag_use_dummy_appserver` is a boolean. when true, instead of the actual
-appserver image, the cloud run appserver will be setup to use a hello-world
-appserver. this can be useful when standing up the boilerplate if the real
-appserver image wouldn't work initially due to other dependent services or
-configurations that aren't ready yet.
+`flag_use_dummy_appserver` is a boolean. set this true on the first deployment,
+then false once the docker repo has been provisioned.  when true, instead of
+the actual appserver image, the cloud run appserver will be setup to use a
+hello-world appserver from a public docker repo. without this, the first
+deployment has a chicken or egg problem in which the appserver depends on a
+custom image that can't be created because the private docker repository itself
+doesn't exist.
 
 `gcp_project_id` is a string containing the gcp project id.
 

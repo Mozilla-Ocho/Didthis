@@ -17,6 +17,8 @@ TODO- flesh this out, this is an outline.
       - `TF_PROVISIONER_SVC_ACCOUNT_NAME`
    - add vars `APP_NAME` `REGION` `GCP_PROJECT_ID` `TF_VARS_FILE` `TF_BACKEND_STATE_BUCKET`
 - update values in `vars-nonprod.tfvars` and `vars-prod.tfvars` files, see `doc/vars-files.md`
+- note that on the first deployment, `flag_use_dummy_appserver` needs to be
+  true, see `doc/var-files.md` description of that var for why.
 - commit do first deploy to nonprod by pushing or merging to `releases/nonprod`
 - note it takes ~15min to create the sql db instance the first time
 
