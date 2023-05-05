@@ -1,36 +1,18 @@
-variable "app_name" {
-  type = string
-}
-variable "env_name" {
-  type = string
-}
-variable "region" {
-  type = string
-}
-variable "gcp_project_id" {
-  type = string
-}
-variable "gcp_project_number" {
-  type = string # it's a number in practice but a string in these configs
-}
-variable "flag_use_dummy_appserver" {
-  type = bool
-}
-variable "flag_use_db" {
-  type = bool
-}
-variable "db_deletion_protection" {
-  type = bool
-}
-variable "db_tier" {
-  type = string
-}
-variable "autoscaling_min" {
-  type = number
-}
-variable "autoscaling_max" {
-  type = number
-}
+variable "app_name" { type = string }
+variable "autoscaling_max" { type = number }
+variable "autoscaling_min" { type = number }
+variable "db_deletion_protection" { type = bool }
+variable "db_tier" { type = string }
+variable "env_name" { type = string }
+variable "flag_destroy" { type = bool }
+variable "flag_use_db" { type = bool }
+variable "flag_use_dummy_appserver" { type = bool }
+variable "gcp_project_id" { type = string }
+variable "gcp_project_number" { type = string }
+variable "region" { type = string }
+variable "vpc_remote_bucket" { type = string }
+variable "vpc_remote_name" { type = string }
+
 variable "image_tag" {
   # this var is not defined in the vars file, it's passed in at runtime via the
   # CLI in the github action job because it changes for each run.
@@ -45,7 +27,7 @@ terraform {
   backend "gcs" {
     # note that a bucket value is required here but is passed in from the
     # terraform init step via a command line argument.
-    prefix  = "terraform/state"
+    prefix  = "terraform/state/app"
   }
 }
 
@@ -55,36 +37,50 @@ provider "google" {
   zone    = "us-central1-b"
 }
 
+data "terraform_remote_state" "remote_vpcs" {
+  backend = "gcs"
+  config = {
+    bucket = var.vpc_remote_bucket
+    prefix = "terraform/state/app"
+  }
+}
+
+locals {
+  # get shorthand for the specific vpc id, access connector id, and access
+  # connectore name for the vpc we're using from the set of available vpcs
+  # in the remote.
+  vpc_id = data.terraform_remote_state.remote_vpcs.outputs.ids[var.vpc_remote_name]
+  vpc_access_connector_id = data.terraform_remote_state.remote_vpcs.outputs.connector_ids[var.vpc_remote_name]
+  vpc_access_connector_name = data.terraform_remote_state.remote_vpcs.outputs.connector_names[var.vpc_remote_name]
+}
+
 module "gcp_apis" {
+  # note that deleting the gcp_apis resources has no real effect because they
+  # are set to disable_on_destroy=false, it could wreak havoc on a gcp project
+  # for a single application in the project to go around deleting these global
+  # api enablements. in this case, flag_destroy will really just remove them
+  # from terraform state.
+  count = var.flag_destroy ? 0 : 1
   source = "./modules/gcp_apis"
 }
 
-module "vpc" {
-  source = "./modules/vpc"
-  app_name = var.app_name
-  region = var.region
-  gcp_project_id = var.gcp_project_id
-  gcp_project_number = var.gcp_project_number
-  depends_on = [module.gcp_apis]
-}
-
 module "db" {
-  count = var.flag_use_db ? 1 : 0
+  count = var.flag_destroy ? 0 : var.flag_use_db ? 1 : 0
   source = "./modules/db"
   db_name = "${var.app_name}-pgmain"
   db_tier = var.db_tier
   region = var.region
-  vpc_id = module.vpc.vpc_id
+  vpc_id = local.vpc_id
   db_deletion_protection = var.db_deletion_protection
-  depends_on = [module.vpc, module.gcp_apis]
+  depends_on = [module.gcp_apis]
 }
 
 module "db_proxy" {
-  count = var.flag_use_db ? 1 : 0
+  count = var.flag_destroy ? 0 : var.flag_use_db ? 1 : 0
   source = "./modules/db_proxy"
   app_name  = var.app_name
   gcp_project_id = var.gcp_project_id
-  vpc_id = module.vpc.vpc_id
+  vpc_id = local.vpc_id
   db_connection_name = module.db[0].connection_name
   db_user = module.db[0].db_user
   db_name = module.db[0].db_name
@@ -93,6 +89,7 @@ module "db_proxy" {
 }
 
 module "docker_repo" {
+  count = var.flag_destroy ? 0 : 1
   source = "./modules/docker_repo"
   region = var.region
   gcp_project_id = var.gcp_project_id
@@ -107,6 +104,7 @@ module "docker_repo" {
 # }
 
 module "appserver_main" {
+  count = var.flag_destroy ? 0 : 1
   source = "./modules/gcr_appserver"
   app_name = var.app_name
   env_name = var.env_name
@@ -115,21 +113,20 @@ module "appserver_main" {
   flag_use_dummy_appserver = var.flag_use_dummy_appserver
   image_basename = "appserver"
   image_tag = var.image_tag
-  image_path_with_slash = module.docker_repo.image_path_with_slash
+  image_path_with_slash = module.docker_repo[0].image_path_with_slash
   region = var.region
   db_host = var.flag_use_db ? module.db[0].private_ip_address : ""
   db_name = var.flag_use_db ? module.db[0].db_name : ""
   db_user = var.flag_use_db ? module.db[0].db_user : ""
   db_pass = var.flag_use_db ? module.db[0].db_pass : ""
-  vpc_access_connector_id = module.vpc.vpc_access_connector_id
-  vpc_access_connector_name = module.vpc.vpc_access_connector_name
+  vpc_access_connector_id = local.vpc_access_connector_id
+  vpc_access_connector_name = local.vpc_access_connector_name
   autoscaling_min = var.autoscaling_min
   autoscaling_max = var.autoscaling_max
   depends_on = [
     module.gcp_apis,
-    module.docker_repo,
-    module.db[0],
-    module.vpc
+    module.docker_repo[0],
+    module.db[0]
   ]
 }
 
@@ -138,18 +135,18 @@ module "appserver_main" {
 #   prefix = var.app_name
 #   name = "main"
 #   region = var.region
-#   gcr_service_name = module.appserver_main.service_name
-#   domains = var.domains
+#   gcr_service_name = module.appserver_main[0].service_name
+#   domains = ["..."]
 #   lb_cert_domain_change_increment_outage = var.lb_cert_domain_change_increment_outage
-#   depends_on = [module.gcp_apis, module.appserver_main]
+#   depends_on = [module.gcp_apis, module.appserver_main[0]]
 # }
 
 output "gcr_service_url" {
-  value = module.appserver_main.service_url
+  value = var.flag_destroy ? "" : module.appserver_main[0].service_url
 }
 
 output "gcr_image_deployed" {
-  value = module.appserver_main.image_deployed
+  value = var.flag_destroy ? "" : module.appserver_main[0].image_deployed
 }
 
 # output "public_ip_address" {
