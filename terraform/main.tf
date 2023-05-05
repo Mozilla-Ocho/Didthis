@@ -41,7 +41,7 @@ data "terraform_remote_state" "remote_vpcs" {
   backend = "gcs"
   config = {
     bucket = var.vpc_remote_bucket
-    prefix = "terraform/state/app"
+    prefix = "terraform/state/vpcs"
   }
 }
 
