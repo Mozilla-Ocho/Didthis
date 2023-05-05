@@ -27,7 +27,7 @@ terraform {
   backend "gcs" {
     # note that a bucket value is required here but is passed in from the
     # terraform init step via a command line argument.
-    prefix  = "terraform/state"
+    prefix  = "terraform/state/app"
   }
 }
 
@@ -41,7 +41,7 @@ data "terraform_remote_state" "remote_vpcs" {
   backend = "gcs"
   config = {
     bucket = var.vpc_remote_bucket
-    prefix = "terraform/state"
+    prefix = "terraform/state/app"
   }
 }
 
