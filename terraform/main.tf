@@ -10,7 +10,7 @@ variable "flag_use_dummy_appserver" { type = bool }
 variable "gcp_project_id" { type = string }
 variable "gcp_project_number" { type = string }
 variable "region" { type = string }
-variable "vpc_remote_backend" { type = string }
+variable "vpc_remote_bucket" { type = string }
 variable "vpc_remote_name" { type = string }
 
 variable "image_tag" {
@@ -40,7 +40,7 @@ provider "google" {
 data "terraform_remote_state" "remote_vpcs" {
   backend = "gcs"
   config = {
-    bucket = var.vpc_remote_backend
+    bucket = var.vpc_remote_bucket
     prefix = "terraform/state"
   }
 }

@@ -8,6 +8,7 @@ TODO- flesh this out, this is an outline.
   get the json key value, https://cloud.google.com/iam/docs/keys-create-delete
 - fork the repo
 - in new repo on github:
+  - enable workflows (disabled by default for forks) in "actions" tab
   - create environments prod/nonprod
   - in each:
     - lock to deployment branch releases/prod or releases/nonprod
@@ -15,8 +16,8 @@ TODO- flesh this out, this is an outline.
       - `TF_PROVISIONER_SVC_ACCOUNT_KEY_JSON` note you have to remove newlines
       - `TF_PROVISIONER_SVC_ACCOUNT_NAME`
    - add vars `APP_NAME` `REGION` `GCP_PROJECT_ID` `TF_VARS_FILE` `TF_BACKEND_STATE_BUCKET`
-- update vars files: app name, project data, turn on or off the db, etc.
-- do first deploy to nonprod.
+- update values in `vars-nonprod.tfvars` and `vars-prod.tfvars` files, see `doc/vars-files.md`
+- commit do first deploy to nonprod by pushing or merging to `releases/nonprod`
 - note it takes ~15min to create the sql db instance the first time
 
 see `doc/teardown.md` for destroying the provisioned resources for a throwaway
