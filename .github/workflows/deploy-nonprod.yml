@@ -110,6 +110,11 @@ jobs:
         additional-approved-words: 'shipit,engage,hitit,go,gogo,gogogo'
         additional-denied-words: 'nope,nono,nonono,abort,stop'
 
+    - name: debugging approval ticket creation failure
+      if: ${{ failure() }}
+      run: |
+        echo "note: If the manual approval issue step failed with an error from the GitHub API and was not because of a direct rejection of the approval ticket, it is possible that the DEPLOY_APPROVERS variable in the GitHub environment needs to be updated. It must contain a comma-separated list of GitHub usernames who are valid, and have access to the repo at the level that permits them to be approvers in environments. Review the DEPLOY_APPROVERS value and ensure each username is valid and has sufficient access to the repo."
+
     - name: terraform apply
       working-directory: ./terraform
       run: terraform apply -no-color -input=false tfplan
