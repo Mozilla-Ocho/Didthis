@@ -4,7 +4,8 @@ export default function Home({ dbResult }: { dbResult: string }) {
   return (
     <main className="p-10">
       <div>
-        <p>Appserver hello world from Next.js</p>
+        <h1>h3y</h1>
+        <p>psst it stands for hobby</p>
         <p>database query result: {dbResult}</p>
       </div>
     </main>
