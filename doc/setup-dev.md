@@ -1,5 +1,6 @@
 # setting up dev environment
 
+- follow forking instructions in `doc/setup-forking.md` if you haven't yet
 - install docker on your dev box if you haven't yet.
 - clone the repo
 - edit vars in `env-dev`, see `doc/vars-files.md` (some values are duplicated in `env-dev` and the terraform vars files)
