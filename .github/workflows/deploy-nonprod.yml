@@ -16,9 +16,13 @@ jobs:
       run:
         shell: bash
 
+    env:
+      GH_ENV_NAME: nonprod # REF
+
     permissions:
       contents: 'read'
       id-token: 'write'
+      issues: 'write'
 
     runs-on: ubuntu-latest
     environment: nonprod # REF
@@ -33,6 +37,16 @@ jobs:
       env:
         CONCATENATED: ${{format('{0}-docker.pkg.dev/{1}/{2}-repo1', vars.REGION, vars.GCP_PROJECT_ID, vars.APP_NAME)}}
 
+    - name: check flag_destroy
+      run: echo "FLAG_DESTROY=`cat terraform/${TF_VARS_FILE} | grep flag_destroy | sed 's/flag_destroy *=//' | sed 's/ //g' `" >> $GITHUB_ENV
+      env:
+        TF_VARS_FILE: ${{vars.TF_VARS_FILE}}
+
+    - name: check flag_use_dummy_appserver
+      run: echo "FLAG_USE_DUMMY_APPSERVER=`cat terraform/${TF_VARS_FILE} | grep flag_use_dummy_appserver | sed 's/flag_use_dummy_appserver *=//' | sed 's/ //g' `" >> $GITHUB_ENV
+      env:
+        TF_VARS_FILE: ${{vars.TF_VARS_FILE}}
+
     - name: auth to gcp
       uses: google-github-actions/auth@v1
       with:
@@ -43,14 +57,19 @@ jobs:
       uses: google-github-actions/setup-gcloud@v1
 
     - name: auth docker
+      if: ${{ env.FLAG_DESTROY == 'false' && env.FLAG_USE_DUMMY_APPSERVER == 'false' }}
       # note: it's important to have the regional domain here for auth to succeed
       run: gcloud auth configure-docker ${{vars.REGION}}-docker.pkg.dev
 
     - name: pull latest image for cache
+      if: ${{ env.FLAG_DESTROY == 'false' && env.FLAG_USE_DUMMY_APPSERVER == 'false' }}
+      # continue on error because the first run will not have a docker repo.
       continue-on-error: true
       run: docker pull $IMAGE_PATH/appserver:latest
 
     - name: build and push image
+      if: ${{ env.FLAG_DESTROY == 'false' && env.FLAG_USE_DUMMY_APPSERVER == 'false' }}
+      # continue on error because the first run will not have a docker repo.
       run: |-
         docker build --file=dockerfiles/appserver --target appserver_prod -t $IMAGE_PATH/appserver:$IMAGE_TAG -t $IMAGE_PATH/appserver:latest --cache-from $IMAGE_PATH/appserver:latest .
         docker push $IMAGE_PATH/appserver:$IMAGE_TAG
@@ -67,8 +86,34 @@ jobs:
       run: terraform init --backend-config="bucket=${{vars.TF_BACKEND_STATE_BUCKET}}"
 
     - name: terraform plan
+      id: plan
       working-directory: ./terraform
-      run: terraform plan -no-color -input=false -out=tfplan -var-file=${{vars.TF_VARS_FILE}} -var="image_tag=$IMAGE_TAG"
+      run: |
+        terraform plan -no-color -input=false -out=tfplan -var-file=${{vars.TF_VARS_FILE}} -var="image_tag=$IMAGE_TAG"
+        echo "PLAN_OUTPUT<<EOF" >> $GITHUB_OUTPUT
+        terraform show -no-color tfplan >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
+    - uses: trstringer/manual-approval@v1
+      with:
+        secret: ${{ github.TOKEN }}
+        approvers: ${{ vars.DEPLOY_APPROVERS }}
+        minimum-approvals: 1
+        issue-title: "Deploy ${{env.IMAGE_TAG}} to ${{env.GH_ENV_NAME}}"
+        issue-body: |
+          Please review the terraform plan and approve or deny the deployment of ${{env.IMAGE_TAG}} to ${{env.GH_ENV_NAME}}.
+
+          ```
+          ${{steps.plan.outputs.PLAN_OUTPUT}}
+          ```
+        exclude-workflow-initiator-as-approver: false
+        additional-approved-words: 'shipit,engage,hitit,go,gogo,gogogo'
+        additional-denied-words: 'nope,nono,nonono,abort,stop'
+
+    - name: debugging approval ticket creation failure
+      if: ${{ failure() }}
+      run: |
+        echo "note: If the manual approval issue step failed with an error from the GitHub API and was not because of a direct rejection of the approval ticket, it is possible that the DEPLOY_APPROVERS variable in the GitHub environment needs to be updated. It must contain a comma-separated list of GitHub usernames who are valid, and have access to the repo at the level that permits them to be approvers in environments. Review the DEPLOY_APPROVERS value and ensure each username is valid and has sufficient access to the repo."
 
     - name: terraform apply
       working-directory: ./terraform
