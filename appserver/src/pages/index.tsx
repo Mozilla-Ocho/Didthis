@@ -1,6 +1,7 @@
 import knex from "@/knex";
 
 export default function Home({ dbResult }: { dbResult: string }) {
+  console.log("homepage render")
   return (
     <main className="p-10">
       <div>
@@ -8,6 +9,11 @@ export default function Home({ dbResult }: { dbResult: string }) {
         <p>psst it stands for hobby</p>
         <p>database query result: {dbResult}</p>
       </div>
+      <form action='/api/upload' encType='multipart/form-data' method="post">
+        <input id='files' type="file" name="thefile" accept="image/*, video/*" />
+        <input type="hidden" name="wut" value="wuuuut" />
+        <button type='submit'>Upload</button>
+      </form>
     </main>
   );
 }
