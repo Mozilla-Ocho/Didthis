@@ -41,6 +41,18 @@ services:
       timeout: 4s
       retries: 20
 
+  mitmweb:
+    build:
+      context: '.'
+      dockerfile: dockerfiles/mitmweb
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    environment:
+      UPSTREAM: http://appserver:3000/
+    networks:
+      - allhosts
+
 networks:
   allhosts:
 
