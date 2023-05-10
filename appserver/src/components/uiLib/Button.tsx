@@ -5,6 +5,9 @@ type Props = {
   useCase?: "primary" | "secondary" | undefined;
   children: ReactNode;
   type?: "submit" | undefined;
+  onClick?: Function;
+  loading?: boolean; // XXX_PORTING
+  "data-testid"?: string; // XXX_PORTING
 };
 
 const Button: FC<Props> = (props) => {
@@ -14,6 +17,9 @@ const Button: FC<Props> = (props) => {
     primary: "bg-primary hover:bg-primary-hover",
     secondary: "bg-secondary hover:bg-secondary-hover",
   };
+  const onClick = (e) => {
+    if (props.onClick) props.onClick(e)
+  }
   return (
     <button
       type={bType}
@@ -21,6 +27,7 @@ const Button: FC<Props> = (props) => {
         "p-4 text-white py-2 px-4 rounded",
         classes[useCase]
       )}
+      onClick={onClick}
     >
       {props.children}
     </button>
