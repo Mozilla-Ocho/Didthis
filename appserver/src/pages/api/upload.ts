@@ -1,12 +1,13 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import formidable from "formidable";
+import type {File} from "formidable";
 import fs from "fs";
 import type { Readable } from 'node:stream';
 
 
 type Data = {
-  name: string
+  result: string
 }
 
 // Get raw body as string
@@ -33,14 +34,16 @@ export default async function handler(
     console.log("fields",fields)
     console.log("files",files)
     await saveFile(files.thefile);
-    return res.status(201).send("ok");
+    return res.status(201).json({result:"ok"});
   });
   // res.status(200).json({ name: 'upload handler response' })
 }
  
-const saveFile = async (file) => {
+const saveFile = async (file: File | File[]) => {
+  // apparently the formidable module can return File or File[] as members of files prop...
+  if (Array.isArray(file)) return;
   const data = fs.readFileSync(file.filepath);
-  const fname = file.originalFilename.replace(/[^a-zA-Z0-9\-\_\.]/g,'')
+  const fname = (file.originalFilename || (new Date().getTime()+'')).replace(/[^a-zA-Z0-9\-\_\.]/g,'')
   fs.writeFileSync(`./public/${fname}`, data);
   //fs.writeFileSync(`./public/${file.newFilename}`, data);
   await fs.unlinkSync(file.filepath);
