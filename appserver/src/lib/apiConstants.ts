@@ -45,4 +45,4 @@ interface MeWrapper extends Wrapper {
   result: MeSuccess | Failure
 }
 
-export type { Wrapper, POJO, MeWrapper, ErrorId }
+export type { Wrapper, POJO, MeWrapper, ErrorId, User }

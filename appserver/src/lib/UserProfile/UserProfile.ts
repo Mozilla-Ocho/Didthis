@@ -10,7 +10,7 @@ import { getValidationErrors } from './validation';
 class UserProfile {
   _data:any = {};
 
-  constructor(opts:any) {
+  constructor(opts?:any) {
     opts = opts || {};
     let parsed;
     if (opts.json) {

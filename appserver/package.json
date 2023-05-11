@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@types/cookies": "^0.7.7",
     "@types/formidable": "^2.0.6",
     "@types/js-cookie": "^3.0.3",
     "@types/lodash-es": "^4.17.7",
@@ -20,6 +21,7 @@
     "eslint": "8.38.0",
     "eslint-config-next": "13.3.0",
     "firebase": "^9.21.0",
+    "firebase-admin": "^11.8.0",
     "firebaseui": "^6.0.2",
     "formidable": "^2.1.1",
     "history": "^5.3.0",
