@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 // because the firebaseui react library is an unmaintained project that doesn't
 // work under react strict mode and looks like it never will.
 import { onAuthStateChanged } from 'firebase/auth';
-// import * as firebaseui from 'firebaseui';
+// import * as firebaseui from 'firebaseui'; // see below, doing dynamic import now for nextjs SSR compat
 import 'firebaseui/dist/firebaseui.css';
 
 const StyledFirebaseAuth = ({
