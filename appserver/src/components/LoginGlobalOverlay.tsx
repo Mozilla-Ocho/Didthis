@@ -16,7 +16,7 @@ const LoginGlobalOverlay = observer(() => {
       },
     ],
     callbacks: {
-      signInSuccessWithAuthResult: (authResult) => {
+      signInSuccessWithAuthResult: (authResult:any) => {
         // note that the logic to handle the new auth state is in the store, on
         // the onAuthStateChanged callback, here all we do is show a spinner
         // until the store finishes.
@@ -28,7 +28,7 @@ const LoginGlobalOverlay = observer(() => {
         log.auth("signInSuccessWithAuthResult", authResult);
         return false;
       },
-      signInFailure: (error) => {
+      signInFailure: (error:any) => {
         log.auth("signInFailure", error);
         store.cancelGlobalLoginOverlay();
         return false;
@@ -46,9 +46,8 @@ const LoginGlobalOverlay = observer(() => {
         />
       </div>
     );
-  } else {
-    return false;
   }
+  return <></>;
   // return (
   //   <>
   //     <Modal

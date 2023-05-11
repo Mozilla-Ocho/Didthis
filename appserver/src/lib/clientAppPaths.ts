@@ -2,7 +2,7 @@ const clientAppPaths = {
   afterLogout: '/',
   getYourOwn: '/',
   userHomepage: '/:urlSlug',
-  userHomepageUrlForSlug: slug => process.env.REACT_APP_API_ENDPOINT + '/' + encodeURI(slug),
+  userHomepageUrlForSlug: (slug:string):string => process.env.REACT_APP_API_ENDPOINT + '/' + encodeURI(slug),
   amplitudeProxy: process.env.REACT_APP_API_ENDPOINT + '/amplitude',
   // DRY_65823 feedback url
   feedbackFormPath: 'https://survey.alchemer.com/s3/7138935/Graceland-MVP-feedback',

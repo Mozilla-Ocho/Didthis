@@ -5,7 +5,7 @@
 import normalizeUrl from 'normalize-url';
 import { constants } from './constants';
 
-function getParsedUrl({ url, strict }) {
+function getParsedUrl({ url, strict }:any) {
   let parsedUrl;
   try {
     let processedUrl = url;
@@ -31,8 +31,8 @@ function getParsedUrl({ url, strict }) {
 // XXX_PORTING add functions to validate project, project posts, etc, so the UI
 // can use them granularly in form flows.
 
-export function getValidationErrors({ data }) {
-  let errors = {};
+export function getValidationErrors({ data }:any) {
+  let errors:any = {};
 
   if ((data.name || '').length > constants.MAX_CHARS.names) {
     errors.name = {

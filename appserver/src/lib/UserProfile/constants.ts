@@ -33,7 +33,7 @@ const constants = {
     // are using it as a user input parser that is more lenient than URL() lib.
     // for example you can give it 'twitter.com/foo' and it will return
     // 'https://twitter.com/foo' where URL() would throw an error.
-    defaultProtocol: 'https:',
+    defaultProtocol: 'https' as const,
     removeTrailingSlash: false,
     removeSingleSlash: false,
     stripTextFragment: false,
@@ -44,6 +44,7 @@ const constants = {
     removeDirectoryIndex: false,
     sortQueryParameters: false,
   },
+
 };
 
 export { constants };

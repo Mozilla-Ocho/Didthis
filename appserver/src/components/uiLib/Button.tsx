@@ -17,7 +17,7 @@ const Button: FC<Props> = (props) => {
     primary: "bg-primary hover:bg-primary-hover",
     secondary: "bg-secondary hover:bg-secondary-hover",
   };
-  const onClick = (e) => {
+  const onClick = (e:any) => {
     if (props.onClick) props.onClick(e)
   }
   return (

@@ -11,12 +11,12 @@ const LoginButton = observer(
     text,
     onClick,
     'data-testid': dataTestid,
-  }) => {
+  }:any) => {
     const store = useStore();
     if (!store.signupCode) {
       overrideCodeCheck = overrideCodeCheck || overrideCodeCheckIfNoSignupCode;
     }
-    const handleClick = (e) => {
+    const handleClick = (e:any) => {
       store.launchGlobalLoginOverlay(overrideCodeCheck);
       onClick && onClick(e);
     };

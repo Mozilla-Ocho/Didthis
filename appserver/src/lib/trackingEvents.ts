@@ -1,4 +1,10 @@
-const trackingEvents = {
+type EventSpec = {
+  eventName: string,
+  key?: string,
+  opts: { name?: string, isAuthed?: "y" | "n", isSelfView?: "y"|"n", signupCodeName?:string, id?:string, format?:string, completedPromptCount?:number  }
+}
+
+const trackingEvents: {[key:string]:EventSpec} = {
   // note most events will include an isAuthed:y|n parameter by default.
 
   // pageviews
@@ -99,6 +105,15 @@ const trackingEvents = {
   },
 };
 
-Object.keys(trackingEvents).map((key) => (trackingEvents[key].key = key));
+type TrackingEventName = keyof typeof trackingEvents
 
-export { trackingEvents };
+//Object.keys(trackingEvents).map((key:TrackingEventName) => (trackingEvents[key].key = key));
+
+for (let key in trackingEvents) {
+  trackingEvents[key].key = key
+}
+
+// make another variable who is strongly typed to the values for the keys and export that
+const te2:{[key:TrackingEventName]:EventSpec} = trackingEvents
+
+export { te2 as trackingEvents };

@@ -12,7 +12,16 @@ const channelNames = [
   "tracking",
 ] as const;
 
-type Channel = typeof channelNames[number];
+//type Channel = typeof channelNames[number];
+type ChannelName = "warn" |
+"error" |
+"auth" |
+"readiness" |
+"api" |
+"unfurl" |
+"location" |
+"sql" |
+"tracking"
 
 type LoggingEnv = "default" | "test" | "inProdBrowser";
 
@@ -23,12 +32,12 @@ type EnvToggles = {
 
 type ChannelConfig = {
   // for each channel, what it's EnvToggles
-  [key in Channel]: EnvToggles;
+  [key in ChannelName]: EnvToggles;
 };
 
 type Logger = {
   // the main interface, a dict of channel name -> logging function
-  [key in Channel]: Function;
+  [key in ChannelName]: Function;
 };
 
 // initialize log object to a map of channel names to dummy functions
@@ -96,9 +105,9 @@ function setConfig(x: LoggingEnv) {
 }
 
 function assign() {
-  for (let channel in channelConfig) {
+  for (let channel of channelNames) {
     if (channelConfig[channel][env]) {
-      log[channel] = (...args) => console.log(channel, ":", ...args);
+      log[channel] = (...args:any) => console.log(channel, ":", ...args);
     } else {
       log[channel] = () => false;
     }

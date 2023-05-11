@@ -1,6 +1,6 @@
 import { constants } from './constants';
 
-function isPOJO(obj) {
+function isPOJO(obj:any) {
   // ensures the object, at the top level is a plain object (not an instance of
   // a special class), and that all its properties are either plain objects or
   // plain data types (number, boolean, string, array, null, pojo) recursively.
@@ -11,7 +11,7 @@ function isPOJO(obj) {
   if (proto !== null && proto.constructor.name !== 'Object') return false;
   // now we do a deep check to ensure everything else is either a pojo, array,
   // string, bool, or number.
-  function _isPlainData(x) {
+  function _isPlainData(x:any) {
     if (typeof x === 'string') return true;
     if (typeof x === 'boolean') return true;
     if (typeof x === 'number') return true;
@@ -31,7 +31,7 @@ function isPOJO(obj) {
   return true;
 }
 
-const validateUrlMeta = (urlMeta, errContext) => {
+const validateUrlMeta = (urlMeta:any, errContext:any) => {
   if (typeof urlMeta === 'undefined') return;
   if (!isPOJO(urlMeta))
     throw new Error(errContext + ' url meta must be undef or a pojo');
@@ -53,7 +53,7 @@ const validateUrlMeta = (urlMeta, errContext) => {
   }
 };
 
-export function parse({ json, data }) {
+export function parse({ json, data }:any) {
   // either json or a data POJO must be given, but not both. this also
   // validates the data schema (required keys are present, unexpected keys
   // aren't present, values are of the right type, etc), but it does not

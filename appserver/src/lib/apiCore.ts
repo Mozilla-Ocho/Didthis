@@ -8,14 +8,25 @@ const endpoint = process.env.REACT_APP_API_ENDPOINT;
 const inBrowserContext = typeof window !== 'undefined'
 
 // build a complete api endpoint url given an api action name
-const mkUrl = (action, queryParams) => {
+const mkUrl = (action:string, queryParams:any) => {
   const qs = new URLSearchParams(queryParams || {}).toString();
   return endpoint + '/api/v1/' + action + (qs ? '?' + qs : '');
 };
 
+type ApiInfo = {
+  errorConst: string,
+  errorMsg: string,
+  fetchArgs?: any,
+  responseWrapper?: any,
+  responseStatus?: number,
+  responseBody?: any,
+}
+
 class ApiError extends Error {
+  apiInfo?: ApiInfo
+
   constructor(
-    message,
+    message:string,
     {
       errorConst,
       errorMsg,
@@ -23,7 +34,7 @@ class ApiError extends Error {
       responseWrapper,
       responseStatus,
       responseBody,
-    }
+    }:ApiInfo
   ) {
     super(message);
     this.name = 'ApiError';
@@ -38,7 +49,7 @@ class ApiError extends Error {
   }
 }
 
-const wrapFetch = async fetchArgs => {
+const wrapFetch = async (fetchArgs:any):Promise<any> => {
   // encapsulate fetch with a wrapper that:
   // - lets us use other http lib if we want
   // - only exposes the things we use
@@ -59,7 +70,7 @@ const wrapFetch = async fetchArgs => {
       }
     }
     const url = mkUrl(action, queryParams);
-    const config = {
+    const config:any = {
       method: method,
       headers: {
         Accept: 'application/json',
@@ -97,7 +108,7 @@ const wrapFetch = async fetchArgs => {
     wrapper = await res.json();
     log.api('response:', action, wrapper);
     return wrapper.payload;
-  } catch (e) {
+  } catch (e: any) {
     if (e.message.match(/fetch failed/)) {
       if (retries < 2) {
         fetchArgs.retries++;

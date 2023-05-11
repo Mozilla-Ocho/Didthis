@@ -1,13 +1,13 @@
 import { createContext, useContext } from 'react';
 import { observer } from 'mobx-react-lite';
-import Store from './store.ts';
+import Store from './store';
 
 const storeSingleton = new Store();
 storeSingleton.boot();
 
-const StoreContext = createContext();
+const StoreContext = createContext<Store | null>(null);
 
-const StoreWrapper = ({ children }) => {
+const StoreWrapper = ({ children }:any) => {
   // this wrapper should only be present once, towards the top of the
   // application component component tree.
   return (
@@ -18,14 +18,14 @@ const StoreWrapper = ({ children }) => {
 };
 
 const useStore = () => {
-  const store = useContext(StoreContext);
+  const store = useContext<Store | null>(StoreContext);
   if (!store) {
     throw new Error('useStore doesnt have the StoreContext');
   }
   return store;
 };
 
-const StoreReadinessWrapper = observer(({ ifNotReady, children }) => {
+const StoreReadinessWrapper = observer(({ ifNotReady, children }:any) => {
   const store = useStore();
   if (store.ready)
     return (

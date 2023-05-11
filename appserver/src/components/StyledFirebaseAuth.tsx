@@ -12,9 +12,9 @@ const StyledFirebaseAuth = ({
   firebaseAuth,
   className,
   uiCallback,
-}) => {
+}:any) => {
   const [userSignedIn, setUserSignedIn] = useState(false);
-  const [deregisterFn, setDeregisterFn] = useState(false);
+  const [deregisterFn, setDeregisterFn] = useState<false | Function>(false);
   const elementRef = useRef(null);
 
   const loadFirebaseui = useCallback(async () => {
@@ -46,7 +46,7 @@ const StyledFirebaseAuth = ({
   useEffect(() => {
     loadFirebaseui();
     return () => {
-      deregisterFn && deregisterFn()
+      if (deregisterFn) deregisterFn()
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

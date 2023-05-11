@@ -8,9 +8,9 @@ import { parse } from './parse';
 import { getValidationErrors } from './validation';
 
 class UserProfile {
-  _data = {};
+  _data:any = {};
 
-  constructor(opts) {
+  constructor(opts:any) {
     opts = opts || {};
     let parsed;
     if (opts.json) {
@@ -70,6 +70,7 @@ class UserProfile {
   backfillDefaults() {
     const defaults = constants.mkDefaultProfile();
     for (let key of constants.PROFILE_KEYS) {
+      // @ts-ignore
       this[key] = this[key] || defaults[key];
     }
   }
@@ -78,12 +79,12 @@ class UserProfile {
     // the backend applies this transformation before saving.  this makes it
     // easy to test for the presence of data in a field so we aren't thrown off
     // by pure whitespace.
-    function trimRecurse(obj) {
+    function trimRecurse(obj:any):any {
       if (typeof obj === 'undefined' || obj === null) return obj;
       if (typeof obj === 'string') return obj.trim();
       if (Array.isArray(obj)) return obj.map(trimRecurse);
       if (typeof obj === 'object') {
-        const newObj = {};
+        const newObj:any = {};
         for (let prop in obj) {
           newObj[prop] = trimRecurse(obj[prop]);
         }
@@ -98,7 +99,7 @@ class UserProfile {
     return getValidationErrors({ data: this._data });
   }
 
-  isMinimallyComplete({ urlSlug }) {
+  isMinimallyComplete({ urlSlug }:any) {
     // returns true if sufficient data is defined for the homepage to be live.
     // since the slug is not part of the profile object, urlSlug must be
     // passed in.
