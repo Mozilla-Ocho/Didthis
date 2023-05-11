@@ -14,18 +14,8 @@ import { useEffect } from "react";
 type GeneralError = false | "_get_me_first_fail_" | "_api_fail_"
 type LoginErrorMode = false | "_inactive_code_" | "_code_error_"
 
-// object lifecycle:
-// the mobx store is an application singleton instantiated once and then made
-// available via context through the the StoreWrapper component which is very
-// near the top of the react component tree.
-//
-// making it a singleton, rather than creating it via useState() avoids quite
-// some headache in respecting component lifecycle.  even though our top level
-// context wrapper component is only used once and never changes, react strict
-// mode in dev forces all components through the lifecycle and thus our store
-// setup would have to deal with getting run through that wash cycle, and
-// results in things like double api calls from boot() logic.
-//
+// XXX_PORTING review for non-singleton changes
+
 class Store {
   // ready becomes true after we've loaded the user from the api (get /me using
   // the session cookie), or gotten an unauth response from that api.
@@ -63,7 +53,7 @@ class Store {
     );
   }
 
-  boot() {
+  boot(nextURL?:string) {
     log.readiness("store booting");
     if (this.booted) {
       log.warn("store boot() called more than once");
@@ -74,6 +64,11 @@ class Store {
     //   serverUrl: clientAppPaths.amplitudeProxy,
     // });
     this.initAuth();
+    const url = nextURL && new URL(nextURL) || (typeof window === 'object' && new URL(window.location.toString()));
+    if (url) {
+      // DRY_47693 signup code logic
+      this.signupCode = url.searchParams.get('signupCode') || false;
+    }
     this.booted = true;
   }
 
@@ -169,7 +164,7 @@ class Store {
     firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE);
 
     apiClient
-      .getMe({ signupCode: self.signupCode })
+      .getMe({ signupCode: self.signupCode || undefined, expectUnauth: true })
       .then((user) => {
         log.readiness("initial getMe returned a user");
         self.setUser(user);
@@ -177,8 +172,9 @@ class Store {
       })
       .catch((e) => {
         if (
-          e.apiInfo?.responseWrapper?.status === 401 ||
-          e.apiInfo?.responseWrapper?.status === 403
+          e.apiInfo && (
+          e.apiInfo.responseWrapper.status === 401 ||
+          e.apiInfo.responseWrapper.status === 403)
         ) {
           log.readiness("initial getMe returned unauth");
           self.setReady(true);
@@ -205,7 +201,7 @@ class Store {
             // the GET me call here needs the signup code because it will
             // actually auto-vivify the user and register the signup event in
             // amplitude, which we want to associated with the code.
-            .then(() => apiClient.getMe({ signupCode: self.signupCode }))
+            .then(() => apiClient.getMe({ signupCode: self.signupCode || undefined }))
             .then((user) => {
               log.readiness("acquired getMe user after firebase auth");
               self.setUser(user);
@@ -255,18 +251,18 @@ class Store {
       return;
     }
     this.loginButtonsSpinning = true;
-    this.validateSignupCode().then(
+    apiClient.validateSignupCode({ code: this.signupCode || '' }).then(
       action((res) => {
         this.loginButtonsSpinning = false;
-        if (res.codeStatus === "active") {
+        if (res.payload.active) {
           this.firebaseModalOpen = true;
-        } else if (res.codeStatus === "inactive") {
+        } else if (res.payload.active === false) {
           this.loginErrorMode = "_inactive_code_";
-        } else {
-          this.loginErrorMode = "_code_error_";
         }
       })
-    );
+    ).catch(() => {
+      this.setGeneralError("_api_fail_");
+    });
   }
 
   cancelGlobalLoginOverlay() {
@@ -279,16 +275,17 @@ class Store {
     if (x) {
       log.auth("store acquired user", x);
       // @ts-ignore
-      window.fullResetForTestUser = async (confirm) => {
-        // test runners call this to reset test user profiles
-        if (confirm !== "confirm") throw new Error('arg must be "confirm"');
-        let user = await apiClient.postUserProfile({
-          fullResetForTestUser: confirm,
-        });
-        this.ingestUpdatedUser(user);
-        user = await apiClient.postUrlSlug({ fullResetForTestUser: confirm });
-        this.ingestUpdatedUser(user);
-      };
+      // XXX_PORTING
+      // window.fullResetForTestUser = async (confirm) => {
+      //   // test runners call this to reset test user profiles
+      //   if (confirm !== "confirm") throw new Error('arg must be "confirm"');
+      //   let user = await apiClient.postUserProfile({
+      //     fullResetForTestUser: confirm,
+      //   });
+      //   this.ingestUpdatedUser(user);
+      //   user = await apiClient.postUrlSlug({ fullResetForTestUser: confirm });
+      //   this.ingestUpdatedUser(user);
+      // };
       this.ingestUpdatedUser(x);
       // XXX_PORTING
       // amplitude.setUserId(x.id);
@@ -351,20 +348,6 @@ class Store {
     this.suggestedSlug = "";
   }
 
-  validateSignupCode() {
-    // DRY_47693 signup code logic
-    return apiClient
-      .validateSignupCode({ code: this.signupCode || '' })
-      .then(
-        action((res) => {
-          return res;
-        })
-      )
-      .catch((e) => {
-        this.setGeneralError("_api_fail_");
-      });
-  }
-
   // }}}
 
   ingestUpdatedUser(user: any) {
@@ -400,55 +383,58 @@ class Store {
     );
     this.editingSlug = user.urlSlug || this.suggestedSlug || "";
     this.suggestedSlug = "";
-    this.fetchSlugSuggestionIfNeeded();
+    //XXX_PORTING
+    //this.fetchSlugSuggestionIfNeeded();
   }
 
-  saveProfileChanges() {
-    if (!this.user)
-      throw new Error("updateProfile called without having an auth user");
-    // TODO: what if savingProfile is already true? it's mostly avoided
-    // by disabling the save button while saving, but what else might
-    this.savingProfile = true;
-    const wasIncomplete = !this.profileIsMinimallyComplete;
-    return apiClient
-      .postUserProfile({
-        userProfile: this.editingUserProfile,
-      })
-      .then(
-        action((user) => {
-          this.ingestUpdatedUser(user);
-          this.savingProfile = false;
-          if (wasIncomplete && this.profileIsMinimallyComplete) {
-            this.trackEvent(trackingEvents.caProfileBasicsAll);
-          }
-          return this.userProfile;
-        })
-      )
-      .catch(
-        action((e) => {
-          this.savingProfile = false;
-          this.setGeneralError("_api_fail_");
-          this.trackEvent(trackingEvents.apiError, { action: "profileSave" });
-          throw e;
-        })
-      );
-  }
+  // XXX_PORTING
+  // saveProfileChanges() {
+  //   if (!this.user)
+  //     throw new Error("updateProfile called without having an auth user");
+  //   // TODO: what if savingProfile is already true? it's mostly avoided
+  //   // by disabling the save button while saving, but what else might
+  //   this.savingProfile = true;
+  //   const wasIncomplete = !this.profileIsMinimallyComplete;
+  //   return apiClient
+  //     .postUserProfile({
+  //       userProfile: this.editingUserProfile,
+  //     })
+  //     .then(
+  //       action((user) => {
+  //         this.ingestUpdatedUser(user);
+  //         this.savingProfile = false;
+  //         if (wasIncomplete && this.profileIsMinimallyComplete) {
+  //           this.trackEvent(trackingEvents.caProfileBasicsAll);
+  //         }
+  //         return this.userProfile;
+  //       })
+  //     )
+  //     .catch(
+  //       action((e) => {
+  //         this.savingProfile = false;
+  //         this.setGeneralError("_api_fail_");
+  //         this.trackEvent(trackingEvents.apiError, { action: "profileSave" });
+  //         throw e;
+  //       })
+  //     );
+  // }
 
-  fetchSlugSuggestionIfNeeded() {
-    if (this.user && !this.user.urlSlug && !this.user.unsolicited) {
-      // they don't have a slug yet. fetch the current/best suggested slug from
-      // the API when the user loads and/or they update their profile.
-      apiClient
-        .getUrlSlug({ checkSlug: "" })
-        .then((payload) => {
-          if (payload.suggestedSlug) {
-            this.suggestedSlug = payload.suggestedSlug;
-            this.editingSlug = payload.suggestedSlug;
-          }
-        })
-        .catch(() => {});
-    }
-  }
+  // XXX_PORTING
+  // fetchSlugSuggestionIfNeeded() {
+  //   if (this.user && !this.user.urlSlug && !this.user.unsolicited) {
+  //     // they don't have a slug yet. fetch the current/best suggested slug from
+  //     // the API when the user loads and/or they update their profile.
+  //     apiClient
+  //       .getUrlSlug({ checkSlug: "" })
+  //       .then((payload) => {
+  //         if (payload.suggestedSlug) {
+  //           this.suggestedSlug = payload.suggestedSlug;
+  //           this.editingSlug = payload.suggestedSlug;
+  //         }
+  //       })
+  //       .catch(() => {});
+  //   }
+  // }
 
   setEditingSlug(x: string) {
     this.editingSlug = x;

@@ -1,17 +1,19 @@
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import Store from './store';
 
-const storeSingleton = new Store();
-storeSingleton.boot();
 
 const StoreContext = createContext<Store | null>(null);
 
-const StoreWrapper = ({ children }:any) => {
+const StoreWrapper = ({ nextURL, children }:any) => {
   // this wrapper should only be present once, towards the top of the
   // application component component tree.
+  const [store] = useState(() => new Store())
+  useEffect(() => {
+    store.boot(nextURL)
+  },[store])
   return (
-    <StoreContext.Provider value={storeSingleton}>
+    <StoreContext.Provider value={store}>
       {children}
     </StoreContext.Provider>
   );

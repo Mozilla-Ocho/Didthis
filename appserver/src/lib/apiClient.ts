@@ -1,5 +1,6 @@
 import { wrapFetch } from "./apiCore";
-import type { POJO, MeWrapper } from "./apiConstants";
+import type { FetchArgs} from "@/lib/apiCore"
+import type { POJO, MeWrapper, ValidateSignupCodeWrapper } from "./apiConstants";
 import { UserProfile } from "@/lib/UserProfile";
 
 const getHealthCheck = async () => {
@@ -7,14 +8,19 @@ const getHealthCheck = async () => {
   return payload;
 };
 
-const getMe = async (opts?: any): Promise<MeWrapper> => {
+const getMe = async (opts?: {
+  asTestUser?: string;
+  signupCode?: string;
+  expectUnauth?: boolean;
+}): Promise<MeWrapper> => {
   opts = opts || {};
   const { asTestUser, signupCode } = opts;
-  const fetchOpts: any = {
+  const fetchOpts: FetchArgs = {
     action: "me",
     asTestUser,
+    expectErrorIds: opts.expectUnauth ? ["ERR_UNAUTHORIZED"] : undefined,
+    queryParams: signupCode ? { signupCode } : undefined,
   };
-  if (signupCode) fetchOpts.queryParams = { signupCode };
   let wrapper = (await wrapFetch(fetchOpts)) as MeWrapper;
   return wrapper;
 };
@@ -160,14 +166,13 @@ const sessionLogout = async () => {
   return wrapper;
 };
 
-// XXX_PORTING change response shape
-const validateSignupCode = async ({ code }: { code: string }) => {
-  let payload = await wrapFetch({
+const validateSignupCode = async ({ code }: { code: string }): Promise<ValidateSignupCodeWrapper> => {
+  let wrapper = await wrapFetch({
     action: "validateSignupCode",
     method: "GET",
     queryParams: { code },
-  });
-  return payload;
+  }) as ValidateSignupCodeWrapper;
+  return wrapper;
 };
 
 const apiClient = {

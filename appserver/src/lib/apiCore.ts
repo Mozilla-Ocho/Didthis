@@ -1,6 +1,6 @@
 import log from "./log";
 import Cookies from "js-cookie";
-import type { Wrapper, ErrorId, POJO } from "./apiConstants";
+import type { Wrapper, ErrorWrapper, SuccessWrapper, ErrorId, POJO } from "./apiConstants";
 
 // endpoint is the scheme, domain, and port of the api backend
 // XXX_PORTING setup var
@@ -17,11 +17,13 @@ type FetchArgs = {
   queryParams?: QueryParams;
   body?: POJO;
   asTestUser?: string;
+  expectErrorStatuses?: number[];
+  expectErrorIds?: ErrorId[];
 };
 
 type ApiInfo = {
-  errorId: ErrorId;
-  errorMsg: string;
+  errorId?: ErrorId;
+  errorMsg?: string;
   fetchArgs?: FetchArgs;
   responseWrapper?: Wrapper;
   responseStatus?: number;
@@ -61,7 +63,7 @@ class ApiError extends Error {
   }
 }
 
-const wrapFetch = async (fetchArgs: FetchArgs): Promise<Wrapper> => {
+const wrapFetch = async (fetchArgs: FetchArgs): Promise<SuccessWrapper> => {
   // encapsulate fetch with a wrapper that:
   // - lets us use other http lib if we want
   // - only exposes the things we use
@@ -71,7 +73,16 @@ const wrapFetch = async (fetchArgs: FetchArgs): Promise<Wrapper> => {
   // todo: support passing post data and etc
   fetchArgs.method = fetchArgs.method || "GET";
   fetchArgs.retries = fetchArgs.retries || 0;
-  let { action, method, retries, queryParams, body, asTestUser } = fetchArgs;
+  let {
+    action,
+    method,
+    retries,
+    queryParams,
+    body,
+    asTestUser,
+    expectErrorIds,
+    expectErrorStatuses,
+  } = fetchArgs;
   queryParams = queryParams || {};
   try {
     if (process.env.NODE_ENV === "development") {
@@ -102,12 +113,12 @@ const wrapFetch = async (fetchArgs: FetchArgs): Promise<Wrapper> => {
     }
     log.api("fetching", action, queryParams, config);
     let res = await fetch(url, config);
-    let wrapper = null;
     if (res.status !== 200) {
       let errorId, errorMsg;
+      let wrapper: ErrorWrapper | undefined;
       try {
         // get the response json if present
-        wrapper = await res.json();
+        wrapper = await res.json() as ErrorWrapper;
         errorId = wrapper.errorId;
         errorMsg = wrapper.errorMsg;
       } catch (e) {}
@@ -118,10 +129,9 @@ const wrapFetch = async (fetchArgs: FetchArgs): Promise<Wrapper> => {
         responseWrapper: wrapper,
         responseStatus: res.status,
       });
-      //log.api('non 200 response:', wrapper);
       throw err;
     }
-    wrapper = await res.json();
+    let wrapper = await res.json() as SuccessWrapper;
     log.api("response:", action, wrapper);
     return wrapper;
   } catch (e: any) {
@@ -133,11 +143,31 @@ const wrapFetch = async (fetchArgs: FetchArgs): Promise<Wrapper> => {
         return wrapFetch(fetchArgs);
       }
     }
-    // putting error:e instead of just e prevents console from spewing a stack
-    // trace by default on everything including normal 401s when logged out and
-    // such.
-    log.api("error", { error: e });
-    throw e;
+    if (
+      (e instanceof ApiError &&
+        expectErrorIds &&
+        e.apiInfo?.errorId &&
+        expectErrorIds.includes(e.apiInfo?.errorId)) ||
+      (expectErrorStatuses &&
+        e.apiInfo?.responseStatus &&
+        expectErrorStatuses.includes(e.apiInfo?.responseStatus))
+    ) {
+      log.api("got expected error", {
+        action,
+        status: e.apiInfo.responseStatus,
+        errorId: e.apiInfo.errorId,
+      });
+      // even for expected errors, we throw because the promise in the normal
+      // case has to return a successful response only. caller is still
+      // expected to catch expected errors.
+      throw e;
+    } else {
+      // putting error:e instead of just e prevents console from spewing a
+      // stack trace by default on everything including normal 401s when logged
+      // out and such.
+      log.api("error", { error: e });
+      throw e;
+    }
   }
 };
 

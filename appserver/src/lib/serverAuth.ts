@@ -7,9 +7,16 @@ import Cookies from "cookies";
 import knex from "@/knex";
 import log from "@/lib/log";
 
-const firebaseApp = initializeApp({
-  credential: applicationDefault(),
-});
+let firebaseApp: ReturnType<typeof initializeApp>
+
+try {
+  firebaseApp = initializeApp({
+    credential: applicationDefault(),
+  });
+} catch(e) {
+  // nextjs hot reloading / rendering throws errors in firebase initializeApp
+  // about being called more than once.
+}
 
 const userFromDbRow = (dbRow: any, opts?: any): User => {
   // here we parse, validate, and return a polished POJO for the raw profile

@@ -1,11 +1,17 @@
-import { UserProfile } from "@/lib/UserProfile";
+// import { UserProfile } from "@/lib/UserProfile";
 
-type JSONABLE = undefined | boolean | string | number | {[key:string]: JSONABLE} | Array<JSONABLE>
-type POJO = {[key:string]:JSONABLE}
+type JSONABLE =
+  | undefined
+  | boolean
+  | string
+  | number
+  | { [key: string]: JSONABLE }
+  | Array<JSONABLE>;
+type POJO = { [key: string]: JSONABLE };
 
-type GenericErrorId = "ERR_UNAUTHORIZED" | "ERR_CSRF_TOKEN"
+type GenericErrorId = "ERR_UNAUTHORIZED" | "ERR_CSRF_TOKEN";
 
-type ErrorId = GenericErrorId
+type ErrorId = GenericErrorId;
 
 type User = {
   id: string;
@@ -20,29 +26,45 @@ type User = {
   lastFullPageLoad?: number;
   lastWrite?: number;
   updatedAt?: number;
-}
-
-interface Failure {
-  success: false;
-  errorId: ErrorId;
-  errorMsg?: string;
-}
-interface Success {
-  success: true;
-  payload: POJO;
-}
+};
 
 interface Wrapper {
   action: string;
   status: number;
-  result: Success | Failure;
+  success: boolean;
+  payload?: POJO;
+  errorId?: ErrorId;
+  errorMsg?: string;
+}
+interface SuccessWrapper extends Wrapper {
+  action: string;
+  status: number;
+  success: true;
+  payload: POJO;
+}
+interface ErrorWrapper extends Wrapper {
+  action: string;
+  status: number;
+  success: false;
+  errorId: ErrorId;
+  errorMsg: string;
 }
 
-interface MeSuccess extends Success {
+interface MeWrapper extends SuccessWrapper {
   payload: User;
 }
-interface MeWrapper extends Wrapper {
-  result: MeSuccess | Failure
+
+interface ValidateSignupCodeWrapper extends SuccessWrapper {
+  payload: { code: string; name: string; active: boolean };
 }
 
-export type { Wrapper, POJO, MeWrapper, ErrorId, User }
+export type {
+  Wrapper,
+  SuccessWrapper,
+  ErrorWrapper,
+  POJO,
+  ErrorId,
+  User,
+  MeWrapper,
+  ValidateSignupCodeWrapper,
+};

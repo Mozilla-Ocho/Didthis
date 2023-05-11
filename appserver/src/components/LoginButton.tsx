@@ -1,7 +1,6 @@
 import { Button } from "@/components/uiLib";
 import { observer } from "mobx-react-lite";
 import { useStore } from "@/lib/store";
-import { StyledFirebaseAuth } from "@/components/StyledFirebaseAuth";
 
 const LoginButton = observer(
   ({
@@ -20,6 +19,7 @@ const LoginButton = observer(
       store.launchGlobalLoginOverlay(overrideCodeCheck);
       onClick && onClick(e);
     };
+    const defaultText = store.signupCode ? 'Sign Up' : 'Log In'
     return (
       <Button
         onClick={handleClick}
@@ -27,7 +27,7 @@ const LoginButton = observer(
         loading={store.loginButtonsSpinning}
         data-testid={dataTestid || "loginButton"}
       >
-        {text || 'Log in / Sign up'}
+        {text || defaultText}
       </Button>
     );
   }

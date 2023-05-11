@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import type { MeWrapper } from "@/lib/apiConstants";
+import type { MeWrapper, ErrorWrapper } from "@/lib/apiConstants";
 import { getAuthUser } from "@/lib/serverAuth";
 import knex from "@/knex";
 
@@ -26,21 +26,17 @@ export default async function handler(
     const wrapper: MeWrapper = {
       action: "authentication",
       status: 401,
-      result: {
-        success: true,
-        payload: user,
-      },
+      success: true,
+      payload: user,
     };
     res.status(200).json(wrapper);
   } else {
-    const wrapper: MeWrapper = {
+    const wrapper: ErrorWrapper = {
       action: "authentication",
       status: 401,
-      result: {
-        success: false,
-        errorId: "ERR_UNAUTHORIZED",
-        errorMsg: "unauthorized",
-      },
+      success: false,
+      errorId: "ERR_UNAUTHORIZED",
+      errorMsg: "unauthorized",
     };
     res.status(401).json(wrapper);
   }
