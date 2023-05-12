@@ -1,6 +1,6 @@
 import log from "./log";
 import Cookies from "js-cookie";
-import type { Wrapper, ErrorWrapper, SuccessWrapper, ErrorId, POJO } from "./apiConstants";
+import type { Wrapper, ErrorWrapper, SuccessWrapper, ErrorId } from "./apiConstants";
 
 // endpoint is the scheme, domain, and port of the api backend
 // XXX_PORTING setup var
@@ -165,7 +165,7 @@ const wrapFetch = async (fetchArgs: FetchArgs): Promise<SuccessWrapper> => {
       // putting error:e instead of just e prevents console from spewing a
       // stack trace by default on everything including normal 401s when logged
       // out and such.
-      log.api("error", { error: e });
+      log.api("error", action, { error: e });
       throw e;
     }
   }

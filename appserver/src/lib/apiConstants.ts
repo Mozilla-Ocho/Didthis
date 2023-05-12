@@ -1,14 +1,5 @@
 // import { UserProfile } from "@/lib/UserProfile";
 
-type JSONABLE =
-  | undefined
-  | boolean
-  | string
-  | number
-  | { [key: string]: JSONABLE }
-  | Array<JSONABLE>;
-type POJO = { [key: string]: JSONABLE };
-
 type GenericErrorId = "ERR_UNAUTHORIZED" | "ERR_CSRF_TOKEN";
 
 type ErrorId = GenericErrorId;
@@ -40,7 +31,7 @@ interface SuccessWrapper extends Wrapper {
   action: string;
   status: number;
   success: true;
-  payload: POJO;
+  payload?: POJO;
 }
 interface ErrorWrapper extends Wrapper {
   action: string;
@@ -48,6 +39,11 @@ interface ErrorWrapper extends Wrapper {
   success: false;
   errorId: ErrorId;
   errorMsg: string;
+}
+
+interface EmptySuccessWrapper extends SuccessWrapper {
+  // some calls don't return data, for example sessionLogin and sessionLogout
+  // because their purpose is to set/destroy cookies.
 }
 
 interface MeWrapper extends SuccessWrapper {
@@ -62,9 +58,9 @@ export type {
   Wrapper,
   SuccessWrapper,
   ErrorWrapper,
-  POJO,
   ErrorId,
   User,
   MeWrapper,
   ValidateSignupCodeWrapper,
+  EmptySuccessWrapper,
 };

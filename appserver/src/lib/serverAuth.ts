@@ -6,19 +6,21 @@ import type { User } from "@/lib/apiConstants";
 import Cookies from "cookies";
 import knex from "@/knex";
 import log from "@/lib/log";
+import * as constants from "@/lib/constants";
+import type { UserDbRow } from "./dbTypes";
 
-let firebaseApp: ReturnType<typeof initializeApp>
+let firebaseApp: ReturnType<typeof initializeApp>;
 
 try {
   firebaseApp = initializeApp({
     credential: applicationDefault(),
   });
-} catch(e) {
+} catch (e) {
   // nextjs hot reloading / rendering throws errors in firebase initializeApp
   // about being called more than once.
 }
 
-const userFromDbRow = (dbRow: any, opts?: any): User => {
+const userFromDbRow = (dbRow: UserDbRow, opts?: any): User => {
   // here we parse, validate, and return a polished POJO for the raw profile
   // data in the db.  doing this here lets us do things like apply upgrades
   // from old profile versions to new ones at read time, and proactively fail
@@ -27,9 +29,9 @@ const userFromDbRow = (dbRow: any, opts?: any): User => {
   const user: User = {
     id: dbRow.id,
     email: dbRow.email,
-    urlSlug: dbRow.url_slug, // nullable
+    urlSlug: dbRow.url_slug || undefined,
     profile: profilePOJO,
-    createdAt: parseInt(dbRow.created_at_millis, 10),
+    createdAt: dbRow.created_at_millis,
     signupCodeName: dbRow.signup_code_name || "",
   };
   // DRY_47693 signup code logic
@@ -38,12 +40,9 @@ const userFromDbRow = (dbRow: any, opts?: any): User => {
   if (dbRow.ban_status === "banned") user.isBanned = true;
   if (opts && opts.includeAdminUIFields) {
     // signupCodeName was in here but is now just always returned
-    user.lastFullPageLoad =
-      dbRow.last_read_from_user && parseInt(dbRow.last_read_from_user, 10);
-    user.lastWrite =
-      dbRow.last_write_from_user && parseInt(dbRow.last_write_from_user, 10);
-    user.updatedAt =
-      dbRow.updated_at_millis && parseInt(dbRow.updated_at_millis, 10);
+    user.lastFullPageLoad = dbRow.last_read_from_user || undefined
+    user.lastWrite = dbRow.last_write_from_user || undefined
+    user.updatedAt = dbRow.updated_at_millis
   }
   return user;
 };
@@ -56,7 +55,7 @@ const getOrCreateUser = async ({
   email: string;
 }): Promise<User> => {
   const millis = new Date().getTime();
-  let dbRow: any = await knex("users").where("id", id).first();
+  let dbRow = await knex("users").where("id", id).first() as UserDbRow | undefined;
   // XXX_PORTING
   // const codeInfo = validateSignupCode(req.query.signupCode || "");
   if (dbRow) {
@@ -76,26 +75,27 @@ const getOrCreateUser = async ({
     //       .returning("*")
     //   )[0];
     // }
-    return dbRow;
+    return userFromDbRow(dbRow);
   }
   // else, create new
   // DRY_r9639 user creation logic
   log.auth("no user found, potentially a new signup, autovivifying");
   const defaultProfile = new UserProfile();
-  let columns = {
+  let columns: UserDbRow = {
     id,
-    is_firebase: true,
     email: email,
     url_slug: null,
-    profile: defaultProfile.toJSON(),
+    profile: defaultProfile.toPOJO(),
     //signup_code_name: codeInfo.codeName || null,
     signup_code_name: null, // XXX_PORTING
     created_at_millis: millis,
     updated_at_millis: millis,
     last_write_from_user: millis,
     last_read_from_user: millis,
+    admin_status: null,
+    ban_status: null,
   };
-  dbRow = (await knex("users").insert(columns).returning("*"))[0];
+  dbRow = (await knex("users").insert(columns).returning("*"))[0] as UserDbRow;
   log.auth("created user", dbRow.id);
   // XXX_PORTING
   // setReqAuthentication(req, dbRow); // have to set this early here so track event can obtain the new auth user id
@@ -111,9 +111,14 @@ const getAuthUser = (
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<User | null> => {
-  const cookies = new Cookies(req, res);
+  const cookies = new Cookies(req, res, {
+    // explicitly tell cookies lib whether to use secure cookies, rather
+    // than having it inspect the request, which won't work due to
+    // x-forwarded-proto being the real value.
+    secure: process.env.NEXT_PUBLIC_ENV_NAME !== "dev",
+  });
   // DRY_r9725 session cookie name
-  const sessionCookie = cookies.get("_grac_sess") || "";
+  const sessionCookie = cookies.get(constants.sessionCookieName) || "";
   // console.log('sessionCookie', sessionCookie);
   return (
     getAuth(firebaseApp)
@@ -126,6 +131,7 @@ const getAuthUser = (
       // specific api methods that warrant it.
       .verifySessionCookie(sessionCookie, true)
       .then((decodedClaims) => {
+        // console.log("decodedClaims",decodedClaims)
         // decodedClaims looks like: {
         //   iss: 'https://session.firebase.google.com/grac3land-dev',
         //   aud: 'grac3land-dev',
@@ -141,14 +147,17 @@ const getAuthUser = (
         // }
         return getOrCreateUser({
           id: decodedClaims.user_id,
-          email: decodedClaims.email || '',
+          email: decodedClaims.email || "",
         });
       })
       .catch(() => {
+        console.log("sessionCookie failed firebase verification")
         // TODO: delete cookie here?
         return null;
       })
   );
 };
 
-export { getAuthUser, userFromDbRow };
+const getAuthFirebaseApp = () => getAuth(firebaseApp);
+
+export { getAuthUser, userFromDbRow, getAuthFirebaseApp };

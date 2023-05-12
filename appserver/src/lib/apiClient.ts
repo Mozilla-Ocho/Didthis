@@ -1,6 +1,6 @@
 import { wrapFetch } from "./apiCore";
 import type { FetchArgs} from "@/lib/apiCore"
-import type { POJO, MeWrapper, ValidateSignupCodeWrapper } from "./apiConstants";
+import type { MeWrapper, ValidateSignupCodeWrapper, EmptySuccessWrapper } from "./apiConstants";
 import { UserProfile } from "@/lib/UserProfile";
 
 const getHealthCheck = async () => {
@@ -8,22 +8,51 @@ const getHealthCheck = async () => {
   return payload;
 };
 
-const getMe = async (opts?: {
+const getMe = async ({
+  asTestUser,
+  signupCode,
+  expectUnauth,
+}:{
   asTestUser?: string;
   signupCode?: string;
   expectUnauth?: boolean;
 }): Promise<MeWrapper> => {
-  opts = opts || {};
-  const { asTestUser, signupCode } = opts;
   const fetchOpts: FetchArgs = {
     action: "me",
     asTestUser,
-    expectErrorIds: opts.expectUnauth ? ["ERR_UNAUTHORIZED"] : undefined,
+    expectErrorIds: expectUnauth ? ["ERR_UNAUTHORIZED"] : undefined,
     queryParams: signupCode ? { signupCode } : undefined,
   };
   let wrapper = (await wrapFetch(fetchOpts)) as MeWrapper;
   return wrapper;
 };
+
+const sessionLogin = async ({ idToken }: { idToken: string }):Promise<EmptySuccessWrapper> => {
+  let wrapper = await wrapFetch({
+    action: "sessionLogin",
+    method: "POST",
+    body: { idToken },
+  }) as EmptySuccessWrapper
+  return wrapper;
+};
+
+const sessionLogout = async ():Promise<EmptySuccessWrapper> => {
+  let wrapper = await wrapFetch({
+    action: "sessionLogout",
+    method: "POST",
+  }) as EmptySuccessWrapper
+  return wrapper;
+};
+
+const validateSignupCode = async ({ code }: { code: string }): Promise<ValidateSignupCodeWrapper> => {
+  let wrapper = await wrapFetch({
+    action: "validateSignupCode",
+    method: "GET",
+    queryParams: { code },
+  }) as ValidateSignupCodeWrapper;
+  return wrapper;
+};
+
 
 // XXX_PORTING change response shape
 const postUserProfile = async ({
@@ -143,35 +172,6 @@ const getWaitlist = async ({ id }: { id: string }) => {
     method: "GET",
     queryParams: { id },
   });
-  return wrapper;
-};
-
-// XXX_PORTING change response shape
-const sessionLogin = async ({ idToken }: { idToken: string }) => {
-  let wrapper = await wrapFetch({
-    action: "sessionLogin",
-    method: "POST",
-    body: { idToken },
-  });
-  return wrapper;
-};
-
-// XXX_PORTING change response shape
-const sessionLogout = async () => {
-  let wrapper = await wrapFetch({
-    action: "sessionLogout",
-    method: "POST",
-    body: {},
-  });
-  return wrapper;
-};
-
-const validateSignupCode = async ({ code }: { code: string }): Promise<ValidateSignupCodeWrapper> => {
-  let wrapper = await wrapFetch({
-    action: "validateSignupCode",
-    method: "GET",
-    queryParams: { code },
-  }) as ValidateSignupCodeWrapper;
   return wrapper;
 };
 

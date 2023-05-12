@@ -31,7 +31,7 @@ const StoreReadinessWrapper = observer(({ ifNotReady, children }:any) => {
   const store = useStore();
   if (store.ready)
     return (
-      <div data-testid="storeReady" data-auth-uid={store.user?.id || ''}>
+      <div data-testid="storeReady" data-auth-uid={store.user && store.user.id || ''}>
         {children}
       </div>
     );

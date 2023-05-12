@@ -2,6 +2,7 @@ import { action, computed, makeAutoObservable, reaction, toJS } from "mobx";
 import apiClient from "@/lib/apiClient";
 import log from "@/lib/log";
 import { UserProfile } from "@/lib/UserProfile";
+import type { User } from "@/lib/apiConstants";
 import { constants as userProfileConstants } from "@/lib/UserProfile/constants";
 import { isEqual, debounce } from "lodash-es";
 import firebase from "firebase/compat/app";
@@ -11,8 +12,8 @@ import { clientAppPaths } from "@/lib/clientAppPaths";
 import { trackingEvents } from "@/lib/trackingEvents";
 import { useEffect } from "react";
 
-type GeneralError = false | "_get_me_first_fail_" | "_api_fail_"
-type LoginErrorMode = false | "_inactive_code_" | "_code_error_"
+type GeneralError = false | "_get_me_first_fail_" | "_api_fail_";
+type LoginErrorMode = false | "_inactive_code_" | "_code_error_";
 
 // XXX_PORTING review for non-singleton changes
 
@@ -22,7 +23,7 @@ class Store {
   ready = false;
   booted = false; // true on boot()
   showAuthComponents = false; // see clearUserBits() for explanation
-  user: false | any = false;
+  user: false | User = false;
   userProfile: false | UserProfile = false;
   // a copy of the user profile but for use in editable forms. this way we have
   // the last known server state and the changes in the client separately.
@@ -41,6 +42,7 @@ class Store {
   firebaseModalOpen = false;
   loginButtonsSpinning = false;
   loginErrorMode: LoginErrorMode = false;
+  nextURL: string | undefined = undefined;
 
   constructor() {
     makeAutoObservable(
@@ -53,7 +55,7 @@ class Store {
     );
   }
 
-  boot(nextURL?:string) {
+  boot() {
     log.readiness("store booting");
     if (this.booted) {
       log.warn("store boot() called more than once");
@@ -64,12 +66,23 @@ class Store {
     //   serverUrl: clientAppPaths.amplitudeProxy,
     // });
     this.initAuth();
-    const url = nextURL && new URL(nextURL) || (typeof window === 'object' && new URL(window.location.toString()));
+    this.parseSignupCode()
+    this.booted = true;
+  }
+
+  setNextURL(s: undefined | string) {
+    this.nextURL = s;
+    this.parseSignupCode()
+  }
+
+  parseSignupCode() {
+    const url = this.nextURL
+      ? new URL(this.nextURL)
+      : typeof window === "object" && new URL(window.location.toString());
     if (url) {
       // DRY_47693 signup code logic
-      this.signupCode = url.searchParams.get('signupCode') || false;
+      this.signupCode = url.searchParams.get("signupCode") || false;
     }
-    this.booted = true;
   }
 
   // {{{ urls
@@ -84,6 +97,7 @@ class Store {
     // if (store.userHomepageUrl) { assumes a live page } else { profile not
     // complete enough }
     if (!this.user) return undefined;
+    if (!this.user.urlSlug) return undefined;
     if (!this.userProfile) return undefined;
     if (!this.userProfile.isMinimallyComplete({ urlSlug: this.user.urlSlug }))
       return undefined;
@@ -165,16 +179,16 @@ class Store {
 
     apiClient
       .getMe({ signupCode: self.signupCode || undefined, expectUnauth: true })
-      .then((user) => {
+      .then((wrapper) => {
         log.readiness("initial getMe returned a user");
-        self.setUser(user);
+        self.setUser(wrapper.payload);
         self.setReady(true);
       })
       .catch((e) => {
         if (
-          e.apiInfo && (
-          e.apiInfo.responseWrapper.status === 401 ||
-          e.apiInfo.responseWrapper.status === 403)
+          e.apiInfo &&
+          (e.apiInfo.responseWrapper.status === 401 ||
+            e.apiInfo.responseWrapper.status === 403)
         ) {
           log.readiness("initial getMe returned unauth");
           self.setReady(true);
@@ -201,10 +215,12 @@ class Store {
             // the GET me call here needs the signup code because it will
             // actually auto-vivify the user and register the signup event in
             // amplitude, which we want to associated with the code.
-            .then(() => apiClient.getMe({ signupCode: self.signupCode || undefined }))
-            .then((user) => {
+            .then(() =>
+              apiClient.getMe({ signupCode: self.signupCode || undefined })
+            )
+            .then((wrapper) => {
               log.readiness("acquired getMe user after firebase auth");
-              self.setUser(user);
+              self.setUser(wrapper.payload);
               self.trackEvent(trackingEvents.caLogin);
               self.setReady(true);
             })
@@ -251,18 +267,21 @@ class Store {
       return;
     }
     this.loginButtonsSpinning = true;
-    apiClient.validateSignupCode({ code: this.signupCode || '' }).then(
-      action((res) => {
-        this.loginButtonsSpinning = false;
-        if (res.payload.active) {
-          this.firebaseModalOpen = true;
-        } else if (res.payload.active === false) {
-          this.loginErrorMode = "_inactive_code_";
-        }
-      })
-    ).catch(() => {
-      this.setGeneralError("_api_fail_");
-    });
+    apiClient
+      .validateSignupCode({ code: this.signupCode || "" })
+      .then(
+        action((res) => {
+          this.loginButtonsSpinning = false;
+          if (res.payload.active) {
+            this.firebaseModalOpen = true;
+          } else if (res.payload.active === false) {
+            this.loginErrorMode = "_inactive_code_";
+          }
+        })
+      )
+      .catch(() => {
+        this.setGeneralError("_api_fail_");
+      });
   }
 
   cancelGlobalLoginOverlay() {
@@ -271,7 +290,7 @@ class Store {
     this.loginButtonsSpinning = false;
   }
 
-  setUser(x: any) {
+  setUser(x: User | false) {
     if (x) {
       log.auth("store acquired user", x);
       // @ts-ignore
@@ -500,11 +519,17 @@ class Store {
     );
   }
 
-  postWaitlist({ email, landing_page }:{email: string, landing_page: string}) {
+  postWaitlist({
+    email,
+    landing_page,
+  }: {
+    email: string;
+    landing_page: string;
+  }) {
     return apiClient.postWaitlist({ email, landing_page });
   }
 
-  trackEvent(evt:any, opts?: any) {
+  trackEvent(evt: any, opts?: any) {
     // XXX_PORTING
     // const key = evt.key;
     // const fullEvent = JSON.parse(JSON.stringify(trackingEvents[key]));
@@ -518,7 +543,7 @@ class Store {
     // amplitude.track(fullEvent.eventName, fullEvent.opts);
   }
 
-  setTrackedPageEvent(evt:any, opts?: any) {
+  setTrackedPageEvent(evt: any, opts?: any) {
     const key = evt.key;
     // @ts-ignore
     const fullEvent = JSON.parse(JSON.stringify(trackingEvents[key]));
@@ -541,7 +566,7 @@ class Store {
     this.trackedPageEvent = fullEvent;
   }
 
-  useTrackedPageEvent = (evt:any, opts?:any) => {
+  useTrackedPageEvent = (evt: any, opts?: any) => {
     // react complains if i call useEffect as an object method. it has to be a
     // pure function. and you can't use 'this' in the dependency array.
     const self = this;
@@ -550,7 +575,7 @@ class Store {
     }, [self, evt, opts]);
   };
 
-  setGeneralError = (errId:GeneralError) => {
+  setGeneralError = (errId: GeneralError) => {
     this.generalError = errId;
   };
 

@@ -17,6 +17,8 @@ services:
     environment:
       PORT: 3000
       DATABASE_URL: "postgresql://devuser:devdummypass@pgserver:5432/devdb"
+      # XXX_PORTING add this to boilerplate docs for firebase, vars list etc
+      GOOGLE_APPLICATION_CREDENTIALS: '/appserver/.firebase-dev-credentials.json'
     ports:
       - "3000:3000"
     depends_on:

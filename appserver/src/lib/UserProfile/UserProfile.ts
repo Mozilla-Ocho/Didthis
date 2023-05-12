@@ -99,7 +99,7 @@ class UserProfile {
     return getValidationErrors({ data: this._data });
   }
 
-  isMinimallyComplete({ urlSlug }:any) {
+  isMinimallyComplete({ urlSlug }:{urlSlug?:string}):boolean {
     // returns true if sufficient data is defined for the homepage to be live.
     // since the slug is not part of the profile object, urlSlug must be
     // passed in.
@@ -112,15 +112,15 @@ class UserProfile {
     );
   }
 
-  toJSON() {
+  toJSON() : string {
     return JSON.stringify(this._data);
   }
 
-  toPOJO() {
+  toPOJO() : POJO {
     // this is used for returning profile data in payloads on the json api.
     // could return this._data here but that letters callers access/mutate
     // internal state.
-    return JSON.parse(this.toJSON());
+    return JSON.parse(this.toJSON()) as POJO;
   }
 }
 
