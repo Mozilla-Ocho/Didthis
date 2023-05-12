@@ -5,12 +5,12 @@ import Store from './store';
 
 const StoreContext = createContext<Store | null>(null);
 
-const StoreWrapper = ({ nextURL, children }:any) => {
+const StoreWrapper = ({ children }:any) => {
   // this wrapper should only be present once, towards the top of the
   // application component component tree.
   const [store] = useState(() => new Store())
   useEffect(() => {
-    store.boot(nextURL)
+    store.boot()
   },[store])
   return (
     <StoreContext.Provider value={store}>
