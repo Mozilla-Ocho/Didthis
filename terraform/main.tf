@@ -97,11 +97,12 @@ module "docker_repo" {
   depends_on = [module.gcp_apis]
 }
 
-# module "firebase" {
-#   source = "./modules/firebase"
-#   gcp_project_id = var.gcp_project_id
-#   depends_on = [module.gcp_apis]
-# }
+module "firebase" {
+  source = "./modules/firebase"
+  gcp_project_id = var.gcp_project_id
+  app_name = var.app_name
+  depends_on = [module.gcp_apis]
+}
 
 module "appserver_main" {
   count = var.flag_destroy ? 0 : 1
