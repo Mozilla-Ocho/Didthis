@@ -139,12 +139,12 @@ class Store {
       // from production bundles because the conditions will be
       // deterministically false to the transpiler.
       firebaseConfig = {
-        apiKey: "AIzaSyAqyllYZkkqUSB0dcQYdl6epZiCatVGFfc",
-        authDomain: "grac3land-dev.firebaseapp.com",
-        projectId: "grac3land-dev",
-        storageBucket: "grac3land-dev.appspot.com",
-        messagingSenderId: "613385491326",
-        appId: "1:613385491326:web:851e0f20d74d07c53dd92f",
+        apiKey: "AIzaSyDKFg457lbVbAB_dcLXU-2foZkl96ayu6U",
+        authDomain: "moz-fx-future-products-nonprod.firebaseapp.com",
+        projectId: "moz-fx-future-products-nonprod",
+        storageBucket: "moz-fx-future-products-nonprod.appspot.com",
+        messagingSenderId: "984891837435",
+        appId: "1:984891837435:web:f6e3d55ffb1f35db5d995e"
       };
     }
     if (process.env.NEXT_PUBLIC_ENV_NAME === "nonprod") {
@@ -154,7 +154,7 @@ class Store {
         projectId: "moz-fx-future-products-nonprod",
         storageBucket: "moz-fx-future-products-nonprod.appspot.com",
         messagingSenderId: "984891837435",
-        appId: "1:984891837435:web:1c40610ed86016115d995e",
+        appId: "1:984891837435:web:f6e3d55ffb1f35db5d995e"
       };
     }
     if (process.env.NEXT_PUBLIC_ENV_NAME === "prod") {
@@ -164,7 +164,8 @@ class Store {
         projectId: "moz-fx-future-products-prod",
         storageBucket: "moz-fx-future-products-prod.appspot.com",
         messagingSenderId: "29393258446",
-        appId: "1:29393258446:web:1c1f3bc100e5f679140d9f",
+        // XXX_PORTING
+        // appId: "1:29393258446:web:1c1f3bc100e5f679140d9f",
       };
     }
     const self = this;
