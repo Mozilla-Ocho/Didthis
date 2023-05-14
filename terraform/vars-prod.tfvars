@@ -10,6 +10,7 @@ env_name="prod"
 flag_destroy=false
 flag_use_db=false
 flag_use_dummy_appserver=true
+flag_use_firebase=false
 gcp_project_id="REPLACEME"
 gcp_project_number="REPLACEME"
 region="us-central1"
