@@ -120,6 +120,7 @@ const getAuthUser = (
   // DRY_r9725 session cookie name
   const sessionCookie = cookies.get(constants.sessionCookieName) || "";
   // console.log('sessionCookie', sessionCookie);
+  if (!sessionCookie) return Promise.resolve(null);
   return (
     getAuth(firebaseApp)
       // note that "true" here in verifySessionCookie is important, it checks the

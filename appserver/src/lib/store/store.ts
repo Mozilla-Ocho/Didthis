@@ -159,13 +159,7 @@ class Store {
     }
     if (process.env.NEXT_PUBLIC_ENV_NAME === "prod") {
       firebaseConfig = {
-        apiKey: "AIzaSyCBrJmCmx2HA2Q70m5P6oS4XGPGb9z9xBo",
-        authDomain: "moz-fx-future-products-prod.firebaseapp.com",
-        projectId: "moz-fx-future-products-prod",
-        storageBucket: "moz-fx-future-products-prod.appspot.com",
-        messagingSenderId: "29393258446",
-        // XXX_PORTING
-        // appId: "1:29393258446:web:1c1f3bc100e5f679140d9f",
+        // XXX_PORTING setup prod here
       };
     }
     const self = this;
