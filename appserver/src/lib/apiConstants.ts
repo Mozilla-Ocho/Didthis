@@ -4,21 +4,6 @@ type GenericErrorId = "ERR_UNAUTHORIZED" | "ERR_CSRF_TOKEN";
 
 type ErrorId = GenericErrorId;
 
-type User = {
-  id: string;
-  email: string;
-  urlSlug?: string;
-  profile: POJO;
-  createdAt: number;
-  signupCodeName?: string;
-  unsolicited?: true;
-  isAdmin?: true;
-  isBanned?: true;
-  lastFullPageLoad?: number;
-  lastWrite?: number;
-  updatedAt?: number;
-};
-
 interface Wrapper {
   action: string;
   status: number;
@@ -47,7 +32,7 @@ interface EmptySuccessWrapper extends SuccessWrapper {
 }
 
 interface MeWrapper extends SuccessWrapper {
-  payload: User;
+  payload: ApiUser;
 }
 
 interface ValidateSignupCodeWrapper extends SuccessWrapper {
@@ -59,7 +44,6 @@ export type {
   SuccessWrapper,
   ErrorWrapper,
   ErrorId,
-  User,
   MeWrapper,
   ValidateSignupCodeWrapper,
   EmptySuccessWrapper,

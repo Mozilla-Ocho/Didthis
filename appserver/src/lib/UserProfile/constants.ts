@@ -25,7 +25,6 @@ const constants = {
       name: '',
       avatarPublicID: '',
       bio: '',
-      promptResponses: [],
     }),
 
   normalizeUrlConfig: {

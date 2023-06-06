@@ -1,6 +1,7 @@
 import log from "./log";
 import Cookies from "js-cookie";
 import type { Wrapper, ErrorWrapper, SuccessWrapper, ErrorId } from "./apiConstants";
+import * as constants from "@/lib/constants";
 
 // endpoint is the scheme, domain, and port of the api backend
 // XXX_PORTING setup var
@@ -16,6 +17,7 @@ type FetchArgs = {
   retries?: number;
   queryParams?: QueryParams;
   body?: POJO;
+  sessionCookie?: string;
   asTestUser?: string;
   expectErrorStatuses?: number[];
   expectErrorIds?: ErrorId[];
@@ -79,6 +81,7 @@ const wrapFetch = async (fetchArgs: FetchArgs): Promise<SuccessWrapper> => {
     retries,
     queryParams,
     body,
+    sessionCookie,
     asTestUser,
     expectErrorIds,
     expectErrorStatuses,
@@ -99,6 +102,9 @@ const wrapFetch = async (fetchArgs: FetchArgs): Promise<SuccessWrapper> => {
         Accept: "application/json",
       },
     };
+    if (sessionCookie) {
+      config.headers['Cookie'] = constants.sessionCookieName+"="+sessionCookie
+    }
     if (method === "POST") {
       config.headers["Content-Type"] = "application/json";
       if (typeof body === "object") {

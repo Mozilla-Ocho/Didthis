@@ -1,10 +1,10 @@
-import { action, computed, makeAutoObservable, reaction, toJS } from "mobx";
+import { action, computed, makeAutoObservable } from "mobx";
 import apiClient from "@/lib/apiClient";
 import log from "@/lib/log";
 import { UserProfile } from "@/lib/UserProfile";
 import type { User } from "@/lib/apiConstants";
-import { constants as userProfileConstants } from "@/lib/UserProfile/constants";
-import { isEqual, debounce } from "lodash-es";
+// import { constants as userProfileConstants } from "@/lib/UserProfile/constants";
+import { isEqual } from "lodash-es";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import { clientAppPaths } from "@/lib/clientAppPaths";
@@ -15,13 +15,11 @@ import { useEffect } from "react";
 type GeneralError = false | "_get_me_first_fail_" | "_api_fail_";
 type LoginErrorMode = false | "_inactive_code_" | "_code_error_";
 
+let moduleGlobalFirebaseInitialized = false;
+
 // XXX_PORTING review for non-singleton changes
 
 class Store {
-  // ready becomes true after we've loaded the user from the api (get /me using
-  // the session cookie), or gotten an unauth response from that api.
-  ready = false;
-  booted = false; // true on boot()
   showAuthComponents = false; // see clearUserBits() for explanation
   user: false | User = false;
   userProfile: false | UserProfile = false;
@@ -42,9 +40,9 @@ class Store {
   firebaseModalOpen = false;
   loginButtonsSpinning = false;
   loginErrorMode: LoginErrorMode = false;
-  nextURL: string | undefined = undefined;
+  fullpageLoading: boolean = false; // used when signing in
 
-  constructor() {
+  constructor({user, signupCode}:{user?:ApiUser | false, signupCode?: false | string}) {
     makeAutoObservable(
       this,
       {
@@ -53,36 +51,12 @@ class Store {
       },
       { autoBind: true }
     );
+    if (signupCode) this.setSignupCode(signupCode)
+    if (user) this.setUser(user)
   }
 
-  boot() {
-    log.readiness("store booting");
-    if (this.booted) {
-      log.warn("store boot() called more than once");
-      return;
-    }
-    // XXX_PORTING
-    // amplitude.init(process.env.REACT_APP_AMPLITUDE_API_KEY, '', {
-    //   serverUrl: clientAppPaths.amplitudeProxy,
-    // });
-    this.initAuth();
-    this.parseSignupCode()
-    this.booted = true;
-  }
-
-  setNextURL(s: undefined | string) {
-    this.nextURL = s;
-    this.parseSignupCode()
-  }
-
-  parseSignupCode() {
-    const url = this.nextURL
-      ? new URL(this.nextURL)
-      : typeof window === "object" && new URL(window.location.toString());
-    if (url) {
-      // DRY_47693 signup code logic
-      this.signupCode = url.searchParams.get("signupCode") || false;
-    }
+  setSignupCode(code: string | false) {
+    this.signupCode = code
   }
 
   // {{{ urls
@@ -120,13 +94,16 @@ class Store {
 
   // {{{ auth
 
-  setReady(x: boolean) {
-    log.readiness("store ready");
-    this.ready = x;
+  setFullPageLoading(x: boolean) {
+    this.fullpageLoading = x
   }
 
-  initAuth() {
+  initFirebase() {
+    const self = this;
     let firebaseConfig;
+    if (moduleGlobalFirebaseInitialized) return;
+    moduleGlobalFirebaseInitialized = true;
+
     // DRY_63816 firebase client config (not secret, but does depend on
     // environment)
     // TODO: better environment config handling. i don't yet have a way to set
@@ -162,48 +139,25 @@ class Store {
         // XXX_PORTING setup prod here
       };
     }
-    const self = this;
 
     if (firebaseConfig) firebase.initializeApp(firebaseConfig);
     self.firebaseRef = firebase;
 
-    // we disable client-side auth because we're using cookie session auth
-    // instead. when session auth is active, the react app knows it's authed by
-    // the result of the get /me api call.
+    // we disable client-side auth because we're using our own cookie session
+    // auth instead.
     firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE);
 
-    apiClient
-      .getMe({ signupCode: self.signupCode || undefined, expectUnauth: true })
-      .then((wrapper) => {
-        log.readiness("initial getMe returned a user");
-        self.setUser(wrapper.payload);
-        self.setReady(true);
-      })
-      .catch((e) => {
-        if (
-          e.apiInfo &&
-          (e.apiInfo.responseWrapper.status === 401 ||
-            e.apiInfo.responseWrapper.status === 403)
-        ) {
-          log.readiness("initial getMe returned unauth");
-          self.setReady(true);
-        } else {
-          // unknown. network error?
-          this.setGeneralError("_get_me_first_fail_");
-          self.setReady(true);
-        }
-      });
-
     firebase.auth().onAuthStateChanged(
+      // called after a sign in / sign up action from the user in the firebase
+      // ui, and we want to generate a session cookie from it (and potentially
+      // autovivify the user in the backend)
       function (firebaseUser) {
         if (firebaseUser) {
           log.auth("firebase user", firebaseUser);
-          log.readiness(
-            "switch back to ready=false to handle firebase auth result"
-          );
-          self.setReady(false); // start the fullpage spinner again
           // and we can close the firebase ui container modal
           self.cancelGlobalLoginOverlay();
+          // and switch to our own loading state
+          self.setFullPageLoading(true)
           firebaseUser
             .getIdToken()
             .then((idToken) => apiClient.sessionLogin({ idToken }))
@@ -211,13 +165,13 @@ class Store {
             // actually auto-vivify the user and register the signup event in
             // amplitude, which we want to associated with the code.
             .then(() =>
-              apiClient.getMe({ signupCode: self.signupCode || undefined })
+              apiClient.getMe({ signupCode: self.signupCode })
             )
             .then((wrapper) => {
               log.readiness("acquired getMe user after firebase auth");
               self.setUser(wrapper.payload);
               self.trackEvent(trackingEvents.caLogin);
-              self.setReady(true);
+              self.setFullPageLoading(false)
             })
             .catch((e) => {
               log.error("error acquiring user onAuthStateChanged", e);
@@ -230,13 +184,14 @@ class Store {
             });
         } else {
           self.cancelGlobalLoginOverlay();
+          self.setFullPageLoading(false)
         }
       },
       function (error) {
         log.error(error);
-        log.readiness("firebase auth error, set ready=true (still unauth)");
+        log.readiness("firebase auth error");
         self.cancelGlobalLoginOverlay();
-        self.setReady(true);
+        self.setFullPageLoading(false)
       }
     );
   }
@@ -286,6 +241,7 @@ class Store {
   }
 
   setUser(x: User | false) {
+    log.auth("setuser", x);
     if (x) {
       log.auth("store acquired user", x);
       // @ts-ignore
@@ -328,8 +284,6 @@ class Store {
       this.showAuthComponents = false;
       setTimeout(() => this.clearUserBits(), 1);
     }
-    if (x) window.localStorage.setItem("authUserId", x.id);
-    else window.localStorage.removeItem("authUserId");
   }
 
   logOut() {
@@ -339,7 +293,7 @@ class Store {
     return apiClient
       .sessionLogout()
       .then(() => {
-        this.setUser(false);
+        // this.setUser(false); // avoid ux flash, the new page load handles state reset
         // XXX_PORTING
         // amplitude.reset(); // clears amplitude ids
         window.location.assign(clientAppPaths.afterLogout);

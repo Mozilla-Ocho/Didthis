@@ -12,16 +12,19 @@ const getMe = async ({
   asTestUser,
   signupCode,
   expectUnauth,
+  sessionCookie,
 }:{
   asTestUser?: string;
-  signupCode?: string;
+  signupCode?: string | false;
   expectUnauth?: boolean;
+  sessionCookie?: string;
 }): Promise<MeWrapper> => {
   const fetchOpts: FetchArgs = {
     action: "me",
     asTestUser,
     expectErrorIds: expectUnauth ? ["ERR_UNAUTHORIZED"] : undefined,
     queryParams: signupCode ? { signupCode } : undefined,
+    sessionCookie,
   };
   let wrapper = (await wrapFetch(fetchOpts)) as MeWrapper;
   return wrapper;
