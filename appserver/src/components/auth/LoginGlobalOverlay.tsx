@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import log from "@/lib/log";
 import { useStore } from "@/lib/store";
-import { StyledFirebaseAuth } from "@/components/StyledFirebaseAuth";
+import { StyledFirebaseAuth } from "@/components/auth/StyledFirebaseAuth";
 
 // XXX_SKELETON
 const LoginGlobalOverlay = observer(() => {

@@ -2,12 +2,10 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { initializeApp, applicationDefault } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { UserProfile } from "@/lib/UserProfile";
-import type { User } from "@/lib/apiConstants";
 import Cookies from "cookies";
 import knex from "@/knex";
 import log from "@/lib/log";
 import * as constants from "@/lib/constants";
-import type { UserDbRow } from "./dbTypes";
 
 let firebaseApp: ReturnType<typeof initializeApp>;
 
@@ -20,25 +18,28 @@ try {
   // about being called more than once.
 }
 
-const userFromDbRow = (dbRow: UserDbRow, opts?: any): User => {
+const userFromDbRow = (dbRow: UserDbRow, opts: {publicFilter: boolean, includeAdminUIFields?: boolean}): ApiUser => {
   // here we parse, validate, and return a polished POJO for the raw profile
   // data in the db.  doing this here lets us do things like apply upgrades
   // from old profile versions to new ones at read time, and proactively fail
   // if db profile data is corrupted.
-  const profilePOJO = new UserProfile({ data: dbRow.profile }).toPOJO();
-  const user: User = {
+  const profile = new UserProfile({ data: dbRow.profile })
+  const profilePOJO = opts.publicFilter ? profile.toPOJOwithPublic() : profile.toPOJOwithPrivate();
+  const user: ApiUser = {
     id: dbRow.id,
     email: dbRow.email,
     urlSlug: dbRow.url_slug || undefined,
     profile: profilePOJO,
     createdAt: dbRow.created_at_millis,
-    signupCodeName: dbRow.signup_code_name || "",
   };
-  // DRY_47693 signup code logic
-  if (!dbRow.signup_code_name) user.unsolicited = true;
+  if (!opts.publicFilter && !opts.includeAdminUIFields) {
+    // DRY_47693 signup code logic
+    user.signupCodeName = dbRow.signup_code_name || ""
+    if (!dbRow.signup_code_name) user.unsolicited = true;
+  }
   if (dbRow.admin_status === "admin") user.isAdmin = true;
   if (dbRow.ban_status === "banned") user.isBanned = true;
-  if (opts && opts.includeAdminUIFields) {
+  if (opts.includeAdminUIFields) {
     // signupCodeName was in here but is now just always returned
     user.lastFullPageLoad = dbRow.last_read_from_user || undefined
     user.lastWrite = dbRow.last_write_from_user || undefined
@@ -47,13 +48,35 @@ const userFromDbRow = (dbRow: UserDbRow, opts?: any): User => {
   return user;
 };
 
+const generateRandomAvailableSlug = async() => {
+  const mkRandSlug = () => {
+    const chars = 'bcdfghjkmnpqrstvwxyz23456789'
+    let slug = ''
+    for (let i = 0; i < 8; i++) {
+      slug = slug + chars[Math.floor(Math.random() * chars.length)]
+    }
+    return slug
+  }
+  let available = false
+  let slug = mkRandSlug()
+  while (!available) {
+    const dbRow = await knex("users").where("url_slug", slug).first() as UserDbRow | undefined;
+    if (dbRow) {
+      slug = mkRandSlug()
+    } else {
+      available = true
+    }
+  }
+  return slug
+}
+
 const getOrCreateUser = async ({
   id,
   email,
 }: {
   id: string;
   email: string;
-}): Promise<User> => {
+}): Promise<ApiUser> => {
   const millis = new Date().getTime();
   let dbRow = await knex("users").where("id", id).first() as UserDbRow | undefined;
   // XXX_PORTING
@@ -75,17 +98,18 @@ const getOrCreateUser = async ({
     //       .returning("*")
     //   )[0];
     // }
-    return userFromDbRow(dbRow);
+    return userFromDbRow(dbRow, {publicFilter:false})
   }
   // else, create new
   // DRY_r9639 user creation logic
   log.auth("no user found, potentially a new signup, autovivifying");
+  const newSlug = await generateRandomAvailableSlug()
   const defaultProfile = new UserProfile();
   let columns: UserDbRow = {
     id,
     email: email,
-    url_slug: null,
-    profile: defaultProfile.toPOJO(),
+    url_slug: newSlug,
+    profile: defaultProfile.toPOJOwithPrivate(),
     //signup_code_name: codeInfo.codeName || null,
     signup_code_name: null, // XXX_PORTING
     created_at_millis: millis,
@@ -102,7 +126,7 @@ const getOrCreateUser = async ({
   // trackEventReqEvtOpts(req, trackingEvents.caSignup, {
   //   signupCodeName: codeInfo.codeName || "none",
   // });
-  return userFromDbRow(dbRow);
+  return userFromDbRow(dbRow, {publicFilter: false});
 };
 
 // reads the Authorization header for the bearer token and validates it, looks
@@ -110,7 +134,7 @@ const getOrCreateUser = async ({
 const getAuthUser = (
   req: NextApiRequest,
   res: NextApiResponse
-): Promise<User | null> => {
+): Promise<ApiUser | null> => {
   const cookies = new Cookies(req, res, {
     // explicitly tell cookies lib whether to use secure cookies, rather
     // than having it inspect the request, which won't work due to

@@ -6,20 +6,24 @@ import { useStore } from "@/lib/store";
 import { getServerSideProps as indexPageGetServerSideProps } from "@/pages/index";
 
 import { H } from "@/components/uiLib";
-import LoginBouncer from '@/components/auth/LoginBouncer';
-import ProjectForm from '@/components/forms/ProjectForm';
+import UserPreview from '@/components/UserPreview';
 
 // XXX_SKELETON
 
-const NewProject = observer(() => {
+const ProjectWithPostFocus = observer(() => {
   const store = useStore();
   const router = useRouter();
-  if (!store.user) return <LoginBouncer/>
+  const fakeUser = {
+    id: 'asdf',
+    email: 'foo@bar.com',
+    createdAt: new Date().getTime(),
+    profile: {}
+  }
   return (
     <>
       <div>
-        <H.H1>new project for user {router.query.slug}</H.H1>
-        <ProjectForm />
+        <H.H1>project detail (id={router.query.projectId}) for user {router.query.slug}</H.H1>
+        <UserPreview user={fakeUser} />
       </div>
     </>
   );
@@ -28,7 +32,7 @@ const NewProject = observer(() => {
 const Wrapper = ({ authUser, signupCode }: {authUser: ApiUser | false, signupCode: string | false}) => {
   return (
     <DefaultLayout authUser={authUser} signupCode={signupCode} headerFooter={true}>
-      <NewProject />
+      <ProjectWithPostFocus />
     </DefaultLayout>
   );
 };

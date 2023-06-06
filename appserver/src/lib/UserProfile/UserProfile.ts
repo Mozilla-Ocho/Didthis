@@ -10,7 +10,7 @@ import { getValidationErrors } from './validation';
 class UserProfile {
   _data:any = {};
 
-  constructor(opts?:any) {
+  constructor(opts?:{json?: string, data?: POJO}) {
     opts = opts || {};
     let parsed;
     if (opts.json) {
@@ -116,11 +116,25 @@ class UserProfile {
     return JSON.stringify(this._data);
   }
 
-  toPOJO() : POJO {
+  toPOJOwithPrivate() : POJO {
     // this is used for returning profile data in payloads on the json api.
     // could return this._data here but that letters callers access/mutate
     // internal state.
     return JSON.parse(this.toJSON()) as POJO;
+  }
+
+  privacyFilteredCopy() : UserProfile {
+    // XXX_SKELETON
+    const filtered = new UserProfile()
+    filtered.name = this.name
+    filtered.bio = this.bio
+    filtered.avatarPublicID = this.avatarPublicID
+    filtered.version = this.version
+    return filtered
+  }
+
+  toPOJOwithPublic() : POJO {
+    return this.privacyFilteredCopy()._data
   }
 }
 

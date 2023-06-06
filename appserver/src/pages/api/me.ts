@@ -25,7 +25,7 @@ export default async function handler(
     user.updatedAt = millis
     const wrapper: MeWrapper = {
       action: "authentication",
-      status: 401,
+      status: 200,
       success: true,
       payload: user,
     };

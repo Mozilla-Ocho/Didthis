@@ -2,7 +2,6 @@ import { action, computed, makeAutoObservable } from "mobx";
 import apiClient from "@/lib/apiClient";
 import log from "@/lib/log";
 import { UserProfile } from "@/lib/UserProfile";
-import type { User } from "@/lib/apiConstants";
 // import { constants as userProfileConstants } from "@/lib/UserProfile/constants";
 import { isEqual } from "lodash-es";
 import firebase from "firebase/compat/app";
@@ -21,7 +20,7 @@ let moduleGlobalFirebaseInitialized = false;
 
 class Store {
   showAuthComponents = false; // see clearUserBits() for explanation
-  user: false | User = false;
+  user: false | ApiUser = false;
   userProfile: false | UserProfile = false;
   // a copy of the user profile but for use in editable forms. this way we have
   // the last known server state and the changes in the client separately.
@@ -42,7 +41,7 @@ class Store {
   loginErrorMode: LoginErrorMode = false;
   fullpageLoading: boolean = false; // used when signing in
 
-  constructor({user, signupCode}:{user?:ApiUser | false, signupCode?: false | string}) {
+  constructor({authUser, signupCode}:{authUser?:ApiUser | false, signupCode?: false | string}) {
     makeAutoObservable(
       this,
       {
@@ -52,7 +51,7 @@ class Store {
       { autoBind: true }
     );
     if (signupCode) this.setSignupCode(signupCode)
-    if (user) this.setUser(user)
+    if (authUser) this.setUser(authUser)
   }
 
   setSignupCode(code: string | false) {
@@ -240,7 +239,7 @@ class Store {
     this.loginButtonsSpinning = false;
   }
 
-  setUser(x: User | false) {
+  setUser(x: ApiUser | false) {
     log.auth("setuser", x);
     if (x) {
       log.auth("store acquired user", x);
@@ -342,8 +341,9 @@ class Store {
     this.editingUserProfile = makeAutoObservable(
       new UserProfile({
         data: user.profile,
-        mobxMakeAutoObservable: makeAutoObservable,
-        mobxComputed: computed,
+        // XXX_PORTING
+        // mobxMakeAutoObservable: makeAutoObservable,
+        // mobxComputed: computed,
       }),
       {
         validation: computed.struct,

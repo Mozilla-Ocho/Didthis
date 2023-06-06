@@ -1,6 +1,6 @@
 // import { UserProfile } from "@/lib/UserProfile";
 
-type GenericErrorId = "ERR_UNAUTHORIZED" | "ERR_CSRF_TOKEN";
+type GenericErrorId = "ERR_UNAUTHORIZED" | "ERR_CSRF_TOKEN" | "ERR_NOT_FOUND";
 
 type ErrorId = GenericErrorId;
 
@@ -35,6 +35,10 @@ interface MeWrapper extends SuccessWrapper {
   payload: ApiUser;
 }
 
+interface PublicUserWrapper extends SuccessWrapper {
+  payload: ApiUser;
+}
+
 interface ValidateSignupCodeWrapper extends SuccessWrapper {
   payload: { code: string; name: string; active: boolean };
 }
@@ -45,6 +49,7 @@ export type {
   ErrorWrapper,
   ErrorId,
   MeWrapper,
+  PublicUserWrapper,
   ValidateSignupCodeWrapper,
   EmptySuccessWrapper,
 };

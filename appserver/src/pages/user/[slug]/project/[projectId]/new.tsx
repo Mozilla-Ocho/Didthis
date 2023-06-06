@@ -7,19 +7,19 @@ import { getServerSideProps as indexPageGetServerSideProps } from "@/pages/index
 
 import { H } from "@/components/uiLib";
 import LoginBouncer from '@/components/auth/LoginBouncer';
-import ProjectForm from '@/components/forms/ProjectForm';
+import PostForm from '@/components/forms/PostForm';
 
 // XXX_SKELETON
 
-const NewProject = observer(() => {
+const NewPost = observer(() => {
   const store = useStore();
   const router = useRouter();
   if (!store.user) return <LoginBouncer/>
   return (
     <>
       <div>
-        <H.H1>new project for user {router.query.slug}</H.H1>
-        <ProjectForm />
+        <H.H1>new post for user {router.query.slug} in project {router.query.projectId}</H.H1>
+        <PostForm />
       </div>
     </>
   );
@@ -28,7 +28,7 @@ const NewProject = observer(() => {
 const Wrapper = ({ authUser, signupCode }: {authUser: ApiUser | false, signupCode: string | false}) => {
   return (
     <DefaultLayout authUser={authUser} signupCode={signupCode} headerFooter={true}>
-      <NewProject />
+      <NewPost />
     </DefaultLayout>
   );
 };

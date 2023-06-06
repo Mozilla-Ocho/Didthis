@@ -1,6 +1,6 @@
 import { wrapFetch } from "./apiCore";
 import type { FetchArgs} from "@/lib/apiCore"
-import type { MeWrapper, ValidateSignupCodeWrapper, EmptySuccessWrapper } from "./apiConstants";
+import type { MeWrapper, PublicUserWrapper, ValidateSignupCodeWrapper, EmptySuccessWrapper } from "./apiConstants";
 import { UserProfile } from "@/lib/UserProfile";
 
 const getHealthCheck = async () => {
@@ -30,6 +30,19 @@ const getMe = async ({
   return wrapper;
 };
 
+const getPublicUser = async ({
+  urlSlug,
+}:{
+  urlSlug: string;
+}): Promise<PublicUserWrapper> => {
+  const fetchOpts: FetchArgs = {
+    action: "getUser",
+    queryParams: { urlSlug },
+  };
+  let wrapper = (await wrapFetch(fetchOpts)) as PublicUserWrapper;
+  return wrapper;
+};
+
 const sessionLogin = async ({ idToken }: { idToken: string }):Promise<EmptySuccessWrapper> => {
   let wrapper = await wrapFetch({
     action: "sessionLogin",
@@ -56,7 +69,6 @@ const validateSignupCode = async ({ code }: { code: string }): Promise<ValidateS
   return wrapper;
 };
 
-
 // XXX_PORTING change response shape
 const postUserProfile = async ({
   userProfile,
@@ -68,7 +80,7 @@ const postUserProfile = async ({
   asTestUser?: string;
 }): Promise<MeWrapper> => {
   let body: POJO = {};
-  body.profile = _testRawProfile || userProfile.toPOJO();
+  body.profile = _testRawProfile || userProfile.toPOJOwithPrivate();
   let wrapper = (await wrapFetch({
     action: "profile",
     method: "POST",
@@ -181,6 +193,7 @@ const getWaitlist = async ({ id }: { id: string }) => {
 const apiClient = {
   getHealthCheck,
   getMe,
+  getPublicUser,
   postUserProfile,
   getUrlSlug,
   postUrlSlug,

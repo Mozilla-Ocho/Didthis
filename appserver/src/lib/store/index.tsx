@@ -5,17 +5,17 @@ import Store from "./store";
 const StoreContext = createContext<Store | null>(null);
 
 const StoreWrapper = ({
-  user,
+  authUser,
   signupCode,
   children,
 }: {
-  user: ApiUser | false;
+  authUser: ApiUser | false;
   signupCode: false | string;
   children: any;
 }) => {
   // this wrapper should only be present once, towards the top of the
   // application component component tree.
-  const [store] = useState(() => new Store({ user, signupCode }));
+  const [store] = useState(() => new Store({ authUser, signupCode }));
   return (
     <StoreContext.Provider value={store}>{children}</StoreContext.Provider>
   );
