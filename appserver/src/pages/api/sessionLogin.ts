@@ -15,13 +15,13 @@ export default async function handler(
   // been created yet. getOrCreateUser does that in the general auth middleware
   // handler once a valid session cookie is detected on subsequent requests.
   const idToken = req.body.idToken.toString();
-  console.log("sessionLogin idToken:",idToken)
+  // console.log("sessionLogin idToken:",idToken)
   const cookies = new Cookies(req, res);
   // note that 'expiresIn' option for the firebase createSessionCookie sdk
   // method is the behavior of the 'maxAge' option in the Cookies sdk, whereas
   // in Cookies sdk, there is no 'expiresIn' field but there is an 'expires'
   // field that accepts a Date object (vs a number relative to current time)
-  getAuthFirebaseApp()
+  return getAuthFirebaseApp()
     .createSessionCookie(idToken, { expiresIn: authCookieMaxAge })
     .then(
       sessionCookie => {
@@ -36,7 +36,7 @@ export default async function handler(
         };
         // DRY_r9725 session cookie name
         cookies.set(constants.sessionCookieName, sessionCookie, options);
-        console.log("sessionLogin setting cookie", constants.sessionCookieName, sessionCookie)
+        // console.log("sessionLogin setting cookie", constants.sessionCookieName, sessionCookie)
         const wrapper: EmptySuccessWrapper = {
           action: "sessionLogin",
           status: 200,
