@@ -1,8 +1,7 @@
-import { action, computed, makeAutoObservable } from "mobx";
+import { action, makeAutoObservable } from "mobx";
 import apiClient from "@/lib/apiClient";
 import log from "@/lib/log";
-import { UserProfile } from "@/lib/UserProfile";
-// import { constants as userProfileConstants } from "@/lib/UserProfile/constants";
+// import profileUtils from "../profileUtils";
 import { isEqual } from "lodash-es";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
@@ -21,10 +20,6 @@ let moduleGlobalFirebaseInitialized = false;
 class Store {
   showAuthComponents = false; // see clearUserBits() for explanation
   user: false | ApiUser = false;
-  userProfile: false | UserProfile = false;
-  // a copy of the user profile but for use in editable forms. this way we have
-  // the last known server state and the changes in the client separately.
-  editingUserProfile: false | UserProfile = false;
   savingProfile = false; // for showing a spinner / tmp disabling forms
   slugValidationError: false | string = false;
   editingSlug = "";
@@ -71,9 +66,6 @@ class Store {
     // complete enough }
     if (!this.user) return undefined;
     if (!this.user.urlSlug) return undefined;
-    if (!this.userProfile) return undefined;
-    if (!this.userProfile.isMinimallyComplete({ urlSlug: this.user.urlSlug }))
-      return undefined;
     return this.userHomepageUrlForSlug(this.user.urlSlug);
   }
 
@@ -309,8 +301,6 @@ class Store {
     // doesn't cause errors by re-rendering authenticated components before the
     // top level branch component that woud remove them is re-rendered.
     this.user = false;
-    this.userProfile = false;
-    this.editingUserProfile = false;
     this.editingSlug = "";
     this.suggestedSlug = "";
   }
@@ -319,36 +309,6 @@ class Store {
 
   ingestUpdatedUser(user: any) {
     this.user = user;
-    this.userProfile = makeAutoObservable(
-      new UserProfile({
-        data: user.profile,
-      }),
-      {
-        // validation is observed as a computed.struct because it returns a new
-        // object every time it's read, but the structure and content of that
-        // object do not change.
-        validation: computed.struct,
-      }
-    );
-    // note there is a possible buggy race condition in which the user makes an
-    // subsequtn edit in a form field while the api call is in flight to save
-    // prior edits, in which case, upon the response, we're going to blow
-    // away those edits with whatever the api returned.  the flip side is, if
-    // we didn't update this.editingUserProfile in order to preserve all user
-    // edits even during in-flight requests, their forms could have old data if
-    // they edited the value in another tab/context. i don't want to go to the
-    // level of detail of tracking individual field states...
-    this.editingUserProfile = makeAutoObservable(
-      new UserProfile({
-        data: user.profile,
-        // XXX_PORTING
-        // mobxMakeAutoObservable: makeAutoObservable,
-        // mobxComputed: computed,
-      }),
-      {
-        validation: computed.struct,
-      }
-    );
     this.editingSlug = user.urlSlug || this.suggestedSlug || "";
     this.suggestedSlug = "";
     //XXX_PORTING
@@ -417,7 +377,7 @@ class Store {
         action((user) => {
           this.ingestUpdatedUser(user);
           this.slugValidationError = false;
-          return this.userProfile;
+          return user
         })
       )
       .catch((e) => {

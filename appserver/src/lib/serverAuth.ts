@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { initializeApp, applicationDefault } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
-import { UserProfile } from "@/lib/UserProfile";
+import profileUtils from "./profileUtils";
 import Cookies from "cookies";
 import knex from "@/knex";
 import log from "@/lib/log";
@@ -19,17 +19,12 @@ try {
 }
 
 const userFromDbRow = (dbRow: UserDbRow, opts: {publicFilter: boolean, includeAdminUIFields?: boolean}): ApiUser => {
-  // here we parse, validate, and return a polished POJO for the raw profile
-  // data in the db.  doing this here lets us do things like apply upgrades
-  // from old profile versions to new ones at read time, and proactively fail
-  // if db profile data is corrupted.
-  const profile = new UserProfile({ data: dbRow.profile })
-  const profilePOJO = opts.publicFilter ? profile.toPOJOwithPublic() : profile.toPOJOwithPrivate();
+  const profile = opts.publicFilter ? dbRow.profile : profileUtils.privacyFilteredCopy(dbRow.profile)
   const user: ApiUser = {
     id: dbRow.id,
     email: dbRow.email,
     urlSlug: dbRow.url_slug || undefined,
-    profile: profilePOJO,
+    profile,
     createdAt: dbRow.created_at_millis,
   };
   if (!opts.publicFilter && !opts.includeAdminUIFields) {
@@ -104,12 +99,11 @@ const getOrCreateUser = async ({
   // DRY_r9639 user creation logic
   log.auth("no user found, potentially a new signup, autovivifying");
   const newSlug = await generateRandomAvailableSlug()
-  const defaultProfile = new UserProfile();
   let columns: UserDbRow = {
     id,
     email: email,
     url_slug: newSlug,
-    profile: defaultProfile.toPOJOwithPrivate(),
+    profile: profileUtils.mkDefaultProfile(),
     //signup_code_name: codeInfo.codeName || null,
     signup_code_name: null, // XXX_PORTING
     created_at_millis: millis,

@@ -1,5 +1,3 @@
-// import { UserProfile } from "@/lib/UserProfile";
-
 type GenericErrorId = "ERR_UNAUTHORIZED" | "ERR_CSRF_TOKEN" | "ERR_NOT_FOUND";
 
 type ErrorId = GenericErrorId;

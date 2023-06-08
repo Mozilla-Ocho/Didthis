@@ -1,8 +1,17 @@
+type ProjectStatus = "active" | "complete" | "paused";
+type Scope = "public" | "private";
+type Timestamp = number; // epoch seconds integer
+type UrlMeta = {
+  host: string,
+  title: string,
+  imageUrl: string,
+}
+
 type ApiUser = {
   id: string;
   email: string;
   urlSlug?: string;
-  profile: POJO;
+  profile: ApiProfile;
   createdAt: number;
   signupCodeName?: string;
   unsolicited?: true;
@@ -17,7 +26,7 @@ interface UserDbRow {
   id: string;
   email: string;
   url_slug: string | null;
-  profile: POJO;
+  profile: ApiProfile;
   created_at_millis: number;
   updated_at_millis: number;
   signup_code_name: string | null;
@@ -25,8 +34,35 @@ interface UserDbRow {
   ban_status: string | null;
   last_write_from_user: number | null;
   last_read_from_user: number | null;
+}
+
+type ApiPost = {
+  id: string;
+  title: string;
+  scope: Scope;
+  description?: string;
+  linkUrl?: string;
+  urlMeta?: UrlMeta;
+  imageAssetId?: string;
 };
 
+type ApiProject = {
+  id: string;
+  createdAt: Timestamp;
+  title: string;
+  scope: Scope;
+  description?: string;
+  currentStatus: ProjectStatus;
+  imageAssetId?: string;
+  posts: ApiPost[];
+};
+
+type ApiProfile = {
+  name?: string;
+  bio?: string;
+  imageAssetId?: string;
+  projects: ApiProject[];
+};
 
 type JSONABLE =
   | undefined
@@ -37,4 +73,3 @@ type JSONABLE =
   | Array<JSONABLE>;
 
 type POJO = { [key: string]: JSONABLE };
-
