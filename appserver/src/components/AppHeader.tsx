@@ -1,18 +1,22 @@
-import {observer} from "mobx-react-lite"
+import { observer } from "mobx-react-lite";
 import { useStore } from "@/lib/store";
 import { LogoutButton } from "@/components/auth/LogoutButton";
+import { Divider, Link } from "./uiLib";
+// import {LoginButton} from "./auth/LoginButton";
 
 // XXX_SKELETON
 const AppHeader = observer(() => {
-  const store = useStore()
+  const store = useStore();
   return (
-    <div>
-      <hr/>
-      app header.
-      {store.user && <span>{store.user.email} <LogoutButton /></span> }
-      <hr/>
-    </div>
+    <>
+      <div className="container grid grid-cols-3">
+        <Link href="/">HOBBYR</Link>
+        <div>{store.user ? <Link href={"/user/"+store.user.urlSlug}>{store.user.email}</Link> : ""}</div>
+        <div>{store.user ? <LogoutButton /> : ""}</div>
+      </div>
+      <Divider />
+    </>
   );
-})
+});
 
-export default AppHeader
+export default AppHeader;
