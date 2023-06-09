@@ -9,8 +9,6 @@ import { H } from "@/components/uiLib";
 import LoginBouncer from '@/components/auth/LoginBouncer';
 import PostForm from '@/components/forms/PostForm';
 
-// XXX_SKELETON
-
 const NewPost = observer(() => {
   const store = useStore();
   const router = useRouter();

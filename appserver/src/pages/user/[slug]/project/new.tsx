@@ -9,8 +9,6 @@ import { H } from "@/components/uiLib";
 import LoginBouncer from '@/components/auth/LoginBouncer';
 import ProjectForm from '@/components/forms/ProjectForm';
 
-// XXX_SKELETON
-
 const NewProject = observer(() => {
   const store = useStore();
   const router = useRouter();

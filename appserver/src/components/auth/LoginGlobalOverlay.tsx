@@ -28,6 +28,7 @@ const LoginGlobalOverlay = observer(() => {
         },
       ],
       callbacks: {
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         signInSuccessWithAuthResult: (authResult:any) => {
           // note that the logic to handle the new auth state is in the store, on
           // the onAuthStateChanged callback, here all we do is show a spinner
@@ -40,6 +41,7 @@ const LoginGlobalOverlay = observer(() => {
           log.auth("signInSuccessWithAuthResult", authResult);
           return false;
         },
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         signInFailure: (error:any) => {
           log.auth("signInFailure", error);
           store.cancelGlobalLoginOverlay();

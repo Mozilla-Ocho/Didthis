@@ -12,10 +12,12 @@ const StyledFirebaseAuth = ({
   firebaseAuth,
   className,
   uiCallback,
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 }:any) => {
   const [userSignedIn, setUserSignedIn] = useState(false);
+  /* eslint-disable-next-line @typescript-eslint/ban-types */
   const [deregisterFn, setDeregisterFn] = useState<false | Function>(false);
-  const elementRef = useRef(null);
+  const elementRef = useRef<HTMLDivElement | null>(null);
 
   const loadFirebaseui = useCallback(async () => {
     // importing firebaseui implicitly assumes we are in browser context. in
@@ -32,8 +34,7 @@ const StyledFirebaseAuth = ({
       setUserSignedIn(!!user);
     });
     if (uiCallback) uiCallback(firebaseUiWidget);
-    // @ts-ignore
-    firebaseUiWidget.start(elementRef.current, uiConfig);
+    elementRef.current && firebaseUiWidget.start(elementRef.current, uiConfig);
     setDeregisterFn(() => {
       // because we're in an async callback, deregistration functions require
       // jumping hoops. store it in a state value.

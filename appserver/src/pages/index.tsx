@@ -15,7 +15,6 @@ const Wrapper = ({ authUser, signupCode }: {authUser: ApiUser | false, signupCod
 export default Wrapper;
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
-  // console.time('getServerSideProps-user')
   // DRY_47693 signup code logic
   const url = new URL("http://anyhost.com" + context.resolvedUrl);
   const signupCode = url.searchParams.get("signupCode") || false;
@@ -30,7 +29,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         })
     ).payload as ApiUser | false;
   }
-  // console.timeEnd('getServerSideProps-user')
   return {
     props: {
       signupCode,

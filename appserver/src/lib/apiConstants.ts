@@ -24,10 +24,7 @@ interface ErrorWrapper extends Wrapper {
   errorMsg: string;
 }
 
-interface EmptySuccessWrapper extends SuccessWrapper {
-  // some calls don't return data, for example sessionLogin and sessionLogout
-  // because their purpose is to set/destroy cookies.
-}
+type EmptySuccessWrapper = SuccessWrapper
 
 interface MeWrapper extends SuccessWrapper {
   payload: ApiUser;

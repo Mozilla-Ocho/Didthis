@@ -1,5 +1,4 @@
 import normalizeUrl from "normalize-url";
-import log from "./log";
 
 // a bunch of helpers for ApiProfile POJOs
 const normalizeUrlConfig = {
@@ -94,14 +93,15 @@ const getParsedUrl = ({
 };
 
 const cleanupUserInput = (profile: ApiProfile): void => {
-  // trims whitespace so we aren't confused about empty fields.
-  function trimRecurse(obj: any): any {
+  // mutates the profile data in place to trim whitespace so we aren't confused
+  // about empty fields.
+  function trimRecurse(obj: JSONABLE): JSONABLE {
     if (typeof obj === "undefined" || obj === null) return obj;
     if (typeof obj === "string") return obj.trim();
     if (Array.isArray(obj)) return obj.map(trimRecurse);
     if (typeof obj === "object") {
-      const newObj: any = {};
-      for (let prop in obj) {
+      const newObj: JSONABLE = {};
+      for (const prop in obj) {
         newObj[prop] = trimRecurse(obj[prop]);
       }
       return newObj;

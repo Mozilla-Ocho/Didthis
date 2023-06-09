@@ -69,6 +69,19 @@ type ApiProfile = {
   projects: {[key:string]: ApiProject};
 };
 
+type EventSpec = {
+  eventName: string,
+  key: string,
+  opts: {
+    name?: string,
+    isAuthed?: "y" | "n",
+    isSelfView?: "y"|"n",
+    signupCodeName?:string,
+    id?:string,
+    newProject?: "y" | "n", 
+  }
+}
+
 type JSONABLE =
   | undefined
   | boolean
@@ -78,3 +91,5 @@ type JSONABLE =
   | Array<JSONABLE>;
 
 type POJO = { [key: string]: JSONABLE };
+
+type KvString = { [key: string]: string };

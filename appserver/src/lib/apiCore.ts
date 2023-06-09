@@ -75,18 +75,17 @@ const wrapFetch = async (fetchArgs: FetchArgs): Promise<SuccessWrapper> => {
   // todo: support passing post data and etc
   fetchArgs.method = fetchArgs.method || "GET";
   fetchArgs.retries = fetchArgs.retries || 0;
-  let {
+  const {
     action,
     method,
     retries,
-    queryParams,
     body,
     sessionCookie,
     asTestUser,
     expectErrorIds,
     expectErrorStatuses,
   } = fetchArgs;
-  queryParams = queryParams || {};
+  const queryParams = fetchArgs.queryParams || {};
   try {
     if (process.env.NODE_ENV === "development") {
       if (asTestUser) {
@@ -96,6 +95,11 @@ const wrapFetch = async (fetchArgs: FetchArgs): Promise<SuccessWrapper> => {
       }
     }
     const url = mkUrl(action, queryParams);
+    // i really don't know how to type the options for fetch... apparently it's
+    // a RequestInit type but that type doesn't let me assign headers by
+    // property name. sometimes typescript is just too much overhead or i'm not
+    // good enough at it yet.
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     const config: any = {
       method: method,
       headers: {
@@ -108,7 +112,7 @@ const wrapFetch = async (fetchArgs: FetchArgs): Promise<SuccessWrapper> => {
     if (method === "POST") {
       config.headers["Content-Type"] = "application/json";
       if (typeof body === "object") {
-        let bodyWithCsrfToken: POJO = { ...body };
+        const bodyWithCsrfToken: POJO = { ...body };
         if (inBrowserContext) {
           bodyWithCsrfToken["csrf"] = Cookies.get("_csrf") || ""; // XXX_PORTING changed name from _grac_csrf
         }
@@ -118,7 +122,7 @@ const wrapFetch = async (fetchArgs: FetchArgs): Promise<SuccessWrapper> => {
       }
     }
     log.api("fetching", action, queryParams, config);
-    let res = await fetch(url, config);
+    const res = await fetch(url, config);
     if (res.status !== 200) {
       let errorId, errorMsg;
       let wrapper: ErrorWrapper | undefined;
@@ -137,9 +141,12 @@ const wrapFetch = async (fetchArgs: FetchArgs): Promise<SuccessWrapper> => {
       });
       throw err;
     }
-    let wrapper = await res.json() as SuccessWrapper;
+    const wrapper = await res.json() as SuccessWrapper;
     log.api("response:", action, wrapper);
     return wrapper;
+    // really not sure what typescript best practice is for catch blocks. you
+    // seemingly can't specify anything but any on them, but "any" is bad?
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   } catch (e: any) {
     if (e.message.match(/fetch failed/)) {
       if (retries < 2) {

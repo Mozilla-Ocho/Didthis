@@ -39,10 +39,12 @@ type ChannelConfig = {
 
 type Logger = {
   // the main interface, a dict of channel name -> logging function
+  /* eslint-disable-next-line @typescript-eslint/ban-types */
   [key in ChannelName]: Function;
 };
 
 // initialize log object to a map of channel names to dummy functions
+/* eslint-disable-next-line @typescript-eslint/no-empty-function */
 const log: Logger = Object.fromEntries([channelNames.map((c) => [c, () => {}])]);
 
 let env: LoggingEnv = "default";
@@ -125,8 +127,9 @@ function setConfig(x: LoggingEnv) {
 }
 
 function assign() {
-  for (let channel of channelNames) {
+  for (const channel of channelNames) {
     if (channelConfig[channel][env]) {
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       log[channel] = (...args:any) => console.log(channel, ":", ...args);
     } else {
       log[channel] = () => false;

@@ -1,14 +1,12 @@
 import { action, makeAutoObservable } from "mobx";
 import apiClient from "@/lib/apiClient";
 import log from "@/lib/log";
-// import profileUtils from "../profileUtils";
 import { isEqual } from "lodash-es";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 // import * as amplitude from '@amplitude/analytics-browser';
 import { trackingEvents } from "@/lib/trackingEvents";
 import { useEffect } from "react";
-import profileUtils from "../profileUtils";
 
 type GeneralError = false | "_get_me_first_fail_" | "_api_fail_";
 type LoginErrorMode = false | "_inactive_code_" | "_code_error_";
@@ -19,6 +17,8 @@ let moduleGlobalFirebaseInitialized = false;
 
 class Store {
   user: false | ApiUser = false;
+  // we don't control firebase, it's an allowed explicit any.
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   firebaseRef: undefined | any = undefined;
   signupCode: false | string = false;
   trackedPageEvent: false | string = false;
@@ -26,7 +26,7 @@ class Store {
   firebaseModalOpen = false;
   loginButtonsSpinning = false;
   loginErrorMode: LoginErrorMode = false;
-  fullpageLoading: boolean = false; // used when signing in
+  fullpageLoading = false; // used when signing in
 
   constructor({authUser, signupCode}:{authUser?:ApiUser | false, signupCode?: false | string}) {
     makeAutoObservable(
@@ -52,7 +52,6 @@ class Store {
   }
 
   initFirebase() {
-    const self = this;
     let firebaseConfig;
     if (moduleGlobalFirebaseInitialized) return;
     moduleGlobalFirebaseInitialized = true;
@@ -94,7 +93,7 @@ class Store {
     }
 
     if (firebaseConfig) firebase.initializeApp(firebaseConfig);
-    self.firebaseRef = firebase;
+    this.firebaseRef = firebase;
 
     // we disable client-side auth because we're using our own cookie session
     // auth instead.
@@ -104,13 +103,13 @@ class Store {
       // called after a sign in / sign up action from the user in the firebase
       // ui, and we want to generate a session cookie from it (and potentially
       // autovivify the user in the backend)
-      function (firebaseUser) {
+      (firebaseUser) => {
         if (firebaseUser) {
           log.auth("firebase user", firebaseUser);
           // and we can close the firebase ui container modal
-          self.cancelGlobalLoginOverlay();
+          this.cancelGlobalLoginOverlay();
           // and switch to our own loading state
-          self.setFullPageLoading(true)
+          this.setFullPageLoading(true)
           firebaseUser
             .getIdToken()
             .then((idToken) => apiClient.sessionLogin({ idToken }))
@@ -118,13 +117,13 @@ class Store {
             // actually auto-vivify the user and register the signup event in
             // amplitude, which we want to associated with the code.
             .then(() =>
-              apiClient.getMe({ signupCode: self.signupCode })
+              apiClient.getMe({ signupCode: this.signupCode })
             )
             .then((wrapper) => {
               log.readiness("acquired getMe user after firebase auth");
-              self.setUser(wrapper.payload);
-              self.trackEvent(trackingEvents.caLogin);
-              self.setFullPageLoading(false)
+              this.setUser(wrapper.payload);
+              this.trackEvent(trackingEvents.caLogin);
+              this.setFullPageLoading(false)
             })
             .catch((e) => {
               log.error("error acquiring user onAuthStateChanged", e);
@@ -136,15 +135,15 @@ class Store {
               window.location.reload();
             });
         } else {
-          self.cancelGlobalLoginOverlay();
-          self.setFullPageLoading(false)
+          this.cancelGlobalLoginOverlay();
+          this.setFullPageLoading(false)
         }
       },
-      function (error) {
+      (error) => {
         log.error(error);
         log.readiness("firebase auth error");
-        self.cancelGlobalLoginOverlay();
-        self.setFullPageLoading(false)
+        this.cancelGlobalLoginOverlay();
+        this.setFullPageLoading(false)
       }
     );
   }
@@ -224,7 +223,7 @@ class Store {
     }
   }
 
-  logOut() {
+  async logOut() {
     // we have to call the api to delete the cookie because it's httpOnly
     log.auth("store logOut");
     this.trackEvent(trackingEvents.bcLogout);
@@ -240,7 +239,7 @@ class Store {
 
   // }}}
 
-  trackEvent(evt: any, opts?: any) {
+  trackEvent(evt: EventSpec, opts?: EventSpec['opts']) {
     // XXX_PORTING
     // const key = evt.key;
     // const fullEvent = JSON.parse(JSON.stringify(trackingEvents[key]));
@@ -254,9 +253,8 @@ class Store {
     // amplitude.track(fullEvent.eventName, fullEvent.opts);
   }
 
-  setTrackedPageEvent(evt: any, opts?: any) {
+  setTrackedPageEvent(evt: EventSpec, opts?: EventSpec['opts']) {
     const key = evt.key;
-    // @ts-ignore
     const fullEvent = JSON.parse(JSON.stringify(trackingEvents[key]));
     if (!fullEvent) {
       log.error(`tracked event is not in trackingEvents (${evt})`);
@@ -277,13 +275,17 @@ class Store {
     this.trackedPageEvent = fullEvent;
   }
 
-  useTrackedPageEvent = (evt: any, opts?: any) => {
+  useTrackedPageEvent = (evt: EventSpec, opts?: EventSpec['opts']) => {
     // react complains if i call useEffect as an object method. it has to be a
-    // pure function. and you can't use 'this' in the dependency array.
+    // pure function. and you can't use 'this' in the dependency array. also,
+    // eslint complains if i'm assinging this to a var, we have competing
+    // style/linting errors here.
+    /* eslint-disable @typescript-eslint/no-this-alias */
     const self = this;
     return useEffect(() => {
       self.setTrackedPageEvent(evt, opts);
     }, [self, evt, opts]);
+    /* eslint-enable @typescript-eslint/no-this-alias */
   };
 
   setGeneralError = (errId: GeneralError) => {
@@ -294,25 +296,15 @@ class Store {
     this.generalError = false;
   };
 
-  savePost(post: ApiPost): Promise<ApiPost> {
+  async savePost(post: ApiPost): Promise<ApiPost> {
     if (!this.user) throw new Error('must be authed')
-    // const profile = this.user.profile
-    // post.id = profileUtils.generateRandomAvailablePostId(profile)
-    // post.createdAt = Math.floor(new Date().getTime() / 1000)
-    // if (post.projectId === "new") {
-    //   const x = profileUtils.mkNewProject(profile)
-    //   post.projectId = x.projectId
-    // }
-    // const project = profile.projects.find(p => p.id === post.projectId)
-    // if (!project) throw new Error('project not found')
-    const self = this
     return apiClient.newPost({post})
       .then((wrapper) => {
-        self.setUser(wrapper.payload.user);
+        this.setUser(wrapper.payload.user);
         if (post.projectId === "new") {
-          self.trackEvent(trackingEvents.caNewPostNewProj);
+          this.trackEvent(trackingEvents.caNewPostNewProj);
         } else {
-          self.trackEvent(trackingEvents.caNewPost);
+          this.trackEvent(trackingEvents.caNewPost);
         }
         return wrapper.payload.post;
       })

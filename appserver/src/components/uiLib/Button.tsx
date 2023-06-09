@@ -1,4 +1,4 @@
-import { ReactNode, FC } from "react";
+import { ReactNode, FC, MouseEventHandler } from "react";
 // import classNames from "classnames";
 
 import { cva, type VariantProps } from "class-variance-authority";
@@ -27,7 +27,7 @@ interface ButtonProps extends VariantProps<typeof buttonCVA> {
   children: ReactNode;
   className?: string;
   type?: "submit" | undefined;
-  onClick?: Function;
+  onClick?: React.MouseEventHandler;
   loading?: boolean; // XXX_PORTING
   "data-testid"?: string; // XXX_PORTING
   disabled?: boolean;
@@ -43,7 +43,7 @@ const Button: FC<ButtonProps> = ({
   ...props
 }) => {
   const bType = props.type || "button";
-  const ourOnClick = (e: any) => {
+  const ourOnClick : MouseEventHandler = (e) => {
     if (onClick) onClick(e);
   };
   return (

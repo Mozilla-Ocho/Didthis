@@ -8,7 +8,6 @@ import LoginBouncer from '@/components/auth/LoginBouncer';
 import { useStore } from "@/lib/store";
 
 const Scratch = observer(() => {
-  // const store = useStore();
   const store = useStore();
   const [isOpen, setIsOpen] = useState(false);
   if (!store.user) return <LoginBouncer/>
