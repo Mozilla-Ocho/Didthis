@@ -18,7 +18,8 @@ const NewPost = observer(() => {
   return (
     <>
       <div>
-        <H.H1>new post for user {router.query.slug} in project {router.query.projectId}</H.H1>
+        <H.H1>new post for user {router.query.slug}</H.H1>
+        {router.query.projectId && <div>for project id {router.query.projectId}</div>}
         <PostForm />
       </div>
     </>
@@ -36,6 +37,4 @@ const Wrapper = ({ authUser, signupCode }: {authUser: ApiUser | false, signupCod
 export default Wrapper;
 
 export const getServerSideProps = indexPageGetServerSideProps
-
-
 

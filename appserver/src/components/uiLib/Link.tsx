@@ -5,12 +5,22 @@ import { cva, type VariantProps } from "class-variance-authority";
 const linkCVA = cva("link", {
   variants: {
     intent: {
-      primary: [
+      link: [
         "underline",
         "text",
         "text-blue-600",
         "hover:text-blue-800",
         "visited:text-purple-600",
+      ],
+      primary: [
+        "inline-block",
+        "bg-primary",
+        "hover:bg-primary-hover",
+        "p-4",
+        "text-white",
+        "py-2",
+        "px-4",
+        "rounded",
       ],
     },
     size: {
@@ -19,7 +29,7 @@ const linkCVA = cva("link", {
     },
   },
   defaultVariants: {
-    intent: "primary",
+    intent: "link",
     size: "medium",
   },
 });

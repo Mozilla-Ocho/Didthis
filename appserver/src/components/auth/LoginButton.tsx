@@ -6,24 +6,28 @@ const LoginButton = observer(
   ({
     overrideCodeCheck,
     overrideCodeCheckIfNoSignupCode,
-    useCase,
+    intent,
     text,
-    onClick,
     'data-testid': dataTestid,
-  }:any) => {
+  }:{
+    overrideCodeCheck?: boolean,
+    overrideCodeCheckIfNoSignupCode?: boolean,
+    intent?: React.ComponentProps<typeof Button>['intent'],
+    text?: string,
+    'data-testid'?: string,
+  }) => {
     const store = useStore();
     if (!store.signupCode) {
       overrideCodeCheck = overrideCodeCheck || overrideCodeCheckIfNoSignupCode;
     }
-    const handleClick = (e:any) => {
-      store.launchGlobalLoginOverlay(overrideCodeCheck);
-      onClick && onClick(e);
+    const handleClick = () => {
+      store.launchGlobalLoginOverlay(!!overrideCodeCheck);
     };
     const defaultText = store.signupCode ? 'Sign Up' : 'Log In'
     return (
       <Button
         onClick={handleClick}
-        useCase={useCase || "primary"}
+        intent={intent}
         loading={store.loginButtonsSpinning}
         data-testid={dataTestid || "loginButton"}
       >

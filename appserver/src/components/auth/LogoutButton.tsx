@@ -4,21 +4,26 @@ import { useStore } from "@/lib/store";
 
 const LogoutButton = observer(
   ({
-    useCase,
+    intent,
     text,
-    onClick,
+    onLogout,
     'data-testid': dataTestid,
-  }:any) => {
+  }:{
+    intent?: React.ComponentProps<typeof Button>['intent'],
+    text?: string,
+    onLogout?: () => void,
+    'data-testid'?: string,
+  }) => {
     const store = useStore();
-    const handleClick = (e:any) => {
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
       store.logOut();
-      onClick && onClick(e);
+      onLogout && onLogout();
     };
     const defaultText = 'Log Out'
     return (
       <Button
         onClick={handleClick}
-        useCase={useCase || "primary"}
+        intent={intent}
         loading={store.loginButtonsSpinning}
         data-testid={dataTestid || "loginButton"}
       >
