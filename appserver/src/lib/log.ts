@@ -25,7 +25,7 @@ type ChannelName = "warn" |
 "tracking" |
 "serverApi"
 
-type LoggingEnv = "default" | "test" | "inProdBrowser";
+type LoggingEnv = "default" | "test" | "inProdBrowser" | "ssr";
 
 type EnvToggles = {
   // for each env, is a channel active or not
@@ -47,6 +47,9 @@ const log: Logger = Object.fromEntries([channelNames.map((c) => [c, () => {}])])
 
 let env: LoggingEnv = "default";
 
+if (typeof window === "undefined") {
+  env = "ssr";
+}
 if (process.env.NODE_ENV === "production" && typeof window !== "undefined") {
   // in production browser context we use a more limited set of active logging
   // channels
@@ -58,51 +61,61 @@ const channelConfig: ChannelConfig = {
     default: true,
     test: true,
     inProdBrowser: true,
+    ssr: true,
   },
   error: {
     default: true,
     test: true,
     inProdBrowser: true,
+    ssr: true,
   },
   auth: {
     default: true,
     test: false,
     inProdBrowser: false,
+    ssr: false,
   },
   readiness: {
     default: true,
     test: false,
     inProdBrowser: false,
+    ssr: false,
   },
   api: {
     default: true,
     test: false,
     inProdBrowser: false,
+    ssr: false,
   },
   unfurl: {
     default: true,
     test: false,
     inProdBrowser: false,
+    ssr: false,
   },
   location: {
     default: true,
     test: false,
     inProdBrowser: false,
+    ssr: false,
   },
   sql: {
     default: true,
     test: false,
     inProdBrowser: false,
+    ssr: true,
   },
   tracking: {
     default: true,
     test: false,
     inProdBrowser: false,
+    ssr: false,
   },
   serverApi: {
     default: true,
     test: false,
     inProdBrowser: false,
+    ssr: true,
   },
 };
 

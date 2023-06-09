@@ -97,7 +97,7 @@ const getOrCreateUser = async ({
   }
   // else, create new
   // DRY_r9639 user creation logic
-  log.auth("no user found, potentially a new signup, autovivifying");
+  log.serverApi("no user found, potentially a new signup, autovivifying");
   const newSlug = await generateRandomAvailableSlug()
   let columns: UserDbRow = {
     id,
@@ -114,7 +114,7 @@ const getOrCreateUser = async ({
     ban_status: null,
   };
   dbRow = (await knex("users").insert(columns).returning("*"))[0] as UserDbRow;
-  log.auth("created user", dbRow.id);
+  log.serverApi("created user", dbRow.id);
   // XXX_PORTING
   // setReqAuthentication(req, dbRow); // have to set this early here so track event can obtain the new auth user id
   // trackEventReqEvtOpts(req, trackingEvents.caSignup, {
@@ -137,7 +137,7 @@ const getAuthUser = (
   });
   // DRY_r9725 session cookie name
   const sessionCookie = cookies.get(constants.sessionCookieName) || "";
-  // console.log('sessionCookie', sessionCookie);
+  // log.serverApi('sessionCookie', sessionCookie);
   if (!sessionCookie) return Promise.resolve(null);
   return (
     getAuth(firebaseApp)
@@ -150,7 +150,7 @@ const getAuthUser = (
       // specific api methods that warrant it.
       .verifySessionCookie(sessionCookie, true)
       .then((decodedClaims) => {
-        // console.log("decodedClaims",decodedClaims)
+        // console.serverApi("decodedClaims",decodedClaims)
         // decodedClaims looks like: {
         //   iss: 'https://session.firebase.google.com/grac3land-dev',
         //   aud: 'grac3land-dev',
@@ -164,13 +164,14 @@ const getAuthUser = (
         //   firebase: { identities: { email: [Array] }, sign_in_provider: 'password' },
         //   uid: 'IUHkIdKRZVV6S9aZ02P8Fokejqx2'
         // }
+        log.serverApi('session valid, fetching user',decodedClaims.user_id);
         return getOrCreateUser({
           id: decodedClaims.user_id,
           email: decodedClaims.email || "",
         });
       })
       .catch(() => {
-        console.log("sessionCookie failed firebase verification")
+        log.serverApi("sessionCookie failed firebase verification")
         // TODO: delete cookie here?
         return null;
       })
