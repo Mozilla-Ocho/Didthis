@@ -1,8 +1,9 @@
 import DefaultLayout from "@/components/DefaultLayout";
 import { getServerSideProps as indexPageGetServerSideProps } from "@/pages/index";
 import apiClient from "@/lib/apiClient";
-import UserProjects from "@/components/pages/UserProjects";
 import { GetServerSidePropsContext } from "next";
+import HomeAuth from "@/components/pages/HomeAuth";
+import UnauthUser from "@/components/pages/UnauthUser";
 
 const Wrapper = ({
   authUser,
@@ -15,7 +16,7 @@ const Wrapper = ({
 }) => {
   return (
     <DefaultLayout authUser={authUser} signupCode={signupCode} headerFooter="always">
-      <UserProjects targetUser={targetUser} />
+      {authUser ? <HomeAuth /> : <UnauthUser targetUser={targetUser} /> }
     </DefaultLayout>
   );
 };

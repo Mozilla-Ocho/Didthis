@@ -18,8 +18,7 @@ const NewPost = observer(() => {
   return (
     <>
       <div>
-        <H.H1>new post for user {router.query.slug}</H.H1>
-        {router.query.projectId && <div>for project id {router.query.projectId}</div>}
+        <H.H1>new post</H.H1>
         <PostForm />
       </div>
     </>

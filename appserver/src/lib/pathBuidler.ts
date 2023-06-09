@@ -11,7 +11,11 @@ const pathBuilder = {
   project,
   post: (slug: string, projectId: string, postId: string) =>
     project(slug, projectId) + "/post/" + encodeURI(postId),
-  newPost: (slug: string) => user(slug) + "/newPost",
+  newPost: (slug: string, projectId?: string) => {
+    if (projectId)
+      return user(slug) + "/post?projectId=" + encodeURIComponent(projectId);
+    else return user(slug) + "/post";
+  },
 };
 
 export default pathBuilder;
