@@ -13,6 +13,7 @@ type ApiUser = {
   urlSlug: string;
   profile: ApiProfile;
   createdAt: number;
+  fullName?: string;
   signupCodeName?: string;
   unsolicited?: true;
   isAdmin?: true;
@@ -25,10 +26,11 @@ type ApiUser = {
 interface UserDbRow {
   id: string;
   email: string;
-  url_slug: string | null;
+  url_slug: string;
   profile: ApiProfile;
   created_at_millis: number;
   updated_at_millis: number;
+  full_name: string | null;
   signup_code_name: string | null;
   admin_status: string | null;
   ban_status: string | null;
@@ -40,6 +42,7 @@ type ApiPost = {
   id: string;
   projectId: string;
   createdAt: Timestamp;
+  updatedAt: Timestamp;
   scope: Scope;
   description?: string;
   linkUrl?: string;
@@ -50,6 +53,7 @@ type ApiPost = {
 type ApiProject = {
   id: string;
   createdAt: Timestamp;
+  updatedAt: Timestamp;
   title: string;
   scope: Scope;
   currentStatus: ProjectStatus;

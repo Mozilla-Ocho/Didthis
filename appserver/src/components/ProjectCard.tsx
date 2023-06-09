@@ -13,7 +13,8 @@ const ProjectCard = observer(
         </H.H3>
         <p>{project.currentStatus}</p>
         <p>{Object.keys(project.posts).length} posts</p>
-        <p><Timestamp seconds={project.createdAt}/></p>
+        <p>created <Timestamp seconds={project.createdAt}/></p>
+        <p>updated <Timestamp seconds={project.updatedAt}/></p>
       </div>
     );
   }

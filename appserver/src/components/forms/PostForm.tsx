@@ -52,22 +52,18 @@ const PostForm = observer(() => {
   let defaultPid = getParamString(router, "projectId");
   if (!(store.user && store.user.profile.projects[defaultPid]))
     defaultPid = "new";
-  const [post, setPost] = useState<ApiPost>({
-    id: "new", // assigned on save
-    createdAt: 0, // asigned on save
-    projectId: defaultPid, // assigned on save if "new"
-    scope: "public",
-    description: "",
-  });
+  const [post, setPost] = useState<ApiPost>(profileUtils.mkBlankSlatePost(defaultPid))
   if (!store.user) return <></>;
   const setProjectId = (pid: string) => {
     const upd = { ...post, projectId: pid };
     setPost(upd);
   };
-  const handleSubmit = () => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
     store.savePost(post).then((newPost) => {
       if (!store.user) return;
-      // console.log("ok done",newPost)
+      console.log("ok done",newPost)
       router.push(
         `/user/${store.user.urlSlug}/project/${newPost.projectId}/post/${newPost.id}`
       );

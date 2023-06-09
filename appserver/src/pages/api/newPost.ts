@@ -32,6 +32,7 @@ export default async function handler(
     ...inputPost,
     id: profileUtils.generateRandomAvailablePostId(profile),
     createdAt: Math.floor(millis / 1000),
+    updatedAt: Math.floor(millis / 1000),
   }
   if (post.projectId === "new") {
     const {projectId} = profileUtils.mkNewProject(profile)
@@ -50,6 +51,7 @@ export default async function handler(
     return
   }
   project.posts[post.id] = post
+  project.updatedAt = Math.floor(millis / 1000)
   log.serverApi("newPost saving:",profile)
   await knex("users")
     .update({

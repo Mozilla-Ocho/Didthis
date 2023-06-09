@@ -3,11 +3,13 @@ import { observer } from "mobx-react-lite";
 import { Timestamp } from "./uiLib";
 
 const PostCard = observer(
-  ({ post, targetUser }: { post: ApiPost; targetUser: ApiUser }) => {
+  // XXX focused should scroll
+  ({ post, targetUser, focused }: { post: ApiPost; targetUser: ApiUser, focused: boolean }) => {
     return (
-      <div className="border p-4">
+      <div className={`border p-4 ${focused ? 'border-4 bg-slate-50' : ''}`}>
         <p>{post.description}</p>
-        <p><Timestamp seconds={post.createdAt}/></p>
+        <p>created <Timestamp seconds={post.createdAt}/></p>
+        <p>updated <Timestamp seconds={post.updatedAt}/></p>
       </div>
     );
   }

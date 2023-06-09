@@ -1,45 +1,27 @@
-import { useRouter } from 'next/router';
-
 import DefaultLayout from "@/components/DefaultLayout";
-import { observer } from "mobx-react-lite";
-import { useStore } from "@/lib/store";
-import { getServerSideProps as indexPageGetServerSideProps } from "@/pages/index";
+import { getServerSideProps as userPageGetServerSideProps } from "@/pages/user/[slug]";
+import ProjectPage from '@/components/pages/Project';
+import NotFound from "@/components/pages/NotFound";
 
-import { H } from "@/components/uiLib";
-import UserPreview from '@/components/UserPreview';
-
-// XXX_SKELETON
-
-const ProjectWithPostFocus = observer(() => {
-  const store = useStore();
-  const router = useRouter();
-  const fakeUser : ApiUser = {
-    id: 'asdf',
-    email: 'foo@bar.com',
-    createdAt: new Date().getTime(),
-    profile: {projects:{}}
-  }
-  return (
-    <>
-      <div>
-        <H.H1>project detail (id={router.query.projectId}) for user {router.query.slug}</H.H1>
-        <UserPreview user={fakeUser} />
-      </div>
-    </>
-  );
-});
-
-const Wrapper = ({ authUser, signupCode }: {authUser: ApiUser | false, signupCode: string | false}) => {
+const Wrapper = ({
+  authUser,
+  signupCode,
+  targetUser,
+}: {
+  authUser: ApiUser | false;
+  signupCode: string | false;
+  targetUser: ApiUser | false;
+}) => {
+  if (!targetUser) return <NotFound/>
   return (
     <DefaultLayout authUser={authUser} signupCode={signupCode} headerFooter="always">
-      <ProjectWithPostFocus />
+      <ProjectPage targetUser={targetUser} />
     </DefaultLayout>
   );
 };
 
 export default Wrapper;
 
-export const getServerSideProps = indexPageGetServerSideProps
-
+export const getServerSideProps = userPageGetServerSideProps
 
 

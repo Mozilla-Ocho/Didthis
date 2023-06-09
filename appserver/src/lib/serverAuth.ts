@@ -23,9 +23,10 @@ const userFromDbRow = (dbRow: UserDbRow, opts: {publicFilter: boolean, includeAd
   const user: ApiUser = {
     id: dbRow.id,
     email: dbRow.email,
-    urlSlug: dbRow.url_slug || undefined,
+    urlSlug: dbRow.url_slug,
     profile,
     createdAt: dbRow.created_at_millis,
+    fullName: dbRow.full_name || undefined,
   };
   if (!opts.publicFilter && !opts.includeAdminUIFields) {
     // DRY_47693 signup code logic
@@ -104,6 +105,7 @@ const getOrCreateUser = async ({
     email: email,
     url_slug: newSlug,
     profile: profileUtils.mkDefaultProfile(),
+    full_name: null,
     //signup_code_name: codeInfo.codeName || null,
     signup_code_name: null, // XXX_PORTING
     created_at_millis: millis,
@@ -141,14 +143,16 @@ const getAuthUser = (
   if (!sessionCookie) return Promise.resolve(null);
   return (
     getAuth(firebaseApp)
-      // note that "true" here in verifySessionCookie is important, it checks the
-      // session hasn't been revoked via a password reset or direct admin call to
-      // revoke it. it slows down auth, so, TODO: check session revocation less
-      // often (on writes, on initial get /me, but not all the time - set this to
-      // false as the default and add a more specific requireRevalidatedAuth
-      // middleware that does the cookie check again with true, and use it on the
-      // specific api methods that warrant it.
-      .verifySessionCookie(sessionCookie, true)
+    // XXX TODO: false here is insecure in that is doesn't deal with password
+    // reset invalidation of sessions. however, setting it true costs ~500ms of
+    // latency which is totally unacceptable for most pages, and with nextjs
+    // SSR it happens on every page navigation. i need to add logic to manage a
+    // nonce per user that is changed on password resets somehow, even though
+    // that happens on the firebase end of things. or perhaps implement a
+    // server-signed and validated cookie that supresses revocation checks for
+    // N minutes then expires, forcing a revocation check then reissuing the
+    // suppression cookie. and: have POST methods use revokation checks.
+      .verifySessionCookie(sessionCookie, false)
       .then((decodedClaims) => {
         // console.serverApi("decodedClaims",decodedClaims)
         // decodedClaims looks like: {

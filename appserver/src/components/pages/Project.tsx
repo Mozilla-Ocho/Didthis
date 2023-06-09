@@ -1,20 +1,23 @@
 // import { useStore } from "@/lib/store";
 import { useRouter } from "next/router";
 import { observer } from "mobx-react-lite";
-import { H,Link,Timestamp } from "../uiLib";
+import { H,Link,Timestamp,Divider } from "../uiLib";
 import UserPreview from "../UserPreview";
 import pathBuilder from "@/lib/pathBuidler";
 import {getParamString} from "@/lib/nextUtils";
 import NotFound from "./NotFound";
+import PostCard from "../PostCard";
 
 const ProjectPage = observer(({targetUser}:{targetUser:ApiUser}) => {
   // const store = useStore();
   if (!targetUser) return <NotFound>user not found</NotFound>;
   const router = useRouter();
   const projectId = getParamString(router,'projectId')
+  const focusPostId = getParamString(router,'postId')
   const project = targetUser.profile.projects[projectId];
-  console.log(projectId, targetUser.profile)
   if (!project) return <NotFound>project not found</NotFound>;
+  const posts = Object.values(project.posts)
+  posts.sort((a,b) => a.createdAt - b.createdAt)
   return (
     <>
       <div>
@@ -24,7 +27,9 @@ const ProjectPage = observer(({targetUser}:{targetUser:ApiUser}) => {
         </H.H3>
         <p>{project.currentStatus}</p>
         <p>{Object.keys(project.posts).length} posts</p>
-        <p><Timestamp seconds={project.createdAt}/></p>
+        <p>created <Timestamp seconds={project.createdAt}/></p>
+        <Divider/>
+        {posts.map(p => <PostCard key={p.id} post={p} targetUser={targetUser} focused={focusPostId === p.id}/>)}
       </div>
     </>
   );

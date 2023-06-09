@@ -25,6 +25,7 @@ export default Wrapper;
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
+  // console.time('getServerSideProps-targetUser')
   const indexProps = await indexPageGetServerSideProps(context);
   // now fetch user we're looking at
   let targetUser: ApiUser | false = false;
@@ -34,8 +35,10 @@ export const getServerSideProps = async (
       : context.params.slug;
     if (indexProps.props.authUser && indexProps.props.authUser.urlSlug === urlSlug) {
       // self-view. don't use getPublicUser and use the authUser instead.
+      // console.log('getServerSideProps-targetUser using auth user')
       targetUser = indexProps.props.authUser
     } else {
+      // console.log('getServerSideProps-targetUser fetching other user')
       targetUser = (
         await apiClient.getPublicUser({ urlSlug }).catch(() => {
           // XXX differentiate not found from other errors...
@@ -44,5 +47,6 @@ export const getServerSideProps = async (
       ).payload as ApiUser | false;
     }
   }
+  // console.timeEnd('getServerSideProps-targetUser')
   return { props: {...indexProps.props, targetUser} };
 };

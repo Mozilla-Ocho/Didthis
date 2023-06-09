@@ -12,6 +12,7 @@ import NotFound from "./NotFound";
 const UserProjects = observer(({targetUser}:{targetUser:ApiUser | false}) => {
   if (!targetUser) return <NotFound />;
   const projects = Object.values(targetUser.profile.projects)
+  if (projects.length === 0) return <></>
   projects.sort((a,b) => a.createdAt - b.createdAt)
   return (
     <>
