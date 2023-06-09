@@ -10,7 +10,7 @@ type UrlMeta = {
 type ApiUser = {
   id: string;
   email: string;
-  urlSlug?: string;
+  urlSlug: string;
   profile: ApiProfile;
   createdAt: number;
   signupCodeName?: string;

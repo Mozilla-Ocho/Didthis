@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
-
 import { H } from "@/components/uiLib";
+import ProjectCard from "../ProjectCard";
 import NotFound from "./NotFound";
 
 // XXX_SKELETON
@@ -10,11 +10,14 @@ import NotFound from "./NotFound";
 // - add proj btn
 // - sort?
 const UserProjects = observer(({targetUser}:{targetUser:ApiUser | false}) => {
-  if (!targetUser) return <NotFound />
+  if (!targetUser) return <NotFound />;
+  const projects = Object.values(targetUser.profile.projects)
+  projects.sort((a,b) => a.createdAt - b.createdAt)
   return (
     <>
       <div>
         <H.H1>projects for user {targetUser.urlSlug || targetUser.id}</H.H1>
+        {projects.map(p => <ProjectCard key={p.id} project={p} targetUser={targetUser}/>)}
       </div>
     </>
   );

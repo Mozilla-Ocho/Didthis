@@ -67,10 +67,10 @@ const PostForm = observer(() => {
   const handleSubmit = () => {
     store.savePost(post).then((newPost) => {
       if (!store.user) return;
-      console.log("ok done",newPost)
-      // router.push(
-      //   `/user/${store.user.urlSlug}/project/${newPost.projectId}/post/${newPost.id}`
-      // );
+      // console.log("ok done",newPost)
+      router.push(
+        `/user/${store.user.urlSlug}/project/${newPost.projectId}/post/${newPost.id}`
+      );
     });
   };
   const setBlurb = (e: React.ChangeEvent<HTMLTextAreaElement>) => {

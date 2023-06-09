@@ -32,12 +32,17 @@ export const getServerSideProps = async (
     const urlSlug = Array.isArray(context.params.slug)
       ? context.params.slug[0] || ""
       : context.params.slug;
-    targetUser = (
-      await apiClient.getPublicUser({ urlSlug }).catch(() => {
-        // XXX differentiate not found from other errors...
-        return { payload: false };
-      })
-    ).payload as ApiUser | false;
+    if (indexProps.props.authUser && indexProps.props.authUser.urlSlug === urlSlug) {
+      // self-view. don't use getPublicUser and use the authUser instead.
+      targetUser = indexProps.props.authUser
+    } else {
+      targetUser = (
+        await apiClient.getPublicUser({ urlSlug }).catch(() => {
+          // XXX differentiate not found from other errors...
+          return { payload: false };
+        })
+      ).payload as ApiUser | false;
+    }
   }
   return { props: {...indexProps.props, targetUser} };
 };

@@ -10,6 +10,7 @@ export default async function handler(
   const urlSlug = (req.query.urlSlug || '')
   let dbRow = await knex("users").where("url_slug", urlSlug).first() as UserDbRow | undefined;
   if (dbRow) {
+    // this api returns public data only even if requested by the owner of that data.
     const user : ApiUser = userFromDbRow(dbRow, {publicFilter: true})
     const wrapper: PublicUserWrapper = {
       action: "getUser",

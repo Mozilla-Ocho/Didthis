@@ -4,6 +4,7 @@ import H from './H';
 import Link from './Link';
 import Select from './Select';
 import Textarea from './Textarea';
+import Timestamp from './Timestamp';
 
 export {
   H,
@@ -11,5 +12,6 @@ export {
   Divider,
   Link,
   Select,
-  Textarea
+  Textarea,
+  Timestamp
 }
