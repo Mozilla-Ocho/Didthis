@@ -1,34 +1,40 @@
-import { action, makeAutoObservable } from "mobx";
-import apiClient from "@/lib/apiClient";
-import log from "@/lib/log";
-import { isEqual } from "lodash-es";
-import firebase from "firebase/compat/app";
-import "firebase/compat/auth";
+import { action, makeAutoObservable } from 'mobx'
+import apiClient from '@/lib/apiClient'
+import log from '@/lib/log'
+import { isEqual } from 'lodash-es'
+import firebase from 'firebase/compat/app'
+import 'firebase/compat/auth'
 // import * as amplitude from '@amplitude/analytics-browser';
-import { trackingEvents } from "@/lib/trackingEvents";
-import { useEffect } from "react";
+import { trackingEvents } from '@/lib/trackingEvents'
+import { useEffect } from 'react'
 
-type GeneralError = false | "_get_me_first_fail_" | "_api_fail_";
-type LoginErrorMode = false | "_inactive_code_" | "_code_error_";
+type GeneralError = false | '_get_me_first_fail_' | '_api_fail_'
+type LoginErrorMode = false | '_inactive_code_' | '_code_error_'
 
-let moduleGlobalFirebaseInitialized = false;
+let moduleGlobalFirebaseInitialized = false
 
 // XXX_PORTING review for non-singleton changes
 
 class Store {
-  user: false | ApiUser = false;
+  user: false | ApiUser = false
   // we don't control firebase, it's an allowed explicit any.
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  firebaseRef: undefined | any = undefined;
-  signupCode: false | string = false;
-  trackedPageEvent: false | string = false;
-  generalError: GeneralError = false;
-  firebaseModalOpen = false;
-  loginButtonsSpinning = false;
-  loginErrorMode: LoginErrorMode = false;
-  fullpageLoading = false; // used when signing in
+  firebaseRef: undefined | any = undefined
+  signupCode: false | string = false
+  trackedPageEvent: false | string = false
+  generalError: GeneralError = false
+  firebaseModalOpen = false
+  loginButtonsSpinning = false
+  loginErrorMode: LoginErrorMode = false
+  fullpageLoading = false // used when signing in
 
-  constructor({authUser, signupCode}:{authUser?:ApiUser | false, signupCode?: false | string}) {
+  constructor({
+    authUser,
+    signupCode,
+  }: {
+    authUser?: ApiUser | false
+    signupCode?: false | string
+  }) {
     makeAutoObservable(
       this,
       {
@@ -36,7 +42,7 @@ class Store {
         trackedPageEvent: false,
       },
       { autoBind: true }
-    );
+    )
     if (signupCode) this.setSignupCode(signupCode)
     if (authUser) this.setUser(authUser)
   }
@@ -52,9 +58,9 @@ class Store {
   }
 
   initFirebase() {
-    let firebaseConfig;
-    if (moduleGlobalFirebaseInitialized) return;
-    moduleGlobalFirebaseInitialized = true;
+    let firebaseConfig
+    if (moduleGlobalFirebaseInitialized) return
+    moduleGlobalFirebaseInitialized = true
 
     // DRY_63816 firebase client config (not secret, but does depend on
     // environment)
@@ -63,94 +69,92 @@ class Store {
     // built by the appserver_prod image, which is shared in both environments
     // so the test/prod bundles are currently identical. however, the
     // NEXT_PUBLIC_ENV_NAME var does give me a way to do this right here, for now.
-    if (process.env.NEXT_PUBLIC_ENV_NAME === "dev") {
+    if (process.env.NEXT_PUBLIC_ENV_NAME === 'dev') {
       // note that webpack bundle optimization will remove these config chunks
       // from production bundles because the conditions will be
       // deterministically false to the transpiler.
       firebaseConfig = {
-        apiKey: "AIzaSyDKFg457lbVbAB_dcLXU-2foZkl96ayu6U",
-        authDomain: "moz-fx-future-products-nonprod.firebaseapp.com",
-        projectId: "moz-fx-future-products-nonprod",
-        storageBucket: "moz-fx-future-products-nonprod.appspot.com",
-        messagingSenderId: "984891837435",
-        appId: "1:984891837435:web:f6e3d55ffb1f35db5d995e"
-      };
+        apiKey: 'AIzaSyDKFg457lbVbAB_dcLXU-2foZkl96ayu6U',
+        authDomain: 'moz-fx-future-products-nonprod.firebaseapp.com',
+        projectId: 'moz-fx-future-products-nonprod',
+        storageBucket: 'moz-fx-future-products-nonprod.appspot.com',
+        messagingSenderId: '984891837435',
+        appId: '1:984891837435:web:f6e3d55ffb1f35db5d995e',
+      }
     }
-    if (process.env.NEXT_PUBLIC_ENV_NAME === "nonprod") {
+    if (process.env.NEXT_PUBLIC_ENV_NAME === 'nonprod') {
       firebaseConfig = {
-        apiKey: "AIzaSyDKFg457lbVbAB_dcLXU-2foZkl96ayu6U",
-        authDomain: "moz-fx-future-products-nonprod.firebaseapp.com",
-        projectId: "moz-fx-future-products-nonprod",
-        storageBucket: "moz-fx-future-products-nonprod.appspot.com",
-        messagingSenderId: "984891837435",
-        appId: "1:984891837435:web:f6e3d55ffb1f35db5d995e"
-      };
+        apiKey: 'AIzaSyDKFg457lbVbAB_dcLXU-2foZkl96ayu6U',
+        authDomain: 'moz-fx-future-products-nonprod.firebaseapp.com',
+        projectId: 'moz-fx-future-products-nonprod',
+        storageBucket: 'moz-fx-future-products-nonprod.appspot.com',
+        messagingSenderId: '984891837435',
+        appId: '1:984891837435:web:f6e3d55ffb1f35db5d995e',
+      }
     }
-    if (process.env.NEXT_PUBLIC_ENV_NAME === "prod") {
+    if (process.env.NEXT_PUBLIC_ENV_NAME === 'prod') {
       firebaseConfig = {
         // XXX_PORTING setup prod here
-      };
+      }
     }
 
-    if (firebaseConfig) firebase.initializeApp(firebaseConfig);
-    this.firebaseRef = firebase;
+    if (firebaseConfig) firebase.initializeApp(firebaseConfig)
+    this.firebaseRef = firebase
 
     // we disable client-side auth because we're using our own cookie session
     // auth instead.
-    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE);
+    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE)
 
     firebase.auth().onAuthStateChanged(
       // called after a sign in / sign up action from the user in the firebase
       // ui, and we want to generate a session cookie from it (and potentially
       // autovivify the user in the backend)
-      (firebaseUser) => {
+      firebaseUser => {
         if (firebaseUser) {
-          log.auth("firebase user", firebaseUser);
+          log.auth('firebase user', firebaseUser)
           // and we can close the firebase ui container modal
-          this.cancelGlobalLoginOverlay();
+          this.cancelGlobalLoginOverlay()
           // and switch to our own loading state
           this.setFullPageLoading(true)
           firebaseUser
             .getIdToken()
-            .then((idToken) => apiClient.sessionLogin({ idToken }))
+            .then(idToken => apiClient.sessionLogin({ idToken }))
             // the GET me call here needs the signup code because it will
             // actually auto-vivify the user and register the signup event in
             // amplitude, which we want to associated with the code.
-            .then(() =>
-              apiClient.getMe({ signupCode: this.signupCode })
-            )
-            .then((wrapper) => {
-              log.readiness("acquired getMe user after firebase auth");
-              this.setUser(wrapper.payload);
-              this.trackEvent(trackingEvents.caLogin);
+            .then(() => apiClient.getMe({ signupCode: this.signupCode }))
+            .then(wrapper => {
+              log.readiness('acquired getMe user after firebase auth')
+              this.setUser(wrapper.payload)
+              this.trackEvent(trackingEvents.caLogin)
               this.setFullPageLoading(false)
             })
-            .catch((e) => {
-              log.error("error acquiring user onAuthStateChanged", e);
+            .catch(e => {
+              log.error('error acquiring user onAuthStateChanged', e)
               // this is what happens if the user is banned, or if there's a
               // network error on any of the critical api sequences.  better
               // error handling is important but for now, we will just force a
               // page reload.
               // TODO: better handling here.
-              window.location.reload();
-            });
+              window.location.reload()
+            })
         } else {
-          this.cancelGlobalLoginOverlay();
+          this.cancelGlobalLoginOverlay()
           this.setFullPageLoading(false)
         }
       },
-      (error) => {
-        log.error(error);
-        log.readiness("firebase auth error");
-        this.cancelGlobalLoginOverlay();
+      error => {
+        log.error(error)
+        log.readiness('firebase auth error')
+        this.cancelGlobalLoginOverlay()
         this.setFullPageLoading(false)
       }
-    );
+    )
   }
 
   launchGlobalLoginOverlay(overrideCodeCheck: boolean) {
-    this.trackEvent(trackingEvents.bcLoginSignup);
-    this.loginErrorMode = false;
+    this.trackEvent(trackingEvents.bcLoginSignup)
+    this.loginErrorMode = false
     // DRY_47693 signup code logic
     if (overrideCodeCheck) {
       // when overrideCodeCheck is true, we found the signupCode was invalid
@@ -158,60 +162,60 @@ class Store {
       // if they do sign up this way, which is allowed via firebase, they end
       // up in the unsolicited state, same as if they used the signupCode=false
       // flow.
-      this.firebaseModalOpen = true;
-      return;
+      this.firebaseModalOpen = true
+      return
     }
     if (this.signupCode === false) {
       // with no code present, we don't show any special case ui, we just let
       // them sign in and if they sign up for a new account, they'll land on
       // an unsolicited user page.
-      this.firebaseModalOpen = true;
-      return;
+      this.firebaseModalOpen = true
+      return
     }
-    this.loginButtonsSpinning = true;
+    this.loginButtonsSpinning = true
     apiClient
-      .validateSignupCode({ code: this.signupCode || "" })
+      .validateSignupCode({ code: this.signupCode || '' })
       .then(
-        action((res) => {
-          this.loginButtonsSpinning = false;
+        action(res => {
+          this.loginButtonsSpinning = false
           if (res.payload.active) {
-            this.firebaseModalOpen = true;
+            this.firebaseModalOpen = true
           } else if (res.payload.active === false) {
-            this.loginErrorMode = "_inactive_code_";
+            this.loginErrorMode = '_inactive_code_'
           }
         })
       )
       .catch(() => {
-        this.setGeneralError("_api_fail_");
-      });
+        this.setGeneralError('_api_fail_')
+      })
   }
 
   cancelGlobalLoginOverlay() {
-    this.firebaseModalOpen = false;
-    this.loginErrorMode = false;
-    this.loginButtonsSpinning = false;
+    this.firebaseModalOpen = false
+    this.loginErrorMode = false
+    this.loginButtonsSpinning = false
   }
 
   setUser(x: ApiUser | false) {
-    log.auth("setuser", x);
+    log.auth('setuser', x)
     if (x) {
-      log.auth("store acquired user", x);
-      this.user = x;
+      log.auth('store acquired user', x)
+      this.user = x
       // XXX_PORTING
       // amplitude.setUserId(x.id);
       // DRY_47693 signup code logic
       // if we have a signup code on the url, clear it
       if (this.signupCode) {
-        log.location("removing signupCode from url");
-        const url = new URL(window.location.toString());
-        url.searchParams.delete("signupCode");
+        log.location('removing signupCode from url')
+        const url = new URL(window.location.toString())
+        url.searchParams.delete('signupCode')
         // XXX_PORTING
-        window.history.replaceState({}, '', url.toString());
-        this.signupCode = false;
+        window.history.replaceState({}, '', url.toString())
+        this.signupCode = false
       }
       if (x.signupCodeName) {
         // if the user has a signup code, make sure it's set in the amplitude user properties
-        log.tracking('identify() signupCode');
+        log.tracking('identify() signupCode')
         // XXX_PORTING
         // const identifyOps = new amplitude.Identify();
         // identifyOps.setOnce('signupCodeName', x.signupCodeName);
@@ -219,22 +223,22 @@ class Store {
         // amplitude.identify(identifyOps);
       }
     } else {
-      log.auth("store clearing user");
+      log.auth('store clearing user')
     }
   }
 
   async logOut() {
     // we have to call the api to delete the cookie because it's httpOnly
-    log.auth("store logOut");
-    this.trackEvent(trackingEvents.bcLogout);
+    log.auth('store logOut')
+    this.trackEvent(trackingEvents.bcLogout)
     return apiClient
       .sessionLogout()
       .then(() => {
-        window.location.assign("/");
+        window.location.assign('/')
       })
       .catch(() => {
-        this.setGeneralError("_api_fail_");
-      });
+        this.setGeneralError('_api_fail_')
+      })
   }
 
   // }}}
@@ -254,25 +258,25 @@ class Store {
   }
 
   setTrackedPageEvent(evt: EventSpec, opts?: EventSpec['opts']) {
-    const key = evt.key;
-    const fullEvent = JSON.parse(JSON.stringify(trackingEvents[key]));
+    const key = evt.key
+    const fullEvent = JSON.parse(JSON.stringify(trackingEvents[key]))
     if (!fullEvent) {
-      log.error(`tracked event is not in trackingEvents (${evt})`);
-      return;
+      log.error(`tracked event is not in trackingEvents (${evt})`)
+      return
     }
-    fullEvent.opts = { ...fullEvent.opts, opts };
-    if (!fullEvent.opts.name || fullEvent.eventName !== "pageview") {
+    fullEvent.opts = { ...fullEvent.opts, opts }
+    if (!fullEvent.opts.name || fullEvent.eventName !== 'pageview') {
       log.error(
         `tracking a page event requires a pageview-like spec (${JSON.stringify(
           fullEvent
         )})`
-      );
-      return;
+      )
+      return
     }
     if (!isEqual(fullEvent, this.trackedPageEvent)) {
-      this.trackEvent(evt, opts);
+      this.trackEvent(evt, opts)
     }
-    this.trackedPageEvent = fullEvent;
+    this.trackedPageEvent = fullEvent
   }
 
   useTrackedPageEvent = (evt: EventSpec, opts?: EventSpec['opts']) => {
@@ -281,34 +285,33 @@ class Store {
     // eslint complains if i'm assinging this to a var, we have competing
     // style/linting errors here.
     /* eslint-disable @typescript-eslint/no-this-alias */
-    const self = this;
+    const self = this
     return useEffect(() => {
-      self.setTrackedPageEvent(evt, opts);
-    }, [self, evt, opts]);
+      self.setTrackedPageEvent(evt, opts)
+    }, [self, evt, opts])
     /* eslint-enable @typescript-eslint/no-this-alias */
-  };
+  }
 
   setGeneralError = (errId: GeneralError) => {
-    this.generalError = errId;
-  };
+    this.generalError = errId
+  }
 
   clearGeneralError = () => {
-    this.generalError = false;
-  };
+    this.generalError = false
+  }
 
   async savePost(post: ApiPost): Promise<ApiPost> {
     if (!this.user) throw new Error('must be authed')
-    return apiClient.newPost({post})
-      .then((wrapper) => {
-        this.setUser(wrapper.payload.user);
-        if (post.projectId === "new") {
-          this.trackEvent(trackingEvents.caNewPostNewProj);
-        } else {
-          this.trackEvent(trackingEvents.caNewPost);
-        }
-        return wrapper.payload.post;
-      })
+    return apiClient.newPost({ post }).then(wrapper => {
+      this.setUser(wrapper.payload.user)
+      if (post.projectId === 'new') {
+        this.trackEvent(trackingEvents.caNewPostNewProj)
+      } else {
+        this.trackEvent(trackingEvents.caNewPost)
+      }
+      return wrapper.payload.post
+    })
   }
 }
 
-export default Store;
+export default Store

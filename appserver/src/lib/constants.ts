@@ -1,2 +1,1 @@
-export const sessionCookieName = "_h3y_sess"
-
+export const sessionCookieName = '_h3y_sess'

@@ -1,13 +1,13 @@
-import { useEffect } from "react";
+import { useEffect } from 'react'
 // import { Button } from "@/components/uiLib";
-import { observer } from "mobx-react-lite";
-import log from "@/lib/log";
-import { useStore } from "@/lib/store";
-import { StyledFirebaseAuth } from "@/components/auth/StyledFirebaseAuth";
+import { observer } from 'mobx-react-lite'
+import log from '@/lib/log'
+import { useStore } from '@/lib/store'
+import { StyledFirebaseAuth } from '@/components/auth/StyledFirebaseAuth'
 
 // XXX_SKELETON
 const LoginGlobalOverlay = observer(() => {
-  const store = useStore();
+  const store = useStore()
   useEffect(() => {
     // client only, not on server
     store.initFirebase()
@@ -20,7 +20,7 @@ const LoginGlobalOverlay = observer(() => {
     // firebaseModalOpen condition, outside this it could fail w/ uninitialized
     // firebase instance.
     const firebaseUiConfig = {
-      signInFlow: "popup",
+      signInFlow: 'popup',
       signInOptions: [
         {
           provider: store.firebaseRef.auth.EmailAuthProvider.PROVIDER_ID,
@@ -29,7 +29,7 @@ const LoginGlobalOverlay = observer(() => {
       ],
       callbacks: {
         /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-        signInSuccessWithAuthResult: (authResult:any) => {
+        signInSuccessWithAuthResult: (authResult: any) => {
           // note that the logic to handle the new auth state is in the store, on
           // the onAuthStateChanged callback, here all we do is show a spinner
           // until the store finishes.
@@ -38,17 +38,17 @@ const LoginGlobalOverlay = observer(() => {
           // process, this would just spin forever. the store currently forces
           // a page reload on an error during this process, so that's a bad
           // hack.
-          log.auth("signInSuccessWithAuthResult", authResult);
-          return false;
+          log.auth('signInSuccessWithAuthResult', authResult)
+          return false
         },
         /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-        signInFailure: (error:any) => {
-          log.auth("signInFailure", error);
-          store.cancelGlobalLoginOverlay();
-          return false;
+        signInFailure: (error: any) => {
+          log.auth('signInFailure', error)
+          store.cancelGlobalLoginOverlay()
+          return false
         },
       },
-    };
+    }
 
     return (
       <div>
@@ -57,9 +57,9 @@ const LoginGlobalOverlay = observer(() => {
           firebaseAuth={store.firebaseRef.auth()}
         />
       </div>
-    );
+    )
   }
-  return <></>;
+  return <></>
   // return (
   //   <>
   //     <Modal
@@ -72,6 +72,6 @@ const LoginGlobalOverlay = observer(() => {
   //     </Modal>
   //   </>
   // );
-});
+})
 
-export { LoginGlobalOverlay };
+export { LoginGlobalOverlay }

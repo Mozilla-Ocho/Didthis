@@ -1,85 +1,99 @@
-import { wrapFetch } from "./apiCore";
-import type { FetchArgs} from "@/lib/apiCore"
-import type { MeWrapper, PublicUserWrapper, ValidateSignupCodeWrapper, EmptySuccessWrapper, NewPostWrapper } from "./apiConstants";
+import { wrapFetch } from './apiCore'
+import type { FetchArgs } from '@/lib/apiCore'
+import type {
+  MeWrapper,
+  PublicUserWrapper,
+  ValidateSignupCodeWrapper,
+  EmptySuccessWrapper,
+  NewPostWrapper,
+} from './apiConstants'
 
 const getHealthCheck = async () => {
-  const payload = await wrapFetch({ action: "health_check" });
-  return payload;
-};
+  const payload = await wrapFetch({ action: 'health_check' })
+  return payload
+}
 
 const getMe = async ({
   asTestUser,
   signupCode,
   expectUnauth,
   sessionCookie,
-}:{
-  asTestUser?: string;
-  signupCode?: string | false;
-  expectUnauth?: boolean;
-  sessionCookie?: string;
+}: {
+  asTestUser?: string
+  signupCode?: string | false
+  expectUnauth?: boolean
+  sessionCookie?: string
 }): Promise<MeWrapper> => {
   const fetchOpts: FetchArgs = {
-    action: "me",
+    action: 'me',
     asTestUser,
-    expectErrorIds: expectUnauth ? ["ERR_UNAUTHORIZED"] : undefined,
+    expectErrorIds: expectUnauth ? ['ERR_UNAUTHORIZED'] : undefined,
     queryParams: signupCode ? { signupCode } : undefined,
     sessionCookie,
-  };
-  const wrapper = (await wrapFetch(fetchOpts)) as MeWrapper;
-  return wrapper;
-};
+  }
+  const wrapper = (await wrapFetch(fetchOpts)) as MeWrapper
+  return wrapper
+}
 
 const getPublicUser = async ({
   urlSlug,
-}:{
-  urlSlug: string;
+}: {
+  urlSlug: string
 }): Promise<PublicUserWrapper> => {
   const fetchOpts: FetchArgs = {
-    action: "getUser",
+    action: 'getUser',
     queryParams: { urlSlug },
-  };
-  const wrapper = (await wrapFetch(fetchOpts)) as PublicUserWrapper;
-  return wrapper;
-};
+  }
+  const wrapper = (await wrapFetch(fetchOpts)) as PublicUserWrapper
+  return wrapper
+}
 
-const sessionLogin = async ({ idToken }: { idToken: string }):Promise<EmptySuccessWrapper> => {
-  const wrapper = await wrapFetch({
-    action: "sessionLogin",
-    method: "POST",
+const sessionLogin = async ({
+  idToken,
+}: {
+  idToken: string
+}): Promise<EmptySuccessWrapper> => {
+  const wrapper = (await wrapFetch({
+    action: 'sessionLogin',
+    method: 'POST',
     body: { idToken },
-  }) as EmptySuccessWrapper
-  return wrapper;
-};
+  })) as EmptySuccessWrapper
+  return wrapper
+}
 
-const sessionLogout = async ():Promise<EmptySuccessWrapper> => {
-  const wrapper = await wrapFetch({
-    action: "sessionLogout",
-    method: "POST",
-  }) as EmptySuccessWrapper
-  return wrapper;
-};
+const sessionLogout = async (): Promise<EmptySuccessWrapper> => {
+  const wrapper = (await wrapFetch({
+    action: 'sessionLogout',
+    method: 'POST',
+  })) as EmptySuccessWrapper
+  return wrapper
+}
 
-const validateSignupCode = async ({ code }: { code: string }): Promise<ValidateSignupCodeWrapper> => {
-  const wrapper = await wrapFetch({
-    action: "validateSignupCode",
-    method: "GET",
+const validateSignupCode = async ({
+  code,
+}: {
+  code: string
+}): Promise<ValidateSignupCodeWrapper> => {
+  const wrapper = (await wrapFetch({
+    action: 'validateSignupCode',
+    method: 'GET',
     queryParams: { code },
-  }) as ValidateSignupCodeWrapper;
-  return wrapper;
-};
+  })) as ValidateSignupCodeWrapper
+  return wrapper
+}
 
 const newPost = async ({
   post,
 }: {
-  post: ApiPost;
+  post: ApiPost
 }): Promise<NewPostWrapper> => {
   const wrapper = (await wrapFetch({
-    action: "newPost",
-    method: "POST",
-    body: {post},
-  })) as NewPostWrapper;
-  return wrapper;
-};
+    action: 'newPost',
+    method: 'POST',
+    body: { post },
+  })) as NewPostWrapper
+  return wrapper
+}
 
 // const postUserProfile = async ({
 //   profile,
@@ -99,19 +113,19 @@ const getUrlSlug = async ({
   checkSlug,
   asTestUser,
 }: {
-  checkSlug: string;
-  asTestUser?: string;
+  checkSlug: string
+  asTestUser?: string
 }) => {
-  const qp: KvString = {};
-  if (typeof checkSlug === "string") qp.checkSlug = checkSlug;
+  const qp: KvString = {}
+  if (typeof checkSlug === 'string') qp.checkSlug = checkSlug
   const wrapper = await wrapFetch({
-    action: "url_slug",
-    method: "GET",
+    action: 'url_slug',
+    method: 'GET',
     queryParams: qp,
     asTestUser,
-  });
-  return wrapper;
-};
+  })
+  return wrapper
+}
 
 // XXX_PORTING change response shape
 const postUrlSlug = async ({
@@ -119,25 +133,25 @@ const postUrlSlug = async ({
   asTestUser,
   fullResetForTestUser,
 }: {
-  slug?: string;
-  asTestUser?: string;
-  fullResetForTestUser?: boolean;
+  slug?: string
+  asTestUser?: string
+  fullResetForTestUser?: boolean
 }) => {
-  const body: POJO = {};
+  const body: POJO = {}
   if (fullResetForTestUser) {
     // the api backend only accepts the string "confirm" for this value
-    body.fullResetForTestUser = fullResetForTestUser;
+    body.fullResetForTestUser = fullResetForTestUser
   } else {
-    body.slug = slug;
+    body.slug = slug
   }
   const wrapper = await wrapFetch({
-    action: "url_slug",
-    method: "POST",
+    action: 'url_slug',
+    method: 'POST',
     body,
     asTestUser,
-  });
-  return wrapper;
-};
+  })
+  return wrapper
+}
 
 // XXX_PORTING change response shape
 const getUrlMeta = async ({
@@ -145,54 +159,54 @@ const getUrlMeta = async ({
   processor,
   asTestUser,
 }: {
-  url: string;
-  processor: string;
-  asTestUser?: string;
+  url: string
+  processor: string
+  asTestUser?: string
 }) => {
   const wrapper = await wrapFetch({
-    action: "url_meta",
-    method: "GET",
+    action: 'url_meta',
+    method: 'GET',
     queryParams: { url, processor },
     asTestUser,
-  });
-  return wrapper;
-};
+  })
+  return wrapper
+}
 
 // XXX_PORTING change response shape
 const rawUnfurl = async ({ url }: { url: string }) => {
   const wrapper = await wrapFetch({
-    action: "raw_unfurl",
-    method: "GET",
+    action: 'raw_unfurl',
+    method: 'GET',
     queryParams: { url },
-  });
-  return wrapper;
-};
+  })
+  return wrapper
+}
 
 // XXX_PORTING change response shape
 const postWaitlist = async ({
   email,
   landing_page,
 }: {
-  email: string;
-  landing_page: string;
+  email: string
+  landing_page: string
 }) => {
   const wrapper = await wrapFetch({
-    action: "waitlist",
-    method: "POST",
+    action: 'waitlist',
+    method: 'POST',
     body: { email, landing_page },
-  });
-  return wrapper;
-};
+  })
+  return wrapper
+}
 
 // XXX_PORTING change response shape
 const getWaitlist = async ({ id }: { id: string }) => {
   const wrapper = await wrapFetch({
-    action: "waitlist",
-    method: "GET",
+    action: 'waitlist',
+    method: 'GET',
     queryParams: { id },
-  });
-  return wrapper;
-};
+  })
+  return wrapper
+}
 
 const apiClient = {
   getHealthCheck,
@@ -209,6 +223,6 @@ const apiClient = {
   sessionLogin,
   sessionLogout,
   validateSignupCode,
-};
+}
 
-export default apiClient;
+export default apiClient

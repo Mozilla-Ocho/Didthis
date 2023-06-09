@@ -1,48 +1,52 @@
-type GenericErrorId = "ERR_UNAUTHORIZED" | "ERR_CSRF_TOKEN" | "ERR_NOT_FOUND" | "ERR_BAD_INPUT";
+type GenericErrorId =
+  | 'ERR_UNAUTHORIZED'
+  | 'ERR_CSRF_TOKEN'
+  | 'ERR_NOT_FOUND'
+  | 'ERR_BAD_INPUT'
 
-type ErrorId = GenericErrorId;
+type ErrorId = GenericErrorId
 
 interface Wrapper {
-  action: string;
-  status: number;
-  success: boolean;
-  payload?: POJO;
-  errorId?: ErrorId;
-  errorMsg?: string;
+  action: string
+  status: number
+  success: boolean
+  payload?: POJO
+  errorId?: ErrorId
+  errorMsg?: string
 }
 interface SuccessWrapper extends Wrapper {
-  action: string;
-  status: number;
-  success: true;
-  payload?: POJO;
+  action: string
+  status: number
+  success: true
+  payload?: POJO
 }
 interface ErrorWrapper extends Wrapper {
-  action: string;
-  status: number;
-  success: false;
-  errorId: ErrorId;
-  errorMsg: string;
+  action: string
+  status: number
+  success: false
+  errorId: ErrorId
+  errorMsg: string
 }
 
 type EmptySuccessWrapper = SuccessWrapper
 
 interface MeWrapper extends SuccessWrapper {
-  payload: ApiUser;
+  payload: ApiUser
 }
 
 interface NewPostWrapper extends SuccessWrapper {
   payload: {
-    user: ApiUser;
-    post: ApiPost;
+    user: ApiUser
+    post: ApiPost
   }
 }
 
 interface PublicUserWrapper extends SuccessWrapper {
-  payload: ApiUser;
+  payload: ApiUser
 }
 
 interface ValidateSignupCodeWrapper extends SuccessWrapper {
-  payload: { code: string; name: string; active: boolean };
+  payload: { code: string; name: string; active: boolean }
 }
 
 export type {
@@ -55,4 +59,4 @@ export type {
   PublicUserWrapper,
   ValidateSignupCodeWrapper,
   EmptySuccessWrapper,
-};
+}

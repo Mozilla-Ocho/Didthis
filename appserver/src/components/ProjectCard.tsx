@@ -1,6 +1,6 @@
-import pathBuilder from "@/lib/pathBuidler";
-import { observer } from "mobx-react-lite";
-import { H, Link, Timestamp } from "./uiLib";
+import pathBuilder from '@/lib/pathBuidler'
+import { observer } from 'mobx-react-lite'
+import { H, Link, Timestamp } from './uiLib'
 
 const ProjectCard = observer(
   ({ project, targetUser }: { project: ApiProject; targetUser: ApiUser }) => {
@@ -13,11 +13,15 @@ const ProjectCard = observer(
         </H.H3>
         <p>{project.currentStatus}</p>
         <p>{Object.keys(project.posts).length} posts</p>
-        <p>created <Timestamp seconds={project.createdAt}/></p>
-        <p>updated <Timestamp seconds={project.updatedAt}/></p>
+        <p>
+          created <Timestamp seconds={project.createdAt} />
+        </p>
+        <p>
+          updated <Timestamp seconds={project.updatedAt} />
+        </p>
       </div>
-    );
+    )
   }
-);
+)
 
-export default ProjectCard;
+export default ProjectCard

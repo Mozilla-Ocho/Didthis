@@ -1,11 +1,11 @@
-import React, { useRef, useEffect, ReactNode } from "react";
-import ReactDOM from "react-dom";
+import React, { useRef, useEffect, ReactNode } from 'react'
+import ReactDOM from 'react-dom'
 
 interface ModalProps {
-  isOpen: boolean;
-  handleClose: () => void;
-  title: string;
-  children: ReactNode;
+  isOpen: boolean
+  handleClose: () => void
+  title: string
+  children: ReactNode
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -14,18 +14,20 @@ const Modal: React.FC<ModalProps> = ({
   title,
   children,
 }) => {
-  const modalRef = useRef<HTMLDivElement | null>(null);
-  const elRef = useRef<HTMLDivElement | null>(null);
+  const modalRef = useRef<HTMLDivElement | null>(null)
+  const elRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     // portal node creation must happen inside useeffect due to nextjs SSR
-    const div = document.createElement('div');
-    div.className = 'modal-root';
-    elRef.current = div;
-    const modalRoot = document.body;
-    modalRoot.appendChild(elRef.current);
-    return () => { modalRoot.removeChild(elRef.current as HTMLDivElement); }
-  }, []);
+    const div = document.createElement('div')
+    div.className = 'modal-root'
+    elRef.current = div
+    const modalRoot = document.body
+    modalRoot.appendChild(elRef.current)
+    return () => {
+      modalRoot.removeChild(elRef.current as HTMLDivElement)
+    }
+  }, [])
 
   useEffect(() => {
     function handleOutsideClick(event: MouseEvent) {
@@ -34,25 +36,25 @@ const Modal: React.FC<ModalProps> = ({
         !modalRef.current.contains(event.target as Node)
       ) {
         if (isOpen) {
-          handleClose();
+          handleClose()
         }
       }
     }
 
     function handleEscapeKeydown(event: KeyboardEvent) {
-      if (event.code === "Escape") {
-        handleClose();
+      if (event.code === 'Escape') {
+        handleClose()
       }
     }
 
-    window.addEventListener("mousedown", handleOutsideClick);
-    window.addEventListener("keydown", handleEscapeKeydown);
+    window.addEventListener('mousedown', handleOutsideClick)
+    window.addEventListener('keydown', handleEscapeKeydown)
 
     return () => {
-      window.removeEventListener("mousedown", handleOutsideClick);
-      window.removeEventListener("keydown", handleEscapeKeydown);
-    };
-  }, [isOpen, handleClose]);
+      window.removeEventListener('mousedown', handleOutsideClick)
+      window.removeEventListener('keydown', handleEscapeKeydown)
+    }
+  }, [isOpen, handleClose])
 
   return isOpen
     ? ReactDOM.createPortal(
@@ -102,7 +104,7 @@ const Modal: React.FC<ModalProps> = ({
         </div>,
         elRef.current as HTMLDivElement
       )
-    : null;
-};
+    : null
+}
 
-export default Modal;
+export default Modal

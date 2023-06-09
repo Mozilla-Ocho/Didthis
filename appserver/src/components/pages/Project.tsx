@@ -1,26 +1,26 @@
 // import { useStore } from "@/lib/store";
-import { useRouter } from "next/router";
-import { observer } from "mobx-react-lite";
-import { H, Link, Timestamp, Divider } from "../uiLib";
-import UserPreview from "../UserPreview";
-import pathBuilder from "@/lib/pathBuidler";
-import { getParamString } from "@/lib/nextUtils";
-import NotFound from "./NotFound";
-import PostCard from "../PostCard";
-import { useStore } from "@/lib/store";
+import { useRouter } from 'next/router'
+import { observer } from 'mobx-react-lite'
+import { H, Link, Timestamp, Divider } from '../uiLib'
+import UserPreview from '../UserPreview'
+import pathBuilder from '@/lib/pathBuidler'
+import { getParamString } from '@/lib/nextUtils'
+import NotFound from './NotFound'
+import PostCard from '../PostCard'
+import { useStore } from '@/lib/store'
 
 const ProjectPage = observer(({ targetUser }: { targetUser: ApiUser }) => {
   // const store = useStore();
-  if (!targetUser) return <NotFound>user not found</NotFound>;
-  const router = useRouter();
-  const store = useStore();
-  const projectId = getParamString(router, "projectId");
-  const focusPostId = getParamString(router, "postId");
-  const project = targetUser.profile.projects[projectId];
-  if (!project) return <NotFound>project not found</NotFound>;
-  const posts = Object.values(project.posts);
-  posts.sort((a, b) => a.createdAt - b.createdAt);
-  const isSelf = store.user && store.user.id === targetUser.id;
+  if (!targetUser) return <NotFound>user not found</NotFound>
+  const router = useRouter()
+  const store = useStore()
+  const projectId = getParamString(router, 'projectId')
+  const focusPostId = getParamString(router, 'postId')
+  const project = targetUser.profile.projects[projectId]
+  if (!project) return <NotFound>project not found</NotFound>
+  const posts = Object.values(project.posts)
+  posts.sort((a, b) => a.createdAt - b.createdAt)
+  const isSelf = store.user && store.user.id === targetUser.id
   return (
     <>
       <div>
@@ -44,7 +44,7 @@ const ProjectPage = observer(({ targetUser }: { targetUser: ApiUser }) => {
               <Divider />
             </>
           )}
-        {posts.map((p) => (
+        {posts.map(p => (
           <PostCard
             key={p.id}
             post={p}
@@ -54,7 +54,7 @@ const ProjectPage = observer(({ targetUser }: { targetUser: ApiUser }) => {
         ))}
       </div>
     </>
-  );
-});
+  )
+})
 
-export default ProjectPage;
+export default ProjectPage

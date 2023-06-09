@@ -1,5 +1,5 @@
-import { H, Divider } from "@/components/uiLib";
-import { LoginButton } from "@/components/auth/LoginButton";
+import { H, Divider } from '@/components/uiLib'
+import { LoginButton } from '@/components/auth/LoginButton'
 
 // XXX_SKELETON
 const HomeUnauth = () => {
@@ -10,12 +10,10 @@ const HomeUnauth = () => {
         <p>welcome to the product</p>
       </div>
       <Divider />
-        <LoginButton />
+      <LoginButton />
       <Divider />
     </>
-  );
+  )
 }
 
-export default HomeUnauth;
-
-
+export default HomeUnauth

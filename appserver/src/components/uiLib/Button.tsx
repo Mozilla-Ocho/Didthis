@@ -1,36 +1,36 @@
-import { ReactNode, FC, MouseEventHandler } from "react";
+import { ReactNode, FC, MouseEventHandler } from 'react'
 // import classNames from "classnames";
 
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva, type VariantProps } from 'class-variance-authority'
 
 const buttonCVA = cva(
-  "button p-4 py-2 px-4 rounded text-white disabled:bg-slate-300",
+  'button p-4 py-2 px-4 rounded text-white disabled:bg-slate-300',
   {
     variants: {
       intent: {
-        primary: ["bg-primary", "hover:bg-primary-hover"],
-        secondary: ["bg-secondary", "hover:bg-secondary-hover"],
+        primary: ['bg-primary', 'hover:bg-primary-hover'],
+        secondary: ['bg-secondary', 'hover:bg-secondary-hover'],
       },
       size: {
-        small: ["text-sm"],
-        medium: ["text-base"],
+        small: ['text-sm'],
+        medium: ['text-base'],
       },
     },
     defaultVariants: {
-      intent: "primary",
-      size: "medium",
+      intent: 'primary',
+      size: 'medium',
     },
   }
-);
+)
 
 interface ButtonProps extends VariantProps<typeof buttonCVA> {
-  children: ReactNode;
-  className?: string;
-  type?: "submit" | undefined;
-  onClick?: React.MouseEventHandler;
-  loading?: boolean; // XXX_PORTING
-  "data-testid"?: string; // XXX_PORTING
-  disabled?: boolean;
+  children: ReactNode
+  className?: string
+  type?: 'submit' | undefined
+  onClick?: React.MouseEventHandler
+  loading?: boolean // XXX_PORTING
+  'data-testid'?: string // XXX_PORTING
+  disabled?: boolean
 }
 
 const Button: FC<ButtonProps> = ({
@@ -42,10 +42,10 @@ const Button: FC<ButtonProps> = ({
   disabled,
   ...props
 }) => {
-  const bType = props.type || "button";
-  const ourOnClick : MouseEventHandler = (e) => {
-    if (onClick) onClick(e);
-  };
+  const bType = props.type || 'button'
+  const ourOnClick: MouseEventHandler = e => {
+    if (onClick) onClick(e)
+  }
   return (
     <button
       type={bType}
@@ -55,7 +55,7 @@ const Button: FC<ButtonProps> = ({
     >
       {children}
     </button>
-  );
-};
+  )
+}
 
-export default Button;
+export default Button

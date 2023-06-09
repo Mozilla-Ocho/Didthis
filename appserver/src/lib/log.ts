@@ -1,61 +1,62 @@
 // this list serves to fuel the type definition as well as provide a runtime
 // iterable
 const channelNames = [
-  "warn",
-  "error",
-  "auth",
-  "readiness",
-  "api",
-  "unfurl",
-  "location",
-  "sql",
-  "tracking",
-  "serverApi",
-] as const;
+  'warn',
+  'error',
+  'auth',
+  'readiness',
+  'api',
+  'unfurl',
+  'location',
+  'sql',
+  'tracking',
+  'serverApi',
+] as const
 
 //type Channel = typeof channelNames[number];
-type ChannelName = "warn" |
-"error" |
-"auth" |
-"readiness" |
-"api" |
-"unfurl" |
-"location" |
-"sql" |
-"tracking" |
-"serverApi"
+type ChannelName =
+  | 'warn'
+  | 'error'
+  | 'auth'
+  | 'readiness'
+  | 'api'
+  | 'unfurl'
+  | 'location'
+  | 'sql'
+  | 'tracking'
+  | 'serverApi'
 
-type LoggingEnv = "default" | "test" | "inProdBrowser" | "ssr";
+type LoggingEnv = 'default' | 'test' | 'inProdBrowser' | 'ssr'
 
 type EnvToggles = {
   // for each env, is a channel active or not
-  [key in LoggingEnv]: boolean;
-};
+  [key in LoggingEnv]: boolean
+}
 
 type ChannelConfig = {
   // for each channel, what it's EnvToggles
-  [key in ChannelName]: EnvToggles;
-};
+  [key in ChannelName]: EnvToggles
+}
 
 type Logger = {
   // the main interface, a dict of channel name -> logging function
   /* eslint-disable-next-line @typescript-eslint/ban-types */
-  [key in ChannelName]: Function;
-};
+  [key in ChannelName]: Function
+}
 
 // initialize log object to a map of channel names to dummy functions
 /* eslint-disable-next-line @typescript-eslint/no-empty-function */
-const log: Logger = Object.fromEntries([channelNames.map((c) => [c, () => {}])]);
+const log: Logger = Object.fromEntries([channelNames.map(c => [c, () => {}])])
 
-let env: LoggingEnv = "default";
+let env: LoggingEnv = 'default'
 
-if (typeof window === "undefined") {
-  env = "ssr";
+if (typeof window === 'undefined') {
+  env = 'ssr'
 }
-if (process.env.NODE_ENV === "production" && typeof window !== "undefined") {
+if (process.env.NODE_ENV === 'production' && typeof window !== 'undefined') {
   // in production browser context we use a more limited set of active logging
   // channels
-  env = "inProdBrowser";
+  env = 'inProdBrowser'
 }
 
 const channelConfig: ChannelConfig = {
@@ -119,30 +120,30 @@ const channelConfig: ChannelConfig = {
     inProdBrowser: false,
     ssr: true,
   },
-};
+}
 
 function setConfig(x: LoggingEnv) {
-  env = x;
-  assign();
+  env = x
+  assign()
 }
 
 function assign() {
   for (const channel of channelNames) {
     if (channelConfig[channel][env]) {
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-      log[channel] = (...args:any) => console.log(channel, ":", ...args);
+      log[channel] = (...args: any) => console.log(channel, ':', ...args)
     } else {
-      log[channel] = () => false;
+      log[channel] = () => false
     }
   }
 }
 
 function setTestMode() {
-  setConfig("test");
+  setConfig('test')
 }
 
-assign();
+assign()
 
-export default log;
+export default log
 
-export { setTestMode };
+export { setTestMode }

@@ -1,18 +1,18 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { initializeApp, applicationDefault } from 'firebase-admin/app';
-import { getAuth } from 'firebase-admin/auth';
-import profileUtils from './profileUtils';
-import Cookies from 'cookies';
-import knex from '@/knex';
-import log from '@/lib/log';
-import * as constants from '@/lib/constants';
+import type { NextApiRequest, NextApiResponse } from 'next'
+import { initializeApp, applicationDefault } from 'firebase-admin/app'
+import { getAuth } from 'firebase-admin/auth'
+import profileUtils from './profileUtils'
+import Cookies from 'cookies'
+import knex from '@/knex'
+import log from '@/lib/log'
+import * as constants from '@/lib/constants'
 
-let firebaseApp: ReturnType<typeof initializeApp>;
+let firebaseApp: ReturnType<typeof initializeApp>
 
 try {
   firebaseApp = initializeApp({
     credential: applicationDefault(),
-  });
+  })
 } catch (e) {
   // nextjs hot reloading / rendering throws errors in firebase initializeApp
   // about being called more than once.
@@ -24,7 +24,7 @@ const userFromDbRow = (
 ): ApiUser => {
   const profile = opts.publicFilter
     ? profileUtils.privacyFilteredCopy(dbRow.profile)
-    : dbRow.profile;
+    : dbRow.profile
   const user: ApiUser = {
     id: dbRow.id,
     email: dbRow.email,
@@ -32,58 +32,58 @@ const userFromDbRow = (
     profile,
     createdAt: dbRow.created_at_millis,
     fullName: dbRow.full_name || undefined,
-  };
+  }
   if (!opts.publicFilter && !opts.includeAdminUIFields) {
     // DRY_47693 signup code logic
-    user.signupCodeName = dbRow.signup_code_name || '';
-    if (!dbRow.signup_code_name) user.unsolicited = true;
+    user.signupCodeName = dbRow.signup_code_name || ''
+    if (!dbRow.signup_code_name) user.unsolicited = true
   }
-  if (dbRow.admin_status === 'admin') user.isAdmin = true;
-  if (dbRow.ban_status === 'banned') user.isBanned = true;
+  if (dbRow.admin_status === 'admin') user.isAdmin = true
+  if (dbRow.ban_status === 'banned') user.isBanned = true
   if (opts.includeAdminUIFields) {
     // signupCodeName was in here but is now just always returned
-    user.lastFullPageLoad = dbRow.last_read_from_user || undefined;
-    user.lastWrite = dbRow.last_write_from_user || undefined;
-    user.updatedAt = dbRow.updated_at_millis;
+    user.lastFullPageLoad = dbRow.last_read_from_user || undefined
+    user.lastWrite = dbRow.last_write_from_user || undefined
+    user.updatedAt = dbRow.updated_at_millis
   }
-  return user;
-};
+  return user
+}
 
 const generateRandomAvailableSlug = async () => {
   const mkRandSlug = () => {
-    const chars = 'bcdfghjkmnpqrstvwxyz23456789';
-    let slug = '';
+    const chars = 'bcdfghjkmnpqrstvwxyz23456789'
+    let slug = ''
     for (let i = 0; i < 8; i++) {
-      slug = slug + chars[Math.floor(Math.random() * chars.length)];
+      slug = slug + chars[Math.floor(Math.random() * chars.length)]
     }
-    return slug;
-  };
-  let available = false;
-  let slug = mkRandSlug();
+    return slug
+  }
+  let available = false
+  let slug = mkRandSlug()
   while (!available) {
     const dbRow = (await knex('users').where('url_slug', slug).first()) as
       | UserDbRow
-      | undefined;
+      | undefined
     if (dbRow) {
-      slug = mkRandSlug();
+      slug = mkRandSlug()
     } else {
-      available = true;
+      available = true
     }
   }
-  return slug;
-};
+  return slug
+}
 
 const getOrCreateUser = async ({
   id,
   email,
 }: {
-  id: string;
-  email: string;
+  id: string
+  email: string
 }): Promise<ApiUser> => {
-  const millis = new Date().getTime();
+  const millis = new Date().getTime()
   let dbRow = (await knex('users').where('id', id).first()) as
     | UserDbRow
-    | undefined;
+    | undefined
   // XXX_PORTING
   // const codeInfo = validateSignupCode(req.query.signupCode || "");
   if (dbRow) {
@@ -103,12 +103,12 @@ const getOrCreateUser = async ({
     //       .returning("*")
     //   )[0];
     // }
-    return userFromDbRow(dbRow, { publicFilter: false });
+    return userFromDbRow(dbRow, { publicFilter: false })
   }
   // else, create new
   // DRY_r9639 user creation logic
-  log.serverApi('no user found, potentially a new signup, autovivifying');
-  const newSlug = await generateRandomAvailableSlug();
+  log.serverApi('no user found, potentially a new signup, autovivifying')
+  const newSlug = await generateRandomAvailableSlug()
   const columns: UserDbRow = {
     id,
     email: email,
@@ -123,16 +123,16 @@ const getOrCreateUser = async ({
     last_read_from_user: millis,
     admin_status: null,
     ban_status: null,
-  };
-  dbRow = (await knex('users').insert(columns).returning('*'))[0] as UserDbRow;
-  log.serverApi('created user', dbRow.id);
+  }
+  dbRow = (await knex('users').insert(columns).returning('*'))[0] as UserDbRow
+  log.serverApi('created user', dbRow.id)
   // XXX_PORTING
   // setReqAuthentication(req, dbRow); // have to set this early here so track event can obtain the new auth user id
   // trackEventReqEvtOpts(req, trackingEvents.caSignup, {
   //   signupCodeName: codeInfo.codeName || "none",
   // });
-  return userFromDbRow(dbRow, { publicFilter: false });
-};
+  return userFromDbRow(dbRow, { publicFilter: false })
+}
 
 // reads the Authorization header for the bearer token and validates it, looks
 // up the user record if any
@@ -145,11 +145,11 @@ const getAuthUser = (
     // than having it inspect the request, which won't work due to
     // x-forwarded-proto being the real value.
     secure: process.env.NEXT_PUBLIC_ENV_NAME !== 'dev',
-  });
+  })
   // DRY_r9725 session cookie name
-  const sessionCookie = cookies.get(constants.sessionCookieName) || '';
+  const sessionCookie = cookies.get(constants.sessionCookieName) || ''
   // log.serverApi('sessionCookie', sessionCookie);
-  if (!sessionCookie) return Promise.resolve(null);
+  if (!sessionCookie) return Promise.resolve(null)
   return (
     getAuth(firebaseApp)
       // XXX TODO: false here is insecure in that is doesn't deal with password
@@ -177,20 +177,20 @@ const getAuthUser = (
         //   firebase: { identities: { email: [Array] }, sign_in_provider: 'password' },
         //   uid: 'IUHkIdKRZVV6S9aZ02P8Fokejqx2'
         // }
-        log.serverApi('session valid, fetching user', decodedClaims.user_id);
+        log.serverApi('session valid, fetching user', decodedClaims.user_id)
         return getOrCreateUser({
           id: decodedClaims.user_id,
           email: decodedClaims.email || '',
-        });
+        })
       })
       .catch(() => {
-        log.serverApi('sessionCookie failed firebase verification');
+        log.serverApi('sessionCookie failed firebase verification')
         // TODO: delete cookie here?
-        return null;
+        return null
       })
-  );
-};
+  )
+}
 
-const getAuthFirebaseApp = () => getAuth(firebaseApp);
+const getAuthFirebaseApp = () => getAuth(firebaseApp)
 
-export { getAuthUser, userFromDbRow, getAuthFirebaseApp };
+export { getAuthUser, userFromDbRow, getAuthFirebaseApp }

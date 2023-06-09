@@ -1,6 +1,6 @@
-import { Button } from "@/components/uiLib";
-import { observer } from "mobx-react-lite";
-import { useStore } from "@/lib/store";
+import { Button } from '@/components/uiLib'
+import { observer } from 'mobx-react-lite'
+import { useStore } from '@/lib/store'
 
 const LoginButton = observer(
   ({
@@ -9,32 +9,32 @@ const LoginButton = observer(
     intent,
     text,
     'data-testid': dataTestid,
-  }:{
-    overrideCodeCheck?: boolean,
-    overrideCodeCheckIfNoSignupCode?: boolean,
-    intent?: React.ComponentProps<typeof Button>['intent'],
-    text?: string,
-    'data-testid'?: string,
+  }: {
+    overrideCodeCheck?: boolean
+    overrideCodeCheckIfNoSignupCode?: boolean
+    intent?: React.ComponentProps<typeof Button>['intent']
+    text?: string
+    'data-testid'?: string
   }) => {
-    const store = useStore();
+    const store = useStore()
     if (!store.signupCode) {
-      overrideCodeCheck = overrideCodeCheck || overrideCodeCheckIfNoSignupCode;
+      overrideCodeCheck = overrideCodeCheck || overrideCodeCheckIfNoSignupCode
     }
     const handleClick = () => {
-      store.launchGlobalLoginOverlay(!!overrideCodeCheck);
-    };
+      store.launchGlobalLoginOverlay(!!overrideCodeCheck)
+    }
     const defaultText = store.signupCode ? 'Sign Up' : 'Log In'
     return (
       <Button
         onClick={handleClick}
         intent={intent}
         loading={store.loginButtonsSpinning}
-        data-testid={dataTestid || "loginButton"}
+        data-testid={dataTestid || 'loginButton'}
       >
         {text || defaultText}
       </Button>
-    );
+    )
   }
-);
+)
 
-export { LoginButton };
+export { LoginButton }
