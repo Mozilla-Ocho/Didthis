@@ -17,7 +17,7 @@ const HomeAuth = observer(() => {
         hi
       </Modal>
       <Button onClick={launchModal}>open modal</Button>
-      {store.user.profile.projects.length ? (
+      {Object.keys(store.user.profile.projects).length ? (
         <UserProjects targetUser={store.user} />
       ) : (
         <div>

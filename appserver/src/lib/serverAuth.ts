@@ -19,7 +19,7 @@ try {
 }
 
 const userFromDbRow = (dbRow: UserDbRow, opts: {publicFilter: boolean, includeAdminUIFields?: boolean}): ApiUser => {
-  const profile = opts.publicFilter ? dbRow.profile : profileUtils.privacyFilteredCopy(dbRow.profile)
+  const profile = opts.publicFilter ? profileUtils.privacyFilteredCopy(dbRow.profile) : dbRow.profile;
   const user: ApiUser = {
     id: dbRow.id,
     email: dbRow.email,

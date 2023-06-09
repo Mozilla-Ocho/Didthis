@@ -2,7 +2,9 @@ import { observer } from "mobx-react-lite";
 import { useStore } from "@/lib/store";
 import { useState } from "react";
 import { Button, Select, Textarea } from "../uiLib";
-import { useRouter } from "next/router";
+import { NextRouter, useRouter } from "next/router";
+import profileUtils from "@/lib/profileUtils";
+import { getParamString } from "@/lib/nextUtils";
 
 // XXX_SKELETON
 
@@ -13,23 +15,27 @@ const ProjectSelector = ({
   projectId: string;
   setProjectId: (arg0: string) => void;
 }) => {
+  const store = useStore();
+  if (!store.user) return <></>;
+  const profile = store.user.profile;
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setProjectId(e.target.value);
   };
-  const store = useStore();
   if (!store.user) return <></>;
-  const nameAndId = [["new project", "new"]];
-  store.user.profile.projects.forEach((proj) => {
+  const nameAndId: [string, string][] = [];
+  Object.values(profile.projects).forEach((proj) => {
     nameAndId.push([proj.title, proj.id]);
   });
+  nameAndId.sort((a, b) => {
+    return profile.projects[a[1]].createdAt - profile.projects[b[1]].createdAt;
+  });
+  nameAndId.unshift(["Create a new project", "new"]);
   return (
     <div>
       <p>Project:</p>
-      <Select onChange={handleChange}
-        value={projectId}
-      >
+      <Select onChange={handleChange} value={projectId}>
         {nameAndId.map((nid) => (
-          <option key={nid[1]} value={nid[1]} selected={nid[1] === projectId}>
+          <option key={nid[1]} value={nid[1]}>
             {nid[0]}
           </option>
         ))}
@@ -40,19 +46,34 @@ const ProjectSelector = ({
 
 const PostForm = observer(() => {
   // const store = useStore();
+  // XXX spinner
   const router = useRouter();
-  const defaultPid = router.query.projectId + "" || "new";
-  const [projectId, setProjectId] = useState<string>(defaultPid);
+  const store = useStore();
+  let defaultPid = getParamString(router, "projectId");
+  if (!(store.user && store.user.profile.projects[defaultPid]))
+    defaultPid = "new";
   const [post, setPost] = useState<ApiPost>({
-    id: "new",
-    title: "",
+    id: "new", // assigned on save
+    createdAt: 0, // asigned on save
+    projectId: defaultPid, // assigned on save if "new"
     scope: "public",
+    description: "",
   });
+  if (!store.user) return <></>;
+  const setProjectId = (pid: string) => {
+    const upd = { ...post, projectId: pid };
+    setPost(upd);
+  };
   const handleSubmit = () => {
-    //
+    store.savePost(post).then((newPost) => {
+      if (!store.user) return;
+      console.log("ok done",newPost)
+      // router.push(
+      //   `/user/${store.user.urlSlug}/project/${newPost.projectId}/post/${newPost.id}`
+      // );
+    });
   };
   const setBlurb = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    console.log(e.target.value);
     const upd = { ...post, description: e.target.value };
     setPost(upd);
   };
@@ -62,7 +83,10 @@ const PostForm = observer(() => {
     <div>
       <form onSubmit={handleSubmit} method="POST">
         <label>post content:</label>
-        <ProjectSelector projectId={projectId} setProjectId={setProjectId} />
+        <ProjectSelector
+          projectId={post.projectId}
+          setProjectId={setProjectId}
+        />
         <Textarea
           placeholder="Write your update here..."
           name="blurb"

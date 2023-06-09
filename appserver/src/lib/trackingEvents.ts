@@ -1,7 +1,14 @@
 type EventSpec = {
   eventName: string,
   key?: string,
-  opts: { name?: string, isAuthed?: "y" | "n", isSelfView?: "y"|"n", signupCodeName?:string, id?:string, format?:string, completedPromptCount?:number  }
+  opts: {
+    name?: string,
+    isAuthed?: "y" | "n",
+    isSelfView?: "y"|"n",
+    signupCodeName?:string,
+    id?:string,
+    newProject?: "y" | "n", 
+  }
 }
 
 const trackingEvents: {[key:string]:EventSpec} = {
@@ -42,17 +49,13 @@ const trackingEvents: {[key:string]:EventSpec} = {
     opts: { name: "avatar" },
   },
   caProfileBasicsAll: { eventName: "completeAllBasicFields", opts: {} },
-  caProfilePrompt: {
-    eventName: "completePrompt",
-    opts: {
-      /* id, format, completedPromptCount */
-    },
+  caNewPostNewProj: {
+    eventName: "newPost",
+    opts: { newProject: "y" },
   },
-  caDeletePrompt: {
-    eventName: "deletePrompt",
-    opts: {
-      /* id, format, completedPromptCount */
-    },
+  caNewPost: {
+    eventName: "newPost",
+    opts: { newProject: "n" },
   },
 
   // edit actions
@@ -68,12 +71,6 @@ const trackingEvents: {[key:string]:EventSpec} = {
     eventName: "editBasicField",
     opts: { name: "avatar" },
   },
-  edProfilePrompt: {
-    eventName: "editPrompt",
-    opts: {
-      /* id, format, completedPromptCount */
-    },
-  },
 
   // button clicks (not necessarily resulting in a completed action)
   bcLoginSignup: {
@@ -86,14 +83,6 @@ const trackingEvents: {[key:string]:EventSpec} = {
   bcWaitlist: {
     eventName: "buttonClick",
     opts: { name: "joinWaitlist" },
-  },
-  bcGetDifferentPrompt: {
-    eventName: "buttonClick",
-    opts: { name: "getDifferentPrompt" /* skippedPromptId, skippedFormat */ },
-  },
-  bcBasicsGetStarted: {
-    eventName: "buttonClick",
-    opts: { name: "profileBasicsGetStarted" },
   },
 
   // errors

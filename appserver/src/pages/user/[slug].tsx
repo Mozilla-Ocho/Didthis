@@ -14,7 +14,7 @@ const Wrapper = ({
   targetUser: ApiUser | false;
 }) => {
   return (
-    <DefaultLayout authUser={authUser} signupCode={signupCode} headerFooter={true}>
+    <DefaultLayout authUser={authUser} signupCode={signupCode} headerFooter="always">
       <UserProjects targetUser={targetUser} />
     </DefaultLayout>
   );

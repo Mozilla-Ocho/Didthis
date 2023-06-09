@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import type { MeWrapper, ErrorWrapper } from "@/lib/apiConstants";
 import { getAuthUser } from "@/lib/serverAuth";
 import knex from "@/knex";
+import log from "@/lib/log";
 
 // the main route used by the SPA to fetch the authenticated user's own user
 // record and also asserts an authenticated session is active for the client.

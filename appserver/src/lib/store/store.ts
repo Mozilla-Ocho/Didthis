@@ -5,10 +5,10 @@ import log from "@/lib/log";
 import { isEqual } from "lodash-es";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
-import { clientAppPaths } from "@/lib/clientAppPaths";
 // import * as amplitude from '@amplitude/analytics-browser';
 import { trackingEvents } from "@/lib/trackingEvents";
 import { useEffect } from "react";
+import profileUtils from "../profileUtils";
 
 type GeneralError = false | "_get_me_first_fail_" | "_api_fail_";
 type LoginErrorMode = false | "_inactive_code_" | "_code_error_";
@@ -18,18 +18,10 @@ let moduleGlobalFirebaseInitialized = false;
 // XXX_PORTING review for non-singleton changes
 
 class Store {
-  showAuthComponents = false; // see clearUserBits() for explanation
   user: false | ApiUser = false;
-  savingProfile = false; // for showing a spinner / tmp disabling forms
-  slugValidationError: false | string = false;
-  editingSlug = "";
-  suggestedSlug = "";
-  urlMetaProcessor = "unfurl";
   firebaseRef: undefined | any = undefined;
   signupCode: false | string = false;
   trackedPageEvent: false | string = false;
-  clickedConfirmBasics = false;
-  suppressBasicsBarOnTimer = false;
   generalError: GeneralError = false;
   firebaseModalOpen = false;
   loginButtonsSpinning = false;
@@ -52,36 +44,6 @@ class Store {
   setSignupCode(code: string | false) {
     this.signupCode = code
   }
-
-  // {{{ urls
-
-  userHomepageUrlForSlug(slug: string) {
-    return clientAppPaths.userHomepageUrlForSlug(slug);
-  }
-
-  get userHomepageUrl() {
-    // this getter also returns the url and also proxies as truthy for when the
-    // profile is live, for example:
-    // if (store.userHomepageUrl) { assumes a live page } else { profile not
-    // complete enough }
-    if (!this.user) return undefined;
-    if (!this.user.urlSlug) return undefined;
-    return this.userHomepageUrlForSlug(this.user.urlSlug);
-  }
-
-  get profileIsMinimallyComplete() {
-    return !!this.userHomepageUrl;
-  }
-
-  // }}}
-
-  // {{{ healthCheck
-
-  getHealthCheck() {
-    return apiClient.getHealthCheck();
-  }
-
-  // }}}
 
   // {{{ auth
 
@@ -235,22 +197,9 @@ class Store {
     log.auth("setuser", x);
     if (x) {
       log.auth("store acquired user", x);
-      // @ts-ignore
-      // XXX_PORTING
-      // window.fullResetForTestUser = async (confirm) => {
-      //   // test runners call this to reset test user profiles
-      //   if (confirm !== "confirm") throw new Error('arg must be "confirm"');
-      //   let user = await apiClient.postUserProfile({
-      //     fullResetForTestUser: confirm,
-      //   });
-      //   this.ingestUpdatedUser(user);
-      //   user = await apiClient.postUrlSlug({ fullResetForTestUser: confirm });
-      //   this.ingestUpdatedUser(user);
-      // };
-      this.ingestUpdatedUser(x);
+      this.user = x;
       // XXX_PORTING
       // amplitude.setUserId(x.id);
-      this.showAuthComponents = true;
       // DRY_47693 signup code logic
       // if we have a signup code on the url, clear it
       if (this.signupCode) {
@@ -258,22 +207,20 @@ class Store {
         const url = new URL(window.location.toString());
         url.searchParams.delete("signupCode");
         // XXX_PORTING
-        //window.history.replaceState({}, '', url.toString());
+        window.history.replaceState({}, '', url.toString());
         this.signupCode = false;
       }
-      // XXX_PORTING
-      // if (x.signupCodeName) {
-      //   // if the user has a signup code, make sure it's set in the amplitude user properties
-      //   log.tracking('identify() signupCode');
-      //   const identifyOps = new amplitude.Identify();
-      //   identifyOps.setOnce('signupCodeName', x.signupCodeName);
-      //   identifyOps.setOnce('hasSignupCode', '1');
-      //   amplitude.identify(identifyOps);
-      // }
+      if (x.signupCodeName) {
+        // if the user has a signup code, make sure it's set in the amplitude user properties
+        log.tracking('identify() signupCode');
+        // XXX_PORTING
+        // const identifyOps = new amplitude.Identify();
+        // identifyOps.setOnce('signupCodeName', x.signupCodeName);
+        // identifyOps.setOnce('hasSignupCode', '1');
+        // amplitude.identify(identifyOps);
+      }
     } else {
       log.auth("store clearing user");
-      this.showAuthComponents = false;
-      setTimeout(() => this.clearUserBits(), 1);
     }
   }
 
@@ -284,159 +231,14 @@ class Store {
     return apiClient
       .sessionLogout()
       .then(() => {
-        // this.setUser(false); // avoid ux flash, the new page load handles state reset
-        // XXX_PORTING
-        // amplitude.reset(); // clears amplitude ids
-        window.location.assign(clientAppPaths.afterLogout);
+        window.location.assign("/");
       })
-      .catch((e) => {
+      .catch(() => {
         this.setGeneralError("_api_fail_");
       });
   }
 
-  clearUserBits() {
-    // the showAuthComponents boolean is used to conditionally render the
-    // authenticated part of the application. on logout, it gets set false
-    // first and then after a timeout the user bits are removed. that way mobx
-    // doesn't cause errors by re-rendering authenticated components before the
-    // top level branch component that woud remove them is re-rendered.
-    this.user = false;
-    this.editingSlug = "";
-    this.suggestedSlug = "";
-  }
-
   // }}}
-
-  ingestUpdatedUser(user: any) {
-    this.user = user;
-    this.editingSlug = user.urlSlug || this.suggestedSlug || "";
-    this.suggestedSlug = "";
-    //XXX_PORTING
-    //this.fetchSlugSuggestionIfNeeded();
-  }
-
-  // XXX_PORTING
-  // saveProfileChanges() {
-  //   if (!this.user)
-  //     throw new Error("updateProfile called without having an auth user");
-  //   // TODO: what if savingProfile is already true? it's mostly avoided
-  //   // by disabling the save button while saving, but what else might
-  //   this.savingProfile = true;
-  //   const wasIncomplete = !this.profileIsMinimallyComplete;
-  //   return apiClient
-  //     .postUserProfile({
-  //       userProfile: this.editingUserProfile,
-  //     })
-  //     .then(
-  //       action((user) => {
-  //         this.ingestUpdatedUser(user);
-  //         this.savingProfile = false;
-  //         if (wasIncomplete && this.profileIsMinimallyComplete) {
-  //           this.trackEvent(trackingEvents.caProfileBasicsAll);
-  //         }
-  //         return this.userProfile;
-  //       })
-  //     )
-  //     .catch(
-  //       action((e) => {
-  //         this.savingProfile = false;
-  //         this.setGeneralError("_api_fail_");
-  //         this.trackEvent(trackingEvents.apiError, { action: "profileSave" });
-  //         throw e;
-  //       })
-  //     );
-  // }
-
-  // XXX_PORTING
-  // fetchSlugSuggestionIfNeeded() {
-  //   if (this.user && !this.user.urlSlug && !this.user.unsolicited) {
-  //     // they don't have a slug yet. fetch the current/best suggested slug from
-  //     // the API when the user loads and/or they update their profile.
-  //     apiClient
-  //       .getUrlSlug({ checkSlug: "" })
-  //       .then((payload) => {
-  //         if (payload.suggestedSlug) {
-  //           this.suggestedSlug = payload.suggestedSlug;
-  //           this.editingSlug = payload.suggestedSlug;
-  //         }
-  //       })
-  //       .catch(() => {});
-  //   }
-  // }
-
-  setEditingSlug(x: string) {
-    this.editingSlug = x;
-  }
-
-  saveUrlSlug() {
-    return apiClient
-      .postUrlSlug({
-        slug: this.editingSlug,
-      })
-      .then(
-        action((user) => {
-          this.ingestUpdatedUser(user);
-          this.slugValidationError = false;
-          return user
-        })
-      )
-      .catch((e) => {
-        // slug unavailability or validation errors are common error cases
-        // here.
-        if (e.apiInfo?.responseWrapper?.status === 400) {
-          this.slugValidationError = e.apiInfo.errorMsg;
-        } else {
-          this.slugValidationError = false;
-          this.setGeneralError("_api_fail_");
-        }
-        throw e;
-      });
-  }
-
-  setUrlMetaProcessor(x: string) {
-    this.urlMetaProcessor = x;
-  }
-
-  getUrlMeta(url: string) {
-    return apiClient.getUrlMeta({
-      url,
-      processor: this.urlMetaProcessor,
-    });
-  }
-
-  rawUnfurl(url: string) {
-    return apiClient.rawUnfurl({ url });
-  }
-
-  setClickedConfirmBasics() {
-    // also see ingestUpdatedUser which sets this true automatically if the
-    // user has one or more projects so the step logic doesn't revert
-    // on a page reload.
-    this.clickedConfirmBasics = true;
-    // when the user clicks the button to collapse the basics editor, we also
-    // then show a new bar below the header where they can reopen it. however
-    // we want that bar to slide in AFTER the basics area has finished
-    // animating, otherwise they're both moving at the same time, it's busy,
-    // and you can't really tell the bar is newly presented.
-    this.suppressBasicsBarOnTimer = true;
-    this.trackEvent(trackingEvents.bcBasicsGetStarted);
-    setTimeout(
-      action(() => {
-        this.suppressBasicsBarOnTimer = false;
-      }),
-      700
-    );
-  }
-
-  postWaitlist({
-    email,
-    landing_page,
-  }: {
-    email: string;
-    landing_page: string;
-  }) {
-    return apiClient.postWaitlist({ email, landing_page });
-  }
 
   trackEvent(evt: any, opts?: any) {
     // XXX_PORTING
@@ -491,6 +293,30 @@ class Store {
   clearGeneralError = () => {
     this.generalError = false;
   };
+
+  savePost(post: ApiPost): Promise<ApiPost> {
+    if (!this.user) throw new Error('must be authed')
+    // const profile = this.user.profile
+    // post.id = profileUtils.generateRandomAvailablePostId(profile)
+    // post.createdAt = Math.floor(new Date().getTime() / 1000)
+    // if (post.projectId === "new") {
+    //   const x = profileUtils.mkNewProject(profile)
+    //   post.projectId = x.projectId
+    // }
+    // const project = profile.projects.find(p => p.id === post.projectId)
+    // if (!project) throw new Error('project not found')
+    const self = this
+    return apiClient.newPost({post})
+      .then((wrapper) => {
+        self.setUser(wrapper.payload.user);
+        if (post.projectId === "new") {
+          self.trackEvent(trackingEvents.caNewPostNewProj);
+        } else {
+          self.trackEvent(trackingEvents.caNewPost);
+        }
+        return wrapper.payload.post;
+      })
+  }
 }
 
 export default Store;

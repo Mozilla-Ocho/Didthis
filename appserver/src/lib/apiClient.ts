@@ -1,6 +1,6 @@
 import { wrapFetch } from "./apiCore";
 import type { FetchArgs} from "@/lib/apiCore"
-import type { MeWrapper, PublicUserWrapper, ValidateSignupCodeWrapper, EmptySuccessWrapper } from "./apiConstants";
+import type { MeWrapper, PublicUserWrapper, ValidateSignupCodeWrapper, EmptySuccessWrapper, NewPostWrapper } from "./apiConstants";
 
 const getHealthCheck = async () => {
   let payload = await wrapFetch({ action: "health_check" });
@@ -68,23 +68,28 @@ const validateSignupCode = async ({ code }: { code: string }): Promise<ValidateS
   return wrapper;
 };
 
-// XXX_PORTING change response shape
+const newPost = async ({
+  post,
+}: {
+  post: ApiPost;
+}): Promise<NewPostWrapper> => {
+  let wrapper = (await wrapFetch({
+    action: "newPost",
+    method: "POST",
+    body: {post},
+  })) as NewPostWrapper;
+  return wrapper;
+};
+
 // const postUserProfile = async ({
-//   userProfile,
-//   _testRawProfile,
-//   asTestUser,
+//   profile,
 // }: {
-//   userProfile: UserProfile;
-//   _testRawProfile?: POJO;
-//   asTestUser?: string;
+//   profile: ApiProfile;
 // }): Promise<MeWrapper> => {
-//   let body: POJO = {};
-//   body.profile = _testRawProfile || userProfile.toPOJOwithPrivate();
 //   let wrapper = (await wrapFetch({
 //     action: "profile",
 //     method: "POST",
-//     body,
-//     asTestUser,
+//     body: {profile},
 //   })) as MeWrapper;
 //   return wrapper;
 // };
@@ -194,6 +199,7 @@ const apiClient = {
   getMe,
   getPublicUser,
   // postUserProfile,
+  newPost,
   getUrlSlug,
   postUrlSlug,
   getUrlMeta,

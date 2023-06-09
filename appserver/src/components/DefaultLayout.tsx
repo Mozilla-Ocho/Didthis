@@ -1,9 +1,34 @@
 import type { ReactNode } from "react";
-import { StoreWrapper, StoreLoadingWrapper } from "@/lib/store";
+import { StoreWrapper, StoreLoadingWrapper, useStore } from "@/lib/store";
 import { LoginGlobalOverlay } from "@/components/auth/LoginGlobalOverlay";
 import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
 import StaticLayout from "./StaticLayout";
+import { observer } from "mobx-react-lite";
+
+// Inner is separate because it has to be a store observer for when
+// headerFooter=authed and the outer layer is the store provider itself.
+const Inner = observer(
+  ({
+    headerFooter,
+    children,
+  }: {
+    headerFooter: "always" | "authed" | "never";
+    children: ReactNode;
+  }) => {
+    const store = useStore();
+    const hf =
+      headerFooter === "always" || (headerFooter === "authed" && !!store.user);
+    return (
+      <StoreLoadingWrapper ifLoading={<p>loading</p>}>
+        <LoginGlobalOverlay />
+        {hf && <AppHeader />}
+        <StaticLayout>{children}</StaticLayout>
+        {hf && <AppFooter />}
+      </StoreLoadingWrapper>
+    );
+  }
+);
 
 export default function DefaultLayout({
   authUser,
@@ -13,17 +38,12 @@ export default function DefaultLayout({
 }: {
   authUser: ApiUser | false;
   signupCode: false | string;
-  headerFooter: boolean,
-  children: ReactNode; // ReactNode not ReactElement 
+  headerFooter: "always" | "authed" | "never";
+  children: ReactNode; // ReactNode not ReactElement
 }) {
   return (
     <StoreWrapper authUser={authUser} signupCode={signupCode}>
-      <StoreLoadingWrapper ifLoading={<p>loading</p>}>
-        <LoginGlobalOverlay />
-        {headerFooter && <AppHeader />}
-        <StaticLayout>{children}</StaticLayout>
-        {headerFooter && <AppFooter />}
-      </StoreLoadingWrapper>
+      <Inner headerFooter={headerFooter}>{children}</Inner>
     </StoreWrapper>
   );
 }

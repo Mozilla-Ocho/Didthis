@@ -38,7 +38,8 @@ interface UserDbRow {
 
 type ApiPost = {
   id: string;
-  title: string;
+  projectId: string;
+  createdAt: Timestamp;
   scope: Scope;
   description?: string;
   linkUrl?: string;
@@ -51,17 +52,17 @@ type ApiProject = {
   createdAt: Timestamp;
   title: string;
   scope: Scope;
-  description?: string;
   currentStatus: ProjectStatus;
+  posts: {[key:string]: ApiPost};
+  description?: string;
   imageAssetId?: string;
-  posts: ApiPost[];
 };
 
 type ApiProfile = {
   name?: string;
   bio?: string;
   imageAssetId?: string;
-  projects: ApiProject[];
+  projects: {[key:string]: ApiProject};
 };
 
 type JSONABLE =

@@ -27,7 +27,7 @@ const NewProject = observer(() => {
 
 const Wrapper = ({ authUser, signupCode }: {authUser: ApiUser | false, signupCode: string | false}) => {
   return (
-    <DefaultLayout authUser={authUser} signupCode={signupCode} headerFooter={true}>
+    <DefaultLayout authUser={authUser} signupCode={signupCode} headerFooter="always">
       <NewProject />
     </DefaultLayout>
   );

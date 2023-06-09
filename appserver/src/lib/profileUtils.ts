@@ -1,4 +1,5 @@
 import normalizeUrl from "normalize-url";
+import log from "./log";
 
 // a bunch of helpers for ApiProfile POJOs
 const normalizeUrlConfig = {
@@ -27,7 +28,7 @@ const maxChars = {
 
 const mkDefaultProfile = () => {
   return {
-    projects: [],
+    projects: {}
   } as ApiProfile;
 };
 
@@ -36,18 +37,28 @@ const privacyFilteredCopy = (original: ApiProfile): ApiProfile => {
   filtered.name = original.name;
   filtered.bio = original.bio;
   filtered.imageAssetId = original.imageAssetId;
-  filtered.projects = [];
-  (original.projects || []).forEach((origProj) => {
+  filtered.projects = {}
+  Object.values(original.projects || {}).forEach((origProj) => {
     if (origProj.scope === "public") {
       const proj = JSON.parse(JSON.stringify(origProj)) as ApiProject;
-      proj.posts = proj.posts.filter((x) => x.scope === "public");
-      filtered.projects.push(proj);
+      Object.keys(proj.posts).forEach(pid => {
+        if (proj.posts[pid].scope !== "public") {
+          delete proj.posts[pid]
+        }
+      })
+      filtered.projects[proj.id] = proj
     }
   });
   return filtered;
 };
 
-const getParsedUrl = ({ url, strict }:{url: string, strict: boolean}) : (URL | false) => {
+const getParsedUrl = ({
+  url,
+  strict,
+}: {
+  url: string;
+  strict: boolean;
+}): URL | false => {
   let parsedUrl;
   try {
     let processedUrl = url;
@@ -57,27 +68,27 @@ const getParsedUrl = ({ url, strict }:{url: string, strict: boolean}) : (URL | f
     }
     // this can also throw an error and is strict
     parsedUrl = new URL(processedUrl);
-    if (parsedUrl.protocol !== 'https:' && parsedUrl.protocol !== 'http:') {
-      throw new Error('url scheme not allowed');
+    if (parsedUrl.protocol !== "https:" && parsedUrl.protocol !== "http:") {
+      throw new Error("url scheme not allowed");
     }
     if (parsedUrl.username || parsedUrl.password) {
-      throw new Error('auth on urls not allowed');
+      throw new Error("auth on urls not allowed");
     }
   } catch (e) {
     // any error from normalizeUrl, new URL(), or our own rules
     return false;
   }
   return parsedUrl;
-}
+};
 
-const cleanupUserInput = (profile: ApiProfile) : void => {
+const cleanupUserInput = (profile: ApiProfile): void => {
   // trims whitespace so we aren't confused about empty fields.
-  function trimRecurse(obj:any):any {
-    if (typeof obj === 'undefined' || obj === null) return obj;
-    if (typeof obj === 'string') return obj.trim();
+  function trimRecurse(obj: any): any {
+    if (typeof obj === "undefined" || obj === null) return obj;
+    if (typeof obj === "string") return obj.trim();
     if (Array.isArray(obj)) return obj.map(trimRecurse);
-    if (typeof obj === 'object') {
-      const newObj:any = {};
+    if (typeof obj === "object") {
+      const newObj: any = {};
       for (let prop in obj) {
         newObj[prop] = trimRecurse(obj[prop]);
       }
@@ -85,9 +96,86 @@ const cleanupUserInput = (profile: ApiProfile) : void => {
     }
     return obj;
   }
-  trimRecurse(profile)
-}
+  trimRecurse(profile);
+};
 
-const profileUtils = { mkDefaultProfile, privacyFilteredCopy, getParsedUrl, cleanupUserInput, maxChars };
+const generateRandomAvailablePostId = (profile: ApiProfile): string => {
+  const mkRandId = () => {
+    const chars = "bcdfghjkmnpqrstvwxyz23456789";
+    let slug = "";
+    for (let i = 0; i < 5; i++) {
+      slug = slug + chars[Math.floor(Math.random() * chars.length)];
+    }
+    return slug;
+  };
+  let available = false;
+  let id = mkRandId();
+  while (!available) {
+    const existing = Object.values(profile.projects).find((proj) => Object.values(proj.posts).find(post => post.id === id));
+    if (existing) {
+      id = mkRandId();
+    } else {
+      available = true;
+    }
+  }
+  return id;
+};
+
+const generateRandomAvailableProfileId = (profile: ApiProfile): string => {
+  const mkRandId = () => {
+    const chars = "bcdfghjkmnpqrstvwxyz23456789";
+    let slug = "";
+    for (let i = 0; i < 5; i++) {
+      slug = slug + chars[Math.floor(Math.random() * chars.length)];
+    }
+    return slug;
+  };
+  let available = false;
+  let id = mkRandId();
+  while (!available) {
+    const existing = Object.values(profile.projects).find((p) => p.id === id);
+    if (existing) {
+      id = mkRandId();
+    } else {
+      available = true;
+    }
+  }
+  return id;
+};
+
+const mkNewProject = (
+  profile: ApiProfile
+): { profile: ApiProfile; projectId: string, project: ApiProject } => {
+  const projectId = generateRandomAvailableProfileId(profile);
+  let i = 1;
+  Object.values(profile.projects).forEach(proj => {
+    if (proj.title.trim().match(/^Untitled Project( \d+)?$/)) {
+      const num = proj.title.split(/ +/)[2] || "1"
+      if (num)
+        i = Math.max(parseInt(num,10)+1,i)
+    }
+  })
+  const counter = (i > 1) ? " "+i : "";
+  const project: ApiProject = {
+    id: projectId,
+    title: "Untitled Project"+counter,
+    createdAt: Math.floor(new Date().getTime() / 1000),
+    currentStatus: "active",
+    scope: "private",
+    posts: {},
+  };
+  profile.projects[project.id] = project;
+  return { profile, projectId, project };
+};
+
+const profileUtils = {
+  mkDefaultProfile,
+  privacyFilteredCopy,
+  getParsedUrl,
+  cleanupUserInput,
+  maxChars,
+  mkNewProject,
+  generateRandomAvailablePostId,
+};
 
 export default profileUtils;

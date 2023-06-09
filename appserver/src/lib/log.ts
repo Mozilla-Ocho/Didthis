@@ -10,6 +10,7 @@ const channelNames = [
   "location",
   "sql",
   "tracking",
+  "serverApi",
 ] as const;
 
 //type Channel = typeof channelNames[number];
@@ -21,7 +22,8 @@ type ChannelName = "warn" |
 "unfurl" |
 "location" |
 "sql" |
-"tracking"
+"tracking" |
+"serverApi"
 
 type LoggingEnv = "default" | "test" | "inProdBrowser";
 
@@ -93,6 +95,11 @@ const channelConfig: ChannelConfig = {
     inProdBrowser: false,
   },
   tracking: {
+    default: true,
+    test: false,
+    inProdBrowser: false,
+  },
+  serverApi: {
     default: true,
     test: false,
     inProdBrowser: false,

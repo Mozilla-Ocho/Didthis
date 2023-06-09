@@ -1,4 +1,4 @@
-type GenericErrorId = "ERR_UNAUTHORIZED" | "ERR_CSRF_TOKEN" | "ERR_NOT_FOUND";
+type GenericErrorId = "ERR_UNAUTHORIZED" | "ERR_CSRF_TOKEN" | "ERR_NOT_FOUND" | "ERR_BAD_INPUT";
 
 type ErrorId = GenericErrorId;
 
@@ -33,6 +33,13 @@ interface MeWrapper extends SuccessWrapper {
   payload: ApiUser;
 }
 
+interface NewPostWrapper extends SuccessWrapper {
+  payload: {
+    user: ApiUser;
+    post: ApiPost;
+  }
+}
+
 interface PublicUserWrapper extends SuccessWrapper {
   payload: ApiUser;
 }
@@ -47,6 +54,7 @@ export type {
   ErrorWrapper,
   ErrorId,
   MeWrapper,
+  NewPostWrapper,
   PublicUserWrapper,
   ValidateSignupCodeWrapper,
   EmptySuccessWrapper,
