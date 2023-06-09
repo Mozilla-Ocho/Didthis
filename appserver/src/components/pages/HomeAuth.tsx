@@ -10,7 +10,7 @@ const HomeAuth = observer(() => {
   const [isOpen, setIsOpen] = useState(false);
   const launchModal = () => setIsOpen(true);
   const hc = () => setIsOpen(false);
-  if (!store.user) return; // typescript helper, it doesn't know this component is auth only
+  if (!store.user) return <></>; // typescript helper, it doesn't know this component is auth only
   return (
     <>
       <Modal isOpen={isOpen} title="foo" handleClose={hc}>

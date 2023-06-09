@@ -13,11 +13,11 @@ import UserPreview from '@/components/UserPreview';
 const ProjectWithPostFocus = observer(() => {
   const store = useStore();
   const router = useRouter();
-  const fakeUser = {
+  const fakeUser : ApiUser = {
     id: 'asdf',
     email: 'foo@bar.com',
     createdAt: new Date().getTime(),
-    profile: {}
+    profile: {projects:{}}
   }
   return (
     <>
