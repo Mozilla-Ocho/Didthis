@@ -18,3 +18,9 @@ body {
   color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-rgb));
 }
+
+/* hack the firebase ui card to fit the modal */
+.firebaseui-container {
+  max-width: none;
+  margin: 0;
+}

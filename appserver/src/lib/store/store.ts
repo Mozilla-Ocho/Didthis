@@ -9,7 +9,7 @@ import { trackingEvents } from '@/lib/trackingEvents'
 import { useEffect } from 'react'
 
 type GeneralError = false | '_get_me_first_fail_' | '_api_fail_'
-type LoginErrorMode = false | '_inactive_code_' | '_code_error_'
+type LoginErrorMode = false | '_inactive_code_'
 
 let moduleGlobalFirebaseInitialized = false
 
@@ -17,7 +17,7 @@ let moduleGlobalFirebaseInitialized = false
 
 class Store {
   user: false | ApiUser = false
-  // we don't control firebase, it's an allowed explicit any.
+  // we don't have a type for the firebase ref
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   firebaseRef: undefined | any = undefined
   signupCode: false | string = false
@@ -35,6 +35,8 @@ class Store {
     authUser?: ApiUser | false
     signupCode?: false | string
   }) {
+    // nextjs SSR computes and provides the authUser and signup code via input
+    // props to the wrapper/provider
     makeAutoObservable(
       this,
       {

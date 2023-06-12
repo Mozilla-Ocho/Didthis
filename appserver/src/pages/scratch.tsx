@@ -1,5 +1,4 @@
-import { Button, Link } from '@/components/uiLib'
-import Modal from '@/components/Modal'
+import { Button, Link, Modal } from '@/components/uiLib'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import DefaultLayout from '@/components/DefaultLayout'

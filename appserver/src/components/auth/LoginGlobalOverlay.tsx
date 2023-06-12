@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
-// import { Button } from "@/components/uiLib";
+import { ReactNode, useEffect } from 'react'
+import { ConfirmationModal, Modal, Button } from '@/components/uiLib'
 import { observer } from 'mobx-react-lite'
 import log from '@/lib/log'
 import { useStore } from '@/lib/store'
@@ -15,6 +15,7 @@ const LoginGlobalOverlay = observer(() => {
 
   // XXX_PORTING i deleted the confirmation modals for now
 
+  let styledFbUi: ReactNode = <></>
   if (store.firebaseModalOpen) {
     // note the store loads firebase async, so this is inside the
     // firebaseModalOpen condition, outside this it could fail w/ uninitialized
@@ -49,29 +50,50 @@ const LoginGlobalOverlay = observer(() => {
         },
       },
     }
-
-    return (
-      <div>
-        <StyledFirebaseAuth
-          uiConfig={firebaseUiConfig}
-          firebaseAuth={store.firebaseRef.auth()}
-        />
-      </div>
+    /* note global/styles.css has an override for the firebase auth ui */
+    styledFbUi = (
+      <StyledFirebaseAuth
+        uiConfig={firebaseUiConfig}
+        firebaseAuth={store.firebaseRef.auth()}
+      />
     )
   }
-  return <></>
-  // return (
-  //   <>
-  //     <Modal
-  //       title={'Log in or Sign up'}
-  //       hideTitle
-  //       noPad
-  //       open={store.firebaseModalOpen}
-  //       onClose={store.cancelGlobalLoginOverlay}
-  //     >
-  //     </Modal>
-  //   </>
-  // );
+
+  return (
+    <div>
+      <ConfirmationModal
+        isOpen={store.loginErrorMode === '_inactive_code_'}
+        title="Expired invite code"
+        noText="Ok"
+        onNo={store.cancelGlobalLoginOverlay}
+        onClose={store.cancelGlobalLoginOverlay}
+      >
+        <div>
+          <p>
+            The sign-up invite code you used is no longer active for creating
+            new accounts. If you already have an account, you can still log in
+            normally:
+          </p>
+          <Button
+            intent="primary"
+            loading={store.loginButtonsSpinning}
+            onClick={() => store.launchGlobalLoginOverlay(true)}
+          >
+            Log in with existing account
+          </Button>
+        </div>
+      </ConfirmationModal>
+      <Modal
+        title={'Log in or Sign up'}
+        hideTitle
+        noPad
+        isOpen={store.firebaseModalOpen}
+        handleClose={store.cancelGlobalLoginOverlay}
+      >
+        {styledFbUi}
+      </Modal>
+    </div>
+  )
 })
 
 export { LoginGlobalOverlay }
