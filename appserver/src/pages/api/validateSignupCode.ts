@@ -1,12 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type { ValidateSignupCodeWrapper } from '@/lib/apiConstants'
-
-const codes: { [key: string]: { active: boolean; name: string } } = {
-  '1234': {
-    active: true,
-    name: 'devdefault',
-  },
-}
+import { signupCodes } from '@/lib/apiConstants';
 
 export default async function handler(
   req: NextApiRequest,
@@ -14,7 +8,7 @@ export default async function handler(
 ) {
   const code = (req.query.code || '') + ''
   // DRY_47693 signup code logic
-  const data = codes[code]
+  const data = signupCodes[code]
   if (data && data.active) {
     const wrapper: ValidateSignupCodeWrapper = {
       action: 'validateSignupCode',

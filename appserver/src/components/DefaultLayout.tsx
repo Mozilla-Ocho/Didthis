@@ -3,6 +3,7 @@ import { StoreWrapper, StoreLoadingWrapper, useStore } from '@/lib/store'
 import { LoginGlobalOverlay } from '@/components/auth/LoginGlobalOverlay'
 import StaticLayout from './StaticLayout'
 import { observer } from 'mobx-react-lite'
+import HomeUnsolicited from './pages/HomeUnsolicited'
 
 // Inner is separate because it has to be a store observer for when
 // headerFooter=authed and the outer layer is the store provider itself.
@@ -17,6 +18,14 @@ const Inner = observer(
     const store = useStore()
     const hf =
       headerFooter === 'always' || (headerFooter === 'authed' && !!store.user)
+    if (store.user && store.user.unsolicited) {
+      return (
+        <StoreLoadingWrapper ifLoading={<p>loading</p>}>
+          <LoginGlobalOverlay />
+          <StaticLayout withHeaderFooter={hf}><HomeUnsolicited /></StaticLayout>
+        </StoreLoadingWrapper>
+      )
+    }
     return (
       <StoreLoadingWrapper ifLoading={<p>loading</p>}>
         <LoginGlobalOverlay />

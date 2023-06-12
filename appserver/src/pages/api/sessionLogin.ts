@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type { EmptySuccessWrapper, ErrorWrapper } from '@/lib/apiConstants'
 import { getAuthFirebaseApp } from '@/lib/serverAuth'
-import * as constants from '@/lib/constants'
+import { sessionCookieName } from '@/lib/apiConstants'
 import Cookies from 'cookies'
 
 const authCookieMaxAge = 1000 * 60 * 60 * 24 * 14
@@ -35,8 +35,8 @@ export default async function handler(
           secure: process.env.NEXT_PUBLIC_ENV_NAME !== 'dev',
         }
         // DRY_r9725 session cookie name
-        cookies.set(constants.sessionCookieName, sessionCookie, options)
-        // console.log("sessionLogin setting cookie", constants.sessionCookieName, sessionCookie)
+        cookies.set(sessionCookieName, sessionCookie, options)
+        // console.log("sessionLogin setting cookie", sessionCookieName, sessionCookie)
         const wrapper: EmptySuccessWrapper = {
           action: 'sessionLogin',
           status: 200,

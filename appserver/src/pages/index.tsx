@@ -1,8 +1,8 @@
 import apiClient from '@/lib/apiClient'
-import * as constants from '@/lib/constants'
 import DefaultLayout from '@/components/DefaultLayout'
 import Home from '@/components/pages/Home'
 import { GetServerSidePropsContext } from 'next'
+import { sessionCookieName } from '@/lib/apiConstants'
 
 const Wrapper = ({
   authUser,
@@ -31,7 +31,7 @@ export const getServerSideProps = async (
   const url = new URL('http://anyhost.com' + context.resolvedUrl)
   const signupCode = url.searchParams.get('signupCode') || false
   let authUser: ApiUser | false = false
-  const sessionCookie = context.req.cookies[constants.sessionCookieName]
+  const sessionCookie = context.req.cookies[sessionCookieName]
   if (sessionCookie) {
     authUser = (
       await apiClient

@@ -1,3 +1,12 @@
+export const sessionCookieName = '_h3y_sess'
+
+export const signupCodes: { [key: string]: { active: boolean; name: string } } = {
+  '1234': {
+    active: true,
+    name: 'devdefault',
+  },
+}
+
 type GenericErrorId =
   | 'ERR_UNAUTHORIZED'
   | 'ERR_CSRF_TOKEN'

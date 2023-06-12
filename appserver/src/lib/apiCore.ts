@@ -6,7 +6,7 @@ import type {
   SuccessWrapper,
   ErrorId,
 } from './apiConstants'
-import * as constants from '@/lib/constants'
+import { sessionCookieName } from './apiConstants'
 
 // endpoint is the scheme, domain, and port of the api backend
 // XXX_PORTING setup var
@@ -113,7 +113,7 @@ const wrapFetch = async (fetchArgs: FetchArgs): Promise<SuccessWrapper> => {
     }
     if (sessionCookie) {
       config.headers['Cookie'] =
-        constants.sessionCookieName + '=' + sessionCookie
+        sessionCookieName + '=' + sessionCookie
     }
     if (method === 'POST') {
       config.headers['Content-Type'] = 'application/json'

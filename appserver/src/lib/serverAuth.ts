@@ -5,7 +5,7 @@ import profileUtils from './profileUtils'
 import Cookies from 'cookies'
 import knex from '@/knex'
 import log from '@/lib/log'
-import * as constants from '@/lib/constants'
+import { sessionCookieName } from './apiConstants'
 
 let firebaseApp: ReturnType<typeof initializeApp>
 
@@ -147,7 +147,7 @@ const getAuthUser = (
     secure: process.env.NEXT_PUBLIC_ENV_NAME !== 'dev',
   })
   // DRY_r9725 session cookie name
-  const sessionCookie = cookies.get(constants.sessionCookieName) || ''
+  const sessionCookie = cookies.get(sessionCookieName) || ''
   // log.serverApi('sessionCookie', sessionCookie);
   if (!sessionCookie) return Promise.resolve(null)
   return (

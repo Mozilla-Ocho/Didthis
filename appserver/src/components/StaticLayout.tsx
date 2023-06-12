@@ -12,7 +12,9 @@ const StaticLayout = ({
   return (
     <div className="max-w-[800px] mx-auto">
       {withHeaderFooter && <AppHeader />}
+      <div className="py-8">
       {children}
+      </div>
       {withHeaderFooter && <AppFooter />}
     </div>
   )
