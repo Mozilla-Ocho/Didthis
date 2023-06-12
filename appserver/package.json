@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "validate": "next lint; tsc --noEmit",
     "prettier-check": "prettier --ignore-path .gitignore -c **/*.{mjs,js,jsx,ts,tsx}",
     "prettier-clobber": "prettier --ignore-path .gitignore --write **/*.{mjs,js,jsx,ts,tsx}"
   },

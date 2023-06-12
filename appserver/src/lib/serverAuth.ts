@@ -5,7 +5,8 @@ import profileUtils from './profileUtils'
 import Cookies from 'cookies'
 import knex from '@/knex'
 import log from '@/lib/log'
-import { sessionCookieName } from './apiConstants'
+import { sessionCookieName, signupCodes } from './apiConstants'
+import {getParamString} from './nextUtils'
 
 let firebaseApp: ReturnType<typeof initializeApp>
 
@@ -76,33 +77,35 @@ const generateRandomAvailableSlug = async () => {
 const getOrCreateUser = async ({
   id,
   email,
+  signupCode,
 }: {
   id: string
   email: string
+  signupCode: string | false
 }): Promise<ApiUser> => {
   const millis = new Date().getTime()
   let dbRow = (await knex('users').where('id', id).first()) as
     | UserDbRow
     | undefined
   // XXX_PORTING
-  // const codeInfo = validateSignupCode(req.query.signupCode || "");
+  const codeInfo = signupCode ? signupCodes[signupCode] : undefined
   if (dbRow) {
     // found
-    // if (codeInfo.codeStatus === "active" && !dbRow.signup_code_name) {
-    //   // link the user to the valid sign up code present on the request if they
-    //   // don't have one.
-    //   dbRow = (
-    //     await knex("users")
-    //       .update({
-    //         signup_code_name: codeInfo.codeName,
-    //         updated_at_millis: millis,
-    //         last_write_from_user: millis,
-    //         last_read_from_user: millis,
-    //       })
-    //       .where("id", dbRow.id)
-    //       .returning("*")
-    //   )[0];
-    // }
+    if (codeInfo && codeInfo.active && !dbRow.signup_code_name) {
+      // link the user to the valid sign up code present on the request if they
+      // don't have one.
+      dbRow = (
+        await knex("users")
+          .update({
+            signup_code_name: codeInfo ? codeInfo.name : null,
+            updated_at_millis: millis,
+            last_write_from_user: millis,
+            last_read_from_user: millis,
+          })
+          .where("id", dbRow.id)
+          .returning("*")
+      )[0] as UserDbRow; // "as" to coerce type as never undef, we can be sure we will get a record.
+    }
     return userFromDbRow(dbRow, { publicFilter: false })
   }
   // else, create new
@@ -115,8 +118,7 @@ const getOrCreateUser = async ({
     url_slug: newSlug,
     profile: profileUtils.mkDefaultProfile(),
     full_name: null,
-    //signup_code_name: codeInfo.codeName || null,
-    signup_code_name: null, // XXX_PORTING
+    signup_code_name: codeInfo ? codeInfo.name : null,
     created_at_millis: millis,
     updated_at_millis: millis,
     last_write_from_user: millis,
@@ -129,7 +131,7 @@ const getOrCreateUser = async ({
   // XXX_PORTING
   // setReqAuthentication(req, dbRow); // have to set this early here so track event can obtain the new auth user id
   // trackEventReqEvtOpts(req, trackingEvents.caSignup, {
-  //   signupCodeName: codeInfo.codeName || "none",
+  //   signupCodeName: codeInfo ? codeInfo.name : "none",
   // });
   return userFromDbRow(dbRow, { publicFilter: false })
 }
@@ -150,6 +152,7 @@ const getAuthUser = (
   const sessionCookie = cookies.get(sessionCookieName) || ''
   // log.serverApi('sessionCookie', sessionCookie);
   if (!sessionCookie) return Promise.resolve(null)
+  const signupCode = getParamString(req,'signupCode') || false
   return (
     getAuth(firebaseApp)
       // XXX TODO: false here is insecure in that is doesn't deal with password
@@ -181,6 +184,7 @@ const getAuthUser = (
         return getOrCreateUser({
           id: decodedClaims.user_id,
           email: decodedClaims.email || '',
+          signupCode,
         })
       })
       .catch(() => {
