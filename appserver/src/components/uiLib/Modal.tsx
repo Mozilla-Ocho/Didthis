@@ -3,6 +3,7 @@ import React, { useRef, useEffect, ReactNode } from 'react'
 import ReactDOM from 'react-dom'
 
 interface ModalProps {
+  id: string,
   isOpen: boolean
   handleClose: () => void
   title: string
@@ -12,6 +13,7 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({
+  id,
   isOpen,
   handleClose,
   title,
@@ -25,14 +27,15 @@ const Modal: React.FC<ModalProps> = ({
   useEffect(() => {
     // portal node creation must happen inside useeffect due to nextjs SSR
     const div = document.createElement('div')
-    div.className = 'modal-root'
+    div.className = `modal-root-${id}`
+    div.id = id
     elRef.current = div
     const modalRoot = document.body
     modalRoot.appendChild(elRef.current)
     return () => {
       modalRoot.removeChild(elRef.current as HTMLDivElement)
     }
-  }, [])
+  }, [id])
 
   useEffect(() => {
     function handleOutsideClick(event: MouseEvent) {

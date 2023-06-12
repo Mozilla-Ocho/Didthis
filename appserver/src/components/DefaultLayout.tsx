@@ -1,8 +1,6 @@
 import type { ReactNode } from 'react'
 import { StoreWrapper, StoreLoadingWrapper, useStore } from '@/lib/store'
 import { LoginGlobalOverlay } from '@/components/auth/LoginGlobalOverlay'
-import AppHeader from '@/components/AppHeader'
-import AppFooter from '@/components/AppFooter'
 import StaticLayout from './StaticLayout'
 import { observer } from 'mobx-react-lite'
 
@@ -22,9 +20,7 @@ const Inner = observer(
     return (
       <StoreLoadingWrapper ifLoading={<p>loading</p>}>
         <LoginGlobalOverlay />
-        {hf && <AppHeader />}
-        <StaticLayout>{children}</StaticLayout>
-        {hf && <AppFooter />}
+        <StaticLayout withHeaderFooter={hf}>{children}</StaticLayout>
       </StoreLoadingWrapper>
     )
   }

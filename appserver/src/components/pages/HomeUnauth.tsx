@@ -1,17 +1,17 @@
 import { H, Divider } from '@/components/uiLib'
 import { LoginButton } from '@/components/auth/LoginButton'
 
-// XXX_SKELETON
 const HomeUnauth = () => {
   return (
     <>
       <div>
-        <H.H1>product home page</H.H1>
-        <p>welcome to the product</p>
+        <H.H1>HOBBYR</H.H1>
+        <Divider />
+        <p>celebrate your progress on your passion projects</p>
+        <p>...screenshots n stuff...</p>
+        <Divider />
+        <LoginButton />
       </div>
-      <Divider />
-      <LoginButton />
-      <Divider />
     </>
   )
 }

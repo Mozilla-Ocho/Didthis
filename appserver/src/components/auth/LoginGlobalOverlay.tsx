@@ -62,6 +62,7 @@ const LoginGlobalOverlay = observer(() => {
   return (
     <div>
       <ConfirmationModal
+        id="code-inactive"
         isOpen={store.loginErrorMode === '_inactive_code_'}
         title="Expired invite code"
         noText="Ok"
@@ -84,6 +85,7 @@ const LoginGlobalOverlay = observer(() => {
         </div>
       </ConfirmationModal>
       <Modal
+        id="fbUI"
         title={'Log in or Sign up'}
         hideTitle
         noPad

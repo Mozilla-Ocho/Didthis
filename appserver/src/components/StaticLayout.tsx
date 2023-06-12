@@ -1,10 +1,19 @@
+import AppHeader from '@/components/AppHeader'
+import AppFooter from '@/components/AppFooter'
 import type { ReactNode } from 'react'
 
-// XXX_SKELETON
-const StaticLayout = ({ children }: { children: ReactNode }) => {
+const StaticLayout = ({
+  children,
+  withHeaderFooter,
+}: {
+  children: ReactNode
+  withHeaderFooter: boolean
+}) => {
   return (
-    <div id="outer" className="p-10">
+    <div className="max-w-[800px] mx-auto">
+      {withHeaderFooter && <AppHeader />}
       {children}
+      {withHeaderFooter && <AppFooter />}
     </div>
   )
 }
