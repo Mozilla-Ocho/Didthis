@@ -7,6 +7,7 @@ import Textarea from './Textarea'
 import Timestamp from './Timestamp'
 import Modal from './Modal'
 import ConfirmationModal from './ConfirmationModal'
+import Input from './Input'
 
 export {
   H,
@@ -18,4 +19,5 @@ export {
   Timestamp,
   Modal,
   ConfirmationModal,
+  Input,
 }

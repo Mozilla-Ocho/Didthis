@@ -2,6 +2,7 @@ import { wrapFetch } from './apiCore'
 import type { FetchArgs } from '@/lib/apiCore'
 import type {
   MeWrapper,
+  NewProjectWrapper,
   PublicUserWrapper,
   ValidateSignupCodeWrapper,
   EmptySuccessWrapper,
@@ -92,6 +93,19 @@ const newPost = async ({
     method: 'POST',
     body: { post },
   })) as NewPostWrapper
+  return wrapper
+}
+
+const newProject = async ({
+  project,
+}: {
+  project: ApiProject
+}): Promise<NewProjectWrapper> => {
+  const wrapper = (await wrapFetch({
+    action: 'newProject',
+    method: 'POST',
+    body: { project },
+  })) as NewProjectWrapper
   return wrapper
 }
 
@@ -214,6 +228,7 @@ const apiClient = {
   getPublicUser,
   // postUserProfile,
   newPost,
+  newProject,
   getUrlSlug,
   postUrlSlug,
   getUrlMeta,

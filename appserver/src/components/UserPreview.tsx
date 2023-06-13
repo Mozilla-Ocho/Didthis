@@ -3,17 +3,18 @@ import { useStore } from '@/lib/store'
 import { Divider, Link } from './uiLib'
 import pathBuilder from '@/lib/pathBuidler'
 
-// XXX_SKELETON
 const UserPreview = observer(({ user }: { user: ApiUser }) => {
   const store = useStore()
   const isSelf = store.user && store.user.id === user.id
   return (
-    <div>
+    <div className="grid gap-4 py-4 grid-cols-[auto_auto_1fr]">
+      <div>((avatar))</div>
       <Link href={pathBuilder.user(user.urlSlug)}>
-        {user.fullName || user.urlSlug}
+        {user.fullName || 'Unnamed user'}
       </Link>
-      {isSelf && '(clickable edit link here)'}
-      <Divider />
+      <div className="text-right">
+        {isSelf && <Link href={pathBuilder.userEdit(user.urlSlug)}>edit</Link>}
+      </div>
     </div>
   )
 })

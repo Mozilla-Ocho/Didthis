@@ -314,6 +314,15 @@ class Store {
       return wrapper.payload.post
     })
   }
+
+  async saveProject(project: ApiProject): Promise<ApiProject> {
+    if (!this.user) throw new Error('must be authed')
+    return apiClient.newProject({ project }).then(wrapper => {
+      this.setUser(wrapper.payload.user)
+      this.trackEvent(trackingEvents.caNewProject)
+      return wrapper.payload.project
+    })
+  }
 }
 
 export default Store

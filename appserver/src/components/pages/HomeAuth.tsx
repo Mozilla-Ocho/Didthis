@@ -3,6 +3,7 @@ import { useStore } from '@/lib/store'
 import ProjectList from '@/components/ProjectList'
 import { Divider, H, Link } from '@/components/uiLib'
 import pathBuilder from '@/lib/pathBuidler'
+import UserPreview from '../UserPreview'
 
 const HomeAuth = observer(() => {
   const store = useStore()
@@ -10,6 +11,7 @@ const HomeAuth = observer(() => {
   const hasProjects = Object.keys(store.user.profile.projects).length > 0
   return (
     <>
+      <UserPreview user={store.user} />
       <div>
         {!hasProjects && (
           <div>
@@ -26,8 +28,11 @@ const HomeAuth = observer(() => {
           </div>
         )}
       </div>
-      <Divider/>
+      <Divider />
       <H.H4>Your projects:</H.H4>
+      <Link intent="primary" href={pathBuilder.newProject(store.user.urlSlug)}>
+        new project
+      </Link>
       <ProjectList targetUser={store.user} />
     </>
   )

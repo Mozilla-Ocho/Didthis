@@ -2,9 +2,10 @@ import { observer } from 'mobx-react-lite'
 import { useStore } from '@/lib/store'
 import { useState } from 'react'
 import { Button, Select, Textarea } from '../uiLib'
-import { NextRouter, useRouter } from 'next/router'
+import { useRouter } from 'next/router'
 import profileUtils from '@/lib/profileUtils'
 import { getParamString } from '@/lib/nextUtils'
+import pathBuilder from '@/lib/pathBuidler'
 
 // XXX_SKELETON
 
@@ -18,7 +19,7 @@ const ProjectSelector = ({
   const store = useStore()
   if (!store.user) return <></>
   const profile = store.user.profile
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleChangeProject = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setProjectId(e.target.value)
   }
   if (!store.user) return <></>
@@ -33,7 +34,7 @@ const ProjectSelector = ({
   return (
     <div>
       <p>Project:</p>
-      <Select onChange={handleChange} value={projectId}>
+      <Select onChange={handleChangeProject} value={projectId}>
         {nameAndId.map(nid => (
           <option key={nid[1]} value={nid[1]}>
             {nid[0]}
@@ -67,7 +68,7 @@ const PostForm = observer(() => {
       if (!store.user) return
       console.log('ok done', newPost)
       router.push(
-        `/user/${store.user.urlSlug}/project/${newPost.projectId}/post/${newPost.id}`
+        pathBuilder.post(store.user.urlSlug, newPost.projectId, newPost.id)
       )
     })
   }

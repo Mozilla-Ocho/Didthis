@@ -48,6 +48,10 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
     eventName: 'newPost',
     opts: { newProject: 'n' },
   },
+  caNewProject: {
+    eventName: 'newProject',
+    opts: { },
+  },
 
   // edit actions
   edProfileBasicsName: {

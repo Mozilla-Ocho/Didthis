@@ -135,7 +135,7 @@ const generateRandomAvailablePostId = (profile: ApiProfile): string => {
   return id
 }
 
-const generateRandomAvailableProfileId = (profile: ApiProfile): string => {
+const generateRandomAvailableProjectId = (profile: ApiProfile): string => {
   const mkRandId = () => {
     const chars = 'bcdfghjkmnpqrstvwxyz23456789'
     let slug = ''
@@ -160,7 +160,7 @@ const generateRandomAvailableProfileId = (profile: ApiProfile): string => {
 const mkNewProject = (
   profile: ApiProfile
 ): { profile: ApiProfile; projectId: string; project: ApiProject } => {
-  const projectId = generateRandomAvailableProfileId(profile)
+  const projectId = generateRandomAvailableProjectId(profile)
   let i = 1
   Object.values(profile.projects).forEach(proj => {
     if (proj.title.trim().match(/^Untitled Project( \d+)?$/)) {

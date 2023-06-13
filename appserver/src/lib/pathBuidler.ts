@@ -8,7 +8,11 @@ const pathBuilder = {
   afterLogout: home,
   afterLogin: user,
   user,
+  userEdit: (slug: string) => user(slug) + '/edit',
   project,
+  projectEdit: (slug: string, projectId: string) =>
+    project(slug, projectId) + '/edit',
+  newProject: (slug: string) => user(slug) + '/project/new',
   post: (slug: string, projectId: string, postId: string) =>
     project(slug, projectId) + '/post/' + encodeURI(postId),
   newPost: (slug: string, projectId?: string) => {

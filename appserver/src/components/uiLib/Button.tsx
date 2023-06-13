@@ -1,7 +1,6 @@
 import { ReactNode, FC, MouseEventHandler } from 'react'
-// import classNames from "classnames";
-
 import { cva, type VariantProps } from 'class-variance-authority'
+import { twMerge } from 'tailwind-merge'
 
 const buttonCVA = cva(
   'button p-4 py-2 px-4 rounded text-white disabled:bg-slate-300',
@@ -49,7 +48,7 @@ const Button: FC<ButtonProps> = ({
   return (
     <button
       type={bType}
-      className={buttonCVA({ intent, size, className })}
+      className={twMerge(buttonCVA({ intent, size }), className)}
       onClick={ourOnClick}
       disabled={!!disabled}
     >

@@ -50,6 +50,13 @@ interface NewPostWrapper extends SuccessWrapper {
   }
 }
 
+interface NewProjectWrapper extends SuccessWrapper {
+  payload: {
+    user: ApiUser
+    project: ApiProject
+  }
+}
+
 interface PublicUserWrapper extends SuccessWrapper {
   payload: ApiUser
 }
@@ -65,6 +72,7 @@ export type {
   ErrorId,
   MeWrapper,
   NewPostWrapper,
+  NewProjectWrapper,
   PublicUserWrapper,
   ValidateSignupCodeWrapper,
   EmptySuccessWrapper,

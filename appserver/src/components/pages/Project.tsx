@@ -26,10 +26,13 @@ const ProjectPage = observer(({ targetUser }: { targetUser: ApiUser }) => {
       <div>
         <UserPreview user={targetUser} />
         <H.H3>{project.title}</H.H3>
-        <p>{project.currentStatus}</p>
-        <p>{Object.keys(project.posts).length} posts</p>
+        {store.user && isSelf && <p><Link href={pathBuilder.projectEdit(store.user.urlSlug, project.id)}>edit</Link></p>}
+        <p>description: {project.description || "no description"}</p>
+        <p>visibility: {project.scope}</p>
+        <p>status: {project.currentStatus}</p>
+        <p># posts: {Object.keys(project.posts).length}</p>
         <p>
-          created <Timestamp seconds={project.createdAt} />
+          created: <Timestamp seconds={project.createdAt} />
         </p>
         <Divider />
         {store.user && // store.user redundant when isSelf but tsserver needs it
