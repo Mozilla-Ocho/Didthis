@@ -57,6 +57,9 @@ COPY appserver /appserver
 
 WORKDIR /appserver
 
+ARG CLOUDINARY_JSON_SECRET
+ENV CLOUDINARY_JSON_SECRET=$CLOUDINARY_JSON_SECRET
+
 # build next.js app in production mode
 RUN yarn next build
 
