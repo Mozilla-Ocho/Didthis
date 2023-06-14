@@ -6,17 +6,18 @@ import profileUtils from '@/lib/profileUtils'
 import pathBuilder from '@/lib/pathBuidler'
 import {useRouter} from 'next/router'
 
-// XXX_SKELETON
+type Props = { mode: "new"; } | { mode: "edit"; project: ApiProject }
 
 const ProjectForm = observer(
-  ({ mode, project }: { mode: 'edit' | 'new'; project?: ApiProject }) => {
+  (props: Props) => {
+    const {mode} = props
     const router = useRouter()
     const store = useStore()
     const user = store.user
     if (!user) return <></>
     const [data, setData] = useState<ApiProject>(() => {
-      if (project) {
-        return JSON.parse(JSON.stringify(project)) as ApiProject
+      if (mode === 'edit') {
+        return JSON.parse(JSON.stringify(props.project)) as ApiProject
       } else {
         const profile = JSON.parse(JSON.stringify(user.profile)) as ApiProfile
         const r = profileUtils.mkNewProject(profile)
@@ -41,11 +42,11 @@ const ProjectForm = observer(
       setData(upd)
     }
     const setVisibility = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const upd = { ...data, scope: e.target.value as Scope }
+      const upd = { ...data, scope: e.target.value as ApiScope }
       setData(upd)
     }
     const setStatus = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const upd = { ...data, currentStatus: e.target.value as ProjectStatus }
+      const upd = { ...data, currentStatus: e.target.value as ApiProjectStatus }
       setData(upd)
     }
     const valid = !!data.title.trim()

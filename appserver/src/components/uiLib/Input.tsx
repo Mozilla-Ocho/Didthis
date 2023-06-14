@@ -18,7 +18,7 @@ const inputCVA = cva(
 
 type Props = React.InputHTMLAttributes<HTMLInputElement> &
   VariantProps<typeof inputCVA> & {
-    error: false | string
+    error?: false | string
   }
 
 const Input: FC<Props> = ({

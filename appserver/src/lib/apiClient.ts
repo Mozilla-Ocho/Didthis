@@ -7,6 +7,7 @@ import type {
   ValidateSignupCodeWrapper,
   EmptySuccessWrapper,
   NewPostWrapper,
+  UrlMetaWrapper,
 } from './apiConstants'
 
 const getHealthCheck = async () => {
@@ -109,6 +110,20 @@ const newProject = async ({
   return wrapper
 }
 
+const getUrlMeta = async ({
+  url,
+}: {
+  url: string
+}): Promise<UrlMetaWrapper> => {
+  const wrapper = (await wrapFetch({
+    action: 'getUrlMeta',
+    method: 'POST',
+    body: { url },
+    expectErrorIds:['ERR_BAD_INPUT','ERR_REMOTE_FETCH_FAILED'],
+  })) as UrlMetaWrapper
+  return wrapper
+}
+
 // const postUserProfile = async ({
 //   profile,
 // }: {
@@ -162,25 +177,6 @@ const postUrlSlug = async ({
     action: 'url_slug',
     method: 'POST',
     body,
-    asTestUser,
-  })
-  return wrapper
-}
-
-// XXX_PORTING change response shape
-const getUrlMeta = async ({
-  url,
-  processor,
-  asTestUser,
-}: {
-  url: string
-  processor: string
-  asTestUser?: string
-}) => {
-  const wrapper = await wrapFetch({
-    action: 'url_meta',
-    method: 'GET',
-    queryParams: { url, processor },
     asTestUser,
   })
   return wrapper

@@ -12,6 +12,7 @@ type GenericErrorId =
   | 'ERR_CSRF_TOKEN'
   | 'ERR_NOT_FOUND'
   | 'ERR_BAD_INPUT'
+  | 'ERR_REMOTE_FETCH_FAILED'
 
 type ErrorId = GenericErrorId
 
@@ -65,9 +66,14 @@ interface ValidateSignupCodeWrapper extends SuccessWrapper {
   payload: { code: string; name: string; active: boolean }
 }
 
+interface UrlMetaWrapper extends SuccessWrapper {
+  payload: { urlMeta: ApiUrlMeta; url: string; }
+}
+
 export type {
   Wrapper,
   SuccessWrapper,
+  EmptySuccessWrapper,
   ErrorWrapper,
   ErrorId,
   MeWrapper,
@@ -75,5 +81,5 @@ export type {
   NewProjectWrapper,
   PublicUserWrapper,
   ValidateSignupCodeWrapper,
-  EmptySuccessWrapper,
+  UrlMetaWrapper,
 }

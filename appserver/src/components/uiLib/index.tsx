@@ -8,6 +8,7 @@ import Timestamp from './Timestamp'
 import Modal from './Modal'
 import ConfirmationModal from './ConfirmationModal'
 import Input from './Input'
+import Icon from './Icon'
 
 export {
   H,
@@ -20,4 +21,5 @@ export {
   Modal,
   ConfirmationModal,
   Input,
+  Icon,
 }

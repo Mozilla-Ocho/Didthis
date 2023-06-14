@@ -29,6 +29,8 @@ type FetchArgs = {
 }
 
 type ApiInfo = {
+  // these fields can be undefined if we never got a resposne, or the response
+  // had no valid wrapper 
   errorId?: ErrorId
   errorMsg?: string
   fetchArgs?: FetchArgs
@@ -44,29 +46,15 @@ const mkUrl = (action: string, queryParams?: QueryParams) => {
 }
 
 class ApiError extends Error {
-  apiInfo?: ApiInfo
+  apiInfo: ApiInfo
 
   constructor(
     message: string,
-    {
-      errorId,
-      errorMsg,
-      fetchArgs,
-      responseWrapper,
-      responseStatus,
-      responseBody,
-    }: ApiInfo
+    theInfo: ApiInfo,
   ) {
     super(message)
     this.name = 'ApiError'
-    this.apiInfo = {
-      errorId,
-      errorMsg,
-      fetchArgs,
-      responseWrapper,
-      responseStatus,
-      responseBody,
-    }
+    this.apiInfo = theInfo
   }
 }
 
@@ -190,6 +178,6 @@ const wrapFetch = async (fetchArgs: FetchArgs): Promise<SuccessWrapper> => {
   }
 }
 
-export { wrapFetch }
+export { wrapFetch, ApiError }
 
 export type { FetchArgs, ApiInfo }

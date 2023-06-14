@@ -31,18 +31,6 @@ const mkDefaultProfile = () => {
   } as ApiProfile
 }
 
-const mkBlankSlatePost = (projectId: 'new' | string): ApiPost => {
-  const seconds = Math.floor(new Date().getTime() / 1000)
-  return {
-    id: 'new', // assigned on save
-    createdAt: seconds, // asigned on save
-    updatedAt: seconds, // asigned on save
-    projectId: projectId, // assigned on save if "new"
-    scope: 'public',
-    description: '',
-  }
-}
-
 const privacyFilteredCopy = (original: ApiProfile): ApiProfile => {
   const filtered = mkDefaultProfile()
   filtered.name = original.name
@@ -191,7 +179,6 @@ const profileUtils = {
   maxChars,
   mkNewProject,
   generateRandomAvailablePostId,
-  mkBlankSlatePost,
 }
 
 export default profileUtils

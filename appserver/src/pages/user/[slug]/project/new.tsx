@@ -17,7 +17,7 @@ const NewProject = observer(() => {
     <>
       <div>
         <H.H1>new project for user {router.query.slug}</H.H1>
-        <ProjectForm />
+        <ProjectForm mode="new" />
       </div>
     </>
   )

@@ -7,6 +7,7 @@ import 'firebase/compat/auth'
 // import * as amplitude from '@amplitude/analytics-browser';
 import { trackingEvents } from '@/lib/trackingEvents'
 import { useEffect } from 'react'
+import {UrlMetaWrapper} from '../apiConstants'
 
 type GeneralError = false | '_get_me_first_fail_' | '_api_fail_'
 type LoginErrorMode = false | '_inactive_code_'
@@ -323,6 +324,7 @@ class Store {
       return wrapper.payload.project
     })
   }
+
 }
 
 export default Store

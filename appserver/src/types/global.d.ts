@@ -1,14 +1,20 @@
-type ProjectStatus = 'active' | 'complete' | 'paused'
-type Scope = 'public' | 'private'
-type Timestamp = number // epoch seconds integer
-type UrlMeta = {
+// just primitive types here, no need to use these strictly but it's
+// descriptive to use named types for key data when possible. {{{
+type ApiUserId = string
+type ApiPostId = string
+type ApiProjectId = string
+type ApiTimestamp = number // epoch seconds integer
+// }}}
+type ApiProjectStatus = 'active' | 'complete' | 'paused'
+type ApiScope = 'public' | 'private'
+type ApiUrlMeta = {
   host: string
   title: string
   imageUrl: string
 }
 
 type ApiUser = {
-  id: string
+  id: ApiUserId
   email: string
   urlSlug: string
   profile: ApiProfile
@@ -24,7 +30,7 @@ type ApiUser = {
 }
 
 interface UserDbRow {
-  id: string
+  id: ApiUserid
   email: string
   url_slug: string
   profile: ApiProfile
@@ -39,24 +45,24 @@ interface UserDbRow {
 }
 
 type ApiPost = {
-  id: string
-  projectId: string
-  createdAt: Timestamp
-  updatedAt: Timestamp
-  scope: Scope
+  id: ApiPostId
+  projectId: ApiProjectId
+  createdAt: ApiTimestamp
+  updatedAt: ApiTimestamp
+  scope: ApiScope
   description?: string
   linkUrl?: string
-  urlMeta?: UrlMeta
+  urlMeta?: ApiUrlMeta
   imageAssetId?: string
 }
 
 type ApiProject = {
-  id: string
-  createdAt: Timestamp
-  updatedAt: Timestamp
+  id: ApiProjectId
+  createdAt: ApiTimestamp
+  updatedAt: ApiTimestamp
   title: string
-  scope: Scope
-  currentStatus: ProjectStatus
+  scope: ApiScope
+  currentStatus: ApiProjectStatus
   posts: { [key: string]: ApiPost }
   description?: string
   imageAssetId?: string
