@@ -20,7 +20,7 @@ class PostStore {
   // only the project level, and posts in a project are assumed public so
   // they all show up externally if the project is public.
   scope: ApiScope = 'public'
-  projectId: ApiProjectId | 'new' = 'new'
+  projectId: ApiProjectId
   linkUrl = ''
   fetchingUrl = ''
   fetching = false
@@ -30,7 +30,7 @@ class PostStore {
   urlMeta: ApiUrlMeta | false = false
   fetchUrlMetaAndUpdateDebounced: () => void
 
-  constructor() {
+  constructor(defaultPid: ApiProjectId) {
     this.fetchUrlMetaAndUpdateDebounced = debounce(
       this.fetchUrlMetaAndUpdate,
       1000,
@@ -40,6 +40,7 @@ class PostStore {
         leading: true,
       }
     )
+    this.projectId = defaultPid
     makeAutoObservable(this, {
       fetchUrlMetaAndUpdateDebounced: false,
     })
@@ -239,7 +240,7 @@ const PostForm = observer(() => {
   let defaultPid = getParamString(router, 'projectId')
   if (!(store.user && store.user.profile.projects[defaultPid]))
     defaultPid = 'new'
-  const [postStore] = useState(() => new PostStore())
+  const [postStore] = useState(() => new PostStore(defaultPid))
   if (!store.user) return <></>
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
