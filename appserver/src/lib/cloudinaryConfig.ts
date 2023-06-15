@@ -61,13 +61,22 @@ const getCloudinaryConfig = (intent: CldImageIntent) => {
     }
   }
   if (intent === 'post') {
-    // XXX TODO: this is graceland stuff
     const x = {
       ...base,
-      tags: ['prompts'],
+      tags: ['post'],
       croppingAspectRatio: 2,
       uploadPreset: 'prompter_uploads',
-      folder: 'prompts',
+      folder: 'posts',
+    }
+    return x
+  }
+  if (intent === 'project') {
+    const x = {
+      ...base,
+      tags: ['project'],
+      croppingAspectRatio: 2,
+      uploadPreset: 'prompter_uploads',
+      folder: 'projects',
     }
     return x
   }

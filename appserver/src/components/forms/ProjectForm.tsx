@@ -1,10 +1,76 @@
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@/lib/store'
-import { Select, Input, Textarea, Button } from '@/components/uiLib'
-import { useState } from 'react'
+import { Select, Input, Textarea, Button, CloudinaryImage } from '@/components/uiLib'
+import { useState,useCallback } from 'react'
 import profileUtils from '@/lib/profileUtils'
 import pathBuilder from '@/lib/pathBuidler'
 import {useRouter} from 'next/router'
+import ImageUpload from '../ImageUpload'
+import type { UploadCallback } from '../ImageUpload'
+import { makeAutoObservable, action } from 'mobx'
+
+class ProjectStore {
+  title: string
+  description: string
+  scope: ApiScope
+  projectId: ApiProjectId
+  imageAssetId: string
+  currentStatus: ApiProjectStatus
+
+  constructor(mode: "new" | "edit", profile: ApiProfile, project: ApiProject | undefined) {
+    if (mode === "new") {
+      const profileCopy = JSON.parse(JSON.stringify(profile)) as ApiProfile
+      const r = profileUtils.mkNewProject(profileCopy)
+      this.title = r.project.title
+      this.description = r.project.description || ''
+      this.scope = r.project.scope
+      this.projectId = r.project.id
+      this.imageAssetId = r.project.imageAssetId || ''
+      this.currentStatus = r.project.currentStatus
+    } else if (project) {
+      this.title = project.title
+      this.description = project.description || ''
+      this.scope = project.scope
+      this.projectId = project.id
+      this.imageAssetId = project.imageAssetId || ''
+      this.currentStatus = project.currentStatus
+    } else {
+      throw new Error('project is required in constructor if mode != new')
+    }
+    makeAutoObservable(this, {})
+  }
+
+  setTitle(x: string) {
+    this.title = x
+  }
+  setDescription(x: string) {
+    this.description = x
+  }
+  setCurrentStatus(x: ApiProjectStatus) {
+    this.currentStatus = x
+  }
+  setScope(x: ApiScope) {
+    this.scope = x
+  }
+  setImageAssetId(assetId: string) {
+    this.imageAssetId = assetId
+  }
+
+  getApiProject(): ApiProject {
+    const seconds = Math.floor(new Date().getTime() / 1000)
+    return {
+      id: this.projectId, // assigned on save
+      createdAt: seconds, // asigned on save
+      updatedAt: seconds, // asigned on save
+      title: this.title,
+      scope: this.scope,
+      currentStatus: this.currentStatus,
+      description: this.description.trim(),
+      imageAssetId: this.imageAssetId || undefined,
+      posts: {}, // the project api ignores the posts object
+    }
+  }
+}
 
 type Props = { mode: "new"; } | { mode: "edit"; project: ApiProject }
 
@@ -15,41 +81,41 @@ const ProjectForm = observer(
     const store = useStore()
     const user = store.user
     if (!user) return <></>
-    const [data, setData] = useState<ApiProject>(() => {
-      if (mode === 'edit') {
-        return JSON.parse(JSON.stringify(props.project)) as ApiProject
-      } else {
-        const profile = JSON.parse(JSON.stringify(user.profile)) as ApiProfile
-        const r = profileUtils.mkNewProject(profile)
-        return r.project
-      }
-    })
-    if (!store.user) return <></>
+    const [projectStore] = useState(() => new ProjectStore(mode, user.profile, mode === "edit" ? props.project : undefined))
     const handleSubmit = (e: React.FormEvent) => {
       e.stopPropagation()
       e.preventDefault()
-      store.saveProject(data).then(newProject => {
+      store.saveProject(projectStore.getApiProject()).then(newProject => {
+        // note that saving projects ignores the posts property. for a new
+        // project the backend sets that to {}, and on updates it keeps
+        // whatever is currently in the user's profile for that project and
+        // only updates the project's attributes.
         if (!store.user) return
         router.push( pathBuilder.project(store.user.urlSlug, newProject.id))
       })
     }
     const setTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const upd = { ...data, title: e.target.value }
-      setData(upd)
+      projectStore.setTitle(e.target.value)
     }
     const setDescription = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      const upd = { ...data, description: e.target.value }
-      setData(upd)
+      projectStore.setDescription(e.target.value)
     }
     const setVisibility = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const upd = { ...data, scope: e.target.value as ApiScope }
-      setData(upd)
+      projectStore.setScope(e.target.value as ApiScope)
     }
     const setStatus = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const upd = { ...data, currentStatus: e.target.value as ApiProjectStatus }
-      setData(upd)
+      projectStore.setCurrentStatus(e.target.value as ApiProjectStatus)
     }
-    const valid = !!data.title.trim()
+    const onImageUpload = useCallback(
+      res => {
+        projectStore.setImageAssetId(res.cloudinaryAssetId)
+      },
+      [projectStore]
+    ) as UploadCallback
+    const deleteImage = () => {
+      projectStore.setImageAssetId('')
+    }
+    const valid = !!projectStore.title.trim()
     return (
       <div>
         <form onSubmit={handleSubmit} method="POST">
@@ -60,7 +126,7 @@ const ProjectForm = observer(
                 type="text"
                 id="title"
                 name="title"
-                value={data.title || ''}
+                value={projectStore.title || ''}
                 onChange={setTitle}
                 className="w-full"
                 error={valid ? false : "required"}
@@ -74,7 +140,7 @@ const ProjectForm = observer(
                 placeholder=""
                 id="description"
                 name="description"
-                value={data.description || ''}
+                value={projectStore.description || ''}
                 onChange={setDescription}
               />
             </label>
@@ -82,7 +148,7 @@ const ProjectForm = observer(
           <div>
             <label htmlFor="visibility">
               visibility:
-              <Select id="visibility" onChange={setVisibility} value={data.scope}>
+              <Select id="visibility" onChange={setVisibility} value={projectStore.scope}>
                 <option key="public" value="public">
                   public
                 </option>
@@ -95,7 +161,7 @@ const ProjectForm = observer(
           <div>
             <label htmlFor="status">
               status:
-              <Select id="status" onChange={setStatus} value={data.currentStatus}>
+              <Select id="status" onChange={setStatus} value={projectStore.currentStatus}>
                 <option key="active" value="active">
                   active
                 </option>
@@ -107,6 +173,13 @@ const ProjectForm = observer(
                 </option>
               </Select>
             </label>
+          </div>
+          <div>
+            {projectStore.imageAssetId && (
+              <CloudinaryImage assetId={projectStore.imageAssetId} intent="project" />
+            )}
+            <ImageUpload intent="project" onUploadWithUseCallback={onImageUpload} />
+            {projectStore.imageAssetId && <Button onClick={deleteImage}>remove</Button>}
           </div>
           <Button type="submit" disabled={!valid}>
             Save

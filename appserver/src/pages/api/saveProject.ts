@@ -34,6 +34,16 @@ export default async function handler(
     createdAt: Math.floor(millis / 1000),
     updatedAt: Math.floor(millis / 1000),
   }
+  // this api ignores the value of "posts" as a property on the project and
+  // preserves whats there or sets to [] for new projects.
+  const existingProject = profile.projects[project.id]
+  if (existingProject) {
+    // do not overwrite posts in this method.
+    project.posts = existingProject.posts
+  } else {
+    // start w/ empty posts.
+    project.posts = []
+  }
   profile.projects[project.id] = project
   log.serverApi('newProject saving:', profile)
   await knex('users')

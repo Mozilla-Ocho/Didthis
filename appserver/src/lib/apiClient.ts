@@ -97,13 +97,13 @@ const newPost = async ({
   return wrapper
 }
 
-const newProject = async ({
+const saveProject = async ({
   project,
 }: {
   project: ApiProject
 }): Promise<NewProjectWrapper> => {
   const wrapper = (await wrapFetch({
-    action: 'newProject',
+    action: 'saveProject',
     method: 'POST',
     body: { project },
   })) as NewProjectWrapper
@@ -224,7 +224,7 @@ const apiClient = {
   getPublicUser,
   // postUserProfile,
   newPost,
-  newProject,
+  saveProject,
   getUrlSlug,
   postUrlSlug,
   getUrlMeta,

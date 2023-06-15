@@ -148,6 +148,7 @@ const generateRandomAvailableProjectId = (profile: ApiProfile): string => {
 const mkNewProject = (
   profile: ApiProfile
 ): { profile: ApiProfile; projectId: string; project: ApiProject } => {
+  // DRY_20466 new project defaults
   const projectId = generateRandomAvailableProjectId(profile)
   let i = 1
   Object.values(profile.projects).forEach(proj => {

@@ -1,7 +1,7 @@
 // import { useStore } from "@/lib/store";
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { H, Link, Timestamp, Divider } from '../uiLib'
+import { H, Link, Timestamp, Divider, CloudinaryImage } from '../uiLib'
 import UserPreview from '../UserPreview'
 import pathBuilder from '@/lib/pathBuidler'
 import { getParamString } from '@/lib/nextUtils'
@@ -26,6 +26,7 @@ const ProjectPage = observer(({ targetUser }: { targetUser: ApiUser }) => {
       <div>
         <UserPreview user={targetUser} />
         <H.H3>{project.title}</H.H3>
+        {project.imageAssetId && <CloudinaryImage assetId={project.imageAssetId} intent="project"/>}
         {store.user && isSelf && <p><Link href={pathBuilder.projectEdit(store.user.urlSlug, project.id)}>edit</Link></p>}
         <p>description: {project.description || "no description"}</p>
         <p>visibility: {project.scope}</p>
