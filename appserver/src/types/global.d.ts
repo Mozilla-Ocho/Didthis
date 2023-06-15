@@ -99,3 +99,8 @@ type JSONABLE =
 type POJO = { [key: string]: JSONABLE }
 
 type KvString = { [key: string]: string }
+
+type CldImageIntent = 'avatar' | 'post'
+
+type UrlMetaError =  false | 'bad_url' | 'remote_fetch' | 'other'
+

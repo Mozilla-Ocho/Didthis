@@ -1,71 +1,72 @@
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@/lib/store'
-import { useState } from 'react'
-import { Button, Input, Select, Textarea } from '../uiLib'
+import { useCallback, useState } from 'react'
+import { Button, Input, Select, Textarea, CloudinaryImage } from '../uiLib'
 import { useRouter } from 'next/router'
 import { getParamString } from '@/lib/nextUtils'
 import pathBuilder from '@/lib/pathBuidler'
-import {makeAutoObservable, action } from 'mobx'
+import { makeAutoObservable, action } from 'mobx'
 import { debounce } from 'lodash-es'
 import apiClient from '@/lib/apiClient'
 import log from '@/lib/log'
-import {ApiError} from '@/lib/apiCore'
+import { ApiError } from '@/lib/apiCore'
 import LinkPreview from '../LinkPreview'
+import ImageUpload from '../ImageUpload'
+import type { UploadCallback } from '../ImageUpload'
 
-  // const mkBlankSlatePost = (projectId: 'new' | string): ApiPost => {
-  //   const seconds = Math.floor(new Date().getTime() / 1000)
-  //   return {
-  //     id: 'new', // assigned on save
-  //     createdAt: seconds, // asigned on save
-  //     updatedAt: seconds, // asigned on save
-  //     projectId: projectId, // assigned on save if "new"
-  //     scope: 'public',
-  //     description: '',
-  //   }
-  // }
 class PostStore {
-  description = ""
-  scope: ApiScope = "public"
-  projectId: ApiProjectId | "new" = "new"
-  linkUrl = ""
-  fetchingUrl = ""
+  description = ''
+  // for MVP we are not giving user control over visibility at a post-level,
+  // only the project level, and posts in a project are assumed public so
+  // they all show up externally if the project is public.
+  scope: ApiScope = 'public'
+  projectId: ApiProjectId | 'new' = 'new'
+  linkUrl = ''
+  fetchingUrl = ''
   fetching = false
-  error : false | 'bad_url' | 'remote_fetch' | 'other' = false
-  urlMeta : ApiUrlMeta | false = false
+  imageAssetId = ''
+  error: UrlMetaError = false
+  urlMeta: ApiUrlMeta | false = false
   fetchUrlMetaAndUpdateDebounced: () => void
 
   constructor() {
-    this.fetchUrlMetaAndUpdateDebounced = debounce(this.fetchUrlMetaAndUpdate, 1000, {
-      // leading=true because i assume they'll copy+paste the url in one event, so
-      // start right away
-      leading: true,
-    });
+    this.fetchUrlMetaAndUpdateDebounced = debounce(
+      this.fetchUrlMetaAndUpdate,
+      1000,
+      {
+        // leading=true because i assume they'll copy+paste the url in one event, so
+        // start right away
+        leading: true,
+      }
+    )
     makeAutoObservable(this, {
-      fetchUrlMetaAndUpdateDebounced: false
+      fetchUrlMetaAndUpdateDebounced: false,
     })
   }
 
-  setDescription(x:string) {
+  setDescription(x: string) {
     this.description = x
   }
-  setProjectId(x:string) {
+  setProjectId(x: string) {
     this.projectId = x
   }
-  setScope(x:ApiScope){
+  setScope(x: ApiScope) {
     this.scope = x
   }
-
+  setImageAssetId(assetId: string) {
+    this.imageAssetId = assetId
+  }
 
   setUrlWithSideEffects(x: string) {
     this.linkUrl = x
     this.fetchUrlMetaAndUpdateDebounced()
   }
 
-  fetchUrlMetaAndUpdate() : void {
+  fetchUrlMetaAndUpdate(): void {
     const url = this.linkUrl
-    if (url.trim() === "") {
+    if (url.trim() === '') {
       this.fetching = false
-      this.fetchingUrl = ""
+      this.fetchingUrl = ''
       this.error = false
       this.urlMeta = false
       return
@@ -76,38 +77,43 @@ class PostStore {
       // fetching
       const check = new URL(url)
       if (check.protocol !== 'https:' && check.protocol !== 'http:') {
-        throw new Error('bad proto');
+        throw new Error('bad proto')
       }
-    } catch(e) {
+    } catch (e) {
       this.fetching = false
-      this.fetchingUrl = ""
+      this.fetchingUrl = ''
       this.error = 'bad_url'
       this.urlMeta = false
       return
     }
     this.fetchingUrl = url
     this.fetching = true
-    apiClient.getUrlMeta({ url }).then(action(wrapper => {
-      this.fetchingUrl = ""
-      this.fetching = false
-      this.error = false
-      this.urlMeta = wrapper.payload.urlMeta
-    })).catch(err => {
-      log.error('error fetching url', {url,err})
-      this.error = 'other'
-      if (err instanceof ApiError) {
-        if (err.apiInfo?.errorId === "ERR_BAD_INPUT") {
-          this.error = 'bad_url'
+    apiClient
+      .getUrlMeta({ url })
+      .then(
+        action(wrapper => {
+          this.fetchingUrl = ''
+          this.fetching = false
+          this.error = false
+          this.urlMeta = wrapper.payload.urlMeta
+        })
+      )
+      .catch(err => {
+        log.error('error fetching url', { url, err })
+        this.error = 'other'
+        if (err instanceof ApiError) {
+          if (err.apiInfo?.errorId === 'ERR_BAD_INPUT') {
+            this.error = 'bad_url'
+          }
+          if (err.apiInfo?.errorId === 'ERR_REMOTE_FETCH_FAILED') {
+            this.error = 'remote_fetch'
+          }
         }
-        if (err.apiInfo?.errorId === "ERR_REMOTE_FETCH_FAILED") {
-          this.error = 'remote_fetch'
-        }
-      }
-      this.urlMeta = false
-    })
+        this.urlMeta = false
+      })
   }
 
-  getApiPost() : ApiPost {
+  getApiPost(): ApiPost {
     const seconds = Math.floor(new Date().getTime() / 1000)
     return {
       id: 'new', // assigned on save
@@ -116,18 +122,15 @@ class PostStore {
       projectId: this.projectId, // assigned on save if "new"
       scope: 'public',
       description: this.description.trim(),
-      linkUrl: this.linkUrl && this.linkUrl.trim() ? this.linkUrl.trim() : undefined,
+      imageAssetId: this.imageAssetId || undefined,
+      linkUrl:
+        this.linkUrl && this.linkUrl.trim() ? this.linkUrl.trim() : undefined,
       urlMeta: this.urlMeta ? this.urlMeta : undefined,
     }
   }
 }
 
-
-const ProjectSelector = observer(({
-  postStore,
-}: {
-  postStore: PostStore
-}) => {
+const ProjectSelector = observer(({ postStore }: { postStore: PostStore }) => {
   const store = useStore()
   if (!store.user) return <></>
   const profile = store.user.profile
@@ -157,11 +160,7 @@ const ProjectSelector = observer(({
   )
 })
 
-const DescriptionField = observer(({
-  postStore,
-}: {
-  postStore: PostStore
-}) => {
+const DescriptionField = observer(({ postStore }: { postStore: PostStore }) => {
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     postStore.setDescription(e.target.value)
   }
@@ -180,11 +179,7 @@ const DescriptionField = observer(({
   )
 })
 
-const LinkField = observer(({
-  postStore,
-}: {
-  postStore: PostStore
-}) => {
+const LinkField = observer(({ postStore }: { postStore: PostStore }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     postStore.setUrlWithSideEffects(e.target.value)
   }
@@ -198,12 +193,38 @@ const LinkField = observer(({
           value={postStore.linkUrl}
           onChange={handleChange}
         />
-        <LinkPreview loading={postStore.fetching} error={postStore.error} urlMeta={postStore.urlMeta} linkUrl={postStore.linkUrl} />
+        <LinkPreview
+          loading={postStore.fetching}
+          error={postStore.error}
+          urlMeta={postStore.urlMeta}
+          linkUrl={postStore.linkUrl}
+        />
         <p>fetching: {JSON.stringify(postStore.fetching)}</p>
         <p>urlMeta: {JSON.stringify(postStore.urlMeta)}</p>
         <p>error: {JSON.stringify(postStore.error)}</p>
       </label>
     </>
+  )
+})
+
+const ImageField = observer(({ postStore }: { postStore: PostStore }) => {
+  const onResult = useCallback(
+    res => {
+      postStore.setImageAssetId(res.cloudinaryAssetId)
+    },
+    [postStore]
+  ) as UploadCallback
+  const deleteImage = () => {
+    postStore.setImageAssetId('')
+  }
+  return (
+    <div>
+      {postStore.imageAssetId && (
+        <CloudinaryImage assetId={postStore.imageAssetId} intent="post" />
+      )}
+      <ImageUpload intent="post" onUploadWithUseCallback={onResult} />
+      {postStore.imageAssetId && <Button onClick={deleteImage}>remove</Button>}
+    </div>
   )
 })
 
@@ -229,15 +250,14 @@ const PostForm = observer(() => {
     })
   }
   // XXX validation
-  const hasContent = (postStore.description).trim().length > 0
+  const hasContent = postStore.description.trim().length > 0
   return (
     <div>
       <form onSubmit={handleSubmit} method="POST">
         <label>post content:</label>
-        <ProjectSelector
-          postStore={postStore}
-        />
+        <ProjectSelector postStore={postStore} />
         <DescriptionField postStore={postStore} />
+        <ImageField postStore={postStore} />
         <LinkField postStore={postStore} />
         <Button type="submit" disabled={!hasContent}>
           POST

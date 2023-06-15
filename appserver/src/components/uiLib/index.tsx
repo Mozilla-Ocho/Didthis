@@ -9,6 +9,7 @@ import Modal from './Modal'
 import ConfirmationModal from './ConfirmationModal'
 import Input from './Input'
 import Icon from './Icon'
+import CloudinaryImage from './CloudinaryImage'
 
 export {
   H,
@@ -22,4 +23,5 @@ export {
   ConfirmationModal,
   Input,
   Icon,
+  CloudinaryImage,
 }

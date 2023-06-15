@@ -19,7 +19,7 @@ const StyledLinkPreview = ({
   imageUrl,
 }: {
   loading?: boolean
-  error?: "bad_url" | "remote_fetch" | "other"
+  error?: UrlMetaError
   url?: string
   title?: string
   host?: string
@@ -53,9 +53,9 @@ const LinkPreview = observer(
     error,
   }: {
     linkUrl: string
-    urlMeta: ApiUrlMeta | null
+    urlMeta?: ApiUrlMeta | false,
     loading?: boolean
-    error?: "bad_url" | "remote_fetch" | "other"
+    error?: UrlMetaError
   }) => {
     if (!linkUrl || linkUrl.trim().length === 0) return <></>
 
