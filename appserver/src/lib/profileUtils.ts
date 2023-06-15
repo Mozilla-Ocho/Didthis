@@ -31,11 +31,25 @@ const mkDefaultProfile = () => {
   } as ApiProfile
 }
 
+const filteredImageMeta = (
+  meta: CldImageMetaAny | CldImageMetaPublic | undefined
+): CldImageMetaPublic | undefined => {
+  if (meta) {
+    return {
+      metaPublic: true,
+      width: meta.width,
+      height: meta.height,
+      format: meta.format,
+    }
+  } else return undefined
+}
+
 const privacyFilteredCopy = (original: ApiProfile): ApiProfile => {
   const filtered = mkDefaultProfile()
   filtered.name = original.name
   filtered.bio = original.bio
   filtered.imageAssetId = original.imageAssetId
+  filtered.imageMeta = filteredImageMeta(original.imageMeta)
   filtered.projects = {}
   Object.values(original.projects || {}).forEach(origProj => {
     if (origProj.scope === 'public') {
@@ -44,7 +58,9 @@ const privacyFilteredCopy = (original: ApiProfile): ApiProfile => {
         if (proj.posts[pid].scope !== 'public') {
           delete proj.posts[pid]
         }
+        proj.posts[pid].imageMeta = filteredImageMeta(proj.posts[pid].imageMeta)
       })
+      proj.imageMeta = filteredImageMeta(proj.imageMeta)
       filtered.projects[proj.id] = proj
     }
   })

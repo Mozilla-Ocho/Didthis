@@ -1,18 +1,13 @@
 import { getCloudinaryConfig } from '@/lib/cloudinaryConfig'
 import { useEffect, useState } from 'react'
-import {Button} from './uiLib'
+import { Button } from './uiLib'
 
 type UploadResult = {
   cloudinaryAssetId: string
-  info: {
-    public_id: string
-    width: number
-    height: number
-    format: string
-  }
+  info: CldImageMetaAny
 }
 
-type UploadCallback = (result: UploadResult) => void;
+type UploadCallback = (result: UploadResult) => void
 
 export type { UploadCallback }
 
@@ -31,7 +26,7 @@ const ImageUpload = ({
   intent: CldImageIntent
   onUploadWithUseCallback: (result: UploadResult) => void
 }) => {
-  const [widget,setWidget] = useState<Widget>()
+  const [widget, setWidget] = useState<Widget>()
 
   const launchWidget = () => {
     if (widget) widget.open()
@@ -48,32 +43,61 @@ const ImageUpload = ({
         if (!error && result && result.event === 'success') {
           console.log('cloudinary result', result)
           /*
-            access_mode: "public"
-            asset_id: "59f46bf2e26a92a480b8318f415e3002"
-            batchId: "uw-batch2"
-            bytes: 10094
-            coordinates: Object { custom: (1) […] }
-            created_at: "2023-06-15T20:11:48Z"
-            etag: "510ea18761d3cfe897bc31504afaa368"
-            folder: "prompts"
-            format: "webp"
-            height: 300
-            id: "uw-file3"
-            original_filename: "woodworking1"
-            pages: 1
-            path: "v1686859908/prompts/awr3ubc4s8exoctukv30.webp"
-            placeholder: false
-            public_id: "prompts/awr3ubc4s8exoctukv30"
-            resource_type: "image"
-            secure_url: "https://res.cloudinary.com/dbpulyvbq/image/upload/v1686859908/prompts/awr3ubc4s8exoctukv30.webp"
-            signature: "9b14d012f1ddd8c576c4cc4dd0483ae31f18baac"
-            tags: Array [ "prompts" ]
-            thumbnail_url: "https://res.cloudinary.com/dbpulyvbq/image/upload/c_limit,h_60,w_90/v1686859908/prompts/awr3ubc4s8exoctukv30.jpg"
-            type: "upload"
-            url: "http://res.cloudinary.com/dbpulyvbq/image/upload/v1686859908/prompts/awr3ubc4s8exoctukv30.webp"
-            version: 1686859908
-            version_id: "a203dc8d7986a67c9140e1b2cec77244"
-            width: 600
+           * note: to get the image_metadata object, the "image metadata"
+           * switch must be enabled for the upload preset under the "media
+           * analysis and ai" category of settings for the preset.
+          result.info = {
+            "id": "uw-file3",
+            "batchId": "uw-batch2",
+            "asset_id": "5d63c1b08ef2995e9907e6b826190c82",
+            "public_id": "prompts/iih1rfvcuuvq5fvr1pzv",
+            "version": 1686869157,
+            "version_id": "77203245d0f3e5f541a23ec48e97c296",
+            "signature": "592a9bea1ebe44486fcc649afca9870a1bd87511",
+            "width": 1500,
+            "height": 750,
+            "format": "jpg",
+            "resource_type": "image",
+            "created_at": "2023-06-15T22:45:57Z",
+            "tags": [
+              "project"
+            ],
+            "pages": 1,
+            "bytes": 510217,
+            "type": "upload",
+            "etag": "2c3b7d5cfb419d81ff6e4a728bd203c3",
+            "placeholder": false,
+            "url": "http://res.cloudinary.com/dbpulyvbq/image/upload/v1686869157/prompts/iih1rfvcuuvq5fvr1pzv.jpg",
+            "secure_url": "https://res.cloudinary.com/dbpulyvbq/image/upload/v1686869157/prompts/iih1rfvcuuvq5fvr1pzv.jpg",
+            "folder": "prompts",
+            "access_mode": "public",
+            "image_metadata": {
+              "JFIFVersion": "1.01",
+              "ResolutionUnit": "None",
+              "XResolution": "1",
+              "YResolution": "1",
+              "ProfileDescription": "Display P3",
+              "Colorspace": "RGB",
+              "DPI": "0"
+            },
+            "coordinates": {
+              "custom": [
+                [
+                  0,
+                  0,
+                  1500,
+                  750
+                ]
+              ]
+            },
+            "illustration_score": 0,
+            "semi_transparent": false,
+            "grayscale": false,
+            "original_filename": "IMG_5299",
+            "original_extension": "jpeg",
+            "path": "v1686869157/prompts/iih1rfvcuuvq5fvr1pzv.jpg",
+            "thumbnail_url": "https://res.cloudinary.com/dbpulyvbq/image/upload/c_limit,h_60,w_90/v1686869157/prompts/iih1rfvcuuvq5fvr1pzv.jpg"
+          }
           */
           onUploadWithUseCallback({
             cloudinaryAssetId: result.info.public_id,
@@ -86,8 +110,13 @@ const ImageUpload = ({
     return () => theWidget.destroy()
   }, [intent, onUploadWithUseCallback])
 
-
-  return <><Button intent="primary" onClick={launchWidget}>Choose Image</Button></>
+  return (
+    <>
+      <Button intent="primary" onClick={launchWidget}>
+        Choose Image
+      </Button>
+    </>
+  )
 }
 
 export default ImageUpload

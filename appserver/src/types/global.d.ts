@@ -44,6 +44,18 @@ interface UserDbRow {
   last_read_from_user: number | null
 }
 
+// on publicly returned data, we restrict the image meta to these properties:
+type CldImageMetaPublic = {
+  metaPublic: true,
+  width: number,
+  height: number,
+  format: string,
+}
+/* we're going to capture whatever object metadata cloudinary returns with
+ * images, which includes things like the original dimensions, format, etc */
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+type CldImageMetaAny = {[key:string]: any} & {metaPublic: false}
+
 type ApiPost = {
   id: ApiPostId
   projectId: ApiProjectId
@@ -54,6 +66,7 @@ type ApiPost = {
   linkUrl?: string
   urlMeta?: ApiUrlMeta
   imageAssetId?: string
+  imageMeta?: CldImageMetaAny | CldImageMetaPublic
 }
 
 type ApiProject = {
@@ -66,12 +79,14 @@ type ApiProject = {
   posts: { [key: string]: ApiPost }
   description?: string
   imageAssetId?: string
+  imageMeta?: CldImageMetaAny | CldImageMetaPublic
 }
 
 type ApiProfile = {
   name?: string
   bio?: string
   imageAssetId?: string
+  imageMeta?: CldImageMetaAny | CldImageMetaPublic
   projects: { [key: string]: ApiProject }
 }
 

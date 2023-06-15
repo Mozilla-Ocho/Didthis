@@ -25,6 +25,7 @@ class PostStore {
   fetchingUrl = ''
   fetching = false
   imageAssetId = ''
+  imageMeta : CldImageMetaAny | CldImageMetaPublic | undefined
   error: UrlMetaError = false
   urlMeta: ApiUrlMeta | false = false
   fetchUrlMetaAndUpdateDebounced: () => void
@@ -44,6 +45,23 @@ class PostStore {
     })
   }
 
+  getApiPost(): ApiPost {
+    const seconds = Math.floor(new Date().getTime() / 1000)
+    return {
+      id: 'new', // assigned on save
+      createdAt: seconds, // asigned on save
+      updatedAt: seconds, // asigned on save
+      projectId: this.projectId, // assigned on save if "new"
+      scope: 'public',
+      description: this.description.trim(),
+      imageAssetId: this.imageAssetId || undefined,
+      imageMeta: this.imageMeta,
+      linkUrl:
+        this.linkUrl && this.linkUrl.trim() ? this.linkUrl.trim() : undefined,
+      urlMeta: this.urlMeta ? this.urlMeta : undefined,
+    }
+  }
+
   setDescription(x: string) {
     this.description = x
   }
@@ -53,10 +71,10 @@ class PostStore {
   setScope(x: ApiScope) {
     this.scope = x
   }
-  setImageAssetId(assetId: string) {
+  setImageAssetId(assetId: string, meta: CldImageMetaAny | undefined) {
     this.imageAssetId = assetId
+    this.imageMeta = meta
   }
-
   setUrlWithSideEffects(x: string) {
     this.linkUrl = x
     this.fetchUrlMetaAndUpdateDebounced()
@@ -113,21 +131,6 @@ class PostStore {
       })
   }
 
-  getApiPost(): ApiPost {
-    const seconds = Math.floor(new Date().getTime() / 1000)
-    return {
-      id: 'new', // assigned on save
-      createdAt: seconds, // asigned on save
-      updatedAt: seconds, // asigned on save
-      projectId: this.projectId, // assigned on save if "new"
-      scope: 'public',
-      description: this.description.trim(),
-      imageAssetId: this.imageAssetId || undefined,
-      linkUrl:
-        this.linkUrl && this.linkUrl.trim() ? this.linkUrl.trim() : undefined,
-      urlMeta: this.urlMeta ? this.urlMeta : undefined,
-    }
-  }
 }
 
 const ProjectSelector = observer(({ postStore }: { postStore: PostStore }) => {
@@ -210,12 +213,12 @@ const LinkField = observer(({ postStore }: { postStore: PostStore }) => {
 const ImageField = observer(({ postStore }: { postStore: PostStore }) => {
   const onResult = useCallback(
     res => {
-      postStore.setImageAssetId(res.cloudinaryAssetId)
+      postStore.setImageAssetId(res.cloudinaryAssetId, res.info)
     },
     [postStore]
   ) as UploadCallback
   const deleteImage = () => {
-    postStore.setImageAssetId('')
+    postStore.setImageAssetId('', undefined)
   }
   return (
     <div>
