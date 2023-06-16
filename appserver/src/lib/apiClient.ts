@@ -169,11 +169,14 @@ const saveProfile = async ({
 
 const getSlugCheck = async ({
   slug,
+  provisionalName,
 }: {
   slug: string
+  provisionalName: string,
 }) => {
   const qp: KvString = {}
   qp.slug = slug
+  qp.provisionalName = provisionalName
   const wrapper = await wrapFetch({
     action: 'slugCheck',
     method: 'GET',

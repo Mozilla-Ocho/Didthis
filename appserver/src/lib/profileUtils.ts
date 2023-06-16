@@ -193,7 +193,7 @@ const slugStringValidation = (
   slug = slug.trim()
   // for invalid chars regexp, use * not + because we don't want to return
   // invalid chars on an empty string
-  if (!slug.match(/^[a-zA-Z0-9]*$/))
+  if (!slug.match(/^[a-zA-Z0-9_\-]*$/))
     return {
       valid: false,
       error: 'ERR_SLUG_CHARS',

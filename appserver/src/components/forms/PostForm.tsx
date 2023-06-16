@@ -90,7 +90,7 @@ class PostStore {
     }
   }
 
-  get linkUrlIsInvalid() {
+  linkUrlIsInvalid() {
     // true if we should show a validation error on the link
     if (this.linkUrl.trim()) {
       const parsed = profileUtils.getParsedUrl(this.linkUrl)
@@ -100,9 +100,9 @@ class PostStore {
     }
   }
 
-  get isPostable() {
+  isPostable() {
     // XXX length validations
-    if (this.linkUrlIsInvalid) return false
+    if (this.linkUrlIsInvalid()) return false
     const hasText = !!this.description.trim()
     const hasUrl = !!this.linkUrl.trim()
     const hasImage = !!this.imageAssetId.trim()
@@ -303,7 +303,7 @@ const PostForm = observer((props: Props) => {
         <DescriptionField postStore={postStore} />
         <ImageField postStore={postStore} />
         <LinkField postStore={postStore} />
-        <Button type="submit" disabled={!postStore.isPostable}>
+        <Button type="submit" disabled={!postStore.isPostable()}>
           {mode === 'new' ? 'POST' : 'SAVE'}
         </Button>
       </form>

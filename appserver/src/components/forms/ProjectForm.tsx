@@ -87,11 +87,11 @@ class ProjectStore {
     this.imageMeta = meta
   }
 
-  get titleMissing() {
+  titleMissing() {
     return !this.title.trim()
   }
 
-  get isPostable() {
+  isPostable() {
     // XXX length validations
     return !!this.title.trim()
   }
@@ -160,7 +160,7 @@ const ProjectForm = observer((props: Props) => {
               value={projectStore.title || ''}
               onChange={setTitle}
               className="w-full"
-              error={projectStore.titleMissing ? 'required' : false}
+              error={projectStore.titleMissing() ? 'required' : false}
             />
           </label>
         </div>
@@ -228,7 +228,7 @@ const ProjectForm = observer((props: Props) => {
             <Button onClick={deleteImage}>remove</Button>
           )}
         </div>
-        <Button type="submit" disabled={!projectStore.isPostable}>
+        <Button type="submit" disabled={!projectStore.isPostable()}>
           Save
         </Button>
       </form>

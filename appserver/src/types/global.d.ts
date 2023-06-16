@@ -36,7 +36,6 @@ interface UserDbRow {
   profile: ApiProfile
   created_at_millis: number
   updated_at_millis: number
-  full_name: string | null
   signup_code_name: string | null
   admin_status: string | null
   ban_status: string | null

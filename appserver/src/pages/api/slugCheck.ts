@@ -64,9 +64,11 @@ const checkAvailability = async (
   }
 }
 
-const getSuggestedSlug = async (user: ApiUser): Promise<string> => {
-  const name = (user.profile.name || '').trim()
-  let slug = name
+const getSuggestedSlug = async (user: ApiUser, provisionalName: string): Promise<string> => {
+  provisionalName = (provisionalName || '').trim()
+  const profileName = (user.profile.name || '').trim()
+  const useName = provisionalName || profileName
+  let slug = useName
   if (!slug) {
     // no name? empty suggestion
     return ''
@@ -76,7 +78,7 @@ const getSuggestedSlug = async (user: ApiUser): Promise<string> => {
   slug = slug.replace(/\w\S*/g, function (word) {
     return word.charAt(0).toUpperCase() + word.substring(1).toLowerCase()
   })
-  slug = name.charAt(0) + slug.substring(1)
+  slug = useName.charAt(0) + slug.substring(1)
   slug = slug.replace(/\s/g, '')
   // add '', 2, 3 onto the slug until we have a good one, up to 20
   let extraNumber = 1
@@ -113,7 +115,8 @@ export default async function handler(
   const source = userDbRow.user_slug ? 'user' : 'system'
   let suggested = undefined
   if (source === 'system') {
-    suggested = await getSuggestedSlug(user)
+    const provisionalName = getParamString(req, 'provisionalName')
+    suggested = await getSuggestedSlug(user, provisionalName)
   }
   const wrapper: SlugCheckWrapper = {
     action: 'slugCheck',

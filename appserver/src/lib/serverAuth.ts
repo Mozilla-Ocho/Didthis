@@ -117,7 +117,6 @@ const getOrCreateUser = async ({
     url_slug: newSlug,
     user_slug: false,
     profile: profileUtils.mkDefaultProfile(),
-    full_name: null,
     signup_code_name: codeInfo ? codeInfo.name : null,
     created_at_millis: millis,
     updated_at_millis: millis,
