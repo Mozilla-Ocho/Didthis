@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import React, { useRef, useEffect, ReactNode } from 'react'
+import React, { useRef, useEffect, ReactNode, useState } from 'react'
 import ReactDOM from 'react-dom'
 
 interface ModalProps {
@@ -23,6 +23,9 @@ const Modal: React.FC<ModalProps> = ({
 }) => {
   const modalRef = useRef<HTMLDivElement | null>(null)
   const elRef = useRef<HTMLDivElement | null>(null)
+  const [initialOpenState] = useState(() => isOpen)
+  const [rerenderHack,setRerenderHack] = useState(false)
+  //console.log("modal render", id)
 
   useEffect(() => {
     // portal node creation must happen inside useeffect due to nextjs SSR
@@ -32,10 +35,16 @@ const Modal: React.FC<ModalProps> = ({
     elRef.current = div
     const modalRoot = document.body
     modalRoot.appendChild(elRef.current)
+    //console.log("modal useEffect mk portal element", id)
+    // if the modal element is created and mounted with isOpen initially true,
+    // because we're building this portal element in the useEffect and
+    // asserting it's truthy in the render below, we have to re-render after
+    // creating it.
+    if (initialOpenState) setRerenderHack(true)
     return () => {
       modalRoot.removeChild(elRef.current as HTMLDivElement)
     }
-  }, [id])
+  }, [id, setRerenderHack, initialOpenState])
 
   useEffect(() => {
     function handleOutsideClick(event: MouseEvent) {
@@ -64,6 +73,7 @@ const Modal: React.FC<ModalProps> = ({
     }
   }, [isOpen, handleClose])
 
+  //console.log("modal render isOpen, elRef.current:",isOpen,!!elRef.current)
   return isOpen && elRef.current
     ? ReactDOM.createPortal(
         <div

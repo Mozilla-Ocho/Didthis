@@ -7,7 +7,9 @@ import 'firebase/compat/auth'
 // import * as amplitude from '@amplitude/analytics-browser';
 import { trackingEvents } from '@/lib/trackingEvents'
 import { useEffect } from 'react'
-import {UrlMetaWrapper} from '../apiConstants'
+import {NextRouter} from 'next/router'
+import pathBuilder from '../pathBuidler'
+// import { UrlMetaWrapper } from '../apiConstants'
 
 type GeneralError = false | '_get_me_first_fail_' | '_api_fail_'
 type LoginErrorMode = false | '_inactive_code_'
@@ -28,14 +30,22 @@ class Store {
   loginButtonsSpinning = false
   loginErrorMode: LoginErrorMode = false
   fullpageLoading = false // used when signing in
+  confirmingDelete:
+    | false
+    | { kind: 'post'; thing: ApiPost; deleting: boolean }
+    | { kind: 'project'; thing: ApiProject; deleting: boolean } = false
+  router: NextRouter
 
   constructor({
     authUser,
     signupCode,
+    router,
   }: {
     authUser?: ApiUser | false
     signupCode?: false | string
+    router: NextRouter
   }) {
+    this.router = router
     // nextjs SSR computes and provides the authUser and signup code via input
     // props to the wrapper/provider
     makeAutoObservable(
@@ -43,6 +53,7 @@ class Store {
       {
         firebaseRef: false,
         trackedPageEvent: false,
+        router: false,
       },
       { autoBind: true }
     )
@@ -325,6 +336,52 @@ class Store {
     })
   }
 
+  promptDeletePost(post: ApiPost) {
+    this.confirmingDelete = {
+      kind: 'post',
+      thing: post,
+      deleting: false,
+    }
+  }
+
+  promptDeleteProject(project: ApiProject) {
+    this.confirmingDelete = {
+      kind: 'project',
+      thing: project,
+      deleting: false,
+    }
+  }
+
+  onDeleteResult(res: 'yes' | 'no') {
+    if (this.confirmingDelete && res === 'yes') {
+      this.confirmingDelete.deleting = true
+      if (this.confirmingDelete.kind === 'post') {
+        apiClient
+          .deletePost({
+            postId: this.confirmingDelete.thing.id,
+            projectId: this.confirmingDelete.thing.projectId,
+          })
+          .then(wrapper => {
+            this.confirmingDelete = false
+            this.setUser(wrapper.payload.user)
+          })
+      }
+      if (this.confirmingDelete.kind === 'project') {
+        apiClient
+          .deleteProject({ projectId: this.confirmingDelete.thing.id })
+          .then(wrapper => {
+            this.confirmingDelete = false
+            // note: upating the user here causes a flash of "not found" page
+            // this.setUser(wrapper.payload)
+            // we can actually just rely on nextjs's server side props behavior
+            // to refetch the user on navigation.
+            this.router.push(pathBuilder.user(wrapper.payload.urlSlug))
+          })
+      }
+    } else {
+      this.confirmingDelete = false
+    }
+  }
 }
 
 export default Store

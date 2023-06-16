@@ -4,6 +4,8 @@ import { LoginGlobalOverlay } from '@/components/auth/LoginGlobalOverlay'
 import StaticLayout from './StaticLayout'
 import { observer } from 'mobx-react-lite'
 import HomeUnsolicited from './pages/HomeUnsolicited'
+import DeletionConfirmationModal from './DeletionConfirmationModal'
+import {useRouter} from 'next/router'
 
 // Inner is separate because it has to be a store observer for when
 // headerFooter=authed and the outer layer is the store provider itself.
@@ -29,6 +31,7 @@ const Inner = observer(
     return (
       <StoreLoadingWrapper ifLoading={<p>loading</p>}>
         <LoginGlobalOverlay />
+        <DeletionConfirmationModal />
         <StaticLayout withHeaderFooter={hf}>{children}</StaticLayout>
       </StoreLoadingWrapper>
     )
@@ -46,8 +49,9 @@ export default function DefaultLayout({
   headerFooter: 'always' | 'authed' | 'never'
   children: ReactNode // ReactNode not ReactElement
 }) {
+  const router = useRouter()
   return (
-    <StoreWrapper authUser={authUser} signupCode={signupCode}>
+    <StoreWrapper authUser={authUser} signupCode={signupCode} router={router}>
       <Inner headerFooter={headerFooter}>{children}</Inner>
     </StoreWrapper>
   )

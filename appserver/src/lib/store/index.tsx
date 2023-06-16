@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, ReactNode } from 'react'
 import { observer } from 'mobx-react-lite'
 import Store from './store'
+import {NextRouter} from 'next/router'
 
 const StoreContext = createContext<Store | null>(null)
 
@@ -8,14 +9,16 @@ const StoreWrapper = ({
   authUser,
   signupCode,
   children,
+  router,
 }: {
   authUser: ApiUser | false
   signupCode: false | string
   children: ReactNode
+  router: NextRouter
 }) => {
   // this wrapper should only be present once, towards the top of the
   // application component component tree.
-  const [store] = useState(() => new Store({ authUser, signupCode }))
+  const [store] = useState(() => new Store({ authUser, signupCode, router }))
   return <StoreContext.Provider value={store}>{children}</StoreContext.Provider>
 }
 

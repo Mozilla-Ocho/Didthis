@@ -110,6 +110,34 @@ const saveProject = async ({
   return wrapper
 }
 
+const deletePost = async ({
+  postId,
+  projectId,
+}: {
+  postId: ApiPostId
+  projectId: ApiProjectId
+}): Promise<SavedProjectWrapper> => {
+  const wrapper = (await wrapFetch({
+    action: 'deletePost',
+    method: 'POST',
+    body: { postId,projectId },
+  })) as SavedProjectWrapper
+  return wrapper
+}
+
+const deleteProject = async ({
+  projectId,
+}: {
+  projectId: ApiProjectId
+}): Promise<MeWrapper> => {
+  const wrapper = (await wrapFetch({
+    action: 'deleteProject',
+    method: 'POST',
+    body: { projectId },
+  })) as MeWrapper
+  return wrapper
+}
+
 const getUrlMeta = async ({
   url,
 }: {
@@ -225,6 +253,8 @@ const apiClient = {
   // postUserProfile,
   savePost,
   saveProject,
+  deletePost,
+  deleteProject,
   getUrlSlug,
   postUrlSlug,
   getUrlMeta,

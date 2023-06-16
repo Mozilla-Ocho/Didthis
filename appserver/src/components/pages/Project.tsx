@@ -1,7 +1,7 @@
 // import { useStore } from "@/lib/store";
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { H, Link, Timestamp, Divider, CloudinaryImage } from '../uiLib'
+import { H, Link, Timestamp, Divider, CloudinaryImage,Button } from '../uiLib'
 import UserPreview from '../UserPreview'
 import pathBuilder from '@/lib/pathBuidler'
 import { getParamString } from '@/lib/nextUtils'
@@ -14,13 +14,14 @@ const ProjectPage = observer(({ targetUser }: { targetUser: ApiUser | false }) =
   if (!targetUser) return <NotFound>user not found</NotFound>
   const router = useRouter()
   const store = useStore()
+  const isSelf = store.user && store.user.id === targetUser.id
+  if (isSelf && store.user) targetUser = store.user // important for mobx reactivity when authed
   const projectId = getParamString(router, 'projectId')
   const focusPostId = getParamString(router, 'postId')
   const project = targetUser.profile.projects[projectId]
   if (!project) return <NotFound>project not found</NotFound>
   const posts = Object.values(project.posts)
   posts.sort((a, b) => a.createdAt - b.createdAt)
-  const isSelf = store.user && store.user.id === targetUser.id
   return (
     <>
       <div>
@@ -28,6 +29,7 @@ const ProjectPage = observer(({ targetUser }: { targetUser: ApiUser | false }) =
         <H.H3>{project.title}</H.H3>
         {project.imageAssetId && <CloudinaryImage assetId={project.imageAssetId} intent="project"/>}
         {store.user && isSelf && <p><Link href={pathBuilder.projectEdit(store.user.urlSlug, project.id)}>edit</Link></p>}
+        {store.user && isSelf && <p><Button onClick={()=>store.promptDeleteProject(project)}>delete</Button></p>}
         <p>description: {project.description || "no description"}</p>
         <p>visibility: {project.scope}</p>
         <p>status: {project.currentStatus}</p>
