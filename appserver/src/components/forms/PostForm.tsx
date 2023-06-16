@@ -13,6 +13,7 @@ import { ApiError } from '@/lib/apiCore'
 import LinkPreview from '../LinkPreview'
 import ImageUpload from '../ImageUpload'
 import type { UploadCallback } from '../ImageUpload'
+import profileUtils from '@/lib/profileUtils'
 
 class PostStore {
   id: string
@@ -89,6 +90,24 @@ class PostStore {
     }
   }
 
+  get linkUrlIsInvalid() {
+    // true if we should show a validation error on the link
+    if (this.linkUrl.trim()) {
+      const parsed = profileUtils.getParsedUrl(this.linkUrl)
+      return parsed === false
+    } else {
+      return false
+    }
+  }
+
+  get isPostable() {
+    if (this.linkUrlIsInvalid) return false
+    const hasText = !!this.description.trim()
+    const hasUrl = !!this.linkUrl.trim()
+    const hasImage = !!this.imageAssetId.trim()
+    return (hasText || hasUrl || hasImage)
+  }
+
   setDescription(x: string) {
     this.description = x
   }
@@ -116,25 +135,18 @@ class PostStore {
       this.urlMeta = false
       return
     }
-    try {
-      // validation is done on the server in a more complete fashion but this
-      // also reduces api calls if we know in advance the url isn't worth
-      // fetching
-      const check = new URL(url)
-      if (check.protocol !== 'https:' && check.protocol !== 'http:') {
-        throw new Error('bad proto')
-      }
-    } catch (e) {
+    const parsedUrl = profileUtils.getParsedUrl(url)
+    if (!parsedUrl) {
       this.fetching = false
       this.fetchingUrl = ''
       this.error = 'bad_url'
       this.urlMeta = false
       return
     }
-    this.fetchingUrl = url
+    this.fetchingUrl = parsedUrl.toString()
     this.fetching = true
     apiClient
-      .getUrlMeta({ url })
+      .getUrlMeta({ url: parsedUrl.toString() })
       .then(
         action(wrapper => {
           this.fetchingUrl = ''
@@ -282,8 +294,6 @@ const PostForm = observer((props: Props) => {
       )
     })
   }
-  // XXX validation
-  const hasContent = postStore.description.trim().length > 0
   return (
     <div>
       <form onSubmit={handleSubmit} method="POST">
@@ -292,7 +302,7 @@ const PostForm = observer((props: Props) => {
         <DescriptionField postStore={postStore} />
         <ImageField postStore={postStore} />
         <LinkField postStore={postStore} />
-        <Button type="submit" disabled={!hasContent}>
+        <Button type="submit" disabled={!postStore.isPostable}>
           {mode === 'new' ? 'POST' : 'SAVE'}
         </Button>
       </form>

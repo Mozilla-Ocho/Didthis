@@ -67,13 +67,7 @@ const privacyFilteredCopy = (original: ApiProfile): ApiProfile => {
   return filtered
 }
 
-const getParsedUrl = ({
-  url,
-  strict,
-}: {
-  url: string
-  strict: boolean
-}): URL | false => {
+const getParsedUrl = (url: string, strict?: boolean): URL | false => {
   let parsedUrl
   try {
     let processedUrl = url

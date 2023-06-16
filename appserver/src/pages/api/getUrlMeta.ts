@@ -5,6 +5,7 @@ import { unfurl, unfurlFromHtmlContent } from '@/lib/hackedUnfurl';
 import log from '@/lib/log'
 import util from 'util'
 import {v2 as cloudinary} from 'cloudinary'
+import profileUtils from '@/lib/profileUtils'
 
 const cloudinarySecret = process.env.CLOUDINARY_JSON_SECRET ? JSON.parse(process.env.CLOUDINARY_JSON_SECRET) : false
 
@@ -226,16 +227,8 @@ export default async function handler(
   // transport reliability since i'm not sure what kind of querystring length
   // limits we're dealing with. also makes for easier debugging in the console
   // to not have gigantic ugly url params.
-  let parsedUrl : URL;
-  try {
-    parsedUrl = new URL(req.body.url);
-    if (parsedUrl.protocol !== 'https:' && parsedUrl.protocol !== 'http:') {
-      throw new Error('bad proto');
-    }
-    if (parsedUrl.username || parsedUrl.password) {
-      throw new Error('auth on urls not allowed');
-    }
-  } catch (e) {
+  const parsedUrl = profileUtils.getParsedUrl(req.body.url)
+  if (!parsedUrl) {
     const wrapper: ErrorWrapper = {
       action: 'getUrlMeta',
       status: 400,
