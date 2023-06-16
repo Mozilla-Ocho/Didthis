@@ -112,47 +112,47 @@ const cleanupUserInput = (profile: ApiProfile): void => {
 const generateRandomAvailablePostId = (profile: ApiProfile): string => {
   const mkRandId = () => {
     const chars = 'bcdfghjkmnpqrstvwxyz23456789'
-    let slug = ''
+    let pid = ''
     for (let i = 0; i < 5; i++) {
-      slug = slug + chars[Math.floor(Math.random() * chars.length)]
+      pid = pid + chars[Math.floor(Math.random() * chars.length)]
     }
-    return slug
+    return pid
   }
   let available = false
-  let id = mkRandId()
+  let pid = mkRandId()
   while (!available) {
     const existing = Object.values(profile.projects).find(proj =>
-      Object.values(proj.posts).find(post => post.id === id)
+      Object.values(proj.posts).find(post => post.id === pid)
     )
     if (existing) {
-      id = mkRandId()
+      pid = mkRandId()
     } else {
       available = true
     }
   }
-  return id
+  return pid
 }
 
 const generateRandomAvailableProjectId = (profile: ApiProfile): string => {
   const mkRandId = () => {
     const chars = 'bcdfghjkmnpqrstvwxyz23456789'
-    let slug = ''
+    let pid = ''
     for (let i = 0; i < 5; i++) {
-      slug = slug + chars[Math.floor(Math.random() * chars.length)]
+      pid = pid + chars[Math.floor(Math.random() * chars.length)]
     }
-    return slug
+    return pid
   }
   let available = false
-  let id = mkRandId()
+  let pid = mkRandId()
   while (!available) {
-    const existing = Object.values(profile.projects).find(p => p.id === id)
+    const existing = Object.values(profile.projects).find(p => p.id === pid)
     if (existing) {
-      id = mkRandId()
+      pid = mkRandId()
     } else {
       available = true
     }
   }
-  return id
+  return pid
 }
 
 const mkNewProject = (

@@ -29,7 +29,9 @@ const userFromDbRow = (
   const user: ApiUser = {
     id: dbRow.id,
     email: dbRow.email,
-    urlSlug: dbRow.url_slug,
+    systemSlug: dbRow.system_slug,
+    userSlug: dbRow.user_slug || undefined,
+    publicPageSlug: dbRow.user_slug || dbRow.system_slug,
     profile,
     createdAt: dbRow.created_at_millis,
   }
@@ -49,7 +51,7 @@ const userFromDbRow = (
   return user
 }
 
-const generateRandomAvailableSlug = async () => {
+const generateRandomAvailableSystemSlug = async () => {
   const mkRandSlug = () => {
     const chars = 'bcdfghjkmnpqrstvwxyz23456789'
     let slug = ''
@@ -61,7 +63,7 @@ const generateRandomAvailableSlug = async () => {
   let available = false
   let slug = mkRandSlug()
   while (!available) {
-    const dbRow = (await knex('users').where('url_slug', slug).first()) as
+    const dbRow = (await knex('users').where('user_slug', slug).orWhere('system_slug', slug).first()) as
       | UserDbRow
       | undefined
     if (dbRow) {
@@ -110,12 +112,12 @@ const getOrCreateUser = async ({
   // else, create new
   // DRY_r9639 user creation logic
   log.serverApi('no user found, potentially a new signup, autovivifying')
-  const newSlug = await generateRandomAvailableSlug()
+  const systemSlug = await generateRandomAvailableSystemSlug()
   const columns: UserDbRow = {
     id,
     email: email,
-    url_slug: newSlug,
-    user_slug: false,
+    system_slug: systemSlug,
+    user_slug: null,
     profile: profileUtils.mkDefaultProfile(),
     signup_code_name: codeInfo ? codeInfo.name : null,
     created_at_millis: millis,

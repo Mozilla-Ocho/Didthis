@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useStore } from '@/lib/store'
 import { LogoutButton } from '@/components/auth/LogoutButton'
 import { Divider, Link, H } from './uiLib'
+import pathBuilder from '@/lib/pathBuidler'
 
 const AppHeader = observer(() => {
   const store = useStore()
@@ -11,7 +12,7 @@ const AppHeader = observer(() => {
         <Link href="/"><H.H1 className="text-lg">HOBBYR</H.H1></Link>
         <div className="text-center">
           {store.user ? (
-            <Link href={'/user/' + store.user.urlSlug}>{store.user.email}</Link>
+            <Link href={pathBuilder.user(store.user.publicPageSlug)}>{store.user.email}</Link>
           ) : (
             ''
           )}

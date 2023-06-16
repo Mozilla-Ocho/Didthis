@@ -8,9 +8,10 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const urlSlug = req.query.urlSlug || ''
-  const dbRow = (await knex('users').where('url_slug', urlSlug).first()) as
-    | UserDbRow
-    | undefined
+  const dbRow = (await knex('users')
+    .where('user_slug', urlSlug)
+    .orWhere('system_slug', urlSlug)
+    .first()) as UserDbRow | undefined
   if (dbRow) {
     // this api returns public data only even if requested by the owner of that data.
     const user: ApiUser = userFromDbRow(dbRow, { publicFilter: true })

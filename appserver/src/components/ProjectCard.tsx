@@ -8,7 +8,7 @@ const ProjectCard = observer(
     return (
       <div className="border p-4">
         <H.H3>
-          <Link href={pathBuilder.project(targetUser.urlSlug, project.id)}>
+          <Link href={pathBuilder.project(targetUser.publicPageSlug, project.id)}>
             {project.title}
           </Link>
         </H.H3>

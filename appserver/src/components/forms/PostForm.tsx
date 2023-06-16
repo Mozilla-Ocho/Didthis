@@ -291,7 +291,7 @@ const PostForm = observer((props: Props) => {
       if (!store.user) return
       console.log('ok done', newPost)
       router.push(
-        pathBuilder.post(store.user.urlSlug, newPost.projectId, newPost.id)
+        pathBuilder.post(store.user.systemSlug, newPost.projectId, newPost.id)
       )
     })
   }

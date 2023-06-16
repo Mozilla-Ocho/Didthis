@@ -98,7 +98,8 @@ interface SlugCheckWrapper extends SuccessWrapper {
   action: 'slugCheck',
   payload: {
     check: SlugCheck,
-    current: string,
+    currentSystem: string,
+    currentUser?: string,
     source: 'system' | 'user',
     suggested?: string, // when source = system, the suggested user slug choice
   }

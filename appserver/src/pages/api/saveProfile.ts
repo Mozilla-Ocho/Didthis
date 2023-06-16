@@ -2,12 +2,13 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import type { SaveProfileWrapper, ErrorWrapper } from '@/lib/apiConstants'
 import { getAuthUser } from '@/lib/serverAuth'
 import knex from '@/knex'
+import {checkAvailability} from '@/lib/userSlugs'
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const [user] = await getAuthUser(req, res)
+  const [user, userDbRow] = await getAuthUser(req, res)
   if (!user) {
     const wrapper: ErrorWrapper = {
       action: 'authentication',
@@ -29,11 +30,22 @@ export default async function handler(
   profile.bio = inputProfile.bio
   profile.imageAssetId = inputProfile.imageAssetId
   profile.imageMeta = inputProfile.imageMeta
+  const inputUserSlug = (req.body.userSlug || '').trim()
+  let assignUserSlug = user.userSlug
+  if (inputUserSlug) {
+    // if the request body includes a slug value, validate it and update the
+    // user_slug field
+    const availability = await checkAvailability(inputUserSlug, user)
+    if (availability.available && availability.valid) {
+      assignUserSlug = inputUserSlug
+    }
+  }
   await knex('users')
     .update({
       last_read_from_user: millis,
       updated_at_millis: millis,
       profile: profile,
+      user_slug: assignUserSlug,
     })
     .where('id', user.id)
   user.updatedAt = millis

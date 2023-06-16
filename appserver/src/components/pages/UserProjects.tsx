@@ -6,7 +6,7 @@ const UserProjects = observer(({ targetUser }: { targetUser: ApiUser }) => {
   return (
     <>
       <div>
-        <H.H1>projects for user {targetUser.urlSlug || targetUser.id}</H.H1>
+        <H.H1>projects for user {targetUser.publicPageSlug}</H.H1>
         <ProjectList targetUser={targetUser} />
       </div>
     </>

@@ -156,47 +156,34 @@ const getUrlMeta = async ({
 
 const saveProfile = async ({
   profile,
+  userSlug,
 }: {
   profile: ApiProfile;
+  userSlug?: string,
 }): Promise<MeWrapper> => {
   const wrapper = (await wrapFetch({
     action: "saveProfile",
     method: "POST",
-    body: {profile},
+    body: {profile,userSlug},
   })) as MeWrapper;
   return wrapper;
 };
 
 const getSlugCheck = async ({
-  slug,
+  userSlug,
   provisionalName,
 }: {
-  slug: string
+  userSlug: string
   provisionalName: string,
 }) => {
   const qp: KvString = {}
-  qp.slug = slug
+  qp.userSlug = userSlug
   qp.provisionalName = provisionalName
   const wrapper = await wrapFetch({
     action: 'slugCheck',
     method: 'GET',
     queryParams: qp,
   }) as SlugCheckWrapper
-  return wrapper
-}
-
-const saveSlug = async ({
-  slug,
-}: {
-  slug: string
-}) => {
-  const body: POJO = {}
-  body.slug = slug
-  const wrapper = await wrapFetch({
-    action: 'saveSlug',
-    method: 'POST',
-    body,
-  }) as MeWrapper
   return wrapper
 }
 
@@ -226,7 +213,6 @@ const apiClient = {
   savePost,
   saveProfile,
   saveProject,
-  saveSlug,
   saveWaitlist,
   sessionLogin,
   sessionLogout,

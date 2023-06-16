@@ -375,7 +375,7 @@ class Store {
             // this.setUser(wrapper.payload)
             // we can actually just rely on nextjs's server side props behavior
             // to refetch the user on navigation.
-            this.router.push(pathBuilder.user(wrapper.payload.urlSlug))
+            this.router.push(pathBuilder.user(wrapper.payload.systemSlug))
           })
       }
     } else {
@@ -383,13 +383,13 @@ class Store {
     }
   }
 
-  async saveProfile(profile: ApiProfile): Promise<void> {
+  async saveProfile(profile: ApiProfile, userSlug?: string): Promise<void> {
     if (!this.user) throw new Error('must be authed')
-    return apiClient.saveProfile({ profile }).then(wrapper => {
+    return apiClient.saveProfile({ profile, userSlug }).then(wrapper => {
       this.setUser(wrapper.payload)
       // XXX tracking
       // this.trackEvent(trackingEvents.caNewProject)
-      this.router.push(pathBuilder.user(wrapper.payload.urlSlug))
+      this.router.push(pathBuilder.user(wrapper.payload.systemSlug))
       // return wrapper.payload
     })
   }

@@ -9,11 +9,11 @@ const UserPreview = observer(({ user }: { user: ApiUser }) => {
   return (
     <div className="grid gap-4 py-4 grid-cols-[auto_auto_1fr]">
       <div>((avatar))</div>
-      <Link href={pathBuilder.user(user.urlSlug)}>
+      <Link href={pathBuilder.user(user.publicPageSlug)}>
         {user.profile.name || 'Unnamed user'}
       </Link>
       <div className="text-right">
-        {isSelf && <Link href={pathBuilder.userEdit(user.urlSlug)}>edit</Link>}
+        {isSelf && <Link href={pathBuilder.userEdit(user.systemSlug)}>edit</Link>}
       </div>
     </div>
   )

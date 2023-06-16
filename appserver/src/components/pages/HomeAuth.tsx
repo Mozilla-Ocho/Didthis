@@ -21,7 +21,7 @@ const HomeAuth = observer(() => {
             </p>
             <Link
               intent="primary"
-              href={pathBuilder.newPost(store.user.urlSlug)}
+              href={pathBuilder.newPost(store.user.systemSlug)}
             >
               new post
             </Link>
@@ -30,7 +30,7 @@ const HomeAuth = observer(() => {
       </div>
       <Divider />
       <H.H4>Your projects:</H.H4>
-      <Link intent="primary" href={pathBuilder.newProject(store.user.urlSlug)}>
+      <Link intent="primary" href={pathBuilder.newProject(store.user.systemSlug)}>
         new project
       </Link>
       <ProjectList targetUser={store.user} />

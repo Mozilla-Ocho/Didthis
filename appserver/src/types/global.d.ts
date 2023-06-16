@@ -16,7 +16,12 @@ type ApiUrlMeta = {
 type ApiUser = {
   id: ApiUserId
   email: string
-  urlSlug: string
+  // use systemSlug for editing/writes/forms because it's stable
+  systemSlug: string
+  // use userSlug when linking to the page in a way that could be shared/public
+  userSlug?: string
+  // publicPageSlug is a shortcut for (userSlug || systemSlug)
+  publicPageSlug: string
   profile: ApiProfile
   createdAt: number
   signupCodeName?: string
@@ -31,8 +36,8 @@ type ApiUser = {
 interface UserDbRow {
   id: ApiUserid
   email: string
-  url_slug: string
-  user_slug: boolean
+  system_slug: string
+  user_slug: string | null
   profile: ApiProfile
   created_at_millis: number
   updated_at_millis: number

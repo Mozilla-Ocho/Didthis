@@ -40,7 +40,8 @@ export const getServerSideProps = async (
       : context.params.slug
     if (
       indexProps.props.authUser &&
-      indexProps.props.authUser.urlSlug === urlSlug
+      (indexProps.props.authUser.userSlug === urlSlug ||
+      indexProps.props.authUser.systemSlug === urlSlug)
     ) {
       // self-view. don't use getPublicUser and use the authUser instead.
       targetUser = indexProps.props.authUser

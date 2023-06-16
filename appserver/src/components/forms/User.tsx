@@ -2,7 +2,7 @@ import apiClient from '@/lib/apiClient'
 import { SlugCheckWrapper } from '@/lib/apiConstants'
 import { useStore } from '@/lib/store'
 import { debounce } from 'lodash-es'
-import { computed, makeAutoObservable } from 'mobx'
+import { makeAutoObservable } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useState } from 'react'
 import ImageUpload, { UploadCallback } from '../ImageUpload'
@@ -11,7 +11,7 @@ import { Button, CloudinaryImage, Input, Textarea } from '../uiLib'
 class FormStore {
   name: string
   bio: string
-  inputSlug: string
+  userSlug: string
   slugWrapper: SlugCheckWrapper | undefined
   checkingSlug = true
   imageAssetId: string
@@ -21,7 +21,7 @@ class FormStore {
   constructor(user: ApiUser) {
     this.name = user.profile.name || ''
     this.bio = user.profile.bio || ''
-    this.inputSlug = user.urlSlug
+    this.userSlug = user.userSlug || ''
     this.imageAssetId = user.profile.imageAssetId || ''
     this.imageMeta = user.profile.imageMeta
     this.doSlugCheckDebounced = debounce(this._doSlugCheck, 500, {
@@ -52,8 +52,8 @@ class FormStore {
     this.imageMeta = meta
   }
 
-  setInputSlug(slug: string) {
-    this.inputSlug = slug
+  setUserSlug(slug: string) {
+    this.userSlug = slug
     this.checkingSlug = true
     this.doSlugCheckDebounced()
   }
@@ -68,11 +68,15 @@ class FormStore {
     }
   }
 
+  hasUserSlug() {
+    return !!this.userSlug.trim()
+  }
+
   _doSlugCheck() {
     apiClient
-      .getSlugCheck({ slug: this.inputSlug, provisionalName: this.name })
+      .getSlugCheck({ userSlug: this.userSlug, provisionalName: this.name })
       .then(wrapper => {
-        if (wrapper.payload.check.value === this.inputSlug) {
+        if (wrapper.payload.check.value === this.userSlug) {
           this.slugWrapper = wrapper
           this.checkingSlug = false
         }
@@ -80,15 +84,25 @@ class FormStore {
   }
 
   isPostable() {
-    // XXX length validations
-    return this.slugWrapper
-      ? this.slugWrapper.payload.check.valid &&
-          this.slugWrapper.payload.check.value === this.inputSlug
-      : false
+    if (this.hasUserSlug()) {
+      if (this.slugWrapper) {
+        return (
+          this.slugWrapper.payload.check.valid &&
+          this.slugWrapper.payload.check.value === this.userSlug
+        )
+      }
+      return false
+    }
+    // XXX other length validations
+    return true
   }
 
   slugErrorText() {
-    if (this.slugWrapper && this.slugWrapper.payload.check.errorConst) {
+    if (
+      this.hasUserSlug() &&
+      this.slugWrapper &&
+      this.slugWrapper.payload.check.errorConst
+    ) {
       const err = this.slugWrapper.payload.check.errorConst
       if (err === 'ERR_SLUG_TOO_SHORT') {
         return 'too short'
@@ -104,6 +118,13 @@ class FormStore {
       }
     }
     return false
+  }
+
+  suggestedSlug() {
+    if (this.slugWrapper && this.slugWrapper.payload.suggested) {
+      return this.slugWrapper.payload.suggested
+    }
+    return ''
   }
 }
 
@@ -138,7 +159,10 @@ const UserForm = observer(() => {
   const handleSubmit = (e: React.FormEvent) => {
     e.stopPropagation()
     e.preventDefault()
-    store.saveProfile(formStore.getApiProfile())
+    store.saveProfile(
+      formStore.getApiProfile(),
+      formStore.hasUserSlug() ? formStore.userSlug.trim() : undefined
+    )
   }
   const setName = (e: React.ChangeEvent<HTMLInputElement>) => {
     formStore.setName(e.target.value)
@@ -146,8 +170,8 @@ const UserForm = observer(() => {
   const setBio = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     formStore.setBio(e.target.value)
   }
-  const setInputSlug = (e: React.ChangeEvent<HTMLInputElement>) => {
-    formStore.setInputSlug(e.target.value)
+  const setUserSlug = (e: React.ChangeEvent<HTMLInputElement>) => {
+    formStore.setUserSlug(e.target.value)
   }
   return (
     <>
@@ -162,14 +186,18 @@ const UserForm = observer(() => {
           />
         </label>
         <label>
-          slug:
+          public username:
           <Input
             type="text"
             name="slug"
-            onChange={setInputSlug}
-            value={formStore.inputSlug}
+            onChange={setUserSlug}
+            value={formStore.userSlug}
             error={formStore.slugErrorText()}
+            placeholder={user.userSlug || ''}
           />
+          {formStore.suggestedSlug() && (
+            <span>suggestion: {formStore.suggestedSlug()}</span>
+          )}
           {formStore.slugErrorText()}
           {formStore.checkingSlug && 'checking...'}
           {JSON.stringify(formStore.slugWrapper)}

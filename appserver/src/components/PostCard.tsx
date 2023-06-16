@@ -21,7 +21,7 @@ const PostCard = observer(
     const store = useStore()
     return (
       <div className={`border p-4 ${focused ? 'border-4 bg-slate-50' : ''}`}>
-        {isSelf && <p><Link href={pathBuilder.postEdit(authUser.urlSlug, post.projectId, post.id)}>edit</Link></p>}
+        {isSelf && <p><Link href={pathBuilder.postEdit(authUser.systemSlug, post.projectId, post.id)}>edit</Link></p>}
         {isSelf && <p><Button onClick={()=>store.promptDeletePost(post)}>delete</Button></p>}
         {post.imageAssetId && <CloudinaryImage assetId={post.imageAssetId} intent="post"/>}
         <p>{post.description}</p>

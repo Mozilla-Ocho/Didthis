@@ -123,7 +123,7 @@ const ProjectForm = observer((props: Props) => {
       // whatever is currently in the user's profile for that project and
       // only updates the project's attributes.
       if (!store.user) return
-      router.push(pathBuilder.project(store.user.urlSlug, newProject.id))
+      router.push(pathBuilder.project(store.user.systemSlug, newProject.id))
     })
   }
   const setTitle = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -34,7 +34,7 @@ const ProjectPage = observer(
           {store.user && isSelf && (
             <p>
               <Link
-                href={pathBuilder.projectEdit(store.user.urlSlug, project.id)}
+                href={pathBuilder.projectEdit(store.user.systemSlug, project.id)}
               >
                 edit
               </Link>
@@ -60,7 +60,7 @@ const ProjectPage = observer(
               <>
                 <Link
                   intent="primary"
-                  href={pathBuilder.newPost(store.user.urlSlug, project.id)}
+                  href={pathBuilder.newPost(store.user.systemSlug, project.id)}
                 >
                   new post
                 </Link>
