@@ -15,22 +15,50 @@ import ImageUpload from '../ImageUpload'
 import type { UploadCallback } from '../ImageUpload'
 
 class PostStore {
-  description = ''
+  id: string
+  description: string
   // for MVP we are not giving user control over visibility at a post-level,
   // only the project level, and posts in a project are assumed public so
   // they all show up externally if the project is public.
-  scope: ApiScope = 'public'
+  scope: ApiScope
   projectId: ApiProjectId
-  linkUrl = ''
+  linkUrl: string
   fetchingUrl = ''
   fetching = false
-  imageAssetId = ''
-  imageMeta : CldImageMetaAny | CldImageMetaPublic | undefined
+  imageAssetId: string
+  imageMeta: CldImageMetaAny | CldImageMetaPublic | undefined
   error: UrlMetaError = false
-  urlMeta: ApiUrlMeta | false = false
+  urlMeta: ApiUrlMeta | false
   fetchUrlMetaAndUpdateDebounced: () => void
 
-  constructor(defaultPid: ApiProjectId) {
+  constructor(
+    mode: 'edit' | 'new',
+    defaultPid: ApiProjectId,
+    post: ApiPost | undefined
+  ) {
+    if (mode === 'new') {
+      this.id = 'new' // assigned on save
+      this.projectId = defaultPid // assigned on save if "new"
+      this.description = ''
+      this.scope = 'public'
+      this.linkUrl = ''
+      this.imageAssetId = ''
+      this.urlMeta = false
+      this.imageMeta = undefined
+    } else if (post) {
+      this.id = post.id
+      this.projectId = post.projectId
+      this.description = post.description || ''
+      this.scope = post.scope
+      this.linkUrl = post.linkUrl || ''
+      this.imageAssetId = post.imageAssetId || ''
+      this.imageMeta = post.imageMeta
+      this.urlMeta = post.urlMeta || false
+    } else {
+      throw new Error(
+        'post store must be initialized with "new", or "edit" and an api post obj'
+      )
+    }
     this.fetchUrlMetaAndUpdateDebounced = debounce(
       this.fetchUrlMetaAndUpdate,
       1000,
@@ -40,20 +68,18 @@ class PostStore {
         leading: true,
       }
     )
-    this.projectId = defaultPid
     makeAutoObservable(this, {
       fetchUrlMetaAndUpdateDebounced: false,
     })
   }
 
   getApiPost(): ApiPost {
-    const seconds = Math.floor(new Date().getTime() / 1000)
     return {
-      id: 'new', // assigned on save
-      createdAt: seconds, // asigned on save
-      updatedAt: seconds, // asigned on save
-      projectId: this.projectId, // assigned on save if "new"
-      scope: 'public',
+      id: this.id,
+      createdAt: 0, // ignored / assigned at backend
+      updatedAt: 0, // ignored / assigned at backend
+      projectId: this.projectId,
+      scope: this.scope,
       description: this.description.trim(),
       imageAssetId: this.imageAssetId || undefined,
       imageMeta: this.imageMeta,
@@ -131,7 +157,6 @@ class PostStore {
         this.urlMeta = false
       })
   }
-
 }
 
 const ProjectSelector = observer(({ postStore }: { postStore: PostStore }) => {
@@ -232,16 +257,20 @@ const ImageField = observer(({ postStore }: { postStore: PostStore }) => {
   )
 })
 
-const PostForm = observer(() => {
-  // const store = useStore();
-  // XXX spinner
+type Props = { mode: 'new' } | { mode: 'edit'; post: ApiPost }
+
+const PostForm = observer((props: Props) => {
+  const { mode } = props
   const router = useRouter()
   const store = useStore()
-  let defaultPid = getParamString(router, 'projectId')
-  if (!(store.user && store.user.profile.projects[defaultPid]))
-    defaultPid = 'new'
-  const [postStore] = useState(() => new PostStore(defaultPid))
   if (!store.user) return <></>
+  let defaultPid = getParamString(router, 'projectId')
+  if (mode === 'new' && !store.user.profile.projects[defaultPid])
+    defaultPid = 'new'
+  const [postStore] = useState(
+    () =>
+      new PostStore(mode, defaultPid, mode === 'edit' ? props.post : undefined)
+  )
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -264,7 +293,7 @@ const PostForm = observer(() => {
         <ImageField postStore={postStore} />
         <LinkField postStore={postStore} />
         <Button type="submit" disabled={!hasContent}>
-          POST
+          {mode === 'new' ? 'POST' : 'SAVE'}
         </Button>
       </form>
     </div>

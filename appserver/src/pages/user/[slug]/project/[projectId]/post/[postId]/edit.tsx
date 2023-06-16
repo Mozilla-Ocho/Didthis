@@ -1,6 +1,7 @@
 import DefaultLayout from '@/components/DefaultLayout'
 import { getServerSideProps as userPageGetServerSideProps } from '@/pages/user/[slug]'
-import ProjectPage from '@/components/pages/Project'
+import NotFound from '@/components/pages/NotFound'
+import PostEditPage from '@/components/pages/PostEdit'
 
 const Wrapper = ({
   authUser,
@@ -11,13 +12,16 @@ const Wrapper = ({
   signupCode: string | false
   targetUser: ApiUser | false
 }) => {
+  if (!targetUser) return <NotFound />
+  if (!authUser) return <NotFound />
+  if (targetUser.id !== authUser.id) return <NotFound />
   return (
     <DefaultLayout
       authUser={authUser}
       signupCode={signupCode}
       headerFooter="always"
     >
-      <ProjectPage targetUser={targetUser} />
+      <PostEditPage />
     </DefaultLayout>
   )
 }

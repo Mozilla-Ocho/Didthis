@@ -10,7 +10,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const user = await getAuthUser(req, res)
-  log.serverApi('newPost user', user)
+  log.serverApi('savePost user', user)
   if (!user) {
     const wrapper: ErrorWrapper = {
       action: 'authentication',
@@ -24,24 +24,25 @@ export default async function handler(
   }
   const millis = new Date().getTime()
   const profile = user.profile
-  log.serverApi('newPost user profile:', profile)
-  const inputPost = req.body.post
-  log.serverApi('newPost input:', inputPost)
+  log.serverApi('savePost user profile:', profile)
+  const inputPost = req.body.post as ApiPost
+  log.serverApi('savePost input:', inputPost)
   // XXX validation of post
   const post = {
     ...inputPost,
-    id: profileUtils.generateRandomAvailablePostId(profile),
-    createdAt: Math.floor(millis / 1000),
-    updatedAt: Math.floor(millis / 1000),
+  } as ApiPost
+  if (post.id === "new") {
+    post.id = profileUtils.generateRandomAvailablePostId(profile)
   }
   if (post.projectId === 'new') {
+    // note mkNewProject mutates profile
     const { projectId } = profileUtils.mkNewProject(profile)
     post.projectId = projectId
   }
   const project = profile.projects[post.projectId]
   if (!project) {
     const wrapper: ErrorWrapper = {
-      action: 'newPost',
+      action: 'savePost',
       status: 400,
       success: false,
       errorId: 'ERR_BAD_INPUT',
@@ -50,9 +51,16 @@ export default async function handler(
     res.status(400).json(wrapper)
     return
   }
+  const existingPost = project.posts[post.id]
+  if (existingPost) {
+    post.createdAt = existingPost.createdAt
+  } else {
+    post.createdAt = Math.floor(millis / 1000)
+  }
+  post.updatedAt = Math.floor(millis / 1000)
   project.posts[post.id] = post
   project.updatedAt = Math.floor(millis / 1000)
-  log.serverApi('newPost saving:', profile)
+  log.serverApi('savePost saving:', profile)
   await knex('users')
     .update({
       last_read_from_user: millis,
@@ -63,11 +71,11 @@ export default async function handler(
   user.updatedAt = millis
   user.profile = profile
   const wrapper: NewPostWrapper = {
-    action: 'newPost',
+    action: 'savePost',
     status: 200,
     success: true,
     payload: { user, post },
   }
-  log.serverApi('newPost resp:', wrapper)
+  log.serverApi('savePost resp:', wrapper)
   res.status(200).json(wrapper)
 }

@@ -53,11 +53,10 @@ class ProjectStore {
   }
 
   getApiProject(): ApiProject {
-    const seconds = Math.floor(new Date().getTime() / 1000)
     return {
-      id: this.projectId, // assigned on save
-      createdAt: seconds, // asigned on save
-      updatedAt: seconds, // asigned on save
+      id: this.projectId, // respected at backend
+      createdAt: 0, // ignored / assigned at backend
+      updatedAt: 0, // "
       title: this.title,
       scope: this.scope,
       currentStatus: this.currentStatus,

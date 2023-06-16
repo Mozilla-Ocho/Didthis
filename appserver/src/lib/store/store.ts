@@ -305,7 +305,7 @@ class Store {
 
   async savePost(post: ApiPost): Promise<ApiPost> {
     if (!this.user) throw new Error('must be authed')
-    return apiClient.newPost({ post }).then(wrapper => {
+    return apiClient.savePost({ post }).then(wrapper => {
       this.setUser(wrapper.payload.user)
       if (post.projectId === 'new') {
         this.trackEvent(trackingEvents.caNewPostNewProj)

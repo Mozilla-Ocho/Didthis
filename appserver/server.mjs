@@ -14,7 +14,7 @@ app
     server.use(
       morgan('combined', {
         skip: req => {
-          return req.path.match(/^\/_next/) || req.path.match(/favicon\.ico/)
+          return req.path.match(/^\/_+next/) || req.path.match(/favicon\.ico/)
         },
       })
     )

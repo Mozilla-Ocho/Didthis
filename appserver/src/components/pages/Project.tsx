@@ -9,7 +9,7 @@ import NotFound from './NotFound'
 import PostCard from '../PostCard'
 import { useStore } from '@/lib/store'
 
-const ProjectPage = observer(({ targetUser }: { targetUser: ApiUser }) => {
+const ProjectPage = observer(({ targetUser }: { targetUser: ApiUser | false }) => {
   // const store = useStore();
   if (!targetUser) return <NotFound>user not found</NotFound>
   const router = useRouter()
@@ -52,6 +52,7 @@ const ProjectPage = observer(({ targetUser }: { targetUser: ApiUser }) => {
           <PostCard
             key={p.id}
             post={p}
+            authUser={store.user}
             targetUser={targetUser}
             focused={focusPostId === p.id}
           />

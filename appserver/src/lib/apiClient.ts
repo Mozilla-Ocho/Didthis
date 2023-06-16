@@ -84,13 +84,13 @@ const validateSignupCode = async ({
   return wrapper
 }
 
-const newPost = async ({
+const savePost = async ({
   post,
 }: {
   post: ApiPost
 }): Promise<NewPostWrapper> => {
   const wrapper = (await wrapFetch({
-    action: 'newPost',
+    action: 'savePost',
     method: 'POST',
     body: { post },
   })) as NewPostWrapper
@@ -223,7 +223,7 @@ const apiClient = {
   getMe,
   getPublicUser,
   // postUserProfile,
-  newPost,
+  savePost,
   saveProject,
   getUrlSlug,
   postUrlSlug,

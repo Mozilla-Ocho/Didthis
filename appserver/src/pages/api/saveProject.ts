@@ -9,7 +9,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const user = await getAuthUser(req, res)
-  log.serverApi('newProject user', user)
+  log.serverApi('saveProject user', user)
   if (!user) {
     const wrapper: ErrorWrapper = {
       action: 'authentication',
@@ -23,15 +23,14 @@ export default async function handler(
   }
   const millis = new Date().getTime()
   const profile = user.profile
-  log.serverApi('newProject user profile:', profile)
+  log.serverApi('saveProject user profile:', profile)
   const inputProject = req.body.project
-  log.serverApi('newProject input:', inputProject)
+  log.serverApi('saveProject input:', inputProject)
   // XXX validation
   // XXX project writes don't behave like post writes
   // XXX rename to putProject (create+update)
   const project = {
     ...inputProject,
-    createdAt: Math.floor(millis / 1000),
     updatedAt: Math.floor(millis / 1000),
   } as ApiProject
   // this api ignores the value of "posts" as a property on the project and
@@ -40,12 +39,15 @@ export default async function handler(
   if (existingProject) {
     // do not overwrite posts in this method.
     project.posts = existingProject.posts
+    // and preserve this timestamp
+    project.createdAt = existingProject.createdAt
   } else {
     // start w/ empty posts.
     project.posts = {}
+    project.createdAt = Math.floor(millis / 1000)
   }
   profile.projects[project.id] = project
-  log.serverApi('newProject saving:', profile)
+  log.serverApi('saveProject saving:', profile)
   await knex('users')
     .update({
       last_read_from_user: millis,
@@ -56,12 +58,11 @@ export default async function handler(
   user.updatedAt = millis
   user.profile = profile
   const wrapper: NewProjectWrapper = {
-    action: 'newPost',
+    action: 'saveProject',
     status: 200,
     success: true,
     payload: { user, project },
   }
-  log.serverApi('newProject resp:', wrapper)
+  log.serverApi('saveProject resp:', wrapper)
   res.status(200).json(wrapper)
 }
-

@@ -15,6 +15,8 @@ const pathBuilder = {
   newProject: (slug: string) => user(slug) + '/project/new',
   post: (slug: string, projectId: string, postId: string) =>
     project(slug, projectId) + '/post/' + encodeURI(postId),
+  postEdit: (slug: string, projectId: string, postId: string) =>
+    project(slug, projectId) + '/post/' + encodeURI(postId) + '/edit',
   newPost: (slug: string, projectId?: string) => {
     if (projectId)
       return user(slug) + '/post?projectId=' + encodeURIComponent(projectId)
