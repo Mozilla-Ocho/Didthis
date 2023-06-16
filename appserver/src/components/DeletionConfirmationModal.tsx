@@ -4,7 +4,7 @@ import { Modal, Button } from './uiLib'
 
 const DeletionConfirmationModal = observer(() => {
   const store = useStore()
-  console.log("DeletionConfirmationModal",store.confirmingDelete)
+  // console.log("DeletionConfirmationModal",store.confirmingDelete)
   if (!store.confirmingDelete) {
     return <></>
   }

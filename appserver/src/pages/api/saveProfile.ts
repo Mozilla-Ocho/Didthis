@@ -1,8 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import type { DeleteProjectWrapper, ErrorWrapper } from '@/lib/apiConstants'
+import type { SaveProfileWrapper, ErrorWrapper } from '@/lib/apiConstants'
 import { getAuthUser } from '@/lib/serverAuth'
 import knex from '@/knex'
-// import log from '@/lib/log'
 
 export default async function handler(
   req: NextApiRequest,
@@ -22,20 +21,14 @@ export default async function handler(
   }
   const millis = new Date().getTime()
   const profile = user.profile
-  const projectId = req.body.projectId as ApiProjectId
-  const project = profile.projects[projectId]
-  if (!project) {
-    const wrapper: ErrorWrapper = {
-      action: 'deleteProject',
-      status: 400,
-      success: false,
-      errorId: 'ERR_BAD_INPUT',
-      errorMsg: 'invalid project id',
-    }
-    res.status(400).json(wrapper)
-    return
-  }
-  delete profile.projects[projectId]
+  const inputProfile = req.body.profile
+  // XXX validation
+  // this api ignores the value of "projects" as a property on the profile and
+  // preserves whats there already.
+  profile.name = inputProfile.name
+  profile.bio = inputProfile.bio
+  profile.imageAssetId = inputProfile.imageAssetId
+  profile.imageMeta = inputProfile.imageMeta
   await knex('users')
     .update({
       last_read_from_user: millis,
@@ -45,8 +38,8 @@ export default async function handler(
     .where('id', user.id)
   user.updatedAt = millis
   user.profile = profile
-  const wrapper: DeleteProjectWrapper = {
-    action: 'deleteProject',
+  const wrapper: SaveProfileWrapper = {
+    action: 'saveProfile',
     status: 200,
     success: true,
     payload: user,

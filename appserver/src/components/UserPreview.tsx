@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@/lib/store'
-import { Divider, Link } from './uiLib'
+import { Link } from './uiLib'
 import pathBuilder from '@/lib/pathBuidler'
 
 const UserPreview = observer(({ user }: { user: ApiUser }) => {
@@ -10,7 +10,7 @@ const UserPreview = observer(({ user }: { user: ApiUser }) => {
     <div className="grid gap-4 py-4 grid-cols-[auto_auto_1fr]">
       <div>((avatar))</div>
       <Link href={pathBuilder.user(user.urlSlug)}>
-        {user.fullName || 'Unnamed user'}
+        {user.profile.name || 'Unnamed user'}
       </Link>
       <div className="text-right">
         {isSelf && <Link href={pathBuilder.userEdit(user.urlSlug)}>edit</Link>}

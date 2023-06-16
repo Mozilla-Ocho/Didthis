@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import type { MeWrapper, ErrorWrapper } from '@/lib/apiConstants'
 import { getAuthUser } from '@/lib/serverAuth'
 import knex from '@/knex'
-import log from '@/lib/log'
+// import log from '@/lib/log'
 
 // the main route used by the SPA to fetch the authenticated user's own user
 // record and also asserts an authenticated session is active for the client.
@@ -10,7 +10,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const user = await getAuthUser(req, res)
+  const [user] = await getAuthUser(req, res)
   if (user) {
     const millis = new Date().getTime()
     // don't need to await this last_read_from_user column write, fire async.
@@ -24,7 +24,7 @@ export default async function handler(
       .where('id', user.id)
     user.updatedAt = millis
     const wrapper: MeWrapper = {
-      action: 'authentication',
+      action: 'getMe',
       status: 200,
       success: true,
       payload: user,
@@ -32,7 +32,7 @@ export default async function handler(
     res.status(200).json(wrapper)
   } else {
     const wrapper: ErrorWrapper = {
-      action: 'authentication',
+      action: 'me',
       status: 401,
       success: false,
       errorId: 'ERR_UNAUTHORIZED',

@@ -41,10 +41,17 @@ interface ErrorWrapper extends Wrapper {
 type EmptySuccessWrapper = SuccessWrapper
 
 interface MeWrapper extends SuccessWrapper {
+  action: 'getMe',
+  payload: ApiUser
+}
+
+interface SaveProfileWrapper extends SuccessWrapper {
+  action: 'saveProfile',
   payload: ApiUser
 }
 
 interface SavedPostWrapper extends SuccessWrapper {
+  action: 'savePost',
   payload: {
     user: ApiUser
     post: ApiPost
@@ -52,34 +59,68 @@ interface SavedPostWrapper extends SuccessWrapper {
 }
 
 interface SavedProjectWrapper extends SuccessWrapper {
+  action: 'saveProject',
   payload: {
     user: ApiUser
     project: ApiProject
   }
 }
 
+interface DeletePostWrapper extends SuccessWrapper {
+  action: 'deletePost',
+  payload: {
+    user: ApiUser
+    project: ApiProject
+  }
+}
+
+interface DeleteProjectWrapper extends SuccessWrapper {
+  action: 'deleteProject',
+  payload: ApiUser
+}
+
 interface PublicUserWrapper extends SuccessWrapper {
+  action: 'publicUser',
   payload: ApiUser
 }
 
 interface ValidateSignupCodeWrapper extends SuccessWrapper {
+  action: 'validateSignupCode',
   payload: { code: string; name: string; active: boolean }
 }
 
 interface UrlMetaWrapper extends SuccessWrapper {
+  action: 'getUrlMeta',
   payload: { urlMeta: ApiUrlMeta; url: string; }
 }
 
+interface SlugCheckWrapper extends SuccessWrapper {
+  action: 'slugCheck',
+  payload: {
+    check: SlugCheck,
+    current: string,
+    source: 'system' | 'user',
+    suggested?: string, // when source = system, the suggested user slug choice
+  }
+}
+
+type WaitlistWrapper = EmptySuccessWrapper
+
 export type {
-  Wrapper,
-  SuccessWrapper,
+  DeletePostWrapper,
+  DeleteProjectWrapper,
   EmptySuccessWrapper,
-  ErrorWrapper,
   ErrorId,
+  ErrorWrapper,
   MeWrapper,
+  PublicUserWrapper,
+  SaveProfileWrapper,
   SavedPostWrapper,
   SavedProjectWrapper,
-  PublicUserWrapper,
-  ValidateSignupCodeWrapper,
+  SlugCheckWrapper,
+  SuccessWrapper,
   UrlMetaWrapper,
+  ValidateSignupCodeWrapper,
+  WaitlistWrapper,
+  Wrapper,
 }

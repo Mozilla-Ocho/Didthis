@@ -27,10 +27,10 @@ const PostCard = observer(
         <p>{post.description}</p>
         {post.linkUrl && <LinkPreview linkUrl={post.linkUrl} urlMeta={post.urlMeta} />}
         <p>
-          created <Timestamp seconds={post.createdAt} />
+          created <Timestamp millis={post.createdAt} />
         </p>
         <p>
-          updated <Timestamp seconds={post.updatedAt} />
+          updated <Timestamp millis={post.updatedAt} />
         </p>
       </div>
     )

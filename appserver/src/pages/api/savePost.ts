@@ -9,7 +9,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const user = await getAuthUser(req, res)
+  const [user] = await getAuthUser(req, res)
   log.serverApi('savePost user', user)
   if (!user) {
     const wrapper: ErrorWrapper = {
@@ -55,11 +55,11 @@ export default async function handler(
   if (existingPost) {
     post.createdAt = existingPost.createdAt
   } else {
-    post.createdAt = Math.floor(millis / 1000)
+    post.createdAt = millis
   }
-  post.updatedAt = Math.floor(millis / 1000)
+  post.updatedAt = millis
   project.posts[post.id] = post
-  project.updatedAt = Math.floor(millis / 1000)
+  project.updatedAt = millis
   log.serverApi('savePost saving:', profile)
   await knex('users')
     .update({

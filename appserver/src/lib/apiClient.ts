@@ -8,12 +8,14 @@ import type {
   EmptySuccessWrapper,
   SavedPostWrapper,
   UrlMetaWrapper,
+  SlugCheckWrapper,
+  WaitlistWrapper,
 } from './apiConstants'
 
-const getHealthCheck = async () => {
-  const payload = await wrapFetch({ action: 'health_check' })
-  return payload
-}
+// const getHealthCheck = async () => {
+//   const payload = await wrapFetch({ action: 'health_check' })
+//   return payload
+// }
 
 const getMe = async ({
   asTestUser,
@@ -27,7 +29,7 @@ const getMe = async ({
   sessionCookie?: string
 }): Promise<MeWrapper> => {
   const fetchOpts: FetchArgs = {
-    action: 'me',
+    action: 'getMe',
     asTestUser,
     expectErrorIds: expectUnauth ? ['ERR_UNAUTHORIZED'] : undefined,
     queryParams: signupCode ? { signupCode } : undefined,
@@ -152,76 +154,50 @@ const getUrlMeta = async ({
   return wrapper
 }
 
-// const postUserProfile = async ({
-//   profile,
-// }: {
-//   profile: ApiProfile;
-// }): Promise<MeWrapper> => {
-//   let wrapper = (await wrapFetch({
-//     action: "profile",
-//     method: "POST",
-//     body: {profile},
-//   })) as MeWrapper;
-//   return wrapper;
-// };
-
-// XXX_PORTING change response shape
-const getUrlSlug = async ({
-  checkSlug,
-  asTestUser,
+const saveProfile = async ({
+  profile,
 }: {
-  checkSlug: string
-  asTestUser?: string
+  profile: ApiProfile;
+}): Promise<MeWrapper> => {
+  const wrapper = (await wrapFetch({
+    action: "saveProfile",
+    method: "POST",
+    body: {profile},
+  })) as MeWrapper;
+  return wrapper;
+};
+
+const getSlugCheck = async ({
+  slug,
+}: {
+  slug: string
 }) => {
   const qp: KvString = {}
-  if (typeof checkSlug === 'string') qp.checkSlug = checkSlug
+  qp.slug = slug
   const wrapper = await wrapFetch({
-    action: 'url_slug',
+    action: 'slugCheck',
     method: 'GET',
     queryParams: qp,
-    asTestUser,
-  })
+  }) as SlugCheckWrapper
   return wrapper
 }
 
-// XXX_PORTING change response shape
-const postUrlSlug = async ({
+const saveSlug = async ({
   slug,
-  asTestUser,
-  fullResetForTestUser,
 }: {
-  slug?: string
-  asTestUser?: string
-  fullResetForTestUser?: boolean
+  slug: string
 }) => {
   const body: POJO = {}
-  if (fullResetForTestUser) {
-    // the api backend only accepts the string "confirm" for this value
-    body.fullResetForTestUser = fullResetForTestUser
-  } else {
-    body.slug = slug
-  }
+  body.slug = slug
   const wrapper = await wrapFetch({
-    action: 'url_slug',
+    action: 'saveSlug',
     method: 'POST',
     body,
-    asTestUser,
-  })
+  }) as MeWrapper
   return wrapper
 }
 
-// XXX_PORTING change response shape
-const rawUnfurl = async ({ url }: { url: string }) => {
-  const wrapper = await wrapFetch({
-    action: 'raw_unfurl',
-    method: 'GET',
-    queryParams: { url },
-  })
-  return wrapper
-}
-
-// XXX_PORTING change response shape
-const postWaitlist = async ({
+const saveWaitlist = async ({
   email,
   landing_page,
 }: {
@@ -232,35 +208,23 @@ const postWaitlist = async ({
     action: 'waitlist',
     method: 'POST',
     body: { email, landing_page },
-  })
-  return wrapper
-}
-
-// XXX_PORTING change response shape
-const getWaitlist = async ({ id }: { id: string }) => {
-  const wrapper = await wrapFetch({
-    action: 'waitlist',
-    method: 'GET',
-    queryParams: { id },
-  })
+  }) as WaitlistWrapper
   return wrapper
 }
 
 const apiClient = {
-  getHealthCheck,
-  getMe,
-  getPublicUser,
-  // postUserProfile,
-  savePost,
-  saveProject,
   deletePost,
   deleteProject,
-  getUrlSlug,
-  postUrlSlug,
+  // getHealthCheck,
+  getMe,
+  getPublicUser,
+  getSlugCheck,
   getUrlMeta,
-  rawUnfurl,
-  postWaitlist,
-  getWaitlist,
+  savePost,
+  saveProfile,
+  saveProject,
+  saveSlug,
+  saveWaitlist,
   sessionLogin,
   sessionLogout,
   validateSignupCode,

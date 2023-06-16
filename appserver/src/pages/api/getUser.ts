@@ -15,7 +15,7 @@ export default async function handler(
     // this api returns public data only even if requested by the owner of that data.
     const user: ApiUser = userFromDbRow(dbRow, { publicFilter: true })
     const wrapper: PublicUserWrapper = {
-      action: 'getUser',
+      action: 'publicUser',
       status: 200,
       success: true,
       payload: user,
@@ -23,7 +23,7 @@ export default async function handler(
     res.status(200).json(wrapper)
   } else {
     const wrapper: ErrorWrapper = {
-      action: 'getUser',
+      action: 'publicUser',
       status: 404,
       success: false,
       errorId: 'ERR_NOT_FOUND',

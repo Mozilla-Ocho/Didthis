@@ -1,5 +1,5 @@
-const Timestamp = ({ seconds }: { seconds: number }) => {
-  const date = new Date(seconds * 1000)
+const Timestamp = ({ millis }: { millis: number }) => {
+  const date = new Date(millis)
   return <span>{date.toISOString()}</span>
 }
 

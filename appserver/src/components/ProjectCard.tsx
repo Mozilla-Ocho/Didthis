@@ -16,10 +16,10 @@ const ProjectCard = observer(
         <p>{project.currentStatus}</p>
         <p>{Object.keys(project.posts).length} posts</p>
         <p>
-          created <Timestamp seconds={project.createdAt} />
+          created <Timestamp millis={project.createdAt} />
         </p>
         <p>
-          updated <Timestamp seconds={project.updatedAt} />
+          updated <Timestamp millis={project.updatedAt} />
         </p>
       </div>
     )

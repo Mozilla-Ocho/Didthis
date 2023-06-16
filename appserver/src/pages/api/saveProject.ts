@@ -8,7 +8,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const user = await getAuthUser(req, res)
+  const [user] = await getAuthUser(req, res)
   log.serverApi('saveProject user', user)
   if (!user) {
     const wrapper: ErrorWrapper = {
@@ -31,7 +31,7 @@ export default async function handler(
   // XXX rename to putProject (create+update)
   const project = {
     ...inputProject,
-    updatedAt: Math.floor(millis / 1000),
+    updatedAt: millis,
   } as ApiProject
   // this api ignores the value of "posts" as a property on the project and
   // preserves whats there or sets to [] for new projects.
@@ -44,7 +44,7 @@ export default async function handler(
   } else {
     // start w/ empty posts.
     project.posts = {}
-    project.createdAt = Math.floor(millis / 1000)
+    project.createdAt = millis
   }
   profile.projects[project.id] = project
   log.serverApi('saveProject saving:', profile)

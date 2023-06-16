@@ -32,7 +32,6 @@ const userFromDbRow = (
     urlSlug: dbRow.url_slug,
     profile,
     createdAt: dbRow.created_at_millis,
-    fullName: dbRow.full_name || undefined,
   }
   if (!opts.publicFilter && !opts.includeAdminUIFields) {
     // DRY_47693 signup code logic
@@ -82,7 +81,7 @@ const getOrCreateUser = async ({
   id: string
   email: string
   signupCode: string | false
-}): Promise<ApiUser> => {
+}): Promise<[ApiUser,UserDbRow]> => {
   const millis = new Date().getTime()
   let dbRow = (await knex('users').where('id', id).first()) as
     | UserDbRow
@@ -106,7 +105,7 @@ const getOrCreateUser = async ({
           .returning("*")
       )[0] as UserDbRow; // "as" to coerce type as never undef, we can be sure we will get a record.
     }
-    return userFromDbRow(dbRow, { publicFilter: false })
+    return [userFromDbRow(dbRow, { publicFilter: false }), dbRow]
   }
   // else, create new
   // DRY_r9639 user creation logic
@@ -116,6 +115,7 @@ const getOrCreateUser = async ({
     id,
     email: email,
     url_slug: newSlug,
+    user_slug: false,
     profile: profileUtils.mkDefaultProfile(),
     full_name: null,
     signup_code_name: codeInfo ? codeInfo.name : null,
@@ -133,7 +133,7 @@ const getOrCreateUser = async ({
   // trackEventReqEvtOpts(req, trackingEvents.caSignup, {
   //   signupCodeName: codeInfo ? codeInfo.name : "none",
   // });
-  return userFromDbRow(dbRow, { publicFilter: false })
+  return [userFromDbRow(dbRow, { publicFilter: false }), dbRow]
 }
 
 // reads the Authorization header for the bearer token and validates it, looks
@@ -141,7 +141,7 @@ const getOrCreateUser = async ({
 const getAuthUser = (
   req: NextApiRequest,
   res: NextApiResponse
-): Promise<ApiUser | null> => {
+): Promise<[ApiUser,UserDbRow] | [false,false]> => {
   const cookies = new Cookies(req, res, {
     // explicitly tell cookies lib whether to use secure cookies, rather
     // than having it inspect the request, which won't work due to
@@ -151,7 +151,7 @@ const getAuthUser = (
   // DRY_r9725 session cookie name
   const sessionCookie = cookies.get(sessionCookieName) || ''
   // log.serverApi('sessionCookie', sessionCookie);
-  if (!sessionCookie) return Promise.resolve(null)
+  if (!sessionCookie) return Promise.resolve([false,false])
   const signupCode = getParamString(req,'signupCode') || false
   return (
     getAuth(firebaseApp)
@@ -190,7 +190,7 @@ const getAuthUser = (
       .catch(() => {
         log.serverApi('sessionCookie failed firebase verification')
         // TODO: delete cookie here?
-        return null
+        return [false,false]
       })
   )
 }

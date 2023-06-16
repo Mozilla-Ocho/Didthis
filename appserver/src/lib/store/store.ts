@@ -382,6 +382,18 @@ class Store {
       this.confirmingDelete = false
     }
   }
+
+  async saveProfile(profile: ApiProfile): Promise<void> {
+    if (!this.user) throw new Error('must be authed')
+    return apiClient.saveProfile({ profile }).then(wrapper => {
+      this.setUser(wrapper.payload)
+      // XXX tracking
+      // this.trackEvent(trackingEvents.caNewProject)
+      this.router.push(pathBuilder.user(wrapper.payload.urlSlug))
+      // return wrapper.payload
+    })
+  }
+
 }
 
 export default Store

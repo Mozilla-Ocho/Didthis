@@ -87,6 +87,15 @@ class ProjectStore {
     this.imageMeta = meta
   }
 
+  get titleMissing() {
+    return !this.title.trim()
+  }
+
+  get isPostable() {
+    // XXX length validations
+    return !!this.title.trim()
+  }
+
 }
 
 type Props = { mode: 'new' } | { mode: 'edit'; project: ApiProject }
@@ -138,7 +147,6 @@ const ProjectForm = observer((props: Props) => {
   const deleteImage = () => {
     projectStore.setImageAssetId('', undefined)
   }
-  const valid = !!projectStore.title.trim()
   return (
     <div>
       <form onSubmit={handleSubmit} method="POST">
@@ -152,7 +160,7 @@ const ProjectForm = observer((props: Props) => {
               value={projectStore.title || ''}
               onChange={setTitle}
               className="w-full"
-              error={valid ? false : 'required'}
+              error={projectStore.titleMissing ? 'required' : false}
             />
           </label>
         </div>
@@ -220,7 +228,7 @@ const ProjectForm = observer((props: Props) => {
             <Button onClick={deleteImage}>remove</Button>
           )}
         </div>
-        <Button type="submit" disabled={!valid}>
+        <Button type="submit" disabled={!projectStore.isPostable}>
           Save
         </Button>
       </form>

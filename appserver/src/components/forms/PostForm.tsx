@@ -101,6 +101,7 @@ class PostStore {
   }
 
   get isPostable() {
+    // XXX length validations
     if (this.linkUrlIsInvalid) return false
     const hasText = !!this.description.trim()
     const hasUrl = !!this.linkUrl.trim()

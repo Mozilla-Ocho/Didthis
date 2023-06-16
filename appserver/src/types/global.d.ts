@@ -3,7 +3,7 @@
 type ApiUserId = string
 type ApiPostId = string
 type ApiProjectId = string
-type ApiTimestamp = number // epoch seconds integer
+type ApiTimestamp = number // epoch milliseconds integer
 // }}}
 type ApiProjectStatus = 'active' | 'complete' | 'paused'
 type ApiScope = 'public' | 'private'
@@ -19,7 +19,6 @@ type ApiUser = {
   urlSlug: string
   profile: ApiProfile
   createdAt: number
-  fullName?: string
   signupCodeName?: string
   unsolicited?: true
   isAdmin?: true
@@ -33,6 +32,7 @@ interface UserDbRow {
   id: ApiUserid
   email: string
   url_slug: string
+  user_slug: boolean
   profile: ApiProfile
   created_at_millis: number
   updated_at_millis: number
@@ -118,4 +118,13 @@ type KvString = { [key: string]: string }
 type CldImageIntent = 'avatar' | 'post' | 'project'
 
 type UrlMetaError =  false | 'bad_url' | 'remote_fetch' | 'other'
+
+type SlugError = 'ERR_SLUG_CHARS' | 'ERR_SLUG_TOO_SHORT' | 'ERR_SLUG_TOO_LONG' | 'ERR_SLUG_UNAVAILABLE'
+
+type SlugCheck = {
+  value: string,
+  available: boolean,
+  valid: boolean,
+  errorConst?: SlugError,
+}
 

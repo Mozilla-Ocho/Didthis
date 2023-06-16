@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import type { SavedProjectWrapper, ErrorWrapper } from '@/lib/apiConstants'
+import type { DeletePostWrapper, ErrorWrapper } from '@/lib/apiConstants'
 import { getAuthUser } from '@/lib/serverAuth'
 import knex from '@/knex'
 // import log from '@/lib/log'
@@ -8,7 +8,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const user = await getAuthUser(req, res)
+  const [user] = await getAuthUser(req, res)
   if (!user) {
     const wrapper: ErrorWrapper = {
       action: 'authentication',
@@ -49,7 +49,7 @@ export default async function handler(
     return
   }
   delete project.posts[postId]
-  project.updatedAt = Math.floor(millis / 1000)
+  project.updatedAt = millis
   await knex('users')
     .update({
       last_read_from_user: millis,
@@ -59,7 +59,7 @@ export default async function handler(
     .where('id', user.id)
   user.updatedAt = millis
   user.profile = profile
-  const wrapper: SavedProjectWrapper = {
+  const wrapper: DeletePostWrapper = {
     action: 'deletePost',
     status: 200,
     success: true,

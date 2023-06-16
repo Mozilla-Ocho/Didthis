@@ -168,18 +168,48 @@ const mkNewProject = (
     }
   })
   const counter = i > 1 ? ' ' + i : ''
-  const seconds = Math.floor(new Date().getTime() / 1000)
+  const millis = new Date().getTime()
   const project: ApiProject = {
     id: projectId,
     title: 'Untitled Project' + counter,
-    createdAt: seconds,
-    updatedAt: seconds,
+    createdAt: millis,
+    updatedAt: millis,
     currentStatus: 'active',
     scope: 'private',
     posts: {},
   }
   profile.projects[project.id] = project
   return { profile, projectId, project }
+}
+
+const slugStringValidation = (
+  slug: string
+): { valid: true } | { valid: false; error: SlugError } => {
+  if (typeof slug !== 'string')
+    return {
+      valid: false,
+      error: 'ERR_SLUG_CHARS',
+    }
+  slug = slug.trim()
+  // for invalid chars regexp, use * not + because we don't want to return
+  // invalid chars on an empty string
+  if (!slug.match(/^[a-zA-Z0-9]*$/))
+    return {
+      valid: false,
+      error: 'ERR_SLUG_CHARS',
+    }
+  if (slug.length < 3)
+    return {
+      valid: false,
+      error: 'ERR_SLUG_TOO_SHORT',
+    }
+  if (slug.length > 50)
+    // DRY_35120 slug max chars
+    return {
+      valid: false,
+      error: 'ERR_SLUG_TOO_LONG',
+    }
+  return { valid: true }
 }
 
 const profileUtils = {
@@ -190,6 +220,7 @@ const profileUtils = {
   maxChars,
   mkNewProject,
   generateRandomAvailablePostId,
+  slugStringValidation,
 }
 
 export default profileUtils

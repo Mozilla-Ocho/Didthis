@@ -2,8 +2,8 @@ exports.up = function (knex) {
   return knex.schema.createTable('users', function (table) {
     table.string('id').primary()
     table.string('email').notNullable()
-    table.string('full_name')
     table.string('url_slug').notNullable()
+    table.boolean('user_slug').notNullable() // true if user chose the slug
     table.jsonb('profile').notNullable()
     table.bigInteger('created_at_millis').notNullable()
     table.bigInteger('updated_at_millis').notNullable()
