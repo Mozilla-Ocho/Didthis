@@ -94,7 +94,7 @@ const channelConfig: ChannelConfig = {
     default: true,
     test: false,
     inProdBrowser: false,
-    ssr: false,
+    ssr: true,
   },
   location: {
     default: true,
