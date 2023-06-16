@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import type { NewPostWrapper, ErrorWrapper } from '@/lib/apiConstants'
+import type { SavedPostWrapper, ErrorWrapper } from '@/lib/apiConstants'
 import { getAuthUser } from '@/lib/serverAuth'
 import knex from '@/knex'
 import profileUtils from '@/lib/profileUtils'
@@ -70,7 +70,7 @@ export default async function handler(
     .where('id', user.id)
   user.updatedAt = millis
   user.profile = profile
-  const wrapper: NewPostWrapper = {
+  const wrapper: SavedPostWrapper = {
     action: 'savePost',
     status: 200,
     success: true,

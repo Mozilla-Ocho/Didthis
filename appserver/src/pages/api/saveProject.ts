@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import type { NewProjectWrapper, ErrorWrapper } from '@/lib/apiConstants'
+import type { SavedProjectWrapper, ErrorWrapper } from '@/lib/apiConstants'
 import { getAuthUser } from '@/lib/serverAuth'
 import knex from '@/knex'
 import log from '@/lib/log'
@@ -57,7 +57,7 @@ export default async function handler(
     .where('id', user.id)
   user.updatedAt = millis
   user.profile = profile
-  const wrapper: NewProjectWrapper = {
+  const wrapper: SavedProjectWrapper = {
     action: 'saveProject',
     status: 200,
     success: true,

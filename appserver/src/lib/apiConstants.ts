@@ -44,14 +44,14 @@ interface MeWrapper extends SuccessWrapper {
   payload: ApiUser
 }
 
-interface NewPostWrapper extends SuccessWrapper {
+interface SavedPostWrapper extends SuccessWrapper {
   payload: {
     user: ApiUser
     post: ApiPost
   }
 }
 
-interface NewProjectWrapper extends SuccessWrapper {
+interface SavedProjectWrapper extends SuccessWrapper {
   payload: {
     user: ApiUser
     project: ApiProject
@@ -77,8 +77,8 @@ export type {
   ErrorWrapper,
   ErrorId,
   MeWrapper,
-  NewPostWrapper,
-  NewProjectWrapper,
+  SavedPostWrapper,
+  SavedProjectWrapper,
   PublicUserWrapper,
   ValidateSignupCodeWrapper,
   UrlMetaWrapper,

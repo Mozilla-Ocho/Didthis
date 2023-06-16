@@ -2,11 +2,11 @@ import { wrapFetch } from './apiCore'
 import type { FetchArgs } from '@/lib/apiCore'
 import type {
   MeWrapper,
-  NewProjectWrapper,
+  SavedProjectWrapper,
   PublicUserWrapper,
   ValidateSignupCodeWrapper,
   EmptySuccessWrapper,
-  NewPostWrapper,
+  SavedPostWrapper,
   UrlMetaWrapper,
 } from './apiConstants'
 
@@ -88,12 +88,12 @@ const savePost = async ({
   post,
 }: {
   post: ApiPost
-}): Promise<NewPostWrapper> => {
+}): Promise<SavedPostWrapper> => {
   const wrapper = (await wrapFetch({
     action: 'savePost',
     method: 'POST',
     body: { post },
-  })) as NewPostWrapper
+  })) as SavedPostWrapper
   return wrapper
 }
 
@@ -101,12 +101,12 @@ const saveProject = async ({
   project,
 }: {
   project: ApiProject
-}): Promise<NewProjectWrapper> => {
+}): Promise<SavedProjectWrapper> => {
   const wrapper = (await wrapFetch({
     action: 'saveProject',
     method: 'POST',
     body: { project },
-  })) as NewProjectWrapper
+  })) as SavedProjectWrapper
   return wrapper
 }
 
