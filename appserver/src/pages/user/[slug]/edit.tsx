@@ -1,6 +1,6 @@
 import DefaultLayout from '@/components/DefaultLayout'
 import { getServerSideProps as indexPageGetServerSideProps } from '@/pages/index'
-import UserEditPage from '@/pages/UserEdit'
+import UserEditPage from '@/components/pages/UserEdit'
 import NotFound from '@/components/pages/NotFound'
 
 const Wrapper = ({
