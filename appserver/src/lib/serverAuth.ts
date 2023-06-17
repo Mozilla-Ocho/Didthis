@@ -1,138 +1,173 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import { initializeApp, applicationDefault } from "firebase-admin/app";
-import { getAuth } from "firebase-admin/auth";
-import { UserProfile } from "@/lib/UserProfile";
-import type { User } from "@/lib/apiConstants";
-import Cookies from "cookies";
-import knex from "@/knex";
-import log from "@/lib/log";
-import * as constants from "@/lib/constants";
-import type { UserDbRow } from "./dbTypes";
+import type { NextApiRequest, NextApiResponse } from 'next'
+import { initializeApp, applicationDefault } from 'firebase-admin/app'
+import { getAuth } from 'firebase-admin/auth'
+import profileUtils from './profileUtils'
+import Cookies from 'cookies'
+import knex from '@/knex'
+import log from '@/lib/log'
+import { sessionCookieName, signupCodes } from './apiConstants'
+import {getParamString} from './nextUtils'
 
-let firebaseApp: ReturnType<typeof initializeApp>;
+let firebaseApp: ReturnType<typeof initializeApp>
 
 try {
   firebaseApp = initializeApp({
     credential: applicationDefault(),
-  });
+  })
 } catch (e) {
   // nextjs hot reloading / rendering throws errors in firebase initializeApp
   // about being called more than once.
 }
 
-const userFromDbRow = (dbRow: UserDbRow, opts?: any): User => {
-  // here we parse, validate, and return a polished POJO for the raw profile
-  // data in the db.  doing this here lets us do things like apply upgrades
-  // from old profile versions to new ones at read time, and proactively fail
-  // if db profile data is corrupted.
-  const profilePOJO = new UserProfile({ data: dbRow.profile }).toPOJO();
-  const user: User = {
+const userFromDbRow = (
+  dbRow: UserDbRow,
+  opts: { publicFilter: boolean; includeAdminUIFields?: boolean }
+): ApiUser => {
+  const profile = opts.publicFilter
+    ? profileUtils.privacyFilteredCopy(dbRow.profile)
+    : dbRow.profile
+  const user: ApiUser = {
     id: dbRow.id,
     email: dbRow.email,
-    urlSlug: dbRow.url_slug || undefined,
-    profile: profilePOJO,
+    systemSlug: dbRow.system_slug,
+    userSlug: dbRow.user_slug || undefined,
+    publicPageSlug: dbRow.user_slug || dbRow.system_slug,
+    profile,
     createdAt: dbRow.created_at_millis,
-    signupCodeName: dbRow.signup_code_name || "",
-  };
-  // DRY_47693 signup code logic
-  if (!dbRow.signup_code_name) user.unsolicited = true;
-  if (dbRow.admin_status === "admin") user.isAdmin = true;
-  if (dbRow.ban_status === "banned") user.isBanned = true;
-  if (opts && opts.includeAdminUIFields) {
+  }
+  if (!opts.publicFilter && !opts.includeAdminUIFields) {
+    // DRY_47693 signup code logic
+    user.signupCodeName = dbRow.signup_code_name || ''
+    if (!dbRow.signup_code_name) user.unsolicited = true
+  }
+  if (dbRow.admin_status === 'admin') user.isAdmin = true
+  if (dbRow.ban_status === 'banned') user.isBanned = true
+  if (opts.includeAdminUIFields) {
     // signupCodeName was in here but is now just always returned
     user.lastFullPageLoad = dbRow.last_read_from_user || undefined
     user.lastWrite = dbRow.last_write_from_user || undefined
     user.updatedAt = dbRow.updated_at_millis
   }
-  return user;
-};
+  return user
+}
+
+const generateRandomAvailableSystemSlug = async () => {
+  const mkRandSlug = () => {
+    const chars = 'bcdfghjkmnpqrstvwxyz23456789'
+    let slug = ''
+    for (let i = 0; i < 8; i++) {
+      slug = slug + chars[Math.floor(Math.random() * chars.length)]
+    }
+    return slug
+  }
+  let available = false
+  let slug = mkRandSlug()
+  while (!available) {
+    const dbRow = (await knex('users').where('user_slug', slug).orWhere('system_slug', slug).first()) as
+      | UserDbRow
+      | undefined
+    if (dbRow) {
+      slug = mkRandSlug()
+    } else {
+      available = true
+    }
+  }
+  return slug
+}
 
 const getOrCreateUser = async ({
   id,
   email,
+  signupCode,
 }: {
-  id: string;
-  email: string;
-}): Promise<User> => {
-  const millis = new Date().getTime();
-  let dbRow = await knex("users").where("id", id).first() as UserDbRow | undefined;
+  id: string
+  email: string
+  signupCode: string | false
+}): Promise<[ApiUser,UserDbRow]> => {
+  const millis = new Date().getTime()
+  let dbRow = (await knex('users').where('id', id).first()) as
+    | UserDbRow
+    | undefined
   // XXX_PORTING
-  // const codeInfo = validateSignupCode(req.query.signupCode || "");
+  const codeInfo = signupCode ? signupCodes[signupCode] : undefined
   if (dbRow) {
     // found
-    // if (codeInfo.codeStatus === "active" && !dbRow.signup_code_name) {
-    //   // link the user to the valid sign up code present on the request if they
-    //   // don't have one.
-    //   dbRow = (
-    //     await knex("users")
-    //       .update({
-    //         signup_code_name: codeInfo.codeName,
-    //         updated_at_millis: millis,
-    //         last_write_from_user: millis,
-    //         last_read_from_user: millis,
-    //       })
-    //       .where("id", dbRow.id)
-    //       .returning("*")
-    //   )[0];
-    // }
-    return userFromDbRow(dbRow);
+    if (codeInfo && codeInfo.active && !dbRow.signup_code_name) {
+      // link the user to the valid sign up code present on the request if they
+      // don't have one.
+      dbRow = (
+        await knex("users")
+          .update({
+            signup_code_name: codeInfo ? codeInfo.name : null,
+            updated_at_millis: millis,
+            last_write_from_user: millis,
+            last_read_from_user: millis,
+          })
+          .where("id", dbRow.id)
+          .returning("*")
+      )[0] as UserDbRow; // "as" to coerce type as never undef, we can be sure we will get a record.
+    }
+    return [userFromDbRow(dbRow, { publicFilter: false }), dbRow]
   }
   // else, create new
   // DRY_r9639 user creation logic
-  log.auth("no user found, potentially a new signup, autovivifying");
-  const defaultProfile = new UserProfile();
-  let columns: UserDbRow = {
+  log.serverApi('no user found, potentially a new signup, autovivifying')
+  const systemSlug = await generateRandomAvailableSystemSlug()
+  const columns: UserDbRow = {
     id,
     email: email,
-    url_slug: null,
-    profile: defaultProfile.toPOJO(),
-    //signup_code_name: codeInfo.codeName || null,
-    signup_code_name: null, // XXX_PORTING
+    system_slug: systemSlug,
+    user_slug: null,
+    profile: profileUtils.mkDefaultProfile(),
+    signup_code_name: codeInfo ? codeInfo.name : null,
     created_at_millis: millis,
     updated_at_millis: millis,
     last_write_from_user: millis,
     last_read_from_user: millis,
     admin_status: null,
     ban_status: null,
-  };
-  dbRow = (await knex("users").insert(columns).returning("*"))[0] as UserDbRow;
-  log.auth("created user", dbRow.id);
+  }
+  dbRow = (await knex('users').insert(columns).returning('*'))[0] as UserDbRow
+  log.serverApi('created user', dbRow.id)
   // XXX_PORTING
   // setReqAuthentication(req, dbRow); // have to set this early here so track event can obtain the new auth user id
   // trackEventReqEvtOpts(req, trackingEvents.caSignup, {
-  //   signupCodeName: codeInfo.codeName || "none",
+  //   signupCodeName: codeInfo ? codeInfo.name : "none",
   // });
-  return userFromDbRow(dbRow);
-};
+  return [userFromDbRow(dbRow, { publicFilter: false }), dbRow]
+}
 
 // reads the Authorization header for the bearer token and validates it, looks
 // up the user record if any
 const getAuthUser = (
   req: NextApiRequest,
   res: NextApiResponse
-): Promise<User | null> => {
+): Promise<[ApiUser,UserDbRow] | [false,false]> => {
   const cookies = new Cookies(req, res, {
     // explicitly tell cookies lib whether to use secure cookies, rather
     // than having it inspect the request, which won't work due to
     // x-forwarded-proto being the real value.
-    secure: process.env.NEXT_PUBLIC_ENV_NAME !== "dev",
-  });
+    secure: process.env.NEXT_PUBLIC_ENV_NAME !== 'dev',
+  })
   // DRY_r9725 session cookie name
-  const sessionCookie = cookies.get(constants.sessionCookieName) || "";
-  // console.log('sessionCookie', sessionCookie);
-  if (!sessionCookie) return Promise.resolve(null);
+  const sessionCookie = cookies.get(sessionCookieName) || ''
+  // log.serverApi('sessionCookie', sessionCookie);
+  if (!sessionCookie) return Promise.resolve([false,false])
+  const signupCode = getParamString(req,'signupCode') || false
   return (
     getAuth(firebaseApp)
-      // note that "true" here in verifySessionCookie is important, it checks the
-      // session hasn't been revoked via a password reset or direct admin call to
-      // revoke it. it slows down auth, so, TODO: check session revocation less
-      // often (on writes, on initial get /me, but not all the time - set this to
-      // false as the default and add a more specific requireRevalidatedAuth
-      // middleware that does the cookie check again with true, and use it on the
-      // specific api methods that warrant it.
-      .verifySessionCookie(sessionCookie, true)
-      .then((decodedClaims) => {
-        // console.log("decodedClaims",decodedClaims)
+      // XXX TODO: false here is insecure in that is doesn't deal with password
+      // reset invalidation of sessions. however, setting it true costs ~500ms of
+      // latency which is totally unacceptable for most pages, and with nextjs
+      // SSR it happens on every page navigation. i need to add logic to manage a
+      // nonce per user that is changed on password resets somehow, even though
+      // that happens on the firebase end of things. or perhaps implement a
+      // server-signed and validated cookie that supresses revocation checks for
+      // N minutes then expires, forcing a revocation check then reissuing the
+      // suppression cookie. and: have POST methods use revokation checks.
+      .verifySessionCookie(sessionCookie, false)
+      .then(decodedClaims => {
+        // console.serverApi("decodedClaims",decodedClaims)
         // decodedClaims looks like: {
         //   iss: 'https://session.firebase.google.com/grac3land-dev',
         //   aud: 'grac3land-dev',
@@ -146,19 +181,21 @@ const getAuthUser = (
         //   firebase: { identities: { email: [Array] }, sign_in_provider: 'password' },
         //   uid: 'IUHkIdKRZVV6S9aZ02P8Fokejqx2'
         // }
+        log.serverApi('session valid, fetching user', decodedClaims.user_id)
         return getOrCreateUser({
           id: decodedClaims.user_id,
-          email: decodedClaims.email || "",
-        });
+          email: decodedClaims.email || '',
+          signupCode,
+        })
       })
       .catch(() => {
-        console.log("sessionCookie failed firebase verification")
+        log.serverApi('sessionCookie failed firebase verification')
         // TODO: delete cookie here?
-        return null;
+        return [false,false]
       })
-  );
-};
+  )
+}
 
-const getAuthFirebaseApp = () => getAuth(firebaseApp);
+const getAuthFirebaseApp = () => getAuth(firebaseApp)
 
-export { getAuthUser, userFromDbRow, getAuthFirebaseApp };
+export { getAuthUser, userFromDbRow, getAuthFirebaseApp }
