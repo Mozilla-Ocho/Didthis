@@ -38,7 +38,7 @@ interface LinkProps extends VariantProps<typeof linkCVA> {
   href: string
   children: ReactNode
   className?: string
-  external: boolean
+  external?: boolean
 }
 
 const Link: React.FC<LinkProps> = ({
