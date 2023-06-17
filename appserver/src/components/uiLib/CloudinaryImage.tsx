@@ -12,7 +12,7 @@ const CloudinaryImage = ({
 
   // leading-none fixes space after images
   return (
-    <div className="leading-none inline-block">
+    <div className="leading-none inline-block max-w-md">
       <AdvancedImage
         cldImg={getCloudinaryTransform(intent, assetId)}
         plugins={[lazyload()]}

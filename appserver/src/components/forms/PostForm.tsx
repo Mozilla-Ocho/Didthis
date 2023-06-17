@@ -106,7 +106,7 @@ class PostStore {
     const hasText = !!this.description.trim()
     const hasUrl = !!this.linkUrl.trim()
     const hasImage = !!this.imageAssetId.trim()
-    return (hasText || hasUrl || hasImage)
+    return hasText || hasUrl || hasImage
   }
 
   setDescription(x: string) {
@@ -190,14 +190,20 @@ const ProjectSelector = observer(({ postStore }: { postStore: PostStore }) => {
   nameAndId.unshift(['Create a new project', 'new'])
   return (
     <div>
-      <p>Project:</p>
-      <Select onChange={handleChangeProject} value={postStore.projectId}>
-        {nameAndId.map(nid => (
-          <option key={nid[1]} value={nid[1]}>
-            {nid[0]}
-          </option>
-        ))}
-      </Select>
+      <label htmlFor="project-selector">
+        Project:
+        <Select
+          id="project-selector"
+          onChange={handleChangeProject}
+          value={postStore.projectId}
+        >
+          {nameAndId.map(nid => (
+            <option key={nid[1]} value={nid[1]}>
+              {nid[0]}
+            </option>
+          ))}
+        </Select>
+      </label>
     </div>
   )
 })
@@ -208,9 +214,10 @@ const DescriptionField = observer(({ postStore }: { postStore: PostStore }) => {
   }
   return (
     <>
-      <label>
+      <label htmlFor="description-field">
         description:
         <Textarea
+          id="description-field"
           placeholder="Write your update here..."
           name="description"
           value={postStore.description}
@@ -227,9 +234,10 @@ const LinkField = observer(({ postStore }: { postStore: PostStore }) => {
   }
   return (
     <>
-      <label>
+      <label htmlFor="linkField">
         link:
         <Input
+          id="linkField"
           type="text"
           name="linkUrl"
           value={postStore.linkUrl}
@@ -241,9 +249,14 @@ const LinkField = observer(({ postStore }: { postStore: PostStore }) => {
           urlMeta={postStore.urlMeta}
           linkUrl={postStore.linkUrl}
         />
-        <p>fetching: {JSON.stringify(postStore.fetching)}</p>
-        <p>urlMeta: {JSON.stringify(postStore.urlMeta)}</p>
-        <p>error: {JSON.stringify(postStore.error)}</p>
+        {postStore.fetching && <p>loading preview...</p>}
+        {postStore.error === 'bad_url' && <p>this URL appears to be invalid</p>}
+        {postStore.error === 'remote_fetch' && (
+          <p>error loading this page for a preview</p>
+        )}
+        {postStore.error === 'other' && (
+          <p>oops, unexpected error fetching a preview</p>
+        )}
       </label>
     </>
   )
@@ -264,8 +277,14 @@ const ImageField = observer(({ postStore }: { postStore: PostStore }) => {
       {postStore.imageAssetId && (
         <CloudinaryImage assetId={postStore.imageAssetId} intent="post" />
       )}
-      <ImageUpload intent="post" onUploadWithUseCallback={onResult} />
-      {postStore.imageAssetId && <Button onClick={deleteImage}>remove</Button>}
+      {!postStore.imageAssetId && (
+        <ImageUpload intent="post" onUploadWithUseCallback={onResult} />
+      )}
+      {postStore.imageAssetId && (
+        <Button intent="link" onClick={deleteImage}>
+          remove
+        </Button>
+      )}
     </div>
   )
 })
@@ -298,7 +317,6 @@ const PostForm = observer((props: Props) => {
   return (
     <div>
       <form onSubmit={handleSubmit} method="POST">
-        <label>post content:</label>
         <ProjectSelector postStore={postStore} />
         <DescriptionField postStore={postStore} />
         <ImageField postStore={postStore} />

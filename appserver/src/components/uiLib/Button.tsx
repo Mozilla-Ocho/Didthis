@@ -9,6 +9,7 @@ const buttonCVA = cva(
       intent: {
         primary: ['bg-primary', 'hover:bg-primary-hover'],
         secondary: ['bg-secondary', 'hover:bg-secondary-hover'],
+        link: ['underline', 'text', 'text-blue-600', 'hover:text-blue-800','p-0'],
       },
       size: {
         small: ['text-sm'],

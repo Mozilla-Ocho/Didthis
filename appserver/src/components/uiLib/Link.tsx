@@ -38,6 +38,7 @@ interface LinkProps extends VariantProps<typeof linkCVA> {
   href: string
   children: ReactNode
   className?: string
+  external: boolean
 }
 
 const Link: React.FC<LinkProps> = ({
@@ -46,7 +47,20 @@ const Link: React.FC<LinkProps> = ({
   size,
   className,
   children,
+  external,
 }) => {
+  if (external) {
+    return (
+      <a
+        rel="nofollow noreferer"
+        target="_blank"
+        className={linkCVA({ intent, size, className })}
+        href={href}
+      >
+        {children}
+      </a>
+    )
+  }
   return (
     <NextLink className={linkCVA({ intent, size, className })} href={href}>
       {children}

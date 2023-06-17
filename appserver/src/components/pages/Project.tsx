@@ -22,7 +22,7 @@ const ProjectPage = observer(
     const project = targetUser.profile.projects[projectId]
     if (!project) return <NotFound>project not found</NotFound>
     const posts = Object.values(project.posts)
-    posts.sort((a, b) => a.createdAt - b.createdAt)
+    posts.sort((a, b) => b.createdAt - a.createdAt)
     return (
       <>
         <div>
@@ -34,7 +34,10 @@ const ProjectPage = observer(
           {store.user && isSelf && (
             <p>
               <Link
-                href={pathBuilder.projectEdit(store.user.systemSlug, project.id)}
+                href={pathBuilder.projectEdit(
+                  store.user.systemSlug,
+                  project.id
+                )}
               >
                 edit
               </Link>
@@ -42,7 +45,10 @@ const ProjectPage = observer(
           )}
           {store.user && isSelf && (
             <p>
-              <Button onClick={() => store.promptDeleteProject(project)}>
+              <Button
+                intent="link"
+                onClick={() => store.promptDeleteProject(project)}
+              >
                 delete
               </Button>
             </p>
@@ -67,18 +73,20 @@ const ProjectPage = observer(
                 <Divider />
               </>
             )}
-          {/* even though we return above if targetUser is falsy, because map is
+          <div className="grid grid-cols-1 gap-4">
+            {/* even though we return above if targetUser is falsy, because map is
            passed a function, typescript can't assert that inside that function
            scope that targetUser is still surely not false. hence "as ApiUser"*/}
-          {posts.map(p => (
-            <PostCard
-              key={p.id}
-              post={p}
-              authUser={store.user}
-              targetUser={targetUser as ApiUser}
-              focused={focusPostId === p.id}
-            />
-          ))}
+            {posts.map(p => (
+              <PostCard
+                key={p.id}
+                post={p}
+                authUser={store.user}
+                targetUser={targetUser as ApiUser}
+                focused={focusPostId === p.id}
+              />
+            ))}
+          </div>
         </div>
       </>
     )

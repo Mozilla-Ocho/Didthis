@@ -1,13 +1,13 @@
 import { observer } from 'mobx-react-lite'
-import { Icon } from '@/components/uiLib'
+import { Icon, Link } from '@/components/uiLib'
 
 const ellipsis = (s: string, len: number): string =>
   s.length > len ? s.substring(0, len) + '...' : s
 
 const mkLink = (url: string, text?: string) => (
-  <a href={url} rel="nofollow noreferrer" target="_blank">
+  <Link external href={url}>
     {text ? text : ellipsis(url, 100)}
-  </a>
+  </Link>
 )
 
 const StyledLinkPreview = ({

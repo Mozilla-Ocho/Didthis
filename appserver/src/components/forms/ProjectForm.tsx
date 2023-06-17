@@ -32,7 +32,7 @@ class ProjectStore {
     if (mode === 'new') {
       const profileCopy = JSON.parse(JSON.stringify(profile)) as ApiProfile
       const r = profileUtils.mkNewProject(profileCopy)
-      this.title = r.project.title
+      this.title = '' // not using r.project.title, we want user to specify
       this.description = r.project.description || ''
       this.scope = r.project.scope
       this.projectId = r.project.id
@@ -95,7 +95,6 @@ class ProjectStore {
     // XXX length validations
     return !!this.title.trim()
   }
-
 }
 
 type Props = { mode: 'new' } | { mode: 'edit'; project: ApiProject }
@@ -220,12 +219,16 @@ const ProjectForm = observer((props: Props) => {
               intent="project"
             />
           )}
-          <ImageUpload
-            intent="project"
-            onUploadWithUseCallback={onImageUpload}
-          />
+          {!projectStore.imageAssetId && (
+            <ImageUpload
+              intent="project"
+              onUploadWithUseCallback={onImageUpload}
+            />
+          )}
           {projectStore.imageAssetId && (
-            <Button onClick={deleteImage}>remove</Button>
+            <Button intent="link" onClick={deleteImage}>
+              remove
+            </Button>
           )}
         </div>
         <Button type="submit" disabled={!projectStore.isPostable()}>

@@ -6,7 +6,7 @@ const ProjectList = observer(({ targetUser }: { targetUser: ApiUser }) => {
   const store = useStore()
   if (store.user && store.user.id === targetUser.id) targetUser = store.user // reactivity
   const projects = Object.values(targetUser.profile.projects)
-  projects.sort((a, b) => a.createdAt - b.createdAt)
+  projects.sort((a, b) => b.createdAt - a.createdAt)
   return (
     <>
       <div>

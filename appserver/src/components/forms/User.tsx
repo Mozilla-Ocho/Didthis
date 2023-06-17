@@ -143,8 +143,14 @@ const ImageField = observer(({ formStore }: { formStore: FormStore }) => {
       {formStore.imageAssetId && (
         <CloudinaryImage assetId={formStore.imageAssetId} intent="avatar" />
       )}
-      <ImageUpload intent="avatar" onUploadWithUseCallback={onResult} />
-      {formStore.imageAssetId && <Button onClick={deleteImage}>remove</Button>}
+      {!formStore.imageAssetId && (
+        <ImageUpload intent="avatar" onUploadWithUseCallback={onResult} />
+      )}
+      {formStore.imageAssetId && (
+        <Button intent="link" onClick={deleteImage}>
+          remove
+        </Button>
+      )}
     </div>
   )
 })
