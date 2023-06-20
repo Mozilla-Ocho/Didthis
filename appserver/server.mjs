@@ -1,7 +1,7 @@
 import express from 'express'
 import morgan from 'morgan'
 import next from 'next'
-import Cookies from 'Cookies'
+import Cookies from 'cookies'
 import crypto from 'crypto'
 
 const dev = process.env.NODE_ENV !== 'production'
