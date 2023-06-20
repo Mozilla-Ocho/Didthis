@@ -7,7 +7,22 @@ import util from 'util'
 import {v2 as cloudinary} from 'cloudinary'
 import profileUtils from '@/lib/profileUtils'
 
-const cloudinarySecret = process.env.CLOUDINARY_JSON_SECRET ? JSON.parse(process.env.CLOUDINARY_JSON_SECRET) : false
+const getParseB64Json = (str:string | undefined) : POJO | false => {
+  if (!str || !str.trim()) return false
+  if (typeof window !== 'undefined') {
+    return JSON.parse(window.atob(str)) as POJO
+  } else {
+    return JSON.parse(Buffer.from(str,'utf8').toString('base64')) as POJO
+  }
+}
+
+type CloudinarySecret = {
+  cloud_name: string,
+  api_key: string,
+  api_secret: string,
+  upload_preset: string,
+}
+const cloudinarySecret = getParseB64Json(process.env.CLOUDINARY_JSON_SECRET_B64) as CloudinarySecret | false
 
 if (cloudinarySecret) {
   cloudinary.config({

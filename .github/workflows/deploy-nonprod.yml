@@ -77,7 +77,7 @@ jobs:
           -t $IMAGE_PATH/appserver:$IMAGE_TAG \
           -t $IMAGE_PATH/appserver:latest \
           --cache-from $IMAGE_PATH/appserver:latest \
-          --build-arg CLOUDINARY_JSON_SECRET="${{secrets.CLOUDINARY_JSON_SECRET}}" \
+          --build-arg CLOUDINARY_JSON_SECRET_B64="${{secrets.CLOUDINARY_JSON_SECRET_B64}}" \
           --build-arg ZYTE_SPLASH_USERNAME="${{secrets.ZYTE_SPLASH_USERNAME}}" \
           --build-arg NEXT_PUBLIC_ENV_NAME="${{vars.NEXT_PUBLIC_ENV_NAME}}" \
           --build-arg NEXT_PUBLIC_API_ENDPOINT="${{vars.NEXT_PUBLIC_API_ENDPOINT}}" \
