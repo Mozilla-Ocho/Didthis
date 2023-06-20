@@ -21,12 +21,18 @@ const getMe = async ({
   asTestUser,
   signupCode,
   expectUnauth,
+  // this call accepts a sessionCookie value because in SSR, the
+  // getServerSideProps function will call the api from the server, and needs
+  // to pass the client's cookie value in. in browser context, the cookie
+  // is sent automatically. likewise for csrf cookie.
   sessionCookie,
+  csrfCookie,
 }: {
   asTestUser?: string
   signupCode?: string | false
   expectUnauth?: boolean
   sessionCookie?: string
+  csrfCookie?: string
 }): Promise<MeWrapper> => {
   const fetchOpts: FetchArgs = {
     action: 'getMe',
@@ -34,6 +40,7 @@ const getMe = async ({
     expectErrorIds: expectUnauth ? ['ERR_UNAUTHORIZED'] : undefined,
     queryParams: signupCode ? { signupCode } : undefined,
     sessionCookie,
+    csrfCookie,
   }
   const wrapper = (await wrapFetch(fetchOpts)) as MeWrapper
   return wrapper

@@ -6,7 +6,7 @@ import type {
   SuccessWrapper,
   ErrorId,
 } from './apiConstants'
-import { sessionCookieName } from './apiConstants'
+import { sessionCookieName, csrfCookieName } from './apiConstants'
 
 // endpoint is the scheme, domain, and port of the api backend
 // XXX_PORTING setup var
@@ -23,6 +23,7 @@ type FetchArgs = {
   queryParams?: QueryParams
   body?: POJO
   sessionCookie?: string
+  csrfCookie?: string
   asTestUser?: string
   expectErrorStatuses?: number[]
   expectErrorIds?: ErrorId[]
@@ -74,11 +75,19 @@ const wrapFetch = async (fetchArgs: FetchArgs): Promise<SuccessWrapper> => {
     retries,
     body,
     sessionCookie,
+    csrfCookie,
     asTestUser,
     expectErrorIds,
     expectErrorStatuses,
   } = fetchArgs
-  const queryParams = fetchArgs.queryParams || {}
+  const queryParams = fetchArgs.queryParams ? JSON.parse(JSON.stringify(fetchArgs.queryParams)) as QueryParams : {}
+  if (csrfCookie) {
+    // in ssr
+    queryParams.csrf = csrfCookie
+  } else {
+    // in browser
+    queryParams.csrf = Cookies.get(csrfCookieName) || ''
+  }
   try {
     if (process.env.NODE_ENV === 'development') {
       if (asTestUser) {
@@ -99,20 +108,22 @@ const wrapFetch = async (fetchArgs: FetchArgs): Promise<SuccessWrapper> => {
         Accept: 'application/json',
       },
     }
+    const cookieBits: string[] = []
     if (sessionCookie) {
-      config.headers['Cookie'] =
-        sessionCookieName + '=' + sessionCookie
+      cookieBits.push(sessionCookieName + '=' + sessionCookie)
     }
-    if (method === 'POST') {
+    if (csrfCookie) {
+      cookieBits.push(csrfCookieName+ '=' + csrfCookie)
+    }
+    if (cookieBits.length) {
+      config.headers['Cookie'] = cookieBits.join('; ')
+    } 
+    if (typeof body !== undefined) {
       config.headers['Content-Type'] = 'application/json'
-      if (typeof body === 'object') {
-        const bodyWithCsrfToken: POJO = { ...body }
-        if (inBrowserContext) {
-          bodyWithCsrfToken['csrf'] = Cookies.get('_csrf') || '' // XXX_PORTING changed name from _grac_csrf
-        }
-        config.body = JSON.stringify(bodyWithCsrfToken)
-      } else {
+      if (typeof config.body === 'string') {
         config.body = body
+      } else {
+        config.body = JSON.stringify(body)
       }
     }
     log.api('fetching', action, queryParams, config)

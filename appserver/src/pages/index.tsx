@@ -2,7 +2,8 @@ import apiClient from '@/lib/apiClient'
 import DefaultLayout from '@/components/DefaultLayout'
 import Home from '@/components/pages/Home'
 import { GetServerSidePropsContext } from 'next'
-import { sessionCookieName } from '@/lib/apiConstants'
+import { sessionCookieName, csrfCookieName } from '@/lib/apiConstants'
+import log from '@/lib/log'
 
 const Wrapper = ({
   authUser,
@@ -32,10 +33,13 @@ export const getServerSideProps = async (
   const signupCode = url.searchParams.get('signupCode') || false
   let authUser: ApiUser | false = false
   const sessionCookie = context.req.cookies[sessionCookieName]
+  const csrfCookie = context.req.cookies[csrfCookieName]
+  log.serverApi('sessionCookie:',sessionCookie ? sessionCookie.substring(0,10):false,'csrfCookie',csrfCookie)
   if (sessionCookie) {
+    log.serverApi('literraly cally thie fucking api now')
     authUser = (
       await apiClient
-        .getMe({ sessionCookie, signupCode, expectUnauth: true })
+        .getMe({ sessionCookie, csrfCookie, signupCode, expectUnauth: true })
         .catch(() => {
           return { payload: false }
         })

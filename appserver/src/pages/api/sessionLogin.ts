@@ -29,6 +29,7 @@ export default async function handler(
         const options = {
           maxAge: authCookieMaxAge,
           httpOnly: true,
+          sameSite: 'lax' as const,
           // explicitly tell cookies lib whether to use secure cookies, rather
           // than having it inspect the request, which won't work due to
           // x-forwarded-proto being the real value.
