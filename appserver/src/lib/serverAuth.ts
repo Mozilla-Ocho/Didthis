@@ -188,8 +188,9 @@ const getAuthUser = (
           signupCode,
         })
       })
-      .catch(() => {
+      .catch((e) => {
         log.serverApi('sessionCookie failed firebase verification')
+        log.serverApi('caught error:',e)
         // TODO: delete cookie here?
         return [false,false]
       })
