@@ -9,8 +9,7 @@ import type {
 import { sessionCookieName, csrfCookieName } from './apiConstants'
 
 // endpoint is the scheme, domain, and port of the api backend
-// XXX_PORTING setup var
-const endpoint = 'http://localhost:3000' //process.env.REACT_APP_API_ENDPOINT;
+const endpoint = process.env.NEXT_PUBLIC_API_ENDPOINT;
 
 const inBrowserContext = typeof window !== 'undefined'
 

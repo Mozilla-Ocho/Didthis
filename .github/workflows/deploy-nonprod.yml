@@ -80,6 +80,7 @@ jobs:
           --build-arg CLOUDINARY_JSON_SECRET="${{secrets.CLOUDINARY_JSON_SECRET}}" \
           --build-arg ZYTE_SPLASH_USERNAME="${{secrets.ZYTE_SPLASH_USERNAME}}" \
           --build-arg NEXT_PUBLIC_ENV_NAME="${{vars.NEXT_PUBLIC_ENV_NAME}}" \
+          --build-arg NEXT_PUBLIC_API_ENDPOINT="${{vars.NEXT_PUBLIC_API_ENDPOINT}}" \
           .
         docker push $IMAGE_PATH/appserver:$IMAGE_TAG
         docker push $IMAGE_PATH/appserver:latest
