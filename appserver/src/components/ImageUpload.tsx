@@ -27,7 +27,7 @@ const ImageUpload = ({
   onUploadWithUseCallback: (result: UploadResult) => void
 }) => {
   const [widget, setWidget] = useState<Widget>()
-  const [,setRerenderDummyFn] = useState(0)
+  const [, setRerenderDummyFn] = useState(0)
 
   const launchWidget = () => {
     if (widget) widget.open()
@@ -40,8 +40,8 @@ const ImageUpload = ({
     if (!win.cloudinary) {
       // window global cloudinary lib might not be loaded yet. is there a
       // better way to retrigger useEffect after a timeout?
-      setTimeout(()=>setRerenderDummyFn(new Date().getTime()),20)
-      return;
+      setTimeout(() => setRerenderDummyFn(new Date().getTime()), 20)
+      return
     }
     const theWidget = win.cloudinary.createUploadWidget(
       config,
@@ -111,6 +111,10 @@ const ImageUpload = ({
             info: result.info,
           })
         }
+        setTimeout(() => {
+          // this is insane. but cloudinary widget doesn't clean up properly.
+          document.body.style.overflow = 'auto'
+        }, 100)
       }
     ) as Widget
     setWidget(theWidget)
