@@ -3,7 +3,7 @@ import DefaultLayout from '@/components/DefaultLayout'
 import Home from '@/components/pages/Home'
 import { GetServerSidePropsContext } from 'next'
 import { sessionCookieName, csrfCookieName } from '@/lib/apiConstants'
-import log from '@/lib/log'
+// import log from '@/lib/log'
 
 const Wrapper = ({
   authUser,
@@ -34,9 +34,7 @@ export const getServerSideProps = async (
   let authUser: ApiUser | false = false
   const sessionCookie = context.req.cookies[sessionCookieName]
   const csrfCookie = context.req.cookies[csrfCookieName]
-  log.serverApi('sessionCookie:',sessionCookie ? sessionCookie.substring(0,10):false,'csrfCookie',csrfCookie)
   if (sessionCookie) {
-    log.serverApi('literraly cally thie fucking api now')
     authUser = (
       await apiClient
         .getMe({ sessionCookie, csrfCookie, signupCode, expectUnauth: true })
