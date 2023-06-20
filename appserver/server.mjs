@@ -27,7 +27,12 @@ app
     // assigned one. just a random uuid. POST requests require the api client to
     // include the value of this cookie as part of the body.
     server.use((req, res, next) => {
-      const cookies = new Cookies(req, res)
+      const cookies = new Cookies(req, res, {
+        // we have to force the cookie lib to believe the connection is secure.
+        // the appserver is non-tls and behind a tls terminating proxy.
+        // x-forwarded-proto is https but the library doesn't know to trust that.
+        secure: process.env.NEXT_PUBLIC_ENV_NAME !== 'dev',
+      })
       const csrfCookie = cookies.get(csrfCookieName) || ''
       if (!csrfCookie) {
         const options = {
@@ -46,7 +51,9 @@ app
 
     // ensure csrf query param matches csrf cookie on write requests
     server.use((req, res, next) => {
-      const cookies = new Cookies(req, res)
+      const cookies = new Cookies(req, res, {
+        secure: process.env.NEXT_PUBLIC_ENV_NAME !== 'dev',
+      })
       const csrfCookie = cookies.get(csrfCookieName) || ''
       const csrfParam = req.query.csrf
         ? Array.isArray(req.query.csrf)

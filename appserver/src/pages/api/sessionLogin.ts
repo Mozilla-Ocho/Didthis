@@ -16,7 +16,12 @@ export default async function handler(
   // handler once a valid session cookie is detected on subsequent requests.
   const idToken = req.body.idToken.toString()
   // console.log("sessionLogin idToken:",idToken)
-  const cookies = new Cookies(req, res)
+  const cookies = new Cookies(req, res, {
+    // we have to force the cookie lib to believe the connection is secure.
+    // the appserver is non-tls and behind a tls terminating proxy.
+    // x-forwarded-proto is https but the library doesn't know to trust that.
+    secure: process.env.NEXT_PUBLIC_ENV_NAME !== 'dev',
+  })
   // note that 'expiresIn' option for the firebase createSessionCookie sdk
   // method is the behavior of the 'maxAge' option in the Cookies sdk, whereas
   // in Cookies sdk, there is no 'expiresIn' field but there is an 'expires'
@@ -30,9 +35,6 @@ export default async function handler(
           maxAge: authCookieMaxAge,
           httpOnly: true,
           sameSite: 'lax' as const,
-          // explicitly tell cookies lib whether to use secure cookies, rather
-          // than having it inspect the request, which won't work due to
-          // x-forwarded-proto being the real value.
           secure: process.env.NEXT_PUBLIC_ENV_NAME !== 'dev',
         }
         // DRY_r9725 session cookie name
