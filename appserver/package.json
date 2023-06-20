@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "yarn && nodemon server.mjs",
     "build": "next build",
-    "start": "next start",
+    "start": "yarn && nodemon server.mjs",
     "lint": "next lint",
     "validate": "next lint; tsc --noEmit",
     "prettier-check": "prettier --ignore-path .gitignore -c **/*.{mjs,js,jsx,ts,tsx}",
