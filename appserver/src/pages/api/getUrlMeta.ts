@@ -8,11 +8,14 @@ import {v2 as cloudinary} from 'cloudinary'
 import profileUtils from '@/lib/profileUtils'
 
 const getParseB64Json = (str:string | undefined) : POJO | false => {
+  // console.log("debug str:",str)
   if (!str || !str.trim()) return false
   if (typeof window !== 'undefined') {
+    // console.log("debug atob:",window.atob(str))
     return JSON.parse(window.atob(str)) as POJO
   } else {
-    return JSON.parse(Buffer.from(str,'utf8').toString('base64')) as POJO
+    // console.log("debug buffer decoded:",Buffer.from(str, 'base64').toString('utf8'))
+    return JSON.parse(Buffer.from(str, 'base64').toString('utf8')) as POJO
   }
 }
 
@@ -22,6 +25,7 @@ type CloudinarySecret = {
   api_secret: string,
   upload_preset: string,
 }
+// console.log("debug CLOUDINARY_JSON_SECRET_B64:",JSON.stringify(process.env.CLOUDINARY_JSON_SECRET_B64))
 const cloudinarySecret = getParseB64Json(process.env.CLOUDINARY_JSON_SECRET_B64) as CloudinarySecret | false
 
 if (cloudinarySecret) {
