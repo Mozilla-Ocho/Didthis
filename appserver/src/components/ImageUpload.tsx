@@ -123,7 +123,7 @@ const ImageUpload = ({
 
   return (
     <>
-      <Button intent="primary" onClick={launchWidget}>
+      <Button intent="secondary" onClick={launchWidget}>
         Choose Image
       </Button>
     </>

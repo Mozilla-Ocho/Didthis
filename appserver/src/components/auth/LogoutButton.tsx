@@ -19,7 +19,7 @@ const LogoutButton = observer(
       store.logOut()
       onLogout && onLogout()
     }
-    const defaultText = 'Log Out'
+    const defaultText = 'Sign out'
     return (
       <Button
         onClick={handleClick}

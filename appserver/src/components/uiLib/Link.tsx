@@ -7,10 +7,24 @@ const linkCVA = cva('link', {
     intent: {
       link: [
         'underline',
-        'text',
-        'text-blue-600',
-        'hover:text-blue-800',
-        'visited:text-purple-600',
+        'text-links',
+        'hover:text-links-hover',
+        'visited:text-links',
+        'active:text-links-active',
+      ],
+      internalNav: [
+        'text-links',
+        'hover:text-links-hover',
+        'hover:underline',
+        'visited:text-links',
+        'active:text-links-active',
+      ],
+      logo: [
+        'text-yellow-500',
+        'hover:text-yellow-500',
+        'hover:underline',
+        'visited:text-yellow-500',
+        'active:text-links-active',
       ],
       primary: [
         'inline-block',
@@ -23,14 +37,9 @@ const linkCVA = cva('link', {
         'rounded',
       ],
     },
-    size: {
-      small: ['text-sm'],
-      medium: ['text-base'],
-    },
   },
   defaultVariants: {
     intent: 'link',
-    size: 'medium',
   },
 })
 
@@ -44,7 +53,6 @@ interface LinkProps extends VariantProps<typeof linkCVA> {
 const Link: React.FC<LinkProps> = ({
   href,
   intent,
-  size,
   className,
   children,
   external,
@@ -54,7 +62,7 @@ const Link: React.FC<LinkProps> = ({
       <a
         rel="nofollow noreferer"
         target="_blank"
-        className={linkCVA({ intent, size, className })}
+        className={linkCVA({ intent, className })}
         href={href}
       >
         {children}
@@ -62,7 +70,7 @@ const Link: React.FC<LinkProps> = ({
     )
   }
   return (
-    <NextLink className={linkCVA({ intent, size, className })} href={href}>
+    <NextLink className={linkCVA({ intent, className })} href={href}>
       {children}
     </NextLink>
   )

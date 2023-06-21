@@ -17,6 +17,7 @@
 body {
   color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-rgb));
+  font-family: Rubik, sans-serif;
 }
 
 /* hack the firebase ui card to fit the modal */
