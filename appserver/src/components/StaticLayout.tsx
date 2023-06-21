@@ -4,20 +4,28 @@ import type { ReactNode } from 'react'
 
 const StaticLayout = ({
   children,
+  isHome,
   withHeaderFooter,
 }: {
   children: ReactNode
+  isHome?: boolean
   withHeaderFooter: boolean
 }) => {
-  return (
-    <div className="max-w-[800px] mx-auto">
-      {withHeaderFooter && <AppHeader />}
-      <div className="py-8">
-      {children}
+  if (withHeaderFooter) {
+    return (
+      <div className="max-w-[800px] mx-auto grid grid-rows-[auto_auto_1fr] h-screen gid">
+        <AppHeader isHome={isHome} />
+        <div>{children}</div>
+        <AppFooter isHome={isHome} />
       </div>
-      {withHeaderFooter && <AppFooter />}
-    </div>
-  )
+    )
+  } else {
+    return (
+      <div className="max-w-[800px] mx-auto grid grid-rows-1 h-screen">
+        {children}
+      </div>
+    )
+  }
 }
 
 export default StaticLayout

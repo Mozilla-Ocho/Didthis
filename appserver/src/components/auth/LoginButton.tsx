@@ -23,7 +23,7 @@ const LoginButton = observer(
     const handleClick = () => {
       store.launchGlobalLoginOverlay(!!overrideCodeCheck)
     }
-    const defaultText = store.signupCode ? 'Sign Up' : 'Log In'
+    const defaultText = store.signupCode ? 'Create account' : 'Sign in'
     return (
       <Button
         onClick={handleClick}

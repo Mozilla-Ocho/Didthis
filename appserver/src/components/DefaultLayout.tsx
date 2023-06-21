@@ -12,9 +12,11 @@ import {useRouter} from 'next/router'
 const Inner = observer(
   ({
     headerFooter,
+    isHome,
     children,
   }: {
     headerFooter: 'always' | 'authed' | 'never'
+    isHome?: boolean
     children: ReactNode
   }) => {
     const store = useStore()
@@ -24,7 +26,7 @@ const Inner = observer(
       return (
         <StoreLoadingWrapper ifLoading={<p>loading</p>}>
           <LoginGlobalOverlay />
-          <StaticLayout withHeaderFooter={hf}><HomeUnsolicited /></StaticLayout>
+          <StaticLayout withHeaderFooter={hf} isHome={isHome}><HomeUnsolicited /></StaticLayout>
         </StoreLoadingWrapper>
       )
     }
@@ -32,7 +34,7 @@ const Inner = observer(
       <StoreLoadingWrapper ifLoading={<p>loading</p>}>
         <LoginGlobalOverlay />
         <DeletionConfirmationModal />
-        <StaticLayout withHeaderFooter={hf}>{children}</StaticLayout>
+        <StaticLayout withHeaderFooter={hf} isHome={isHome}>{children}</StaticLayout>
       </StoreLoadingWrapper>
     )
   }
@@ -42,17 +44,19 @@ export default function DefaultLayout({
   authUser,
   signupCode,
   headerFooter,
+  isHome,
   children,
 }: {
   authUser: ApiUser | false
   signupCode: false | string
   headerFooter: 'always' | 'authed' | 'never'
+  isHome?: boolean
   children: ReactNode // ReactNode not ReactElement
 }) {
   const router = useRouter()
   return (
     <StoreWrapper authUser={authUser} signupCode={signupCode} router={router}>
-      <Inner headerFooter={headerFooter}>{children}</Inner>
+      <Inner headerFooter={headerFooter} isHome={isHome}>{children}</Inner>
     </StoreWrapper>
   )
 }

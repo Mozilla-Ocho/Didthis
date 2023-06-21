@@ -22,6 +22,12 @@ const pathBuilder = {
       return user(slug) + '/post?projectId=' + encodeURIComponent(projectId)
     else return user(slug) + '/post'
   },
+  legal: (doc: "tos" | "pp" | "au") => {
+    if (doc === "tos") return '/terms'
+    if (doc === "pp") return '/privacy'
+    if (doc === "au") return '/acceptable-use'
+    return '/terms'
+  }
 }
 
 export default pathBuilder

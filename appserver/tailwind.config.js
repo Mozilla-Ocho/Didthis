@@ -12,6 +12,8 @@ module.exports = {
         'yellow-300': '#fff1a6',
         'yellow-500': '#f4c005',
         'yellow-700': '#5F4D20',
+        'yellow-home': 'rgb(254,249,127)',
+        'yellow-home-light': 'rgb(255,254,228)',
         'black-100': '#E6E6E6',
         'black-300': '#757470',
         'black-500': '#47453E',
@@ -19,6 +21,7 @@ module.exports = {
         white: '#ffffff',
         'charcoal-main': '#0d0d0d',
         'charcoal-light': '#3d3d3d',
+        'edge-gray': 'rgb(117,116,112)',
         'gl-black': '#1f1f1f',
         links: '#5F4D20', // yellow 700
         'links-hover': '#f4c005', // yellow 500
