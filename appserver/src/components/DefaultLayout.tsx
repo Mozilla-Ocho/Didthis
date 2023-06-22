@@ -12,12 +12,11 @@ import {useRouter} from 'next/router'
 const Inner = observer(
   ({
     children,
-    skipLayout,
   }: {
     children: ReactNode,
-    skipLayout: boolean,
   }) => {
     const store = useStore()
+    const router = useRouter()
     if (store.user && store.user.unsolicited) {
       return (
         <StoreLoadingWrapper ifLoading={<p>loading</p>}>
@@ -26,6 +25,7 @@ const Inner = observer(
         </StoreLoadingWrapper>
       )
     }
+    const skipLayout = router.pathname === 'index' && !store.user
     if (skipLayout) {
       return (
         <StoreLoadingWrapper ifLoading={<p>loading</p>}>
@@ -48,18 +48,16 @@ const Inner = observer(
 export default function DefaultLayout({
   authUser,
   signupCode,
-  skipLayout,
   children,
 }: {
   authUser: ApiUser | false
   signupCode: false | string
-  skipLayout?: boolean
   children: ReactNode // ReactNode not ReactElement
 }) {
   const router = useRouter()
   return (
     <StoreWrapper authUser={authUser} signupCode={signupCode} router={router}>
-      <Inner skipLayout={!!skipLayout}>{children}</Inner>
+      <Inner>{children}</Inner>
     </StoreWrapper>
   )
 }
