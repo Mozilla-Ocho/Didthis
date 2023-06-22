@@ -4,7 +4,7 @@ import { LogoutButton } from '@/components/auth/LogoutButton'
 import { Divider, Link, H } from './uiLib'
 // import pathBuilder from '@/lib/pathBuidler'
 
-const AppHeader = observer(({ isHome }: { isHome?: boolean }) => {
+const AppHeader = observer(() => {
   const store = useStore()
   if (store.user) {
     return (

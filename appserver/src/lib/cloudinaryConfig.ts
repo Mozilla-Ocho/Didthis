@@ -15,7 +15,7 @@ const getCloudinaryConfig = (intent: CldImageIntent) => {
   const base = {
     // DRY_02888 cloudinary cloud name
     cloudName: 'dbpulyvbq',
-    sources: ['local', 'url', 'camera'],
+    sources: ['local'],
     multiple: false,
     cropping: true,
     croppingAspectRatio: 1,
@@ -74,7 +74,7 @@ const getCloudinaryConfig = (intent: CldImageIntent) => {
     const x = {
       ...base,
       tags: ['project'],
-      croppingAspectRatio: 2,
+      croppingAspectRatio: 1,
       uploadPreset: 'prompter_uploads',
       folder: 'projects',
     }

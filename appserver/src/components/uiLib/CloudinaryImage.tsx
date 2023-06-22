@@ -17,7 +17,7 @@ const CloudinaryImage = ({
   // we force an aspect ratio using complicated tailwind plugin stuff so that
   // while the image loads, it 
   const aspect = ['aspect-h-1']
-  if (intent === 'avatar') {
+  if (intent === 'avatar' || intent === 'project') {
     aspect.push('aspect-w-1')
   } else {
     aspect.push('aspect-w-2')

@@ -10,7 +10,7 @@ const UserPreview = observer(
     const isSelf = store.user && store.user.id === user.id
     if (compact) {
       return (
-        <div className="px-4 flex flex-row gap-4 items-center">
+        <div className="flex flex-row gap-4 items-center">
           {user.profile.imageAssetId ? (
             <p className="w-8">
               <CloudinaryImage
@@ -38,7 +38,7 @@ const UserPreview = observer(
       )
     }
     return (
-      <div className="px-4 grid grid-rows-[auto_auto_auto] gap-4">
+      <div className="grid grid-rows-[auto_auto_auto] gap-4">
         {isSelf && (
           <p>
             <Link href={pathBuilder.userEdit(user.systemSlug)}>

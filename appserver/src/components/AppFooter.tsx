@@ -1,12 +1,9 @@
 import { observer } from 'mobx-react-lite'
-import { useStore } from '@/lib/store'
 import { Divider, Link } from './uiLib'
 import classNames from 'classnames'
 import pathBuilder from '@/lib/pathBuidler'
 
-const AppFooter = observer(({ isHome }: { isHome?: boolean }) => {
-  const store = useStore()
-  const isHomeUnauth = !store.user && isHome
+const AppFooter = observer(({ isHomeUnauth }: { isHomeUnauth?: boolean }) => {
   return (
     <div>
       <Divider className="my-0" />

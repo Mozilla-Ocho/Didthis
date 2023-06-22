@@ -9,8 +9,8 @@ const Divider: FC<DividerProps> = ({ className, light }) => {
   return (
     <hr
       className={twMerge(
-        'my-4 border-edge-gray border-0 border-t',
-        light && 'border-edge-gray-light',
+        'my-4 border-edges border-0 border-t',
+        light && 'border-edges-light',
         className
       )}
     />

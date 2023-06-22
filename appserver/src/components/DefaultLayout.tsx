@@ -11,22 +11,27 @@ import {useRouter} from 'next/router'
 // headerFooter=authed and the outer layer is the store provider itself.
 const Inner = observer(
   ({
-    headerFooter,
-    isHome,
     children,
+    skipLayout,
   }: {
-    headerFooter: 'always' | 'authed' | 'never'
-    isHome?: boolean
-    children: ReactNode
+    children: ReactNode,
+    skipLayout: boolean,
   }) => {
     const store = useStore()
-    const hf =
-      headerFooter === 'always' || (headerFooter === 'authed' && !!store.user)
     if (store.user && store.user.unsolicited) {
       return (
         <StoreLoadingWrapper ifLoading={<p>loading</p>}>
           <LoginGlobalOverlay />
-          <StaticLayout withHeaderFooter={hf} isHome={isHome}><HomeUnsolicited /></StaticLayout>
+          <StaticLayout><HomeUnsolicited /></StaticLayout>
+        </StoreLoadingWrapper>
+      )
+    }
+    if (skipLayout) {
+      return (
+        <StoreLoadingWrapper ifLoading={<p>loading</p>}>
+          <LoginGlobalOverlay />
+          <DeletionConfirmationModal />
+          {children}
         </StoreLoadingWrapper>
       )
     }
@@ -34,7 +39,7 @@ const Inner = observer(
       <StoreLoadingWrapper ifLoading={<p>loading</p>}>
         <LoginGlobalOverlay />
         <DeletionConfirmationModal />
-        <StaticLayout withHeaderFooter={hf} isHome={isHome}>{children}</StaticLayout>
+        <StaticLayout>{children}</StaticLayout>
       </StoreLoadingWrapper>
     )
   }
@@ -43,20 +48,18 @@ const Inner = observer(
 export default function DefaultLayout({
   authUser,
   signupCode,
-  headerFooter,
-  isHome,
+  skipLayout,
   children,
 }: {
   authUser: ApiUser | false
   signupCode: false | string
-  headerFooter: 'always' | 'authed' | 'never'
-  isHome?: boolean
+  skipLayout?: boolean
   children: ReactNode // ReactNode not ReactElement
 }) {
   const router = useRouter()
   return (
     <StoreWrapper authUser={authUser} signupCode={signupCode} router={router}>
-      <Inner headerFooter={headerFooter} isHome={isHome}>{children}</Inner>
+      <Inner skipLayout={!!skipLayout}>{children}</Inner>
     </StoreWrapper>
   )
 }

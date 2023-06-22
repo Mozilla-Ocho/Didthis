@@ -14,8 +14,6 @@ const colors = {
   white: '#ffffff',
   'charcoal-main': '#0d0d0d',
   'charcoal-light': '#3d3d3d',
-  'edge-gray': 'rgb(117,116,112)',
-  'edge-gray-light': 'rgb(217,216,212)',
   'gl-black': '#1f1f1f',
 }
 
@@ -59,6 +57,9 @@ module.exports = {
         'form-borders': colors['black-300'],
         'form-labels': colors['black-300'],
         'form-toggle-bg': '#6750a4',
+
+        'edges': colors['black-300'],
+        'edges-light': colors['black-100'],
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
