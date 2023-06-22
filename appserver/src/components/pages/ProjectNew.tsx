@@ -10,12 +10,11 @@ const NewProjectPage = observer(() => {
   const router = useRouter()
   if (!store.user) return <LoginBouncer />
   return (
-    <>
-      <div>
-        <H.H1>new project for user {router.query.slug}</H.H1>
-        <ProjectForm mode="new" />
-      </div>
-    </>
+    <div className="pt-4 px-4">
+      <H.H3>Create a project</H.H3>
+      <div className="pt-8" />
+      <ProjectForm mode="new" />
+    </div>
   )
 })
 

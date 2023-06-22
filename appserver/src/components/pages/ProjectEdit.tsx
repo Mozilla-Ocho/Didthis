@@ -10,7 +10,7 @@ import { useStore } from '@/lib/store'
 import ProjectForm from '../forms/ProjectForm'
 
 const ProjectEditPage = observer(() => {
-  const store = useStore();
+  const store = useStore()
   const router = useRouter()
   const user = store.user
   if (!user) return <NotFound>user not found</NotFound>
@@ -18,11 +18,9 @@ const ProjectEditPage = observer(() => {
   const project = user.profile.projects[projectId]
   if (!project) return <NotFound>project not found</NotFound>
   return (
-    <>
-      <div>
-        <ProjectForm mode="edit" project={project} />
-      </div>
-    </>
+    <div className="pt-4 px-4">
+      <ProjectForm mode="edit" project={project} />
+    </div>
   )
 })
 

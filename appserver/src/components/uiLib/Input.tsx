@@ -3,7 +3,8 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { twMerge } from 'tailwind-merge'
 
 const inputCVA = cva(
-  'inline-block p-2.5 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500',
+  //'inline-block p-2.5 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500',
+  'form-input block w-full border border-form-borders rounded-sm focus:ring-blue-500 focus:border-blue-500 text-bm',
   {
     variants: {
       intent: {
@@ -29,7 +30,7 @@ const Input: FC<Props> = ({
   ...props
 }) => {
   const errorClass = error
-    ? 'border-red-300 focus:ring-red-500 focus:border-red-500 dark:border-red-300 dark:focus:ring-red-500 dark:focus:border-red-500'
+    ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
     : ''
   return (
     <div className="relative">

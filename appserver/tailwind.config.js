@@ -1,4 +1,24 @@
 /** @type {import('tailwindcss').Config} */
+
+const colors = {
+  'yellow-100': '#fffce3',
+  'yellow-300': '#fff1a6',
+  'yellow-500': '#f4c005',
+  'yellow-700': '#5F4D20',
+  'yellow-home': 'rgb(254,249,127)',
+  'yellow-home-light': 'rgb(255,254,228)',
+  'black-100': '#E6E6E6',
+  'black-300': '#757470',
+  'black-500': '#47453E',
+  'black-700': '#2C2727',
+  white: '#ffffff',
+  'charcoal-main': '#0d0d0d',
+  'charcoal-light': '#3d3d3d',
+  'edge-gray': 'rgb(117,116,112)',
+  'edge-gray-light': 'rgb(217,216,212)',
+  'gl-black': '#1f1f1f',
+}
+
 module.exports = {
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx}',
@@ -8,25 +28,37 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'yellow-100': '#fffce3',
-        'yellow-300': '#fff1a6',
-        'yellow-500': '#f4c005',
-        'yellow-700': '#5F4D20',
-        'yellow-home': 'rgb(254,249,127)',
-        'yellow-home-light': 'rgb(255,254,228)',
-        'black-100': '#E6E6E6',
-        'black-300': '#757470',
-        'black-500': '#47453E',
-        'black-700': '#2C2727',
-        white: '#ffffff',
-        'charcoal-main': '#0d0d0d',
-        'charcoal-light': '#3d3d3d',
-        'edge-gray': 'rgb(117,116,112)',
-        'gl-black': '#1f1f1f',
-        links: '#5F4D20', // yellow 700
-        'links-hover': '#f4c005', // yellow 500
+        ...colors,
+        'bodytext': colors['black-700'],
+        links: colors['yellow-700'],
+        'links-hover': colors['yellow-700'],
         'links-active': '#bb0000',
-        'links-visited': '#5F4D20', // yellow 700
+        'links-visited': colors['yellow-700'],
+
+        'primary-bg': colors['yellow-500'],
+        'primary-bg-hover': colors['yellow-300'],
+        'primary-bg-active': colors['yellow-700'],
+        'primary-bg-disabled': colors['black-100'],
+        'primary-txt': colors['black-700'],
+        'primary-txt-hover': colors['black-700'],
+        'primary-txt-active': colors['black-100'],
+        'primary-txt-disabled': colors['black-300'],
+
+        'secondary': colors['white'],
+        'secondary-bg-hover': colors['white'],
+        'secondary-bg-active': colors['white'],
+        'secondary-bg-disabled': colors['white'],
+        'secondary-txt': colors['black-700'],
+        'secondary-txt-hover': colors['black-300'],
+        'secondary-txt-active': colors['black-700'],
+        'secondary-txt-disabled': colors['black-100'],
+        'secondary-edge': colors['black-700'],
+        'secondary-edge-hover': colors['black-300'],
+        'secondary-edge-disabled': colors['black-100'],
+
+        'form-borders': colors['black-300'],
+        'form-labels': colors['black-300'],
+        'form-toggle-bg': '#6750a4',
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
@@ -83,5 +115,12 @@ module.exports = {
       },
     },
   },
-  plugins: [require('@tailwindcss/forms')],
+  plugins: [
+    /* es lint for typescript doesn't like require() statements that result in
+    * variables or functions that do things. however, this is actually how you
+    * configure the forms plugin and this file is not an es2015 module */
+    /* eslint-disable-next-line */
+    require('@tailwindcss/forms')({strategy:'class'}),
+    require('@tailwindcss/aspect-ratio'),
+  ],
 }

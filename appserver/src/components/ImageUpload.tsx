@@ -22,9 +22,11 @@ const ImageUpload = ({
   // on re-renders due to it being a dependency in the useEffect here that
   // creates and destroys the widget.
   onUploadWithUseCallback,
+  className,
 }: {
   intent: CldImageIntent
   onUploadWithUseCallback: (result: UploadResult) => void
+  className?: string,
 }) => {
   const [widget, setWidget] = useState<Widget>()
   const [, setRerenderDummyFn] = useState(0)
@@ -123,8 +125,8 @@ const ImageUpload = ({
 
   return (
     <>
-      <Button intent="secondary" onClick={launchWidget}>
-        Choose Image
+      <Button className={className} intent="secondary" onClick={launchWidget}>
+        Upload Image
       </Button>
     </>
   )

@@ -10,7 +10,8 @@ const ProjectList = observer(({ targetUser }: { targetUser: ApiUser }) => {
   return (
     <>
       <div>
-        {projects.length === 0 && <p>None</p>}
+        {projects.length === 0 && store.user === targetUser && <p>Looks like you have no projects</p>}
+        {projects.length === 0 && store.user !== targetUser && <p>No projects</p>}
         {projects.map(p => (
           <ProjectCard key={p.id} project={p} targetUser={targetUser} />
         ))}

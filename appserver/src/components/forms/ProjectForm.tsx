@@ -131,8 +131,9 @@ const ProjectForm = observer((props: Props) => {
   const setDescription = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     projectStore.setDescription(e.target.value)
   }
-  const setVisibility = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    projectStore.setScope(e.target.value as ApiScope)
+  const setVisibility = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("checkbox",e)
+    projectStore.setScope(e.target.checked ? 'private' : 'public')
   }
   const setStatus = (e: React.ChangeEvent<HTMLSelectElement>) => {
     projectStore.setCurrentStatus(e.target.value as ApiProjectStatus)
@@ -148,57 +149,46 @@ const ProjectForm = observer((props: Props) => {
   }
   return (
     <div>
-      <form onSubmit={handleSubmit} method="POST">
+      <form
+        onSubmit={handleSubmit}
+        method="POST"
+        className="flex flex-col gap-8"
+      >
         <div>
-          <label htmlFor="title">
-            title:
+          <label htmlFor="title" className="text-form-labels text-bs">
+            Project title:
             <Input
               type="text"
               id="title"
               name="title"
               value={projectStore.title || ''}
               onChange={setTitle}
-              className="w-full"
+              className="mt-2 text-bodytext"
               error={projectStore.titleMissing() ? 'required' : false}
             />
           </label>
         </div>
         <div>
-          <label htmlFor="description">
-            description:
+          <label htmlFor="description" className="text-form-labels text-bs">
+            Project description:
             <Textarea
               placeholder=""
               id="description"
               name="description"
               value={projectStore.description || ''}
               onChange={setDescription}
+              className="mt-2 text-bodytext"
             />
           </label>
         </div>
         <div>
-          <label htmlFor="visibility">
-            visibility:
-            <Select
-              id="visibility"
-              onChange={setVisibility}
-              value={projectStore.scope}
-            >
-              <option key="public" value="public">
-                public
-              </option>
-              <option key="private" value="private">
-                private
-              </option>
-            </Select>
-          </label>
-        </div>
-        <div>
-          <label htmlFor="status">
-            status:
+          <label htmlFor="status" className="text-form-labels text-bs">
+            Status:
             <Select
               id="status"
               onChange={setStatus}
               value={projectStore.currentStatus}
+              className="mt-2 text-bodytext"
             >
               <option key="active" value="active">
                 active
@@ -213,26 +203,51 @@ const ProjectForm = observer((props: Props) => {
           </label>
         </div>
         <div>
+          <label
+            htmlFor="visibility"
+            className="inline-flex flex-row items-center cursor-pointer"
+          >
+            <span className="mr-3 text-bs text-form-labels inline-block cursor-pointer">
+              Private project:
+            </span>
+            <span className="relative inline-flex items-center inline-block">
+              <input
+                type="checkbox"
+                id="visibility"
+                value="private"
+                className="sr-only peer"
+                checked={projectStore.scope === 'private'}
+                onChange={setVisibility}
+              />
+              {/* https://flowbite.com/docs/forms/toggle/ */}
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-form-toggle-bg"></div>
+            </span>
+          </label>
+        </div>
+        <div>
+          <div className="text-form-labels text-bs mb-2">
+            Project cover image:
+          </div>
           {projectStore.imageAssetId && (
             <CloudinaryImage
               assetId={projectStore.imageAssetId}
               intent="project"
             />
           )}
-          {!projectStore.imageAssetId && (
+          <div className="flex flex-row gap-4 mt-4">
             <ImageUpload
               intent="project"
               onUploadWithUseCallback={onImageUpload}
             />
-          )}
           {projectStore.imageAssetId && (
-            <Button intent="link" onClick={deleteImage}>
-              remove
+            <Button intent="secondary" onClick={deleteImage}>
+              Remove image
             </Button>
           )}
+          </div>
         </div>
         <Button type="submit" disabled={!projectStore.isPostable()}>
-          Save
+          {mode === 'new' ? 'Create' : 'Save' }
         </Button>
       </form>
     </div>

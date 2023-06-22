@@ -14,7 +14,7 @@ const AppFooter = observer(({ isHome }: { isHome?: boolean }) => {
         className={classNames(
           'p-4',
           isHomeUnauth ? 'bg-yellow-home' : 'bg-white',
-          'leading-loose',
+          'leading-10',
           'h-full'
         )}
       >

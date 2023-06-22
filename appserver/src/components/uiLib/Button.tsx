@@ -3,33 +3,33 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { twMerge } from 'tailwind-merge'
 
 const buttonCVA = cva(
-  'button p-4 py-2 px-4 rounded text-white disabled:bg-slate-300',
+  'button px-4 py-3 rounded text-bs',
   {
     variants: {
       intent: {
         primary: [
-          'bg-yellow-500',
-          'hover:bg-yellow-300',
-          'text-black-700',
-          'active:bg-yellow-700',
-          'active:text-black-100',
-          'disabled:bg-black-100',
-          'disabled:text-black-300',
+          'bg-primary-bg',
+          'hover:bg-primary-bg-hover',
+          'active:bg-primary-bg-active',
+          'disabled:bg-primary-bg-disabled',
+          'text-primary-txt',
+          'hover:text-primary-txt-hover',
+          'active:text-primary-txt-active',
+          'disabled:text-primary-txt-disabled',
         ],
         secondary: [
-          'bg-white',
+          'bg-secondary-bg',
+          'hover:bg-secondary-bg-hover',
+          'active:bg-secondary-bg-active',
+          'disabled:bg-secondary-bg-disabled',
+          'text-secondary-txt',
+          'hover:text-secondary-txt-hover',
+          'active:text-secondary-txt-active',
+          'disabled:text-secondary-txt-disabled',
           'border',
-          'rounded',
-          'hover:bg-white',
-          'border-black-700',
-          'border-black-700',
-          'text-black-700',
-          'hover:border-black-300',
-          'hover:text-black-300',
-          'active:border-black-700',
-          'active:text-black-700',
-          'disabled:border-black-100',
-          'disabled:text-black-100',
+          'border-secondary-edge',
+          'hover:border-secondary-edge-hover',
+          'disabled:border-secondary-edge-disabled',
         ],
         link: [
           'underline',
@@ -49,14 +49,9 @@ const buttonCVA = cva(
           'p-0',
         ],
       },
-      size: {
-        small: ['text-sm'],
-        medium: ['text-base'],
-      },
     },
     defaultVariants: {
       intent: 'primary',
-      size: 'medium',
     },
   }
 )
@@ -75,7 +70,6 @@ const Button: FC<ButtonProps> = ({
   onClick,
   children,
   intent,
-  size,
   className,
   disabled,
   ...props
@@ -87,7 +81,7 @@ const Button: FC<ButtonProps> = ({
   return (
     <button
       type={bType}
-      className={twMerge(buttonCVA({ intent, size }), className)}
+      className={twMerge(buttonCVA({ intent }), className)}
       onClick={ourOnClick}
       disabled={!!disabled}
     >
