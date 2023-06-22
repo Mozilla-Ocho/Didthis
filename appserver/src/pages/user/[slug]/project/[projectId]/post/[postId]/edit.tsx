@@ -19,7 +19,6 @@ const Wrapper = ({
     <DefaultLayout
       authUser={authUser}
       signupCode={signupCode}
-      headerFooter="always"
     >
       <PostEditPage />
     </DefaultLayout>

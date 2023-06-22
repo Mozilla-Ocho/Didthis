@@ -3,8 +3,8 @@ import { ReactNode } from 'react'
 
 const NotFound = ({ children }: { children?: ReactNode }) => {
   return (
-    <div>
-      <H.H1>Page not found</H.H1>
+    <div className="pt-8 text-center">
+      <H.H5>Page not found</H.H5>
       {children}
     </div>
   )

@@ -1,4 +1,4 @@
-import { Button, Link, Modal } from '@/components/uiLib'
+import { Button, Modal } from '@/components/uiLib'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import DefaultLayout from '@/components/DefaultLayout'
@@ -33,7 +33,6 @@ const Wrapper = ({
     <DefaultLayout
       authUser={authUser}
       signupCode={signupCode}
-      headerFooter="always"
     >
       <Scratch />
     </DefaultLayout>

@@ -29,11 +29,16 @@ const ProjectCard = observer(
                   targetUser.publicPageSlug,
                   project.id
                 )}
+                className="break-all"
               >
                 {project.title}
               </Link>
             </H.H5>
-            {project.description && <p>{project.description}</p>}
+            {project.description && (
+              <p className="break-all whitespace-pre-line">
+                {project.description}
+              </p>
+            )}
           </div>
           <div>
             {project.imageAssetId && (

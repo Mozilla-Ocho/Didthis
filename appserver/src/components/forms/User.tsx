@@ -198,7 +198,7 @@ const UserForm = observer(() => {
             name="slug"
             onChange={setUserSlug}
             value={formStore.userSlug}
-            error={formStore.slugErrorText()}
+            customError={formStore.slugErrorText()}
             placeholder={user.userSlug || ''}
           />
           {formStore.suggestedSlug() && (

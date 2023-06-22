@@ -13,7 +13,6 @@ const Wrapper = ({
     <DefaultLayout
       authUser={authUser}
       signupCode={signupCode}
-      headerFooter="always"
     >
       <NewProjectPage />
     </DefaultLayout>
