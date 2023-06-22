@@ -12,7 +12,7 @@ const HomeAuth = observer(() => {
   return (
     <>
       <div className="pt-4" />
-      <UserPreview user={store.user} />
+      <UserPreview user={store.user} compact={false} />
       <Divider light />
       <div className="px-4">
         <H.H3 className="my-4">Your projects:</H.H3>

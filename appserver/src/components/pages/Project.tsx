@@ -26,7 +26,7 @@ const ProjectPage = observer(
     return (
       <>
         <div>
-          <UserPreview user={targetUser} />
+          <UserPreview user={targetUser} compact={true} />
           <H.H3>{project.title}</H.H3>
           {project.imageAssetId && (
             <CloudinaryImage assetId={project.imageAssetId} intent="project" />

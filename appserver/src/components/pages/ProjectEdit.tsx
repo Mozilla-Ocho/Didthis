@@ -8,6 +8,7 @@ import { getParamString } from '@/lib/nextUtils'
 import NotFound from './NotFound'
 import { useStore } from '@/lib/store'
 import ProjectForm from '../forms/ProjectForm'
+import {H} from '../uiLib'
 
 const ProjectEditPage = observer(() => {
   const store = useStore()
@@ -19,6 +20,8 @@ const ProjectEditPage = observer(() => {
   if (!project) return <NotFound>project not found</NotFound>
   return (
     <div className="pt-4 px-4">
+      <H.H3>Create a project</H.H3>
+      <div className="pt-8" />
       <ProjectForm mode="edit" project={project} />
     </div>
   )

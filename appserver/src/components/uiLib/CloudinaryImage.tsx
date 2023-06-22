@@ -27,8 +27,9 @@ const CloudinaryImage = ({
     <span className="block max-w-md">
       <span
         className={twMerge(
-          'leading-none block bg-black-100',
+          'leading-none block',
           aspect,
+          intent !== 'avatar' && 'bg-black-100',
           intent === 'avatar' && '[&>img]:rounded-full',
           className
         )}
