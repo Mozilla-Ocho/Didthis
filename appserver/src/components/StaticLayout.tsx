@@ -15,7 +15,7 @@ const StaticLayout = ({
     return (
       <div className="max-w-[800px] mx-auto grid grid-rows-[auto_1fr_auto] h-screen gid">
         <AppHeader isHome={isHome} />
-        <div>{children}</div>
+        <div className={isHome ? "" : "pt-4 pb-16 px-4"}>{children}</div>
         <AppFooter isHome={isHome} />
       </div>
     )

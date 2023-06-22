@@ -17,6 +17,7 @@ import { makeAutoObservable } from 'mobx'
 
 class ProjectStore {
   title: string
+  titleTouched = false
   description: string
   scope: ApiScope
   projectId: ApiProjectId
@@ -40,6 +41,7 @@ class ProjectStore {
       this.currentStatus = r.project.currentStatus
     } else if (project) {
       this.title = project.title
+      this.titleTouched = true
       this.description = project.description || ''
       this.scope = project.scope
       this.projectId = project.id
@@ -69,6 +71,7 @@ class ProjectStore {
 
   setTitle(x: string) {
     this.title = x
+    this.titleTouched = true
   }
   setDescription(x: string) {
     this.description = x
@@ -87,13 +90,11 @@ class ProjectStore {
     this.imageMeta = meta
   }
 
-  titleMissing() {
-    return !this.title.trim()
-  }
-
   isPostable() {
-    // XXX length validations
-    return !!this.title.trim()
+    if (!this.title.trim()) return false
+    if (this.title.trim().length > profileUtils.maxChars.title) return false
+    if (this.description.trim().length > profileUtils.maxChars.blurb) return false
+    return true
   }
 }
 
@@ -164,7 +165,9 @@ const ProjectForm = observer((props: Props) => {
               value={projectStore.title || ''}
               onChange={setTitle}
               className="mt-2 text-bodytext"
-              error={projectStore.titleMissing() ? 'required' : false}
+              required
+              touched={projectStore.titleTouched}
+              maxLen={profileUtils.maxChars.title}
             />
           </label>
         </div>
@@ -178,6 +181,8 @@ const ProjectForm = observer((props: Props) => {
               value={projectStore.description || ''}
               onChange={setDescription}
               className="mt-2 text-bodytext"
+              touched={true}
+              maxLen={profileUtils.maxChars.blurb}
             />
           </label>
         </div>

@@ -25,3 +25,41 @@ body {
   max-width: none;
   margin: 0;
 }
+
+.textarea-grow {
+  display: grid;
+  grid-template-areas: 'foo';
+  position: relative;
+}
+.textarea-grow > textarea {
+  grid-area: foo;
+  white-space: pre-wrap !important;
+  word-wrap: break-word !important;
+  font-size: 16px !important;
+  line-height: 24px !important;
+  font-weight: 400 !important;
+  font-family: 'Rubik', sans-serif !important;
+  margin: 0 !important;
+  padding: 0.5rem 0.75rem 0.5rem 0.75rem !important;
+  resize: none;
+}
+.textarea-grow > pre {
+  grid-area: foo;
+  appearance: none;
+  visibility: hidden;
+  pointer-events: none;
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid transparent;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  color: transparent;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  font-family: 'Rubik', sans-serif;
+  margin: 0 !important;
+  padding: 0.5rem 0.75rem 0.5rem 0.75rem !important;
+  max-height: 400px;
+}
+

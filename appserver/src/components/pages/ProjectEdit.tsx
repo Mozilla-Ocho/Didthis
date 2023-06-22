@@ -19,11 +19,11 @@ const ProjectEditPage = observer(() => {
   const project = user.profile.projects[projectId]
   if (!project) return <NotFound>project not found</NotFound>
   return (
-    <div className="pt-4 px-4">
-      <H.H3>Create a project</H.H3>
+    <>
+      <H.H3>Edit project</H.H3>
       <div className="pt-8" />
       <ProjectForm mode="edit" project={project} />
-    </div>
+    </>
   )
 })
 

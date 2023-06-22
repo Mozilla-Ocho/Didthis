@@ -22,7 +22,8 @@ const maxChars = {
   name: 140,
   imageAssetId: 100,
   url: 300,
-  blurbs: 1000,
+  title: 140,
+  blurb: 2000,
 }
 
 const mkDefaultProfile = () => {

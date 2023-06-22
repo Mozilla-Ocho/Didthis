@@ -19,32 +19,69 @@ const inputCVA = cva(
 
 type Props = React.TextareaHTMLAttributes<HTMLTextAreaElement> &
   VariantProps<typeof inputCVA> & {
-    error?: false | string
+    customError?: false | string
+    required?: boolean
+    touched?: boolean
+    maxLen?: number
+    minLen?: number
+    autoGrow?: boolean
   }
 
 const Textarea: FC<Props> = ({
   onClick,
-  children,
   className,
-  error,
+  customError,
+  required,
+  touched,
+  maxLen,
+  minLen,
+  autoGrow,
   ...props
 }) => {
+  let error = ''
+  let info = ''
+  const empty = ((props.value || '') + '').trim() === ''
+  const chars = ((props.value || '') + '').trim().length
+  if (customError) {
+    error = customError
+  } else {
+    info = required ? 'required' : ''
+    if (maxLen) {
+      info = info + ` (${chars}/${maxLen})`
+    }
+    if (required && touched && empty) {
+      error = 'required'
+    }
+    if (touched && maxLen && chars > maxLen) {
+      error = `too long (${chars}/${maxLen})`
+    }
+    if (touched && minLen && chars < minLen) {
+      error = `too short (${chars}/${maxLen})`
+    }
+  }
   const errorClass = error
     ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
     : ''
   return (
-    <div className="relative">
+    <div className="textarea-grow">
       <textarea
         className={twMerge(inputCVA({}), className, errorClass)}
         {...props}
-      >
-        {children}
-      </textarea>
+      />
       {!!error && (
-        <div className="absolute text-red-400 text-right text-xs right-0">
+        <div className="relative h-0 text-red-400 text-right text-xs right-0">
           {error}
         </div>
       )}
+      {!error && info && (
+        <div className="relative h-0 text-form-labels text-right text-xs right-0">
+          {info}
+        </div>
+      )}
+      <pre>
+        {props.value}
+        <br />
+      </pre>
     </div>
   )
 }
