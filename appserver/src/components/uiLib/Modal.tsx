@@ -1,9 +1,10 @@
 import classNames from 'classnames'
 import React, { useRef, useEffect, ReactNode, useState } from 'react'
 import ReactDOM from 'react-dom'
+import H from './H'
 
 interface ModalProps {
-  id: string,
+  id: string
   isOpen: boolean
   handleClose: () => void
   title: string
@@ -24,7 +25,7 @@ const Modal: React.FC<ModalProps> = ({
   const modalRef = useRef<HTMLDivElement | null>(null)
   const elRef = useRef<HTMLDivElement | null>(null)
   const [initialOpenState] = useState(() => isOpen)
-  const [rerenderHack,setRerenderHack] = useState(false)
+  const [rerenderHack, setRerenderHack] = useState(false)
   //console.log("modal render", id)
 
   useEffect(() => {
@@ -88,26 +89,24 @@ const Modal: React.FC<ModalProps> = ({
               aria-hidden="true"
             ></div>
           </div>
-            <div className="absolute flex justify-center items-center min-h-screen w-screen">
-              <div
-                className={classNames(
-                  'bg-white rounded-lg overflow-hidden shadow-xl min-w-[320px]',
-                  noPad ? '' : 'px-4 pt-5 pb-4 sm:p-6'
-                )}
-                ref={modalRef}
-              >
-                <div>
-                  <h3
-                    className={`text-lg leading-6 font-medium text-gray-900 ${
-                      hideTitle ? 'hidden' : ''
-                    }`}
-                    id="modal-title"
-                  >
-                    {title}
-                  </h3>
-                  <div>{children}</div>
-                </div>
+          <div className="absolute flex justify-center items-center min-h-screen w-screen">
+            <div
+              className={classNames(
+                'bg-white rounded-lg overflow-hidden shadow-xl min-w-[320px] m-4',
+                noPad ? '' : 'px-4 pt-5 pb-4 sm:p-6'
+              )}
+              ref={modalRef}
+            >
+              <div>
+                <H.H4
+                  className={`m-0 mb-4 ${hideTitle ? 'hidden' : ''}`}
+                  id="modal-title"
+                >
+                  {title}
+                </H.H4>
+                <div>{children}</div>
               </div>
+            </div>
           </div>
         </div>,
         elRef.current as HTMLDivElement

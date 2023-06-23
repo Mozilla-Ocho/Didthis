@@ -38,13 +38,18 @@ if (cloudinarySecret) {
 })
 }
 
+type CldResp = {
+  imageUrl: string,
+  imageMeta?: CldImageMetaUrl
+}
+
 // TODO: don't generate it unless the user saves the post?
 // TODO: cache/reuse? i think we're making a new one every time?
 // TODO: add transforms to restrain the size to a link preview's reasonable limits
-const getPermanentCloudinaryUrl = async (imageUrl:string) : Promise<string> => {
+const getPermanentCloudinaryUrl = async (imageUrl:string) : Promise<CldResp> => {
   if (!cloudinarySecret) {
     log.error("cant getPermanentCloudinaryUrl, no secret present")
-    return imageUrl
+    return {imageUrl}
   }
   // the purpose of cloudinary urls for link previews is:
   // - meta properties return very short-lived resources or resources that do
@@ -84,24 +89,23 @@ const getPermanentCloudinaryUrl = async (imageUrl:string) : Promise<string> => {
         //   original_filename: 'tmp-95-0sRGU9zPbBNU',
         //   ...
         // }
-        if (result && result.url) {
-          // TODO why aren't the {secure:true} options working? why do i have
-          // to force https via string replace? i've added the option to both
-          // the config and upload calls.
-          return result.url.replace('http://','https://')
+        if (result && result.secure_url) {
+          return {imageUrl: result.secure_url, imageMeta: {...result, metaOrigin:'urlMeta'} as CldImageMetaUrl}
+        } else if (result && result.url) {
+          return {imageUrl: result.url.replace('http://','https://'), imageMeta: {...result, metaOrigin:'urlMeta'} as CldImageMetaUrl}
         } else {
           // todo: this sucks, the image might not be ssl
           // if (debug) debug.push(`cloudinary result has no image: ${util.inspect(result,{depth:null,maxStringLength:300})}`)
-          return imageUrl
+          return {imageUrl}
         }
       }).catch((e) => {
         log.error('cloudinary linkpreview image upload error', e)
         // if (debug) debug.push(`cloudinary linkpreview image upload error: ${util.inspect(e,{depth:null,maxStringLength:300})}`)
         // todo: this sucks, the image might not be ssl
-        return imageUrl
+        return {imageUrl}
       })
   } else {
-    return ""
+    return {imageUrl:""}
   }
 }
 
@@ -270,7 +274,9 @@ export default async function handler(
   log.unfurl("massagedZyte:",massagedZyte)
   // if zyte returned an image, let's prefer it
   if (massagedZyte && massagedZyte.imageUrl) {
-    massagedZyte.imageUrl = await getPermanentCloudinaryUrl(massagedZyte.imageUrl)
+    const cldResp = await getPermanentCloudinaryUrl(massagedZyte.imageUrl)
+    massagedZyte.imageUrl = cldResp.imageUrl
+    massagedZyte.imageMeta = cldResp.imageMeta
     const wrapper: UrlMetaWrapper = {
       action: 'getUrlMeta',
       status: 200,
@@ -284,7 +290,9 @@ export default async function handler(
   // crawlers get blocked by facebook and our own ip is safer.
   if (massagedUnfurl) {
     if (massagedUnfurl.imageUrl) {
-      massagedUnfurl.imageUrl = await getPermanentCloudinaryUrl(massagedUnfurl.imageUrl)
+      const cldResp = await getPermanentCloudinaryUrl(massagedUnfurl.imageUrl)
+      massagedUnfurl.imageUrl = cldResp.imageUrl
+      massagedUnfurl.imageMeta = cldResp.imageMeta
     }
     const wrapper: UrlMetaWrapper = {
       action: 'getUrlMeta',

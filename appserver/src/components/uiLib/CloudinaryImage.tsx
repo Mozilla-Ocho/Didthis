@@ -24,7 +24,7 @@ const CloudinaryImage = ({
   }
   // leading-none fixes space after images
   return (
-    <span className="block max-w-md">
+    <span className="block w-full">
       <span
         className={twMerge(
           'leading-none block',

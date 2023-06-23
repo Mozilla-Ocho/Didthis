@@ -37,7 +37,7 @@ const filteredImageMeta = (
 ): CldImageMetaPublic | undefined => {
   if (meta) {
     return {
-      metaPublic: true,
+      metaOrigin: 'filtered',
       width: meta.width,
       height: meta.height,
       format: meta.format,

@@ -11,6 +11,7 @@ type ApiUrlMeta = {
   host: string
   title: string
   imageUrl: string
+  imageMeta?: CldImageMetaUrl
 }
 
 type ApiUser = {
@@ -48,9 +49,10 @@ interface UserDbRow {
   last_read_from_user: number | null
 }
 
-// on publicly returned data, we restrict the image meta to these properties:
+// on publicly returned data for user image uploads, we restrict the image meta
+// to these properties:
 type CldImageMetaPublic = {
-  metaPublic: true,
+  metaOrigin: 'filtered',
   width: number,
   height: number,
   format: string,
@@ -58,7 +60,11 @@ type CldImageMetaPublic = {
 /* we're going to capture whatever object metadata cloudinary returns with
  * images, which includes things like the original dimensions, format, etc */
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-type CldImageMetaAny = {[key:string]: any} & {metaPublic: false}
+type CldImageMetaAny = {[key:string]: any} & {metaOrigin: 'private' }
+// for imageMeta on link previews, metaOrigin is "urlMeta" and contains the
+// whole payload but doesn't need to be filtered.
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+type CldImageMetaUrl = {[key:string]: any} & {metaOrigin: 'urlMeta'}
 
 type ApiPost = {
   id: ApiPostId

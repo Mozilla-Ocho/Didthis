@@ -1,11 +1,15 @@
 import pathBuilder from '@/lib/pathBuidler'
+import { useStore } from '@/lib/store'
 import { observer } from 'mobx-react-lite'
-import { H, Link, Timestamp } from './uiLib'
+import { H, Link } from './uiLib'
 import { CloudinaryImage } from './uiLib'
 
 const ProjectCard = observer(
   ({ project, targetUser }: { project: ApiProject; targetUser: ApiUser }) => {
+    const store = useStore()
+    const isSelf = store.user && store.user.id === targetUser.id
     const nUpdates = Object.keys(project.posts).length
+    const hasImage = !!project.imageAssetId
     return (
       <div className="border border-edges p-6">
         <div className="grid grid-cols-[66%_34%] pb-4">
@@ -20,7 +24,9 @@ const ProjectCard = observer(
             {nUpdates} update{nUpdates === 1 ? '' : 's'}
           </p>
         </div>
-        <div className="grid grid-cols-[70%_30%]">
+        <div
+          className={`grid ${hasImage ? 'grid-cols-[70%_30%]' : 'grid-cols-1'}`}
+        >
           <div className="pr-4">
             <H.H5>
               <Link
@@ -29,25 +35,38 @@ const ProjectCard = observer(
                   targetUser.publicPageSlug,
                   project.id
                 )}
-                className="break-all"
+                className="break-words"
               >
                 {project.title}
               </Link>
             </H.H5>
             {project.description && (
-              <p className="break-all whitespace-pre-line">
+              <p className="break-words my-2 whitespace-pre-line line-clamp-2 sm:line-clamp-4 md:line-clamp-5">
                 {project.description}
               </p>
             )}
+            {isSelf && store.user && (
+              <p className="mt-4">
+                <Link
+                  intent="secondary"
+                  href={pathBuilder.projectEdit(
+                    store.user.systemSlug,
+                    project.id
+                  )}
+                >
+                  Edit
+                </Link>
+              </p>
+            )}
           </div>
-          <div>
-            {project.imageAssetId && (
+          {hasImage && (
+            <div>
               <CloudinaryImage
                 assetId={project.imageAssetId}
                 intent="project"
               />
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     )

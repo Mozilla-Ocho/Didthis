@@ -60,6 +60,9 @@ module.exports = {
 
         'edges': colors['black-300'],
         'edges-light': colors['black-100'],
+
+        'timestamps': '#909090',
+        'linkpreview-host': '#909090',
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
@@ -123,5 +126,6 @@ module.exports = {
     /* eslint-disable-next-line */
     require('@tailwindcss/forms')({strategy:'class'}),
     require('@tailwindcss/aspect-ratio'),
+    require('@tailwindcss/line-clamp'),
   ],
 }

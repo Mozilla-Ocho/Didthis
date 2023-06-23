@@ -1,13 +1,14 @@
 // import { useStore } from "@/lib/store";
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { H, Link, Timestamp, Divider, CloudinaryImage, Button } from '../uiLib'
+import { H, Link, Timestamp, Divider, CloudinaryImage, Button, Select } from '../uiLib'
 import UserPreview from '../UserPreview'
 import pathBuilder from '@/lib/pathBuidler'
 import { getParamString } from '@/lib/nextUtils'
 import NotFound from './NotFound'
 import PostCard from '../PostCard'
 import { useStore } from '@/lib/store'
+import { useLocalStorage } from 'usehooks-ts'
 
 const ProjectPage = observer(
   ({ targetUser }: { targetUser: ApiUser | false }) => {
@@ -15,6 +16,7 @@ const ProjectPage = observer(
     if (!targetUser) return <NotFound>user not found</NotFound>
     const router = useRouter()
     const store = useStore()
+    const [sort,setSort] = useLocalStorage<"asc" | "desc">("projectSortDefault","desc")
     const isSelf = store.user && store.user.id === targetUser.id
     if (isSelf && store.user) targetUser = store.user // important for mobx reactivity when authed
     const projectId = getParamString(router, 'projectId')
@@ -22,58 +24,122 @@ const ProjectPage = observer(
     const project = targetUser.profile.projects[projectId]
     if (!project) return <NotFound>project not found</NotFound>
     const posts = Object.values(project.posts)
-    posts.sort((a, b) => b.createdAt - a.createdAt)
+    posts.sort((a, b) => sort === "desc" ? b.createdAt - a.createdAt : a.createdAt - b.createdAt)
+    const nUpdates = posts.length
+    const hasImage = !!project.imageAssetId
+    const changeSort = (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setSort(e.target.value as "asc" | "desc")
+    }
     return (
       <>
         <div>
           <UserPreview user={targetUser} compact={true} />
-          <H.H3>{project.title}</H.H3>
-          {project.imageAssetId && (
-            <CloudinaryImage assetId={project.imageAssetId} intent="project" />
-          )}
-          {store.user && isSelf && (
-            <p>
-              <Link
-                href={pathBuilder.projectEdit(
-                  store.user.systemSlug,
-                  project.id
-                )}
-              >
-                edit
-              </Link>
+          <div className="my-4 flex flex-row items-center gap-8">
+            <H.H4>{project.title}</H.H4>
+          </div>
+          <div className="grid grid-cols-[66%_34%] pb-4">
+            <p className="body-bs">
+              <strong>
+                {project.scope === 'public' ? 'Public' : 'Private'}
+              </strong>{' '}
+              &mdash;{' '}
+              {project.currentStatus === 'active' && <span>In progress</span>}
+              {project.currentStatus === 'complete' && <span>Completed</span>}
+              {project.currentStatus === 'paused' && <span>Paused</span>}
             </p>
-          )}
-          {store.user && isSelf && (
-            <p>
+            <p className="body-bs text-right">
+              {nUpdates} update{nUpdates === 1 ? '' : 's'}
+            </p>
+          </div>
+
+          <div className="my-4 w-full flex flex-row items-center gap-4">
+            {store.user && isSelf && (
               <Button
-                intent="link"
+                intent="secondary"
+                className="flex-grow basis-8/12"
+              >
+                Share
+              </Button>
+            )}
+            {store.user && isSelf && (
+              <div className="basis-2/12">
+                <Link
+                  intent="secondary"
+                  href={pathBuilder.projectEdit(
+                    store.user.systemSlug,
+                    project.id
+                  )}
+                  className="w-full"
+                >
+                  Edit
+                </Link>
+              </div>
+            )}
+            {store.user && isSelf && (
+              <Button
+                intent="secondary"
+                className="basis-2/12"
                 onClick={() => store.promptDeleteProject(project)}
               >
-                delete
+                Delete
               </Button>
-            </p>
-          )}
-          <p>description: {project.description || 'no description'}</p>
-          <p>visibility: {project.scope}</p>
-          <p>status: {project.currentStatus}</p>
-          <p># posts: {Object.keys(project.posts).length}</p>
-          <p>
-            created: <Timestamp millis={project.createdAt} />
-          </p>
-          <Divider />
+            )}
+          </div>
+
+          <div
+            className={`grid gap-4 ${
+              hasImage ? 'grid-rows-[auto_auto] sm:grid-rows-1 sm:grid-cols-[3fr_7fr]' : 'grid-rows-1 grid-cols-1'
+            }`}
+          >
+            {hasImage && (
+              <div>
+                <CloudinaryImage
+                  assetId={project.imageAssetId}
+                  intent="project"
+                />
+              </div>
+            )}
+            <div>
+              {project.description && (
+                <p className="break-words whitespace-pre-line">
+                  {project.description}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <Divider light />
+
+          <div className="grid grid-cols-[auto_1fr] items-baseline gap-4 mb-4">
+            <label htmlFor="sortby">Sort by:</label>
+            <Select
+              id="sortby"
+              onChange={changeSort}
+              value={sort}
+              className="text-bodytext"
+            >
+              <option key="desc" value="desc">
+                newest first
+              </option>
+              <option key="asc" value="asc">
+                oldest first
+              </option>
+            </Select>
+          </div>
+
           {store.user && // store.user redundant when isSelf but tsserver needs it
             isSelf && (
-              <>
+              <div className="grid mb-4">
                 <Link
                   intent="primary"
                   href={pathBuilder.newPost(store.user.systemSlug, project.id)}
                 >
-                  new post
+                  Add post
                 </Link>
-                <Divider />
-              </>
+              </div>
             )}
-          <div className="grid grid-cols-1 gap-4">
+
+          <div className="grid grid-cols-1 gap-8 mt-8">
             {/* even though we return above if targetUser is falsy, because map is
            passed a function, typescript can't assert that inside that function
            scope that targetUser is still surely not false. hence "as ApiUser"*/}
