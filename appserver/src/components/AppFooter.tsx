@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { Divider, Link } from './uiLib'
 import classNames from 'classnames'
-import pathBuilder from '@/lib/pathBuidler'
+import pathBuilder from '@/lib/pathBuilder'
 
 const AppFooter = observer(({ isHomeUnauth }: { isHomeUnauth?: boolean }) => {
   return (

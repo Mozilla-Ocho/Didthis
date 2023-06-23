@@ -8,7 +8,7 @@ import 'firebase/compat/auth'
 import { trackingEvents } from '@/lib/trackingEvents'
 import { useEffect } from 'react'
 import {NextRouter} from 'next/router'
-import pathBuilder from '../pathBuidler'
+import pathBuilder from '../pathBuilder'
 // import { UrlMetaWrapper } from '../apiConstants'
 
 type GeneralError = false | '_get_me_first_fail_' | '_api_fail_'

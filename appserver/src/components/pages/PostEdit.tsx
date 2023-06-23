@@ -8,6 +8,8 @@ import { getParamString } from '@/lib/nextUtils'
 import NotFound from './NotFound'
 import { useStore } from '@/lib/store'
 import PostForm from '@/components/forms/PostForm'
+import Breadcrumbs from '../Breadcrumbs'
+import pathBuilder from '@/lib/pathBuilder'
 
 const PostEditPage = observer(() => {
   const store = useStore();
@@ -22,9 +24,16 @@ const PostEditPage = observer(() => {
   if (!post) return <NotFound>post not found</NotFound>
   return (
     <>
-      <div>
-        <PostForm mode="edit" post={post} />
-      </div>
+      <Breadcrumbs
+        crumbs={[
+          {
+            name: project.title,
+            href: pathBuilder.project(user.systemSlug, project.id),
+          },
+          { name: 'New post' },
+        ]}
+      />
+      <PostForm mode="edit" post={post} />
     </>
   )
 })

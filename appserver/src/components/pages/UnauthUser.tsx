@@ -1,15 +1,19 @@
+import { observer } from 'mobx-react-lite'
+import { Divider, H } from '@/components/uiLib'
+import ProjectList from '../ProjectList'
 import UserPreview from '../UserPreview'
 import NotFound from './NotFound'
-import UserProjects from './UserProjects'
 
-const UnauthUser = ({ targetUser }: { targetUser: ApiUser | false }) => {
+const UnauthUser = observer(({ targetUser }: { targetUser: ApiUser | false }) => {
   if (!targetUser) return <NotFound />
   return (
     <>
       <UserPreview user={targetUser} compact={false} />
-      <UserProjects targetUser={targetUser} />
+      <Divider light />
+      <H.H3>Projects</H.H3>
+      <ProjectList targetUser={targetUser} />
     </>
   )
-}
+})
 
 export default UnauthUser

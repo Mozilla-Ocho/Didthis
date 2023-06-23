@@ -1,4 +1,4 @@
-import pathBuilder from '@/lib/pathBuidler'
+import pathBuilder from '@/lib/pathBuilder'
 import { useStore } from '@/lib/store'
 import { observer } from 'mobx-react-lite'
 import { H, Link } from './uiLib'

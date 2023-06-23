@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@/lib/store'
 import { CloudinaryImage, H, Link } from './uiLib'
-import pathBuilder from '@/lib/pathBuidler'
+import pathBuilder from '@/lib/pathBuilder'
 import { specialAssetIds } from '@/lib/cloudinaryConfig'
 
 const UserPreview = observer(

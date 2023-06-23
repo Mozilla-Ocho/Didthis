@@ -1,7 +1,6 @@
-// import pathBuilder from "@/lib/pathBuidler";
 import { observer } from 'mobx-react-lite'
 import { Timestamp, CloudinaryImage, Link, Button } from './uiLib'
-import pathBuilder from '@/lib/pathBuidler'
+import pathBuilder from '@/lib/pathBuilder'
 import LinkPreview from './LinkPreview'
 
 const PostCard = observer(

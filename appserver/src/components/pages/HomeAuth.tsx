@@ -2,7 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useStore } from '@/lib/store'
 import ProjectList from '@/components/ProjectList'
 import { Divider, H, Link } from '@/components/uiLib'
-import pathBuilder from '@/lib/pathBuidler'
+import pathBuilder from '@/lib/pathBuilder'
 import UserPreview from '../UserPreview'
 
 const HomeAuth = observer(() => {

@@ -9,7 +9,7 @@ import {
 } from '@/components/uiLib'
 import { useState, useCallback } from 'react'
 import profileUtils from '@/lib/profileUtils'
-import pathBuilder from '@/lib/pathBuidler'
+import pathBuilder from '@/lib/pathBuilder'
 import { useRouter } from 'next/router'
 import ImageUpload from '../ImageUpload'
 import type { UploadCallback } from '../ImageUpload'

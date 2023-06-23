@@ -3,12 +3,13 @@ import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import { H, Link, Timestamp, Divider, CloudinaryImage, Button, Select } from '../uiLib'
 import UserPreview from '../UserPreview'
-import pathBuilder from '@/lib/pathBuidler'
+import pathBuilder from '@/lib/pathBuilder'
 import { getParamString } from '@/lib/nextUtils'
 import NotFound from './NotFound'
 import PostCard from '../PostCard'
 import { useStore } from '@/lib/store'
 import { useLocalStorage } from 'usehooks-ts'
+import Breadcrumbs from '../Breadcrumbs'
 
 const ProjectPage = observer(
   ({ targetUser }: { targetUser: ApiUser | false }) => {
@@ -33,6 +34,7 @@ const ProjectPage = observer(
     return (
       <>
         <div>
+          <Breadcrumbs crumbs={[{name:project.title}]} />
           <UserPreview user={targetUser} compact={true} />
           <div className="my-4 flex flex-row items-center gap-8">
             <H.H4>{project.title}</H.H4>
