@@ -19,15 +19,15 @@ const DeletionConfirmationModal = observer(() => {
     >
       <p>This action cannot be undone.</p>
       <div className="grid grid-cols-2 gap-4 mt-4">
-        <Button intent="secondary" onClick={() => store.onDeleteResult('no')}>
-          Cancel
-        </Button>
         <Button
           spinning={store.confirmingDelete.deleting}
           intent="primary"
           onClick={() => store.onDeleteResult('yes')}
         >
           Delete
+        </Button>
+        <Button intent="secondary" onClick={() => store.onDeleteResult('no')}>
+          Cancel
         </Button>
       </div>
     </Modal>

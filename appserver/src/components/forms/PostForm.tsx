@@ -324,6 +324,20 @@ const PostForm = observer((props: Props) => {
         <Button type="submit" disabled={!postStore.isPostable()}>
           {mode === 'new' ? 'POST' : 'SAVE'}
         </Button>
+        {mode === 'edit' && (
+          <div className="text-center">
+            <Button
+              intent="link"
+              className="text-red-500"
+              onClick={() =>
+                store.promptDeletePost(postStore.getApiPost())
+              }
+            >
+              Delete post
+            </Button>
+          </div>
+        )}
+ 
       </form>
     </div>
   )

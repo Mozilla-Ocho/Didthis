@@ -93,7 +93,8 @@ class ProjectStore {
   isPostable() {
     if (!this.title.trim()) return false
     if (this.title.trim().length > profileUtils.maxChars.title) return false
-    if (this.description.trim().length > profileUtils.maxChars.blurb) return false
+    if (this.description.trim().length > profileUtils.maxChars.blurb)
+      return false
     return true
   }
 }
@@ -133,7 +134,7 @@ const ProjectForm = observer((props: Props) => {
     projectStore.setDescription(e.target.value)
   }
   const setVisibility = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("checkbox",e)
+    console.log('checkbox', e)
     projectStore.setScope(e.target.checked ? 'private' : 'public')
   }
   const setStatus = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -244,16 +245,29 @@ const ProjectForm = observer((props: Props) => {
               intent="project"
               onUploadWithUseCallback={onImageUpload}
             />
-          {projectStore.imageAssetId && (
-            <Button intent="secondary" onClick={deleteImage}>
-              Remove image
-            </Button>
-          )}
+            {projectStore.imageAssetId && (
+              <Button intent="secondary" onClick={deleteImage}>
+                Remove image
+              </Button>
+            )}
           </div>
         </div>
         <Button type="submit" disabled={!projectStore.isPostable()}>
-          {mode === 'new' ? 'Create' : 'Save' }
+          {mode === 'new' ? 'Create' : 'Update'}
         </Button>
+        {mode === 'edit' && (
+          <div className="text-center">
+            <Button
+              intent="link"
+              className="text-red-500"
+              onClick={() =>
+                store.promptDeleteProject(projectStore.getApiProject())
+              }
+            >
+              Delete project
+            </Button>
+          </div>
+        )}
       </form>
     </div>
   )

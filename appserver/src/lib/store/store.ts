@@ -362,8 +362,12 @@ class Store {
             projectId: this.confirmingDelete.thing.projectId,
           })
           .then(wrapper => {
-            this.confirmingDelete = false
-            this.setUser(wrapper.payload.user)
+            if (this.confirmingDelete && this.confirmingDelete.kind === "post") {
+              const projectId = this.confirmingDelete.thing.projectId
+              this.confirmingDelete = false
+              this.setUser(wrapper.payload.user)
+              this.router.push(pathBuilder.project(wrapper.payload.user.systemSlug, projectId))
+            }
           })
       }
       if (this.confirmingDelete.kind === 'project') {

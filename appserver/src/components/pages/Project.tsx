@@ -52,36 +52,13 @@ const ProjectPage = observer(
             </p>
           </div>
 
-          <div className="my-4 w-full flex flex-row items-center gap-4">
+          <div className="my-4 w-full flex flex-row items-center gap-4 sm:w-[200px]">
             {store.user && isSelf && (
               <Button
                 intent="secondary"
                 className="flex-grow basis-8/12"
               >
                 Share
-              </Button>
-            )}
-            {store.user && isSelf && (
-              <div className="basis-2/12">
-                <Link
-                  intent="secondary"
-                  href={pathBuilder.projectEdit(
-                    store.user.systemSlug,
-                    project.id
-                  )}
-                  className="w-full"
-                >
-                  Edit
-                </Link>
-              </div>
-            )}
-            {store.user && isSelf && (
-              <Button
-                intent="secondary"
-                className="basis-2/12"
-                onClick={() => store.promptDeleteProject(project)}
-              >
-                Delete
               </Button>
             )}
           </div>

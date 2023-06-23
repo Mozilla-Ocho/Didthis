@@ -3,7 +3,6 @@ import { observer } from 'mobx-react-lite'
 import { Timestamp, CloudinaryImage, Link, Button } from './uiLib'
 import pathBuilder from '@/lib/pathBuidler'
 import LinkPreview from './LinkPreview'
-import { useStore } from '@/lib/store'
 
 const PostCard = observer(
   ({
@@ -18,7 +17,6 @@ const PostCard = observer(
     focused: boolean
   }) => {
     const isSelf = authUser && authUser.id === targetUser.id
-    const store = useStore()
     return (
       <div>
         <p className="text-bs text-timestamps mb-2">
@@ -45,14 +43,6 @@ const PostCard = observer(
             >
               Edit
             </Link>
-            <div className="text-right">
-              <Button
-                intent="link"
-                onClick={() => store.promptDeletePost(post)}
-              >
-                Delete
-              </Button>
-            </div>
           </div>
         )}
       </div>
