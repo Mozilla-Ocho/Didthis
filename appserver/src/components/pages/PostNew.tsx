@@ -32,10 +32,10 @@ const NewPostPage = observer(() => {
                   ),
                 }
               : { name: 'New project' },
-            { name: 'New post' },
+            { name: 'Add post' },
           ]}
         />
-        <H.H1>New post</H.H1>
+        <H.H3>Add post</H.H3>
         <PostForm mode="new" />
       </div>
     </>

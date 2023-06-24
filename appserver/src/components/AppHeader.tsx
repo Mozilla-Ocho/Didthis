@@ -10,12 +10,12 @@ const AppHeader = observer(() => {
     return (
       <div>
         <div className="flex items-baseline p-4">
-          <div className="bg-yellow-300 pt-2 px-1 inline-block text-bxl">
+          <div className="bg-yellow-300 pt-2 px-1 inline-block text-xl">
             <Link intent="logo" href="/">
               <H.HLogo>DABBLER</H.HLogo>
             </Link>
           </div>
-          <div className="text-right text-bs flex-grow">
+          <div className="text-right text-sm flex-grow">
             {store.user ? <LogoutButton intent="headerNav" /> : ''}
           </div>
         </div>
@@ -26,7 +26,7 @@ const AppHeader = observer(() => {
     return (
       <div>
         <div className="p-4 text-center">
-          <span className="bg-yellow-300 pt-2 px-1 inline-block text-bxl mx-auto">
+          <span className="bg-yellow-300 pt-2 px-1 inline-block text-xl mx-auto">
             <Link intent="logo" href="/">
               <H.HLogo>DABBLER</H.HLogo>
             </Link>

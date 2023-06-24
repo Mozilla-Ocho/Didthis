@@ -23,10 +23,14 @@ const ImageUpload = ({
   // creates and destroys the widget.
   onUploadWithUseCallback,
   className,
+  isReplace,
+  required,
 }: {
   intent: CldImageIntent
   onUploadWithUseCallback: (result: UploadResult) => void
   className?: string,
+  isReplace?: boolean,
+  required?: boolean,
 }) => {
   const [widget, setWidget] = useState<Widget>()
   const [, setRerenderDummyFn] = useState(0)
@@ -124,11 +128,9 @@ const ImageUpload = ({
   }, [intent, onUploadWithUseCallback])
 
   return (
-    <>
-      <Button className={className} intent="secondary" onClick={launchWidget}>
-        Upload Image
-      </Button>
-    </>
+    <Button className={className} intent={required && !isReplace ? "primary" : "secondary"} onClick={launchWidget}>
+      {isReplace ? "Replace image" : "Upload image"}
+    </Button>
   )
 }
 

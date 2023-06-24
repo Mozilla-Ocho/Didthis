@@ -29,7 +29,7 @@ const Breadcrumbs = observer(({ crumbs }: { crumbs: Crumb[] }) => {
     if (numCols > 9)
       gridCols = 'grid-cols-[auto_auto_auto_auto_auto_auto_auto_auto_auto]'
     return (
-      <div className={`p-4 -mt-4 -mx-4 mb-4 bg-breadcrumbs`}>
+      <div className={`p-4 -mt-4 -mx-4 mb-4 bg-breadcrumbs border-b-[1px] border-edges-light`}>
         <div className={`w-fit grid gap-2 ${gridCols}`}>
           <div>
             <Link

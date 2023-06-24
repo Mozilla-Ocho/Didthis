@@ -3,7 +3,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { twMerge } from 'tailwind-merge'
 import Spinner from './Spinner'
 
-const buttonCVA = cva('button px-4 py-3 rounded text-bs', {
+const buttonCVA = cva('button px-4 py-3 rounded text-sm', {
   variants: {
     intent: {
       primary: [
@@ -42,7 +42,7 @@ const buttonCVA = cva('button px-4 py-3 rounded text-bs', {
         'underline',
         'text',
         'text-links',
-        'text-bs',
+        'text-sm',
         'hover:text-links-hover',
         'active:text-links-active',
         'p-0',

@@ -29,7 +29,7 @@ const linkCVA = cva('link', {
       primary: [
         'inline-block',
         'text-center',
-        'text-bs',
+        'text-sm',
         'px-4',
         'py-3',
         'rounded',
@@ -45,7 +45,7 @@ const linkCVA = cva('link', {
       secondary: [
         'inline-block',
         'text-center',
-        'text-bs',
+        'text-sm',
         'px-4',
         'py-3',
         'rounded',

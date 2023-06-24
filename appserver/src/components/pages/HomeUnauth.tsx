@@ -9,7 +9,7 @@ const HomeUnauth = () => {
       <AppHeader />
       <div className="bg-yellow-home-light">
         <div className="bg-yellow-home p-4 text-center">
-          <p className="text-h2">You’ve been invited to join</p>
+          <p className="text-5xl">You’ve been invited to join</p>
           <H.H1>Dabbler</H.H1>
           <LoginButton />
           <H.H4>What is Dabbler?</H.H4>

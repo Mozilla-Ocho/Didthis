@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { Icon, Link } from '@/components/uiLib'
+import Spinner from './uiLib/Spinner'
 
 const StyledLinkPreview = ({
   loading,
@@ -30,12 +31,14 @@ const StyledLinkPreview = ({
       </div>
       <div className="overflow-hidden p-3 bg-white">
         <p>
-          {loading && 'Loading preview...'}
+          {loading && <span><Spinner className="inline-block mr-2 align-text-bottom" /> Loading preview...</span>}
+          {error && <span className="text-black-300"><em>
           {error === 'bad_url' && 'This link appears to be an invalid URL'}
           {error === 'remote_fetch' &&
             'Could not fetch the page for this link, is it a working page?'}
           {error === 'other' &&
             'Oops, there was an unexpected error fetching this link.'}
+          </em></span>}
           {!loading && !error && urlMeta?.host && (
             <span className="text-linkpreview-host">{urlMeta?.host}</span>
           )}

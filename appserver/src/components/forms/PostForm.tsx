@@ -14,6 +14,9 @@ import LinkPreview from '../LinkPreview'
 import ImageUpload from '../ImageUpload'
 import type { UploadCallback } from '../ImageUpload'
 import profileUtils from '@/lib/profileUtils'
+import { twMerge } from 'tailwind-merge'
+
+type MediaType = 'text' | 'image' | 'link'
 
 class PostStore {
   id: string
@@ -23,7 +26,9 @@ class PostStore {
   // they all show up externally if the project is public.
   scope: ApiScope
   projectId: ApiProjectId
+  mediaType: MediaType = 'text'
   linkUrl: string
+  linkTouched = false
   fetchingUrl = ''
   fetching = false
   imageAssetId: string
@@ -31,6 +36,7 @@ class PostStore {
   error: UrlMetaError = false
   urlMeta: ApiUrlMeta | false
   fetchUrlMetaAndUpdateDebounced: () => void
+  spinning = false
 
   constructor(
     mode: 'edit' | 'new',
@@ -52,9 +58,12 @@ class PostStore {
       this.description = post.description || ''
       this.scope = post.scope
       this.linkUrl = post.linkUrl || ''
+      this.linkTouched = !!this.linkUrl.trim()
+      if (this.linkTouched) this.mediaType = 'link'
       this.imageAssetId = post.imageAssetId || ''
       this.imageMeta = post.imageMeta
       this.urlMeta = post.urlMeta || false
+      if (this.imageAssetId) this.mediaType = 'image'
     } else {
       throw new Error(
         'post store must be initialized with "new", or "edit" and an api post obj'
@@ -82,11 +91,11 @@ class PostStore {
       projectId: this.projectId,
       scope: this.scope,
       description: this.description.trim(),
-      imageAssetId: this.imageAssetId || undefined,
-      imageMeta: this.imageMeta,
+      imageAssetId: this.mediaType === 'image' ? (this.imageAssetId || undefined) : undefined,
+      imageMeta: this.mediaType === 'image' ? this.imageMeta : undefined,
       linkUrl:
-        this.linkUrl && this.linkUrl.trim() ? this.linkUrl.trim() : undefined,
-      urlMeta: this.urlMeta ? this.urlMeta : undefined,
+        this.mediaType === 'link' && this.linkUrl && this.linkUrl.trim() ? this.linkUrl.trim() : undefined,
+      urlMeta: this.mediaType === 'link' && this.urlMeta ? this.urlMeta : undefined,
     }
   }
 
@@ -102,11 +111,21 @@ class PostStore {
 
   isPostable() {
     // XXX length validations
-    if (this.linkUrlIsInvalid()) return false
     const hasText = !!this.description.trim()
     const hasUrl = !!this.linkUrl.trim()
     const hasImage = !!this.imageAssetId.trim()
-    return hasText || hasUrl || hasImage
+    const descOver = (this.description.trim().length > profileUtils.maxChars.blurb)
+    const linkOver = (this.linkUrl.trim().length > profileUtils.maxChars.url)
+    if (descOver) return false
+    if (this.mediaType === 'link') {
+      if (this.linkUrlIsInvalid()) return false
+      if (linkOver) return false
+      return hasUrl
+    }
+    if (this.mediaType === 'image') {
+      return hasImage
+    }
+    return hasText
   }
 
   setDescription(x: string) {
@@ -124,7 +143,14 @@ class PostStore {
   }
   setUrlWithSideEffects(x: string) {
     this.linkUrl = x
+    this.linkTouched = true
     this.fetchUrlMetaAndUpdateDebounced()
+  }
+  setMediaType(x: MediaType) {
+    this.mediaType = x
+  }
+  setSpinning(x: boolean) {
+    this.spinning = x
   }
 
   fetchUrlMetaAndUpdate(): void {
@@ -167,6 +193,8 @@ class PostStore {
             this.error = 'remote_fetch'
           }
         }
+        this.fetchingUrl = ''
+        this.fetching = false
         this.urlMeta = false
       })
   }
@@ -190,12 +218,13 @@ const ProjectSelector = observer(({ postStore }: { postStore: PostStore }) => {
   nameAndId.unshift(['Create a new project', 'new'])
   return (
     <div>
-      <label htmlFor="project-selector">
-        Project:
+      <label htmlFor="project-selector" className="text-form-labels text-sm">
+        Add to which project?
         <Select
           id="project-selector"
           onChange={handleChangeProject}
           value={postStore.projectId}
+          className="mt-2 text-bodytext"
         >
           {nameAndId.map(nid => (
             <option key={nid[1]} value={nid[1]}>
@@ -215,13 +244,16 @@ const DescriptionField = observer(({ postStore }: { postStore: PostStore }) => {
   return (
     <>
       <label htmlFor="description-field">
-        description:
+        <span className="sr-only">description:</span>
         <Textarea
           id="description-field"
-          placeholder="Write your update here..."
+          placeholder=""
           name="description"
           value={postStore.description}
           onChange={handleChange}
+          className="text-bodytext"
+          touched={true}
+          maxLen={profileUtils.maxChars.blurb}
         />
       </label>
     </>
@@ -234,29 +266,25 @@ const LinkField = observer(({ postStore }: { postStore: PostStore }) => {
   }
   return (
     <>
+      <LinkPreview
+        loading={postStore.fetching}
+        error={postStore.error}
+        urlMeta={postStore.urlMeta}
+        linkUrl={postStore.linkUrl}
+      />
       <label htmlFor="linkField">
-        link:
+        <span className="sr-only">link URL:</span>
         <Input
           id="linkField"
           type="text"
           name="linkUrl"
+          placeholder="https://..."
           value={postStore.linkUrl}
           onChange={handleChange}
+          required
+          touched={postStore.linkTouched}
+          maxLen={profileUtils.maxChars.url}
         />
-        <LinkPreview
-          loading={postStore.fetching}
-          error={postStore.error}
-          urlMeta={postStore.urlMeta}
-          linkUrl={postStore.linkUrl}
-        />
-        {postStore.fetching && <p>loading preview...</p>}
-        {postStore.error === 'bad_url' && <p>this URL appears to be invalid</p>}
-        {postStore.error === 'remote_fetch' && (
-          <p>error loading this page for a preview</p>
-        )}
-        {postStore.error === 'other' && (
-          <p>oops, unexpected error fetching a preview</p>
-        )}
       </label>
     </>
   )
@@ -275,16 +303,30 @@ const ImageField = observer(({ postStore }: { postStore: PostStore }) => {
   return (
     <div>
       {postStore.imageAssetId && (
-        <CloudinaryImage assetId={postStore.imageAssetId} intent="post" />
+        <CloudinaryImage
+          assetId={postStore.imageAssetId}
+          intent="post"
+          className="mb-4"
+        />
       )}
-      {!postStore.imageAssetId && (
-        <ImageUpload intent="post" onUploadWithUseCallback={onResult} />
-      )}
-      {postStore.imageAssetId && (
-        <Button intent="link" onClick={deleteImage}>
-          remove
-        </Button>
-      )}
+      <div className="flex flex-row gap-4 w-full">
+        <ImageUpload
+          intent="post"
+          onUploadWithUseCallback={onResult}
+          className="flex-grow"
+          isReplace={!!postStore.imageAssetId}
+          required
+        />
+        {postStore.imageAssetId && (
+          <Button
+            intent="secondary"
+            onClick={deleteImage}
+            className="flex-grow"
+          >
+            Remove
+          </Button>
+        )}
+      </div>
     </div>
   )
 })
@@ -306,7 +348,10 @@ const PostForm = observer((props: Props) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     e.stopPropagation()
+    postStore.setSpinning(true)
     store.savePost(postStore.getApiPost()).then(newPost => {
+      // keep it spinning while next page loads
+      // postStore.setSpinning(false)
       if (!store.user) return
       console.log('ok done', newPost)
       router.push(
@@ -314,30 +359,78 @@ const PostForm = observer((props: Props) => {
       )
     })
   }
+  const handleMediaType = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('handleMediaType', e)
+    postStore.setMediaType(e.target.value as MediaType)
+  }
+  const labelClass = (t: MediaType) => {
+    return twMerge(
+      'cursor-pointer hover:font-bold text-lg text-black-300',
+      postStore.mediaType === t && 'font-bold text-yellow-700'
+    )
+  }
   return (
     <div>
-      <form onSubmit={handleSubmit} method="POST">
-        <ProjectSelector postStore={postStore} />
+      <form
+        onSubmit={handleSubmit}
+        method="POST"
+        className="flex flex-col gap-5"
+      >
+        {defaultPid === 'new' && <ProjectSelector postStore={postStore} />}
+        <div className="grid grid-cols-3 gap-4 text-center mt-8">
+          <label htmlFor="mediaText" className={labelClass('text')}>
+            <input
+              id="mediaText"
+              onChange={handleMediaType}
+              className="sr-only"
+              type="radio"
+              value="text"
+              checked={postStore.mediaType === 'text'}
+            />{' '}
+            Text
+          </label>
+          <label htmlFor="mediaImage" className={labelClass('image')}>
+            <input
+              id="mediaImage"
+              onChange={handleMediaType}
+              className="sr-only"
+              type="radio"
+              value="image"
+              checked={postStore.mediaType === 'image'}
+            />{' '}
+            Image
+          </label>
+          <label htmlFor="mediaLink" className={labelClass('link')}>
+            <input
+              id="mediaLink"
+              onChange={handleMediaType}
+              className="sr-only"
+              type="radio"
+              value="link"
+              checked={postStore.mediaType === 'link'}
+            />{' '}
+            Link
+          </label>
+        </div>
+        {postStore.mediaType === 'image' && (
+          <ImageField postStore={postStore} />
+        )}
+        {postStore.mediaType === 'link' && <LinkField postStore={postStore} />}
         <DescriptionField postStore={postStore} />
-        <ImageField postStore={postStore} />
-        <LinkField postStore={postStore} />
-        <Button type="submit" disabled={!postStore.isPostable()}>
-          {mode === 'new' ? 'POST' : 'SAVE'}
+        <Button type="submit" disabled={!postStore.isPostable()} spinning={postStore.spinning}>
+          {mode === 'new' ? 'Add' : 'Update'}
         </Button>
         {mode === 'edit' && (
           <div className="text-center">
             <Button
               intent="link"
               className="text-red-500"
-              onClick={() =>
-                store.promptDeletePost(postStore.getApiPost())
-              }
+              onClick={() => store.promptDeletePost(postStore.getApiPost())}
             >
               Delete post
             </Button>
           </div>
         )}
- 
       </form>
     </div>
   )

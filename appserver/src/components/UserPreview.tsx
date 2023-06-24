@@ -26,7 +26,7 @@ const UserPreview = observer(
               />
             </p>
           )}
-          <p className="m-0 text-bs">
+          <p className="m-0 text-sm">
             <Link
               intent="internalNav"
               href={pathBuilder.user(user.publicPageSlug)}

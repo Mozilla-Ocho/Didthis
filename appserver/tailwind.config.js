@@ -72,15 +72,18 @@ module.exports = {
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
       fontSize: {
-        bxl: ['24px','28px'],
-        bl: ['20px','26px'],
-        bm: ['16px','24px'],
-        bs: ['14px','22px'],
-        h1: ['64px','82px'],
-        h2: ['48px','62px'],
-        h3: ['36px','46px'],
-        h4: ['24px','28px'],
-        h5: ['20px','24px'],
+        // for body text. we need to use tailwind's naming conventions for
+        // twMerge to work well.
+        sm: ['14px','22px'],    // S in mocks
+        base: ['16px','24px'],  // M in mocks
+        lg: ['20px','26px'],    // L in mocks
+        xl: ['24px','28px'],    // XL in mocks
+        // for headers, likewise we stick to names that twMerge knows about.
+        '2xl': ['20px','24px'], // H5 in mocks
+        '3xl': ['24px','28px'], // H4 in mocks
+        '4xl': ['36px','46px'], // H3 in mocks
+        '5xl': ['48px','62px'], // H2 in mocks
+        '6xl': ['64px','82px'], // H1 in mocks
       },
       spacing: {
         px: '1px',

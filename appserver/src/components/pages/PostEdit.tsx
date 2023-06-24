@@ -10,6 +10,7 @@ import { useStore } from '@/lib/store'
 import PostForm from '@/components/forms/PostForm'
 import Breadcrumbs from '../Breadcrumbs'
 import pathBuilder from '@/lib/pathBuilder'
+import {H} from '../uiLib'
 
 const PostEditPage = observer(() => {
   const store = useStore();
@@ -30,9 +31,10 @@ const PostEditPage = observer(() => {
             name: project.title,
             href: pathBuilder.project(user.systemSlug, project.id),
           },
-          { name: 'New post' },
+          { name: post ? 'Edit post' : 'New post' },
         ]}
       />
+      <H.H3>Edit post</H.H3>
       <PostForm mode="edit" post={post} />
     </>
   )

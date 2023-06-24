@@ -18,7 +18,7 @@ const PostCard = observer(
     const isSelf = authUser && authUser.id === targetUser.id
     return (
       <div>
-        <p className="text-bs text-timestamps mb-2">
+        <p className="text-sm text-timestamps mb-2">
           <Timestamp millis={post.createdAt} />
         </p>
         {post.imageAssetId && (
