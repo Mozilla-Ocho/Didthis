@@ -23,6 +23,7 @@ const pathBuilder = {
     else return user(slug) + '/post'
   },
   legal: (doc: "tos" | "pp" | "au") => {
+    // DRY_86188 legal page routes
     if (doc === "tos") return '/terms'
     if (doc === "pp") return '/privacy'
     if (doc === "au") return '/acceptable-use'
