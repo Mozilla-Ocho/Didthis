@@ -15,7 +15,7 @@ class FormStore {
   slugWrapper: SlugCheckWrapper | undefined
   checkingSlug = true
   imageAssetId: string
-  imageMeta: CldImageMetaAny | CldImageMetaPublic | undefined
+  imageMeta: CldImageMetaPrivate | CldImageMetaPublic | undefined
   doSlugCheckDebounced: () => void
 
   constructor(user: ApiUser) {
@@ -46,7 +46,7 @@ class FormStore {
   }
   setImageAssetId(
     assetId: string,
-    meta: CldImageMetaAny | CldImageMetaPublic | undefined
+    meta: CldImageMetaPrivate | CldImageMetaPublic | undefined
   ) {
     this.imageAssetId = assetId
     this.imageMeta = meta

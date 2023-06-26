@@ -1,10 +1,11 @@
 import { getCloudinaryConfig } from '@/lib/cloudinaryConfig'
 import { useEffect, useState } from 'react'
 import { Button } from './uiLib'
+import log from '@/lib/log'
 
 type UploadResult = {
   cloudinaryAssetId: string
-  info: CldImageMetaAny
+  info: CldImageMetaPrivate
 }
 
 type UploadCallback = (result: UploadResult) => void
@@ -54,62 +55,100 @@ const ImageUpload = ({
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       (error: any, result: any) => {
         if (!error && result && result.event === 'success') {
-          console.log('cloudinary result', result)
+          log.api('cloudinary result', result)
           /*
            * note: to get the image_metadata object, the "image metadata"
            * switch must be enabled for the upload preset under the "media
            * analysis and ai" category of settings for the preset.
+           * it's important to NOT have any incoming transformations, because
+           * those will remove the ability to obtain the original EXIF data
+           * from camera image uploads.
           result.info = {
-            "id": "uw-file3",
-            "batchId": "uw-batch2",
-            "asset_id": "5d63c1b08ef2995e9907e6b826190c82",
-            "public_id": "prompts/iih1rfvcuuvq5fvr1pzv",
-            "version": 1686869157,
-            "version_id": "77203245d0f3e5f541a23ec48e97c296",
-            "signature": "592a9bea1ebe44486fcc649afca9870a1bd87511",
+          {
+            "id": "uw-file9",
+            "batchId": "uw-batch8",
+            "asset_id": "21ca891add0ab4ba7fb11c049c3d39f4",
+            "public_id": "dabblerposts/niaqzg3bsfdhw2j0qwxn",
+            "version": 1687817193,
+            "version_id": "7ed1234ce6925f956cc34fadf3e22cbe",
+            "signature": "2c96ad8ba98ea770231961214b53f4d9f91df570",
             "width": 1500,
-            "height": 750,
+            "height": 2000,
             "format": "jpg",
             "resource_type": "image",
-            "created_at": "2023-06-15T22:45:57Z",
+            "created_at": "2023-06-26T22:06:33Z",
             "tags": [
-              "project"
+              "post"
             ],
             "pages": 1,
-            "bytes": 510217,
+            "bytes": 2139928,
             "type": "upload",
-            "etag": "2c3b7d5cfb419d81ff6e4a728bd203c3",
+            "etag": "8a56fa3a9239d97eacd9a839f14c4e07",
             "placeholder": false,
-            "url": "http://res.cloudinary.com/dbpulyvbq/image/upload/v1686869157/prompts/iih1rfvcuuvq5fvr1pzv.jpg",
-            "secure_url": "https://res.cloudinary.com/dbpulyvbq/image/upload/v1686869157/prompts/iih1rfvcuuvq5fvr1pzv.jpg",
-            "folder": "prompts",
+            "url": "http://res.cloudinary.com/dbpulyvbq/image/upload/v1687817193/dabblerposts/niaqzg3bsfdhw2j0qwxn.jpg",
+            "secure_url": "https://res.cloudinary.com/dbpulyvbq/image/upload/v1687817193/dabblerposts/niaqzg3bsfdhw2j0qwxn.jpg",
+            "folder": "dabblerposts",
             "access_mode": "public",
             "image_metadata": {
+              "Make": "Apple",
+              "Model": "iPhone 12 mini",
+              "Orientation": "Horizontal (normal)",
+              "XResolution": "72",
+              "YResolution": "72",
+              "ResolutionUnit": "inches",
+              "Software": "16.3.1",
+              "ModifyDate": "2023:06:04 15:49:37",
+              "HostComputer": "iPhone 12 mini",
+              "TileWidth": "512",
+              "TileLength": "512",
+              "YCbCrPositioning": "Centered",
+              "ExposureTime": "1/1366",
+              "FNumber": "1.6",
+              "ExposureProgram": "Program AE",
+              "ISO": "32",
+              "ExifVersion": "0232",
+              "DateTimeOriginal": "2023:06:04 15:49:37",
+              "CreateDate": "2023:06:04 15:49:37",
+              "OffsetTime": "-07:00",
+              "OffsetTimeOriginal": "-07:00",
+              "OffsetTimeDigitized": "-07:00",
+              "ComponentsConfiguration": "Y, Cb, Cr, -",
+              "ShutterSpeedValue": "1/1366",
+              "ApertureValue": "1.6",
+              "BrightnessValue": "8.351612975",
+              "ExposureCompensation": "0",
+              "MeteringMode": "Multi-segment",
+              "Flash": "Off, Did not fire",
+              "FocalLength": "4.2 mm",
+              "SubjectArea": "2009 1502 2208 1387",
+              "SubSecTimeOriginal": "333",
+              "SubSecTimeDigitized": "333",
+              "FlashpixVersion": "0100",
+              "ColorSpace": "Uncalibrated",
+              "ExifImageWidth": "4032",
+              "ExifImageHeight": "3024",
+              "SensingMethod": "One-chip color area",
+              "SceneType": "Directly photographed",
+              "ExposureMode": "Auto",
+              "WhiteBalance": "Auto",
+              "FocalLengthIn35mmFormat": "26 mm",
+              "SceneCaptureType": "Standard",
+              "LensInfo": "1.549999952-4.2mm f/1.6-2.4",
+              "LensMake": "Apple",
+              "LensModel": "iPhone 12 mini back dual wide camera 4.2mm f/1.6",
+              "CompositeImage": "General Composite Image",
               "JFIFVersion": "1.01",
-              "ResolutionUnit": "None",
-              "XResolution": "1",
-              "YResolution": "1",
               "ProfileDescription": "Display P3",
               "Colorspace": "RGB",
-              "DPI": "0"
-            },
-            "coordinates": {
-              "custom": [
-                [
-                  0,
-                  0,
-                  1500,
-                  750
-                ]
-              ]
+              "DPI": "72"
             },
             "illustration_score": 0,
             "semi_transparent": false,
             "grayscale": false,
             "original_filename": "IMG_5299",
             "original_extension": "jpeg",
-            "path": "v1686869157/prompts/iih1rfvcuuvq5fvr1pzv.jpg",
-            "thumbnail_url": "https://res.cloudinary.com/dbpulyvbq/image/upload/c_limit,h_60,w_90/v1686869157/prompts/iih1rfvcuuvq5fvr1pzv.jpg"
+            "path": "v1687817193/dabblerposts/niaqzg3bsfdhw2j0qwxn.jpg",
+            "thumbnail_url": "https://res.cloudinary.com/dbpulyvbq/image/upload/c_limit,h_60,w_90/v1687817193/dabblerposts/niaqzg3bsfdhw2j0qwxn.jpg"
           }
           */
           onUploadWithUseCallback({

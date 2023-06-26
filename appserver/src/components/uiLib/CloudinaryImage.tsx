@@ -1,13 +1,14 @@
-import { AdvancedImage, lazyload } from '@cloudinary/react'
-import { getCloudinaryTransform } from '@/lib/cloudinaryConfig'
+import { getCloudinaryTransform, cloudinaryUrlDirect } from '@/lib/cloudinaryConfig'
 import { twMerge } from 'tailwind-merge'
 
 const CloudinaryImage = ({
   assetId,
+  imageMeta,
   intent,
   className,
 }: {
   assetId: string | undefined | false
+  imageMeta?: CldImageMetaAny
   intent: CldImageIntent
   className?: string
 }) => {
@@ -19,10 +20,13 @@ const CloudinaryImage = ({
   const aspect = ['aspect-h-1']
   if (intent === 'avatar' || intent === 'project') {
     aspect.push('aspect-w-1')
+  } else if (intent === 'post') {
+    aspect.pop()
   } else {
     aspect.push('aspect-w-2')
   }
   // leading-none fixes space after images
+  /* eslint-disable @next/next/no-img-element */
   return (
     <span className="block w-full">
       <span
@@ -34,9 +38,11 @@ const CloudinaryImage = ({
           className
         )}
       >
-        <AdvancedImage
-          cldImg={getCloudinaryTransform(intent, assetId)}
-          plugins={[lazyload()]}
+        <img
+          alt="user uploaded image"
+          width={imageMeta?.width || null}
+          height={imageMeta?.height || null}
+          src={cloudinaryUrlDirect(assetId, intent, imageMeta)}
         />
       </span>
     </span>

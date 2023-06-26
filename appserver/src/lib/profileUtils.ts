@@ -33,7 +33,7 @@ const mkDefaultProfile = () => {
 }
 
 const filteredImageMeta = (
-  meta: CldImageMetaAny | CldImageMetaPublic | undefined
+  meta: CldImageMetaPrivate | CldImageMetaPublic | undefined
 ): CldImageMetaPublic | undefined => {
   if (meta) {
     return {

@@ -60,11 +60,12 @@ type CldImageMetaPublic = {
 /* we're going to capture whatever object metadata cloudinary returns with
  * images, which includes things like the original dimensions, format, etc */
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-type CldImageMetaAny = {[key:string]: any} & {metaOrigin: 'private' }
+type CldImageMetaPrivate = {[key:string]: any} & {metaOrigin: 'private' }
 // for imageMeta on link previews, metaOrigin is "urlMeta" and contains the
 // whole payload but doesn't need to be filtered.
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 type CldImageMetaUrl = {[key:string]: any} & {metaOrigin: 'urlMeta'}
+type CldImageMetaAny = CldImageMetaPublic | CldImageMetaPrivate | CldImageMetaUrl
 
 type ApiPost = {
   id: ApiPostId
@@ -76,7 +77,7 @@ type ApiPost = {
   linkUrl?: string
   urlMeta?: ApiUrlMeta
   imageAssetId?: string
-  imageMeta?: CldImageMetaAny | CldImageMetaPublic
+  imageMeta?: CldImageMetaPrivate | CldImageMetaPublic
 }
 
 type ApiProject = {
@@ -89,14 +90,14 @@ type ApiProject = {
   posts: { [key: string]: ApiPost }
   description?: string
   imageAssetId?: string
-  imageMeta?: CldImageMetaAny | CldImageMetaPublic
+  imageMeta?: CldImageMetaPrivate | CldImageMetaPublic
 }
 
 type ApiProfile = {
   name?: string
   bio?: string
   imageAssetId?: string
-  imageMeta?: CldImageMetaAny | CldImageMetaPublic
+  imageMeta?: CldImageMetaPrivate | CldImageMetaPublic
   projects: { [key: string]: ApiProject }
 }
 

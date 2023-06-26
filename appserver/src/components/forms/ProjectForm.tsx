@@ -22,7 +22,7 @@ class ProjectStore {
   scope: ApiScope
   projectId: ApiProjectId
   imageAssetId: string
-  imageMeta: CldImageMetaAny | CldImageMetaPublic | undefined
+  imageMeta: CldImageMetaPrivate | CldImageMetaPublic | undefined
   currentStatus: ApiProjectStatus
 
   constructor(
@@ -84,7 +84,7 @@ class ProjectStore {
   }
   setImageAssetId(
     assetId: string,
-    meta: CldImageMetaAny | CldImageMetaPublic | undefined
+    meta: CldImageMetaPrivate | CldImageMetaPublic | undefined
   ) {
     this.imageAssetId = assetId
     this.imageMeta = meta

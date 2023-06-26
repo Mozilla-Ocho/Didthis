@@ -32,7 +32,7 @@ class PostStore {
   fetchingUrl = ''
   fetching = false
   imageAssetId: string
-  imageMeta: CldImageMetaAny | CldImageMetaPublic | undefined
+  imageMeta: CldImageMetaPrivate | CldImageMetaPublic | undefined
   error: UrlMetaError = false
   urlMeta: ApiUrlMeta | false
   fetchUrlMetaAndUpdateDebounced: () => void
@@ -137,7 +137,7 @@ class PostStore {
   setScope(x: ApiScope) {
     this.scope = x
   }
-  setImageAssetId(assetId: string, meta: CldImageMetaAny | undefined) {
+  setImageAssetId(assetId: string, meta: CldImageMetaPrivate | undefined) {
     this.imageAssetId = assetId
     this.imageMeta = meta
   }
@@ -305,6 +305,7 @@ const ImageField = observer(({ postStore }: { postStore: PostStore }) => {
       {postStore.imageAssetId && (
         <CloudinaryImage
           assetId={postStore.imageAssetId}
+          imageMeta={postStore.imageMeta}
           intent="post"
           className="mb-4"
         />

@@ -22,7 +22,7 @@ const PostCard = observer(
           <Timestamp millis={post.createdAt} />
         </p>
         {post.imageAssetId && (
-          <CloudinaryImage assetId={post.imageAssetId} intent="post" />
+          <CloudinaryImage assetId={post.imageAssetId} intent="post" imageMeta={post.imageMeta}/>
         )}
         {post.linkUrl && (
           <LinkPreview linkUrl={post.linkUrl} urlMeta={post.urlMeta} />
