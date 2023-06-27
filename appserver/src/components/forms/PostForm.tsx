@@ -383,41 +383,44 @@ const PostForm = observer((props: Props) => {
         className="flex flex-col gap-5"
       >
         {defaultPid === 'new' && <ProjectSelector postStore={postStore} />}
-        <div className="grid grid-cols-3 gap-4 text-center mt-8">
-          <label htmlFor="mediaText" className={labelClass('text')}>
-            <input
-              id="mediaText"
-              onChange={handleMediaType}
-              className="sr-only"
-              type="radio"
-              value="text"
-              checked={postStore.mediaType === 'text'}
-            />{' '}
-            Text
-          </label>
-          <label htmlFor="mediaImage" className={labelClass('image')}>
-            <input
-              id="mediaImage"
-              onChange={handleMediaType}
-              className="sr-only"
-              type="radio"
-              value="image"
-              checked={postStore.mediaType === 'image'}
-            />{' '}
-            Image
-          </label>
-          <label htmlFor="mediaLink" className={labelClass('link')}>
-            <input
-              id="mediaLink"
-              onChange={handleMediaType}
-              className="sr-only"
-              type="radio"
-              value="link"
-              checked={postStore.mediaType === 'link'}
-            />{' '}
-            Link
-          </label>
-        </div>
+        {mode === 'new' && (
+          <div className="grid grid-cols-3 gap-4 text-center mt-8">
+            <label htmlFor="mediaText" className={labelClass('text')}>
+              <input
+                id="mediaText"
+                onChange={handleMediaType}
+                className="sr-only"
+                type="radio"
+                value="text"
+                checked={postStore.mediaType === 'text'}
+              />{' '}
+              Text
+            </label>
+            <label htmlFor="mediaImage" className={labelClass('image')}>
+              <input
+                id="mediaImage"
+                onChange={handleMediaType}
+                className="sr-only"
+                type="radio"
+                value="image"
+                checked={postStore.mediaType === 'image'}
+              />{' '}
+              Image
+            </label>
+            <label htmlFor="mediaLink" className={labelClass('link')}>
+              <input
+                id="mediaLink"
+                onChange={handleMediaType}
+                className="sr-only"
+                type="radio"
+                value="link"
+                checked={postStore.mediaType === 'link'}
+              />{' '}
+              Link
+            </label>
+          </div>
+        )}
+        {mode === 'edit' && <div className="p-1" />}
         {postStore.mediaType === 'image' && (
           <ImageField postStore={postStore} />
         )}
