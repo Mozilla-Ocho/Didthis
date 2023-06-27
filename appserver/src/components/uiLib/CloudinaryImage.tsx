@@ -17,13 +17,12 @@ const CloudinaryImage = ({
   }
   // we force an aspect ratio using complicated tailwind plugin stuff so that
   // while the image loads, it 
-  const aspect = ['aspect-h-1']
-  if (intent === 'avatar' || intent === 'project') {
-    aspect.push('aspect-w-1')
+  const aspect : string[] = []
+  if (intent === 'avatar') {
+    aspect.push('aspect-w-1','aspect-h-1')
+  } else if (intent === 'project') {
+    aspect.push('aspect-w-3','aspect-h-2')
   } else if (intent === 'post') {
-    aspect.pop()
-  } else {
-    aspect.push('aspect-w-2')
   }
   // leading-none fixes space after images
   /* eslint-disable @next/next/no-img-element */

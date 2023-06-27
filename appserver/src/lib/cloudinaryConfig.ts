@@ -78,7 +78,7 @@ const getCloudinaryConfig = (intent: CldImageIntent) => {
     const x = {
       ...base,
       tags: ['project'],
-      croppingAspectRatio: 1,
+      croppingAspectRatio: 1.5,
       uploadPreset: 'prompter_uploads',
       folder: 'projects',
     }
