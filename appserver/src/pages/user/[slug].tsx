@@ -66,6 +66,7 @@ export const getServerSideProps = async (
           },
         }
       }
+      // XXX return a 404 here if target user is not found, otw status is 200
     }
   }
   return { props: { ...indexProps.props, targetUser } }

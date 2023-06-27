@@ -5,7 +5,7 @@ import AppFooter from '@/components/AppFooter'
 
 const HomeUnauth = () => {
   return (
-    <div className="max-w-[800px] mx-auto grid grid-rows-[auto_1fr_auto] h-screen">
+    <div className="max-w-[1280px] mx-auto grid grid-rows-[auto_1fr_auto] h-screen">
       <AppHeader />
       <div className="bg-yellow-home-light">
         <div className="bg-yellow-home p-4 text-center">
@@ -21,7 +21,7 @@ const HomeUnauth = () => {
           <LoginButton />
         </div>
       </div>
-      <AppFooter isHomeUnauth={true} />
+      <AppFooter unauthHomepage={true} />
     </div>
   )
 }

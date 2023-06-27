@@ -16,6 +16,7 @@ const Wrapper = ({
     <DefaultLayout
       authUser={authUser}
       signupCode={signupCode}
+      unauthHomepage={!authUser}
     >
       <Home />
     </DefaultLayout>

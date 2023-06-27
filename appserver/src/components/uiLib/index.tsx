@@ -10,6 +10,8 @@ import ConfirmationModal from './ConfirmationModal'
 import Input from './Input'
 import Icon from './Icon'
 import CloudinaryImage from './CloudinaryImage'
+import PagePad from './PagePad'
+import Spinner from './Spinner'
 
 export {
   H,
@@ -17,6 +19,7 @@ export {
   Divider,
   Link,
   Select,
+  Spinner,
   Textarea,
   Timestamp,
   Modal,
@@ -24,4 +27,5 @@ export {
   Input,
   Icon,
   CloudinaryImage,
+  PagePad,
 }
