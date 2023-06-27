@@ -2,7 +2,7 @@ import pathBuilder from '@/lib/pathBuilder'
 import { useStore } from '@/lib/store'
 import { observer } from 'mobx-react-lite'
 import React from 'react'
-import { Link } from './uiLib'
+import { Link, PagePad } from './uiLib'
 
 type Crumb = {
   name: string
@@ -29,7 +29,9 @@ const Breadcrumbs = observer(({ crumbs }: { crumbs: Crumb[] }) => {
     if (numCols > 9)
       gridCols = 'grid-cols-[auto_auto_auto_auto_auto_auto_auto_auto_auto]'
     return (
-      <div className={`p-4 -mt-4 -mx-4 mb-4 bg-breadcrumbs border-b-[1px] border-edges-light`}>
+      <div className={`py-4 bg-breadcrumbs border-b-[1px] border-edges-light`}>
+        <PagePad wide noPadY>
+
         <div className={`w-fit grid gap-2 ${gridCols}`}>
           <div>
             <Link
@@ -57,6 +59,7 @@ const Breadcrumbs = observer(({ crumbs }: { crumbs: Crumb[] }) => {
             </React.Fragment>
           ))}
         </div>
+        </PagePad>
       </div>
     )
   }

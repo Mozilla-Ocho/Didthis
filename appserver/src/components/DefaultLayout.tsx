@@ -12,11 +12,9 @@ import {useRouter} from 'next/router'
 const Inner = observer(
   ({
     children,
-    wide,
     unauthHomepage,
   }: {
     children: ReactNode,
-    wide?: boolean
     unauthHomepage?: boolean
   }) => {
     const store = useStore()
@@ -24,7 +22,7 @@ const Inner = observer(
       return (
         <StoreLoadingWrapper ifLoading={<p>loading</p>}>
           <LoginGlobalOverlay />
-          <StaticLayout wide={wide}><HomeUnsolicited /></StaticLayout>
+          <StaticLayout><HomeUnsolicited /></StaticLayout>
         </StoreLoadingWrapper>
       )
     }
@@ -32,7 +30,7 @@ const Inner = observer(
       <StoreLoadingWrapper ifLoading={<p>loading</p>}>
         <LoginGlobalOverlay />
         <DeletionConfirmationModal />
-        <StaticLayout unauthHomepage={unauthHomepage} wide={wide}>{children}</StaticLayout>
+        <StaticLayout unauthHomepage={unauthHomepage}>{children}</StaticLayout>
       </StoreLoadingWrapper>
     )
   }
@@ -42,19 +40,17 @@ export default function DefaultLayout({
   authUser,
   signupCode,
   children,
-  wide,
   unauthHomepage,
 }: {
   authUser: ApiUser | false
   signupCode: false | string
   children: ReactNode // ReactNode not ReactElement
-  wide?: boolean,
   unauthHomepage?: boolean,
 }) {
   const router = useRouter()
   return (
     <StoreWrapper authUser={authUser} signupCode={signupCode} router={router}>
-      <Inner wide={wide} unauthHomepage={unauthHomepage}>{children}</Inner>
+      <Inner unauthHomepage={unauthHomepage}>{children}</Inner>
     </StoreWrapper>
   )
 }

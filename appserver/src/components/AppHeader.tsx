@@ -10,7 +10,7 @@ const AppHeader = observer(() => {
   if (store.user) {
     return (
       <div>
-        <PagePad wide>
+        <PagePad wide noPadY>
           <div className="flex items-baseline py-4">
             <div className="bg-yellow-300 pt-2 px-1 inline-block text-xl">
               <Link intent="logo" href="/">
@@ -28,7 +28,7 @@ const AppHeader = observer(() => {
   } else {
     return (
       <div>
-        <PagePad wide>
+        <PagePad wide noPadY>
           <div className="py-4 text-center">
             <span className="bg-yellow-300 pt-2 px-1 inline-block text-xl mx-auto">
               <Link intent="logo" href="/">

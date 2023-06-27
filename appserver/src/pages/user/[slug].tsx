@@ -17,7 +17,11 @@ const Wrapper = ({
 }) => {
   return (
     <DefaultLayout authUser={authUser} signupCode={signupCode}>
-      {authUser ? <HomeAuth /> : <UnauthUser targetUser={targetUser} />}
+      {authUser && targetUser && authUser.id === targetUser.id ? (
+        <HomeAuth />
+      ) : (
+        <UnauthUser targetUser={targetUser} />
+      )}
     </DefaultLayout>
   )
 }
@@ -66,7 +70,9 @@ export const getServerSideProps = async (
           },
         }
       }
-      // XXX return a 404 here if target user is not found, otw status is 200
+      if (!targetUser) {
+        return { notFound: true }
+      }
     }
   }
   return { props: { ...indexProps.props, targetUser } }

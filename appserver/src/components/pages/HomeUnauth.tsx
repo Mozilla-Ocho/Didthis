@@ -3,6 +3,7 @@ import { LoginButton } from '@/components/auth/LoginButton'
 import AppHeader from '@/components/AppHeader'
 import AppFooter from '@/components/AppFooter'
 
+// DRY_20334 outer page width styles
 const HomeUnauth = () => {
   return (
     <div className="max-w-[1280px] mx-auto grid grid-rows-[auto_1fr_auto] h-screen">

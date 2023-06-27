@@ -8,7 +8,7 @@ const AppFooter = observer(
     return (
       <div className={unauthHomepage ? 'bg-yellow-home' : 'bg-white'}>
         <Divider className="my-0" />
-        <PagePad wide={true}>
+        <PagePad wide={true} noPadY>
           <div className={classNames('py-4', 'leading-10', 'h-full')}>
             <p>
               <Link href={pathBuilder.legal('tos')}>Terms of service</Link>

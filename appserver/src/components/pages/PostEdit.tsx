@@ -10,10 +10,10 @@ import { useStore } from '@/lib/store'
 import PostForm from '@/components/forms/PostForm'
 import Breadcrumbs from '../Breadcrumbs'
 import pathBuilder from '@/lib/pathBuilder'
-import {H} from '../uiLib'
+import { H, PagePad } from '../uiLib'
 
 const PostEditPage = observer(() => {
-  const store = useStore();
+  const store = useStore()
   const router = useRouter()
   const user = store.user
   if (!user) return <NotFound>user not found</NotFound>
@@ -34,8 +34,10 @@ const PostEditPage = observer(() => {
           { name: post ? 'Edit post' : 'New post' },
         ]}
       />
-      <H.H3>Edit post</H.H3>
-      <PostForm mode="edit" post={post} />
+      <PagePad>
+        <H.H3>Edit post</H.H3>
+        <PostForm mode="edit" post={post} />
+      </PagePad>
     </>
   )
 })

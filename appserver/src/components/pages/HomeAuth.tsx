@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@/lib/store'
 import ProjectList from '@/components/ProjectList'
-import { Divider, H, Link } from '@/components/uiLib'
+import { Divider, H, Link, PagePad } from '@/components/uiLib'
 import pathBuilder from '@/lib/pathBuilder'
 import UserPreview from '../UserPreview'
 
@@ -10,7 +10,7 @@ const HomeAuth = observer(() => {
   if (!store.user) return <></> // typescript helper, it doesn't know this component is auth only
   // const hasProjects = Object.keys(store.user.profile.projects).length > 0
   return (
-    <>
+    <PagePad>
       <UserPreview user={store.user} compact={false} />
       <Divider light />
       <div>
@@ -31,7 +31,7 @@ const HomeAuth = observer(() => {
         </div>
         <ProjectList targetUser={store.user} />
       </div>
-    </>
+    </PagePad>
   )
 })
 

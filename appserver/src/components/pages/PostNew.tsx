@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@/lib/store'
-import { H } from '@/components/uiLib'
+import { H, PagePad } from '@/components/uiLib'
 import LoginBouncer from '@/components/auth/LoginBouncer'
 import PostForm from '@/components/forms/PostForm'
 import Breadcrumbs from '../Breadcrumbs'
@@ -20,24 +20,24 @@ const NewPostPage = observer(() => {
   // project id if any.
   return (
     <>
-      <div>
-        <Breadcrumbs
-          crumbs={[
-            project
-              ? {
-                  name: project.title,
-                  href: pathBuilder.project(
-                    store.user.publicPageSlug,
-                    project.id
-                  ),
-                }
-              : { name: 'New project' },
-            { name: 'Add post' },
-          ]}
-        />
+      <Breadcrumbs
+        crumbs={[
+          project
+            ? {
+                name: project.title,
+                href: pathBuilder.project(
+                  store.user.publicPageSlug,
+                  project.id
+                ),
+              }
+            : { name: 'New project' },
+          { name: 'Add post' },
+        ]}
+      />
+      <PagePad>
         <H.H3>Add post</H.H3>
         <PostForm mode="new" />
-      </div>
+      </PagePad>
     </>
   )
 })

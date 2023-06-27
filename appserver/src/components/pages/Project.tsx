@@ -11,6 +11,7 @@ import {
   Select,
   Modal,
   Input,
+  PagePad,
 } from '../uiLib'
 import UserPreview from '../UserPreview'
 import pathBuilder from '@/lib/pathBuilder'
@@ -21,7 +22,7 @@ import { useStore } from '@/lib/store'
 import { useLocalStorage } from 'usehooks-ts'
 import Breadcrumbs from '../Breadcrumbs'
 import { useState } from 'react'
-import copyToClipboard from 'copy-to-clipboard';
+import copyToClipboard from 'copy-to-clipboard'
 
 const ProjectPage = observer(
   ({ targetUser }: { targetUser: ApiUser | false }) => {
@@ -49,7 +50,9 @@ const ProjectPage = observer(
     const changeSort = (e: React.ChangeEvent<HTMLSelectElement>) => {
       setSort(e.target.value as 'asc' | 'desc')
     }
-    const shareUrl = pathBuilder.makeFullUrl(pathBuilder.project(targetUser.publicPageSlug, project.id))
+    const shareUrl = pathBuilder.makeFullUrl(
+      pathBuilder.project(targetUser.publicPageSlug, project.id)
+    )
     const handleShare = () => {
       copyToClipboard(shareUrl)
       setShareModalOpen(true)
@@ -62,22 +65,28 @@ const ProjectPage = observer(
     }
     return (
       <>
-        <div>
-          <Modal
-            id="share-proj"
-            isOpen={shareModalOpen}
-            title="Link copied"
-            handleClose={handleCloseShare}
-          >
-            <p>The link for this project has been copied to the clipboard.</p>
-            <Input type="text" value={shareUrl} onFocus={handleFocus} onChange={()=>null} className="my-2" />
-            <div className="grid grid-cols-1 mt-8">
-              <Button intent="primary" onClick={handleCloseShare}>
-                OK
-              </Button>
-            </div>
-          </Modal>
-          <Breadcrumbs crumbs={[{ name: project.title }]} />
+        <Modal
+          id="share-proj"
+          isOpen={shareModalOpen}
+          title="Link copied"
+          handleClose={handleCloseShare}
+        >
+          <p>The link for this project has been copied to the clipboard.</p>
+          <Input
+            type="text"
+            value={shareUrl}
+            onFocus={handleFocus}
+            onChange={() => null}
+            className="my-2"
+          />
+          <div className="grid grid-cols-1 mt-8">
+            <Button intent="primary" onClick={handleCloseShare}>
+              OK
+            </Button>
+          </div>
+        </Modal>
+        <Breadcrumbs crumbs={[{ name: project.title }]} />
+        <PagePad>
           <UserPreview user={targetUser} compact={true} />
           <div className="my-4 flex flex-row items-center gap-8">
             <H.H4>{project.title}</H.H4>
@@ -178,7 +187,7 @@ const ProjectPage = observer(
               />
             ))}
           </div>
-        </div>
+        </PagePad>
       </>
     )
   }
