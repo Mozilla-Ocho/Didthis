@@ -49,6 +49,7 @@ const ProjectCard = observer(
               <p className="mt-4">
                 <Link
                   intent="secondary"
+                  className="px-4 py-1"
                   href={pathBuilder.projectEdit(
                     store.user.systemSlug,
                     project.id

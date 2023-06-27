@@ -34,6 +34,7 @@ const PostCard = observer(
           <div className="grid grid-cols-[auto_1fr] gap-4 items-baseline">
             <Link
               intent="secondary"
+              className="px-4 py-1"
               href={pathBuilder.postEdit(
                 authUser.systemSlug,
                 post.projectId,
