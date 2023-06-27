@@ -28,7 +28,11 @@ const pathBuilder = {
     if (doc === "pp") return '/privacy'
     if (doc === "au") return '/acceptable-use'
     return '/terms'
+  },
+  makeFullUrl: (path: string) => {
+    return process.env.NEXT_PUBLIC_API_ENDPOINT+path
   }
 }
 
 export default pathBuilder
+

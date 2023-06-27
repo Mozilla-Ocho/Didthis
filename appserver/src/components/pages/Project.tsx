@@ -1,7 +1,17 @@
 // import { useStore } from "@/lib/store";
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { H, Link, Timestamp, Divider, CloudinaryImage, Button, Select } from '../uiLib'
+import {
+  H,
+  Link,
+  Timestamp,
+  Divider,
+  CloudinaryImage,
+  Button,
+  Select,
+  Modal,
+  Input,
+} from '../uiLib'
 import UserPreview from '../UserPreview'
 import pathBuilder from '@/lib/pathBuilder'
 import { getParamString } from '@/lib/nextUtils'
@@ -10,6 +20,8 @@ import PostCard from '../PostCard'
 import { useStore } from '@/lib/store'
 import { useLocalStorage } from 'usehooks-ts'
 import Breadcrumbs from '../Breadcrumbs'
+import { useState } from 'react'
+import copyToClipboard from 'copy-to-clipboard';
 
 const ProjectPage = observer(
   ({ targetUser }: { targetUser: ApiUser | false }) => {
@@ -17,7 +29,11 @@ const ProjectPage = observer(
     if (!targetUser) return <NotFound>user not found</NotFound>
     const router = useRouter()
     const store = useStore()
-    const [sort,setSort] = useLocalStorage<"asc" | "desc">("projectSortDefault","desc")
+    const [shareModalOpen, setShareModalOpen] = useState(false)
+    const [sort, setSort] = useLocalStorage<'asc' | 'desc'>(
+      'projectSortDefault',
+      'desc'
+    )
     const isSelf = store.user && store.user.id === targetUser.id
     if (isSelf && store.user) targetUser = store.user // important for mobx reactivity when authed
     const projectId = getParamString(router, 'projectId')
@@ -25,16 +41,43 @@ const ProjectPage = observer(
     const project = targetUser.profile.projects[projectId]
     if (!project) return <NotFound>project not found</NotFound>
     const posts = Object.values(project.posts)
-    posts.sort((a, b) => sort === "desc" ? b.createdAt - a.createdAt : a.createdAt - b.createdAt)
+    posts.sort((a, b) =>
+      sort === 'desc' ? b.createdAt - a.createdAt : a.createdAt - b.createdAt
+    )
     const nUpdates = posts.length
     const hasImage = !!project.imageAssetId
     const changeSort = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setSort(e.target.value as "asc" | "desc")
+      setSort(e.target.value as 'asc' | 'desc')
+    }
+    const shareUrl = pathBuilder.makeFullUrl(pathBuilder.project(targetUser.publicPageSlug, project.id))
+    const handleShare = () => {
+      copyToClipboard(shareUrl)
+      setShareModalOpen(true)
+    }
+    const handleCloseShare = () => {
+      setShareModalOpen(false)
+    }
+    const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+      e.target.select()
     }
     return (
       <>
         <div>
-          <Breadcrumbs crumbs={[{name:project.title}]} />
+          <Modal
+            id="share-proj"
+            isOpen={shareModalOpen}
+            title="Link copied"
+            handleClose={handleCloseShare}
+          >
+            <p>The link for this project has been copied to the clipboard.</p>
+            <Input type="text" value={shareUrl} onFocus={handleFocus} onChange={()=>null} className="my-2" />
+            <div className="grid grid-cols-1 mt-8">
+              <Button intent="primary" onClick={handleCloseShare}>
+                OK
+              </Button>
+            </div>
+          </Modal>
+          <Breadcrumbs crumbs={[{ name: project.title }]} />
           <UserPreview user={targetUser} compact={true} />
           <div className="my-4 flex flex-row items-center gap-8">
             <H.H4>{project.title}</H.H4>
@@ -59,6 +102,7 @@ const ProjectPage = observer(
               <Button
                 intent="secondary"
                 className="flex-grow basis-8/12"
+                onClick={handleShare}
               >
                 Share
               </Button>
@@ -67,7 +111,9 @@ const ProjectPage = observer(
 
           <div
             className={`grid gap-4 ${
-              hasImage ? 'grid-rows-[auto_auto] sm:grid-rows-1 sm:grid-cols-[3fr_7fr]' : 'grid-rows-1 grid-cols-1'
+              hasImage
+                ? 'grid-rows-[auto_auto] sm:grid-rows-1 sm:grid-cols-[3fr_7fr]'
+                : 'grid-rows-1 grid-cols-1'
             }`}
           >
             {hasImage && (
