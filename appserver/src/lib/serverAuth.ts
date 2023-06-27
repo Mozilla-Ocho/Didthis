@@ -63,7 +63,7 @@ const generateRandomAvailableSystemSlug = async () => {
   let available = false
   let slug = mkRandSlug()
   while (!available) {
-    const dbRow = (await knex('users').where('user_slug', slug).orWhere('system_slug', slug).first()) as
+    const dbRow = (await knex('users').where('user_slug_lc', slug.toLowerCase()).orWhere('system_slug', slug).first()) as
       | UserDbRow
       | undefined
     if (dbRow) {
@@ -118,6 +118,7 @@ const getOrCreateUser = async ({
     email: email,
     system_slug: systemSlug,
     user_slug: null,
+    user_slug_lc: null,
     profile: profileUtils.mkDefaultProfile(),
     signup_code_name: codeInfo ? codeInfo.name : null,
     created_at_millis: millis,

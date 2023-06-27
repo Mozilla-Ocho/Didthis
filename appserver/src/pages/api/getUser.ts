@@ -2,14 +2,15 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import type { ErrorWrapper, PublicUserWrapper } from '@/lib/apiConstants'
 import knex from '@/knex'
 import { userFromDbRow } from '@/lib/serverAuth'
+import { getParamString } from '@/lib/nextUtils'
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const urlSlug = req.query.urlSlug || ''
+  const urlSlug = getParamString(req, 'urlSlug')
   const dbRow = (await knex('users')
-    .where('user_slug', urlSlug)
+    .where('user_slug_lc', urlSlug.toLowerCase())
     .orWhere('system_slug', urlSlug)
     .first()) as UserDbRow | undefined
   if (dbRow) {

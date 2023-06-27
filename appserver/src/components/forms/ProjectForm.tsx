@@ -24,6 +24,7 @@ class ProjectStore {
   imageAssetId: string
   imageMeta: CldImageMetaPrivate | CldImageMetaPublic | undefined
   currentStatus: ApiProjectStatus
+  spinning = false
 
   constructor(
     mode: 'new' | 'edit',
@@ -89,6 +90,9 @@ class ProjectStore {
     this.imageAssetId = assetId
     this.imageMeta = meta
   }
+  setSpinning(x: boolean) {
+    this.spinning = x
+  }
 
   isPostable() {
     if (!this.title.trim()) return false
@@ -118,6 +122,7 @@ const ProjectForm = observer((props: Props) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.stopPropagation()
     e.preventDefault()
+    projectStore.setSpinning(true)
     store.saveProject(projectStore.getApiProject()).then(newProject => {
       // note that saving projects ignores the posts property. for a new
       // project the backend sets that to {}, and on updates it keeps
@@ -226,7 +231,7 @@ const ProjectForm = observer((props: Props) => {
             />
             {projectStore.imageAssetId && (
               <Button intent="secondary" onClick={deleteImage}>
-                Remove image
+                Remove
               </Button>
             )}
           </div>
@@ -253,7 +258,11 @@ const ProjectForm = observer((props: Props) => {
             </span>
           </label>
         </div>
-        <Button type="submit" disabled={!projectStore.isPostable()}>
+        <Button
+          spinning={projectStore.spinning}
+          type="submit"
+          disabled={!projectStore.isPostable()}
+        >
           {mode === 'new' ? 'Create' : 'Update'}
         </Button>
         {mode === 'edit' && (

@@ -168,7 +168,7 @@ const ImageUpload = ({
 
   return (
     <Button className={className} intent={required && !isReplace ? "primary" : "secondary"} onClick={launchWidget}>
-      {isReplace ? "Replace image" : "Upload image"}
+      {isReplace ? "Replace" : "Upload image"}
     </Button>
   )
 }

@@ -7,10 +7,12 @@ const checkAvailability = async (
   user: ApiUser
 ): Promise<SlugCheck> => {
   checkSlug = checkSlug.trim()
-  if (checkSlug === user.userSlug || checkSlug === user.systemSlug) {
+  const checkLower = checkSlug.toLowerCase()
+  if (checkLower === user.userSlug?.toLowerCase() || checkSlug === user.systemSlug) {
     // it's their own slug. is it "available"? let's say yes because it's
     // easier for logic: we don't render an error and we allow the user
-    // to click save, etc.
+    // to click save, etc. this also means they could change the case on their
+    // slug w/o issue.
     return {
       value: checkSlug,
       available: true,
@@ -32,7 +34,7 @@ const checkAvailability = async (
       }
     } else {
       const found = await knex('users')
-        .where('user_slug', checkSlug)
+        .where('user_slug_lc', checkLower)
         .orWhere('system_slug', checkSlug)
         .returning('*')
         .first()

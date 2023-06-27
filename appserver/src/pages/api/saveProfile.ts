@@ -30,6 +30,7 @@ export default async function handler(
   profile.bio = inputProfile.bio
   profile.imageAssetId = inputProfile.imageAssetId
   profile.imageMeta = inputProfile.imageMeta
+  profile.socialUrls = inputProfile.socialUrls
   const inputUserSlug = (req.body.userSlug || '').trim()
   let assignUserSlug = user.userSlug
   if (inputUserSlug) {
@@ -46,6 +47,7 @@ export default async function handler(
       updated_at_millis: millis,
       profile: profile,
       user_slug: assignUserSlug,
+      user_slug_lc: assignUserSlug ? assignUserSlug.toLowerCase() : undefined,
     })
     .where('id', user.id)
   user.updatedAt = millis

@@ -19,11 +19,16 @@ const normalizeUrlConfig = {
 }
 
 const maxChars = {
-  name: 140,
+  name: 50,
   imageAssetId: 100,
   url: 300,
   title: 140,
   blurb: 1000,
+  slug: 50,
+}
+
+const minChars = {
+  slug: 3
 }
 
 const mkDefaultProfile = () => {
@@ -89,25 +94,6 @@ const getParsedUrl = (url: string, strict?: boolean): URL | false => {
     return false
   }
   return parsedUrl
-}
-
-const cleanupUserInput = (profile: ApiProfile): void => {
-  // mutates the profile data in place to trim whitespace so we aren't confused
-  // about empty fields.
-  function trimRecurse(obj: JSONABLE): JSONABLE {
-    if (typeof obj === 'undefined' || obj === null) return obj
-    if (typeof obj === 'string') return obj.trim()
-    if (Array.isArray(obj)) return obj.map(trimRecurse)
-    if (typeof obj === 'object') {
-      const newObj: JSONABLE = {}
-      for (const prop in obj) {
-        newObj[prop] = trimRecurse(obj[prop])
-      }
-      return newObj
-    }
-    return obj
-  }
-  trimRecurse(profile)
 }
 
 const generateRandomAvailablePostId = (profile: ApiProfile): string => {
@@ -199,12 +185,12 @@ const slugStringValidation = (
       valid: false,
       error: 'ERR_SLUG_CHARS',
     }
-  if (slug.length < 3)
+  if (slug.length < minChars.slug)
     return {
       valid: false,
       error: 'ERR_SLUG_TOO_SHORT',
     }
-  if (slug.length > 50)
+  if (slug.length > maxChars.slug)
     // DRY_35120 slug max chars
     return {
       valid: false,
@@ -217,8 +203,8 @@ const profileUtils = {
   mkDefaultProfile,
   privacyFilteredCopy,
   getParsedUrl,
-  cleanupUserInput,
   maxChars,
+  minChars,
   mkNewProject,
   generateRandomAvailablePostId,
   slugStringValidation,

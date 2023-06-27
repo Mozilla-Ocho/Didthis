@@ -20,10 +20,13 @@ const inputCVA = cva(
 type Props = React.InputHTMLAttributes<HTMLInputElement> &
   VariantProps<typeof inputCVA> & {
     customError?: false | string
+    greenText?: string,
+    checkingText?: string,
     required?: boolean
     touched?: boolean
     maxLen?: number
     minLen?: number
+    hideLengthUnlessViolated?: boolean
   }
 
 const Input: FC<Props> = ({
@@ -31,10 +34,13 @@ const Input: FC<Props> = ({
   children,
   className,
   customError,
+  greenText,
+  checkingText,
   required,
   touched,
   maxLen,
   minLen,
+  hideLengthUnlessViolated,
   ...props
 }) => {
   let error = ''
@@ -45,16 +51,14 @@ const Input: FC<Props> = ({
     error = customError
   } else {
     info = required ? 'required' : ''
-    if (maxLen) {
+    if (maxLen && !hideLengthUnlessViolated) {
       info = info + ` (${chars}/${maxLen})`
     }
     if (required && touched && empty) {
       error = 'required'
-    }
-    if (touched && maxLen && chars > maxLen) {
+    } else if (touched && maxLen && chars > maxLen) {
       error = `too long (${chars}/${maxLen})`
-    }
-    if (touched && minLen && chars < minLen) {
+    } else if (touched && minLen && chars < minLen) {
       error = `too short (${chars}/${maxLen})`
     }
   }
@@ -74,8 +78,10 @@ const Input: FC<Props> = ({
           {error}
         </div>
       )}
-      {!error && info && (
+      {!error && (info || greenText || checkingText) && (
         <div className="relative h-0 text-form-labels text-right text-xs right-0">
+          {greenText && <span className="text-green-500">{greenText}</span>}
+          {checkingText && <span className="text-black-200">{checkingText}</span>}
           {info}
         </div>
       )}

@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useStore } from '@/lib/store'
 import { LogoutButton } from '@/components/auth/LogoutButton'
 import { Divider, Link, H } from './uiLib'
+import branding from '@/lib/branding'
 // import pathBuilder from '@/lib/pathBuidler'
 
 const AppHeader = observer(() => {
@@ -12,7 +13,7 @@ const AppHeader = observer(() => {
         <div className="flex items-baseline p-4">
           <div className="bg-yellow-300 pt-2 px-1 inline-block text-xl">
             <Link intent="logo" href="/">
-              <H.HLogo>DABBLER</H.HLogo>
+              <H.HLogo>{branding.productName.toUpperCase()}</H.HLogo>
             </Link>
           </div>
           <div className="text-right text-sm flex-grow">
@@ -28,7 +29,7 @@ const AppHeader = observer(() => {
         <div className="p-4 text-center">
           <span className="bg-yellow-300 pt-2 px-1 inline-block text-xl mx-auto">
             <Link intent="logo" href="/">
-              <H.HLogo>DABBLER</H.HLogo>
+              <H.HLogo>{branding.productName.toUpperCase()}</H.HLogo>
             </Link>
           </span>
         </div>

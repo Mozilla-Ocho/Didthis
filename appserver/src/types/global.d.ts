@@ -39,6 +39,7 @@ interface UserDbRow {
   email: string
   system_slug: string
   user_slug: string | null
+  user_slug_lc: string | null
   profile: ApiProfile
   created_at_millis: number
   updated_at_millis: number
@@ -93,9 +94,17 @@ type ApiProject = {
   imageMeta?: CldImageMetaPrivate | CldImageMetaPublic
 }
 
+type ApiSocialUrls = {
+  twitter?: string,
+  reddit?: string,
+  facebook?: string,
+  instagram?: string,
+}
+
 type ApiProfile = {
   name?: string
   bio?: string
+  socialUrls?: ApiSocialUrls
   imageAssetId?: string
   imageMeta?: CldImageMetaPrivate | CldImageMetaPublic
   projects: { [key: string]: ApiProject }

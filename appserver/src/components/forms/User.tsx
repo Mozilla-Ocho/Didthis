@@ -1,27 +1,44 @@
 import apiClient from '@/lib/apiClient'
 import { SlugCheckWrapper } from '@/lib/apiConstants'
+import branding from '@/lib/branding'
+import profileUtils from '@/lib/profileUtils'
 import { useStore } from '@/lib/store'
 import { debounce } from 'lodash-es'
-import { makeAutoObservable } from 'mobx'
+import { action, makeAutoObservable } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useState } from 'react'
 import ImageUpload, { UploadCallback } from '../ImageUpload'
-import { Button, CloudinaryImage, Input, Textarea } from '../uiLib'
+import { Button, CloudinaryImage, H, Input, Textarea } from '../uiLib'
 
 class FormStore {
   name: string
+  nameTouched = false
   bio: string
+  bioTouched = false
   userSlug: string
+  slugTouched = false
   slugWrapper: SlugCheckWrapper | undefined
-  checkingSlug = true
+  checkingSlug = false
   imageAssetId: string
   imageMeta: CldImageMetaPrivate | CldImageMetaPublic | undefined
   doSlugCheckDebounced: () => void
+  twitter: string
+  facebook: string
+  reddit: string
+  instagram: string
+  spinning = false
 
   constructor(user: ApiUser) {
     this.name = user.profile.name || ''
+    if (this.name) this.nameTouched = true
     this.bio = user.profile.bio || ''
+    if (this.bio) this.bioTouched = true
+    this.twitter = user.profile.socialUrls?.twitter || ''
+    this.facebook = user.profile.socialUrls?.facebook || ''
+    this.reddit = user.profile.socialUrls?.reddit || ''
+    this.instagram = user.profile.socialUrls?.instagram || ''
     this.userSlug = user.userSlug || ''
+    if (this.userSlug) this.slugTouched = true
     this.imageAssetId = user.profile.imageAssetId || ''
     this.imageMeta = user.profile.imageMeta
     this.doSlugCheckDebounced = debounce(this._doSlugCheck, 500, {
@@ -35,14 +52,15 @@ class FormStore {
 
   setName(x: string) {
     this.name = x
+    this.nameTouched = true
     if (this.slugWrapper && this.slugWrapper.payload.source === 'system') {
       // get updated suggested slug if they are still on a system slug and are editing their name
-      this.checkingSlug = true
       this.doSlugCheckDebounced()
     }
   }
   setBio(x: string) {
     this.bio = x
+    this.bioTouched = true
   }
   setImageAssetId(
     assetId: string,
@@ -51,20 +69,50 @@ class FormStore {
     this.imageAssetId = assetId
     this.imageMeta = meta
   }
+  setTwitter(x: string) {
+    this.twitter = x
+  }
+  setFacebook(x: string) {
+    this.facebook = x
+  }
+  setReddit(x: string) {
+    this.reddit = x
+  }
+  setInstagram(x: string) {
+    this.instagram = x
+  }
+  setSpinning(x: boolean) {
+    this.spinning = x
+  }
 
   setUserSlug(slug: string) {
     this.userSlug = slug
-    this.checkingSlug = true
-    this.doSlugCheckDebounced()
+    this.slugTouched = true
+    if (profileUtils.slugStringValidation(this.userSlug).valid) {
+      this.checkingSlug = true
+      this.doSlugCheckDebounced()
+    }
   }
 
   getApiProfile(): ApiProfile {
+    const contentOrUndef = (x: string) => (x && x.trim() ? x.trim() : undefined)
+    const normUrl = (x: string) => {
+      const c = contentOrUndef(x)
+      const parsed = c && profileUtils.getParsedUrl(c)
+      if (parsed) return parsed.toString()
+    }
     return {
-      name: this.name.trim() || undefined,
-      bio: this.bio.trim() || undefined,
-      imageAssetId: this.imageAssetId || undefined,
+      name: contentOrUndef(this.name),
+      bio: contentOrUndef(this.bio),
+      imageAssetId: contentOrUndef(this.imageAssetId),
       imageMeta: this.imageMeta,
       projects: {}, // ignored
+      socialUrls: {
+        twitter: normUrl(this.twitter),
+        facebook: normUrl(this.facebook),
+        reddit: normUrl(this.reddit),
+        instagram: normUrl(this.instagram),
+      },
     }
   }
 
@@ -73,42 +121,133 @@ class FormStore {
   }
 
   _doSlugCheck() {
+    this.checkingSlug = true
     apiClient
       .getSlugCheck({ userSlug: this.userSlug, provisionalName: this.name })
-      .then(wrapper => {
-        if (wrapper.payload.check.value === this.userSlug) {
-          this.slugWrapper = wrapper
-          this.checkingSlug = false
-        }
-      })
+      .then(
+        action(wrapper => {
+          if (wrapper.payload.check.value.trim() === this.userSlug.trim()) {
+            this.slugWrapper = wrapper
+            this.checkingSlug = false
+          }
+        })
+      )
+  }
+
+  validOrEmptySocialUrl(
+    network: 'twitter' | 'facebook' | 'reddit' | 'instagram'
+  ) {
+    const isValid = (x: string) => {
+      if (!x.trim()) return true
+      const parsed = profileUtils.getParsedUrl(x.trim())
+      return !!parsed
+    }
+    if (network === 'twitter') return isValid(this.twitter)
+    if (network === 'facebook') return isValid(this.facebook)
+    if (network === 'reddit') return isValid(this.reddit)
+    if (network === 'instagram') return isValid(this.instagram)
+    return false
   }
 
   isPostable() {
-    if (this.hasUserSlug()) {
-      if (this.slugWrapper) {
-        return (
-          this.slugWrapper.payload.check.valid &&
-          this.slugWrapper.payload.check.value === this.userSlug
-        )
-      }
+    if (this.name.trim().length > profileUtils.maxChars.name) {
       return false
+    }
+    if (this.bio.trim().length > profileUtils.maxChars.blurb) {
+      return false
+    }
+    if (this.twitter.trim().length > profileUtils.maxChars.url) {
+      return false
+    }
+    if (this.facebook.trim().length > profileUtils.maxChars.url) {
+      return false
+    }
+    if (this.reddit.trim().length > profileUtils.maxChars.url) {
+      return false
+    }
+    if (this.instagram.trim().length > profileUtils.maxChars.url) {
+      return false
+    }
+    if (!this.validOrEmptySocialUrl('twitter')) return false
+    if (!this.validOrEmptySocialUrl('facebook')) return false
+    if (!this.validOrEmptySocialUrl('instagram')) return false
+    if (!this.validOrEmptySocialUrl('reddit')) return false
+    if (this.hasUserSlug()) {
+      if (!profileUtils.slugStringValidation(this.userSlug).valid) {
+        return false
+      }
+      if (
+        this.checkingSlug ||
+        !this.slugWrapper ||
+        this.slugWrapper.payload.check.value !== this.userSlug
+      ) {
+        // we haven't gotten a backend result on slug validation
+        return false
+      }
+      if (!this.slugWrapper.payload.check.valid) {
+        // backend said no
+        return false
+      }
     }
     // XXX other length validations
     return true
   }
 
+  slugResultIsForUserInput() {
+    return (
+      this.slugWrapper &&
+      this.slugWrapper.payload.check.value.trim() === this.userSlug.trim()
+    )
+  }
+
+  slugGreen() {
+    if (
+      !this.checkingSlug &&
+      this.hasUserSlug() &&
+      this.slugWrapper &&
+      this.slugResultIsForUserInput()
+    ) {
+      return (
+        this.slugWrapper.payload.check.available &&
+        this.slugWrapper.payload.check.valid
+      )
+    }
+    return false
+  }
+
   slugErrorText() {
+    const localValidation = profileUtils.slugStringValidation(this.userSlug)
+    if (!localValidation.valid) {
+      const err = localValidation.error
+      if (err === 'ERR_SLUG_TOO_SHORT') {
+        // the form field component handles this
+        return false
+      }
+      if (err === 'ERR_SLUG_TOO_LONG') {
+        // the form field component handles this
+        return false
+      }
+      if (err === 'ERR_SLUG_CHARS') {
+        return 'a-z, 0-9, dashes and underscores only'
+      }
+      if (err === 'ERR_SLUG_UNAVAILABLE') {
+        return 'unavailable'
+      }
+    }
     if (
       this.hasUserSlug() &&
       this.slugWrapper &&
+      this.slugResultIsForUserInput() &&
       this.slugWrapper.payload.check.errorConst
     ) {
       const err = this.slugWrapper.payload.check.errorConst
       if (err === 'ERR_SLUG_TOO_SHORT') {
-        return 'too short'
+        // the form field component handles this
+        return false
       }
       if (err === 'ERR_SLUG_TOO_LONG') {
-        return 'too long'
+        // the form field component handles this
+        return false
       }
       if (err === 'ERR_SLUG_CHARS') {
         return 'a-z, 0-9, dashes and underscores only'
@@ -140,17 +279,26 @@ const ImageField = observer(({ formStore }: { formStore: FormStore }) => {
   }
   return (
     <div>
-      {formStore.imageAssetId && (
-        <CloudinaryImage assetId={formStore.imageAssetId} intent="avatar" />
-      )}
-      {!formStore.imageAssetId && (
-        <ImageUpload intent="avatar" onUploadWithUseCallback={onResult} />
-      )}
-      {formStore.imageAssetId && (
-        <Button intent="link" onClick={deleteImage}>
-          remove
-        </Button>
-      )}
+      <H.H5 className="mb-4">Avatar</H.H5>
+      <div>
+        {formStore.imageAssetId && (
+          <p className="w-[150px]">
+            <CloudinaryImage assetId={formStore.imageAssetId} intent="avatar" />
+          </p>
+        )}
+        <div className="flex flex-row gap-4 mt-4">
+          <ImageUpload
+            intent="project"
+            onUploadWithUseCallback={onResult}
+            isReplace={!!formStore.imageAssetId}
+          />
+          {formStore.imageAssetId && (
+            <Button intent="secondary" onClick={deleteImage}>
+              Remove
+            </Button>
+          )}
+        </div>
+      </div>
     </div>
   )
 })
@@ -165,6 +313,8 @@ const UserForm = observer(() => {
   const handleSubmit = (e: React.FormEvent) => {
     e.stopPropagation()
     e.preventDefault()
+    // leave it spinning through the page nav
+    formStore.setSpinning(true)
     store.saveProfile(
       formStore.getApiProfile(),
       formStore.hasUserSlug() ? formStore.userSlug.trim() : undefined
@@ -179,41 +329,181 @@ const UserForm = observer(() => {
   const setUserSlug = (e: React.ChangeEvent<HTMLInputElement>) => {
     formStore.setUserSlug(e.target.value)
   }
+  const setTwitter = (e: React.ChangeEvent<HTMLInputElement>) => {
+    formStore.setTwitter(e.target.value)
+  }
+  const setFacebook = (e: React.ChangeEvent<HTMLInputElement>) => {
+    formStore.setFacebook(e.target.value)
+  }
+  const setReddit = (e: React.ChangeEvent<HTMLInputElement>) => {
+    formStore.setReddit(e.target.value)
+  }
+  const setInstagram = (e: React.ChangeEvent<HTMLInputElement>) => {
+    formStore.setInstagram(e.target.value)
+  }
   return (
     <>
-      <form onSubmit={handleSubmit} method="POST">
-        <label>
-          name:
-          <Input
-            type="text"
-            name="name"
-            onChange={setName}
-            value={formStore.name}
-          />
-        </label>
-        <label>
-          public username:
-          <Input
-            type="text"
-            name="slug"
-            onChange={setUserSlug}
-            value={formStore.userSlug}
-            customError={formStore.slugErrorText()}
-            placeholder={user.userSlug || ''}
-          />
-          {formStore.suggestedSlug() && (
-            <span>suggestion: {formStore.suggestedSlug()}</span>
-          )}
-          {formStore.slugErrorText()}
-          {formStore.checkingSlug && 'checking...'}
-          {JSON.stringify(formStore.slugWrapper)}
-        </label>
-        <label>
-          bio:
-          <Textarea name="bio" onChange={setBio} value={formStore.bio} />
-        </label>
+      <form
+        onSubmit={handleSubmit}
+        method="POST"
+        className="flex flex-col gap-8"
+      >
+        <div>
+          <H.H3>Account Details</H.H3>
+          <p>
+            The information you add here will be publicly visible to anyone who
+            visits your page.
+          </p>
+        </div>
+        <div>
+          <label htmlFor="nameField">
+            <H.H5>Real name</H.H5>
+            <p className="text-form-labels text-sm">Your full display name</p>
+            <Input
+              id="nameField"
+              type="text"
+              name="name"
+              onChange={setName}
+              value={formStore.name}
+              placeholder="Enter a name"
+              className="mt-2 text-bodytext"
+              touched={formStore.nameTouched}
+              maxLen={profileUtils.maxChars.name}
+            />
+          </label>
+        </div>
+        <div>
+          <label htmlFor="slugField">
+            <H.H5>Username</H.H5>
+            <p className="text-form-labels text-sm">
+              Your unique handle on {branding.productName}
+              {formStore.suggestedSlug() && (
+                <span> (suggestion: {formStore.suggestedSlug()})</span>
+              )}
+            </p>
+            <Input
+              type="text"
+              id="slugField"
+              name="slug"
+              onChange={setUserSlug}
+              value={formStore.userSlug}
+              customError={formStore.slugErrorText()}
+              placeholder={user.userSlug || ''}
+              className="mt-2 text-bodytext"
+              touched={formStore.slugTouched}
+              maxLen={profileUtils.maxChars.slug}
+              minLen={profileUtils.minChars.slug}
+              greenText={formStore.slugGreen() ? 'available' : undefined}
+              checkingText={
+                formStore.checkingSlug ? 'checking availability...' : ''
+              }
+            />
+          </label>
+        </div>
         <ImageField formStore={formStore} />
-        <Button type="submit" disabled={!formStore.isPostable()}>
+        <div>
+          <H.H5>Social links</H.H5>
+          <label
+            htmlFor="sl_twitter"
+            className="block mt-2 text-form-labels text-sm"
+          >
+            Twitter
+            <Input
+              type="text"
+              id="sl_twitter"
+              name="sl_twitter"
+              onChange={setTwitter}
+              value={formStore.twitter}
+              className="mt-2 text-bodytext"
+              touched
+              maxLen={profileUtils.maxChars.url}
+              hideLengthUnlessViolated
+              customError={
+                formStore.validOrEmptySocialUrl('twitter') ? '' : 'invalid URL'
+              }
+            />
+          </label>
+          <label
+            htmlFor="sl_facebook"
+            className="block mt-2 text-form-labels text-sm"
+          >
+            Facebook
+            <Input
+              type="text"
+              id="sl_facebook"
+              name="sl_facebook"
+              onChange={setFacebook}
+              value={formStore.facebook}
+              className="mt-2 text-bodytext"
+              touched
+              maxLen={profileUtils.maxChars.url}
+              hideLengthUnlessViolated
+              customError={
+                formStore.validOrEmptySocialUrl('facebook') ? '' : 'invalid URL'
+              }
+            />
+          </label>
+          <label
+            htmlFor="sl_reddit"
+            className="block mt-2 text-form-labels text-sm"
+          >
+            Reddit
+            <Input
+              type="text"
+              id="sl_reddit"
+              name="sl_reddit"
+              onChange={setReddit}
+              value={formStore.reddit}
+              className="mt-2 text-bodytext"
+              touched
+              maxLen={profileUtils.maxChars.url}
+              hideLengthUnlessViolated
+              customError={
+                formStore.validOrEmptySocialUrl('reddit') ? '' : 'invalid URL'
+              }
+            />
+          </label>
+          <label
+            htmlFor="sl_instagram"
+            className="block mt-2 text-form-labels text-sm"
+          >
+            Instagram
+            <Input
+              type="text"
+              id="sl_instagram"
+              name="sl_instagram"
+              onChange={setInstagram}
+              value={formStore.instagram}
+              className="mt-2 text-bodytext"
+              touched
+              maxLen={profileUtils.maxChars.url}
+              hideLengthUnlessViolated
+              customError={
+                formStore.validOrEmptySocialUrl('instagram')
+                  ? ''
+                  : 'invalid URL'
+              }
+            />
+          </label>
+        </div>
+        <div>
+          <label htmlFor="bio">
+            <H.H5>Short bio</H.H5>
+            <Textarea
+              name="bio"
+              onChange={setBio}
+              value={formStore.bio}
+              className="mt-2 text-bodytext"
+              touched={formStore.bioTouched}
+              maxLen={profileUtils.maxChars.blurb}
+            />
+          </label>
+        </div>
+        <Button
+          spinning={formStore.spinning}
+          type="submit"
+          disabled={!formStore.isPostable()}
+        >
           Save
         </Button>
       </form>
