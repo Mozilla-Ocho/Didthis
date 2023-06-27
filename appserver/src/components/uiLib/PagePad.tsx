@@ -21,7 +21,7 @@ const PagePad = ({
       className
     )}
   >
-    {wide ? children : <div className="max-w-[450px]">{children}</div>}
+    {wide ? children : <div className="sm:max-w-[450px]">{children}</div>}
   </div>
 )
 

@@ -23,6 +23,7 @@ import { useLocalStorage } from 'usehooks-ts'
 import Breadcrumbs from '../Breadcrumbs'
 import { useState } from 'react'
 import copyToClipboard from 'copy-to-clipboard'
+import { specialAssetIds } from '@/lib/cloudinaryConfig'
 
 const ProjectPage = observer(
   ({ targetUser }: { targetUser: ApiUser | false }) => {
@@ -88,10 +89,8 @@ const ProjectPage = observer(
         <Breadcrumbs crumbs={[{ name: project.title }]} />
         <PagePad>
           <UserPreview user={targetUser} compact={true} />
-          <div className="my-4 flex flex-row items-center gap-8">
-            <H.H4>{project.title}</H.H4>
-          </div>
-          <div className="grid grid-cols-[66%_34%] pb-4">
+
+          <div className="grid grid-cols-[66%_34%] my-4">
             <p className="body-bs">
               <strong>
                 {project.scope === 'public' ? 'Public' : 'Private'}
@@ -106,74 +105,71 @@ const ProjectPage = observer(
             </p>
           </div>
 
-          <div className="my-4 w-full flex flex-row items-center gap-4 sm:w-[200px]">
-            {store.user && isSelf && (
-              <Button
-                intent="secondary"
-                className="flex-grow basis-8/12"
-                onClick={handleShare}
-              >
-                Share
-              </Button>
+          {/* final placeholder XXX */}
+          <div className="my-4">
+            {hasImage ? (
+              <CloudinaryImage
+                assetId={project.imageAssetId}
+                intent="project"
+              />
+            ) : (
+              <CloudinaryImage
+                assetId={specialAssetIds.defaultAvatarID}
+                intent="project"
+              />
             )}
           </div>
 
-          <div
-            className={`grid gap-4 ${
-              hasImage
-                ? 'grid-rows-[auto_auto] sm:grid-rows-1 sm:grid-cols-[3fr_7fr]'
-                : 'grid-rows-1 grid-cols-1'
-            }`}
-          >
-            {hasImage && (
-              <div>
-                <CloudinaryImage
-                  assetId={project.imageAssetId}
-                  intent="project"
-                />
-              </div>
-            )}
-            <div>
-              {project.description && (
-                <p className="break-words whitespace-pre-line">
-                  {project.description}
-                </p>
-              )}
-            </div>
-          </div>
+          <H.H4 className="mt-4 mb-2">{project.title}</H.H4>
 
-          <Divider light />
+          {project.description && (
+            <p className="break-words whitespace-pre-line my-2">
+              {project.description}
+            </p>
+          )}
 
-          <div className="grid grid-cols-[auto_1fr] items-baseline gap-4 mb-4">
-            <label htmlFor="sortby">Sort by:</label>
-            <Select
-              id="sortby"
-              onChange={changeSort}
-              value={sort}
-              className="text-bodytext"
-            >
-              <option key="desc" value="desc">
-                newest first
-              </option>
-              <option key="asc" value="asc">
-                oldest first
-              </option>
-            </Select>
-          </div>
-
-          {store.user && // store.user redundant when isSelf but tsserver needs it
-            isSelf && (
-              <div className="grid mb-4">
+          <div className="my-4 flex flex-row items-center gap-4">
+            {store.user && // store.user redundant when isSelf but tsserver needs it
+              isSelf && (
                 <Link
+                  className="grow basis-1 sm:grow-0 sm:basis-auto"
                   intent="primary"
                   href={pathBuilder.newPost(store.user.systemSlug, project.id)}
                 >
                   Add post
                 </Link>
-              </div>
-            )}
+              )}
+            <Button
+              className="grow basis-1 sm:grow-0 sm:basis-auto"
+              intent="secondary"
+              onClick={handleShare}
+            >
+              Share project
+            </Button>
+          </div>
 
-          <div className="grid grid-cols-1 gap-8 mt-8">
+          <Divider light className="my-6"/>
+
+          <div className="flex flex-row items-baseline gap-4 mb-4">
+            <label htmlFor="block sortby">Sort by:</label>
+            <div className="grow sm:grow-0">
+              <Select
+                id="sortby"
+                onChange={changeSort}
+                value={sort}
+                className="text-bodytext"
+              >
+                <option key="desc" value="desc">
+                  newest first
+                </option>
+                <option key="asc" value="asc">
+                  oldest first
+                </option>
+              </Select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-16 mt-16">
             {/* even though we return above if targetUser is falsy, because map is
            passed a function, typescript can't assert that inside that function
            scope that targetUser is still surely not false. hence "as ApiUser"*/}
