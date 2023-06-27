@@ -7,10 +7,15 @@ const ProjectList = observer(({ targetUser }: { targetUser: ApiUser }) => {
   if (store.user && store.user.id === targetUser.id) targetUser = store.user // reactivity
   const projects = Object.values(targetUser.profile.projects)
   projects.sort((a, b) => b.createdAt - a.createdAt)
+  if (projects.length === 0) {
+    if (store.user && store.user.id === targetUser.id) {
+      return <p>Looks like you have no projects</p>
+    } else {
+      return <p>No projects</p>
+    }
+  }
   return (
-    <div className="flex flex-col gap-4">
-      {projects.length === 0 && store.user === targetUser && <p>Looks like you have no projects</p>}
-      {projects.length === 0 && store.user !== targetUser && <p>No projects</p>}
+    <div className="flex flex-row gap-4 sm:gap-5 flex-wrap">
       {projects.map(p => (
         <ProjectCard key={p.id} project={p} targetUser={targetUser} />
       ))}
