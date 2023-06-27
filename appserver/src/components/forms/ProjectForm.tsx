@@ -223,14 +223,19 @@ const ProjectForm = observer((props: Props) => {
               intent="project"
             />
           )}
-          <div className="flex flex-row gap-4 mt-4">
+          <div className="flex flex-row gap-4 mt-4 w-full sm:w-auto">
             <ImageUpload
               intent="project"
               onUploadWithUseCallback={onImageUpload}
               isReplace={!!projectStore.imageAssetId}
+              className="grow sm:grow-0"
             />
             {projectStore.imageAssetId && (
-              <Button intent="secondary" onClick={deleteImage}>
+              <Button
+                intent="secondary"
+                onClick={deleteImage}
+                className="grow sm:grow-0"
+              >
                 Remove
               </Button>
             )}
@@ -258,15 +263,16 @@ const ProjectForm = observer((props: Props) => {
             </span>
           </label>
         </div>
-        <Button
-          spinning={projectStore.spinning}
-          type="submit"
-          disabled={!projectStore.isPostable()}
-        >
-          {mode === 'new' ? 'Create' : 'Update'}
-        </Button>
-        {mode === 'edit' && (
-          <div className="text-center">
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-10">
+          <Button
+            spinning={projectStore.spinning}
+            type="submit"
+            disabled={!projectStore.isPostable()}
+            className="w-full sm:w-[150px]"
+          >
+            {mode === 'new' ? 'Create' : 'Update'}
+          </Button>
+          {mode === 'edit' && (
             <Button
               intent="link"
               className="text-red-500"
@@ -276,8 +282,8 @@ const ProjectForm = observer((props: Props) => {
             >
               Delete project
             </Button>
-          </div>
-        )}
+          )}
+        </div>
       </form>
     </div>
   )

@@ -292,14 +292,19 @@ const ImageField = observer(({ formStore }: { formStore: FormStore }) => {
             />
           )}
         </p>
-        <div className="flex flex-row gap-4 mt-4">
+        <div className="flex flex-row gap-4 mt-4 w-full sm:w-auto">
           <ImageUpload
             intent="project"
             onUploadWithUseCallback={onResult}
             isReplace={!!formStore.imageAssetId}
+            className="grow sm:grow-0"
           />
           {formStore.imageAssetId && (
-            <Button intent="secondary" onClick={deleteImage}>
+            <Button
+              intent="secondary"
+              onClick={deleteImage}
+              className="grow sm:grow-0"
+            >
               Remove
             </Button>
           )}
@@ -505,13 +510,16 @@ const UserForm = observer(() => {
             />
           </label>
         </div>
-        <Button
-          spinning={formStore.spinning}
-          type="submit"
-          disabled={!formStore.isPostable()}
-        >
-          Save
-        </Button>
+        <div>
+          <Button
+            spinning={formStore.spinning}
+            type="submit"
+            disabled={!formStore.isPostable()}
+            className="w-full sm:w-[150px]"
+          >
+            Save
+          </Button>
+        </div>
       </form>
     </>
   )

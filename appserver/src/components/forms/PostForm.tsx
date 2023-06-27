@@ -91,11 +91,15 @@ class PostStore {
       projectId: this.projectId,
       scope: this.scope,
       description: this.description.trim(),
-      imageAssetId: this.mediaType === 'image' ? (this.imageAssetId || undefined) : undefined,
+      imageAssetId:
+        this.mediaType === 'image' ? this.imageAssetId || undefined : undefined,
       imageMeta: this.mediaType === 'image' ? this.imageMeta : undefined,
       linkUrl:
-        this.mediaType === 'link' && this.linkUrl && this.linkUrl.trim() ? this.linkUrl.trim() : undefined,
-      urlMeta: this.mediaType === 'link' && this.urlMeta ? this.urlMeta : undefined,
+        this.mediaType === 'link' && this.linkUrl && this.linkUrl.trim()
+          ? this.linkUrl.trim()
+          : undefined,
+      urlMeta:
+        this.mediaType === 'link' && this.urlMeta ? this.urlMeta : undefined,
     }
   }
 
@@ -114,8 +118,9 @@ class PostStore {
     const hasText = !!this.description.trim()
     const hasUrl = !!this.linkUrl.trim()
     const hasImage = !!this.imageAssetId.trim()
-    const descOver = (this.description.trim().length > profileUtils.maxChars.blurb)
-    const linkOver = (this.linkUrl.trim().length > profileUtils.maxChars.url)
+    const descOver =
+      this.description.trim().length > profileUtils.maxChars.blurb
+    const linkOver = this.linkUrl.trim().length > profileUtils.maxChars.url
     if (descOver) return false
     if (this.mediaType === 'link') {
       if (this.linkUrlIsInvalid()) return false
@@ -310,11 +315,11 @@ const ImageField = observer(({ postStore }: { postStore: PostStore }) => {
           className="mb-4"
         />
       )}
-      <div className="flex flex-row gap-4 w-full">
+      <div className="flex flex-row gap-4 w-full sm:w-auto">
         <ImageUpload
           intent="post"
           onUploadWithUseCallback={onResult}
-          className="flex-grow"
+          className="grow sm:grow-0"
           isReplace={!!postStore.imageAssetId}
           required
         />
@@ -322,7 +327,7 @@ const ImageField = observer(({ postStore }: { postStore: PostStore }) => {
           <Button
             intent="secondary"
             onClick={deleteImage}
-            className="flex-grow"
+            className="grow sm:grow-0"
           >
             Remove
           </Button>
@@ -418,11 +423,17 @@ const PostForm = observer((props: Props) => {
         )}
         {postStore.mediaType === 'link' && <LinkField postStore={postStore} />}
         <DescriptionField postStore={postStore} />
-        <Button type="submit" disabled={!postStore.isPostable()} spinning={postStore.spinning}>
-          {mode === 'new' ? 'Add' : 'Update'}
-        </Button>
-        {mode === 'edit' && (
-          <div className="text-center">
+
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-10">
+          <Button
+            type="submit"
+            disabled={!postStore.isPostable()}
+            spinning={postStore.spinning}
+            className="w-full sm:w-[150px]"
+          >
+            {mode === 'new' ? 'Add' : 'Update'}
+          </Button>
+          {mode === 'edit' && (
             <Button
               intent="link"
               className="text-red-500"
@@ -430,8 +441,8 @@ const PostForm = observer((props: Props) => {
             >
               Delete post
             </Button>
-          </div>
-        )}
+          )}
+        </div>
       </form>
     </div>
   )
