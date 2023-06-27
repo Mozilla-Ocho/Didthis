@@ -12,10 +12,10 @@ const linkCVA = cva('link', {
         'visited:text-links',
         'active:text-links-active',
       ],
-      internalNav: [
+      internalNav: [ // this used to be different from just regular 'link'
+        'underline',
         'text-links',
         'hover:text-links-hover',
-        'hover:underline',
         'visited:text-links',
         'active:text-links-active',
       ],
