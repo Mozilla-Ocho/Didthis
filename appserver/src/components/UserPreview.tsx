@@ -3,6 +3,7 @@ import { useStore } from '@/lib/store'
 import { CloudinaryImage, H, Link } from './uiLib'
 import pathBuilder from '@/lib/pathBuilder'
 import { specialAssetIds } from '@/lib/cloudinaryConfig'
+import profileUtils from '@/lib/profileUtils'
 
 const UserPreview = observer(
   ({ user, compact }: { user: ApiUser; compact: boolean }) => {
@@ -47,14 +48,14 @@ const UserPreview = observer(
           </p>
         )}
         {user.profile.imageAssetId ? (
-          <p className="w-16">
+          <p className="w-16 sm:w-32">
             <CloudinaryImage
               assetId={user.profile.imageAssetId}
               intent="avatar"
             />
           </p>
         ) : (
-          <p className="w-16">
+          <p className="w-16 sm:w-32">
             <CloudinaryImage
               assetId={specialAssetIds.defaultAvatarID}
               intent="avatar"
@@ -62,6 +63,49 @@ const UserPreview = observer(
           </p>
         )}
         <H.H5 className="m-0">{user.profile.name || 'Unnamed user'}</H.H5>
+        {user.profile.bio && (
+          <p className="text-md text-bodytext my2 break-words whitespace-pre-line">
+            {user.profile.bio}
+          </p>
+        )}
+        {/* the second condition here is logically superfluous but needed to
+      suppress typescript errors */}
+        {profileUtils.hasAnySocialUrls(user.profile) &&
+          user.profile.socialUrls && (
+            <>
+              <p className="text-form-labels text-sm mt-4 mb-0">Find me on:</p>
+              <div className="flex flex-row gap-8 justify-between w-[90%]">
+                {user.profile.socialUrls.twitter && (
+                  <p className="">
+                    <Link external href={user.profile.socialUrls.twitter}>
+                      Twitter
+                    </Link>
+                  </p>
+                )}
+                {user.profile.socialUrls.facebook && (
+                  <p className="">
+                    <Link external href={user.profile.socialUrls.facebook}>
+                      Facebook
+                    </Link>
+                  </p>
+                )}
+                {user.profile.socialUrls.reddit && (
+                  <p className="">
+                    <Link external href={user.profile.socialUrls.reddit}>
+                      Reddit
+                    </Link>
+                  </p>
+                )}
+                {user.profile.socialUrls.instagram && (
+                  <p className="">
+                    <Link external href={user.profile.socialUrls.instagram}>
+                      Instagram
+                    </Link>
+                  </p>
+                )}
+              </div>
+            </>
+          )}
       </div>
     )
   }

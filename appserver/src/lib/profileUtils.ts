@@ -28,7 +28,7 @@ const maxChars = {
 }
 
 const minChars = {
-  slug: 3
+  slug: 3,
 }
 
 const mkDefaultProfile = () => {
@@ -199,6 +199,16 @@ const slugStringValidation = (
   return { valid: true }
 }
 
+const hasAnySocialUrls = (profile: ApiProfile) => {
+  if (!profile.socialUrls) return false
+  return !!(
+    profile.socialUrls.twitter ||
+    profile.socialUrls.facebook ||
+    profile.socialUrls.reddit ||
+    profile.socialUrls.instagram
+  )
+}
+
 const profileUtils = {
   mkDefaultProfile,
   privacyFilteredCopy,
@@ -208,6 +218,7 @@ const profileUtils = {
   mkNewProject,
   generateRandomAvailablePostId,
   slugStringValidation,
+  hasAnySocialUrls,
 }
 
 export default profileUtils
