@@ -1,6 +1,7 @@
 import apiClient from '@/lib/apiClient'
 import { SlugCheckWrapper } from '@/lib/apiConstants'
 import branding from '@/lib/branding'
+import { specialAssetIds } from '@/lib/cloudinaryConfig'
 import profileUtils from '@/lib/profileUtils'
 import { useStore } from '@/lib/store'
 import { debounce } from 'lodash-es'
@@ -281,11 +282,16 @@ const ImageField = observer(({ formStore }: { formStore: FormStore }) => {
     <div>
       <H.H5 className="mb-4">Avatar</H.H5>
       <div>
-        {formStore.imageAssetId && (
-          <p className="w-[150px]">
+        <p className="w-[150px]">
+          {formStore.imageAssetId ? (
             <CloudinaryImage assetId={formStore.imageAssetId} intent="avatar" />
-          </p>
-        )}
+          ) : (
+            <CloudinaryImage
+              assetId={specialAssetIds.defaultAvatarID}
+              intent="avatar"
+            />
+          )}
+        </p>
         <div className="flex flex-row gap-4 mt-4">
           <ImageUpload
             intent="project"
