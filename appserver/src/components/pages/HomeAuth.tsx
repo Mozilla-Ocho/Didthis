@@ -1,43 +1,93 @@
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@/lib/store'
 import ProjectList from '@/components/ProjectList'
-import { Divider, H, Link, PagePad } from '@/components/uiLib'
+import { Button, Divider, H, Link, PagePad } from '@/components/uiLib'
 import pathBuilder from '@/lib/pathBuilder'
 import UserPreview from '../UserPreview'
+import { useLocalStorage } from 'usehooks-ts'
+import { useEffect, useState } from 'react'
 
 const HomeAuth = observer(() => {
   const store = useStore()
+  const [skipBlankSlate, setSkipBlankSlate] = useLocalStorage(
+    'skipBlankSlate',
+    false
+  )
+  const [rendered, setRendered] = useState(false)
+  useEffect(() => {
+    // this is a hack to prevent a failure of client vs server rendering state,
+    // by just rendering blank initially, and then using useState (which is
+    // client-only) to activate rendering.  this is because we're using
+    // localStorage-based state to decide if we should show the full page, or
+    // the blank slate, which the server rendering doesn't have access to.
+    if (!rendered) setRendered(true)
+  }, [rendered])
+  if (!rendered) return <></>
   if (!store.user) return <></> // typescript helper, it doesn't know this component is auth only
-  // const hasProjects = Object.keys(store.user.profile.projects).length > 0
+  const hasProjects = Object.keys(store.user.profile.projects).length > 0
+  const hasProfileEdits =
+    store.user.profile.name ||
+    store.user.userSlug ||
+    store.user.profile.imageAssetId
+  const inBlankSlate = !hasProjects && !hasProfileEdits && !skipBlankSlate
+  const handleSkip = () => {
+    setSkipBlankSlate(true)
+  }
+  const addCreatBtns = (
+    <div className="flex flex-row gap-4 my-2 mb-10">
+      <Link
+        intent="primary"
+        className="grow basis-1 sm:grow-0 sm:basis-auto"
+        href={pathBuilder.newPost(store.user.systemSlug)}
+      >
+        Add post
+      </Link>
+      {inBlankSlate ? (
+        <Button
+          intent="secondary"
+          className="grow basis-1 sm:grow-0 sm:basis-auto"
+          onClick={handleSkip}
+        >
+          Skip for now
+        </Button>
+      ) : (
+        <Link
+          intent="secondary"
+          className="grow basis-1 sm:grow-0 sm:basis-auto"
+          href={pathBuilder.newProject(store.user.systemSlug)}
+        >
+          Create project
+        </Link>
+      )}
+    </div>
+  )
+  if (!hasProjects && !hasProfileEdits && !skipBlankSlate) {
+    return (
+      <>
+        <PagePad>
+          <H.H3 className="mt-10 mb-4">Account created!</H.H3>
+          <p className="mb-6">
+            Now that you’ve created an account, let’s create your first post!
+          </p>
+          {addCreatBtns}
+        </PagePad>
+      </>
+    )
+  }
   return (
     <>
       <PagePad yControlOnly>
         <PagePad noPadY>
           <UserPreview user={store.user} compact={false} />
         </PagePad>
-      <Divider light className="my-10"/>
-      <PagePad wide noPadY>
-        <div>
-          <H.H3 className="my-2">Your projects:</H.H3>
-          <div className="flex flex-row gap-4 my-2 mb-10">
-            <Link
-              intent="primary"
-              className="grow basis-1 sm:grow-0 sm:basis-auto"
-              href={pathBuilder.newPost(store.user.systemSlug)}
-            >
-              Add post
-            </Link>
-            <Link
-              intent="secondary"
-              className="grow basis-1 sm:grow-0 sm:basis-auto"
-              href={pathBuilder.newProject(store.user.systemSlug)}
-            >
-              Create project
-            </Link>
+        <Divider light className="my-10" />
+        <PagePad wide noPadY>
+          <div>
+            <H.H3 className="my-2">Your projects:</H.H3>
+            {addCreatBtns}
+            <ProjectList targetUser={store.user} />
           </div>
-          <ProjectList targetUser={store.user} />
-        </div>
-      </PagePad>
+        </PagePad>
       </PagePad>
     </>
   )
