@@ -2,6 +2,7 @@ import { createContext, useContext, useState, ReactNode } from 'react'
 import { observer } from 'mobx-react-lite'
 import Store from './store'
 import {NextRouter} from 'next/router'
+import Loading from '@/components/pages/Loading'
 
 const StoreContext = createContext<Store | null>(null)
 
@@ -31,11 +32,10 @@ const useStore = () => {
 }
 
 const StoreLoadingWrapper = observer(
-  ({ ifLoading, children }: { ifLoading: ReactNode; children: ReactNode }) => {
+  ({ children }: { children: ReactNode }) => {
     const store = useStore()
-    // XXX_PRETTY full page loading mode
     if (store.fullpageLoading)
-      return <div data-testid="fullPageLoading">{ifLoading}</div>
+      return <div data-testid="fullPageLoading"><Loading/></div>
     return (
       <div
         data-testid="storeReady"

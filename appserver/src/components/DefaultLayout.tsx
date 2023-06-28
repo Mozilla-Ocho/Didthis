@@ -20,14 +20,14 @@ const Inner = observer(
     const store = useStore()
     if (store.user && store.user.unsolicited) {
       return (
-        <StoreLoadingWrapper ifLoading={<p>loading</p>}>
+        <StoreLoadingWrapper>
           <LoginGlobalOverlay />
           <StaticLayout><HomeUnsolicited /></StaticLayout>
         </StoreLoadingWrapper>
       )
     }
     return (
-      <StoreLoadingWrapper ifLoading={<p>loading</p>}>
+      <StoreLoadingWrapper>
         <LoginGlobalOverlay />
         <DeletionConfirmationModal />
         <StaticLayout unauthHomepage={unauthHomepage}>{children}</StaticLayout>

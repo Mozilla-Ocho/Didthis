@@ -141,7 +141,11 @@ class Store {
               log.readiness('acquired getMe user after firebase auth')
               this.setUser(wrapper.payload)
               this.trackEvent(trackingEvents.caLogin)
-              this.setFullPageLoading(false)
+              // this.setFullPageLoading(false)
+              // TODO: HBY-70 need to full page reload here otherwise layout
+              // doesn't update because layout component props that are driven
+              // by ssr auth are not refreshed.
+              window.location.reload()
             })
             .catch(e => {
               log.error('error acquiring user onAuthStateChanged', e)
