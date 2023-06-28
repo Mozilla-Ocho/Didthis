@@ -7,6 +7,7 @@ const buttonCVA = cva('button px-4 py-3 rounded text-sm', {
   variants: {
     intent: {
       primary: [
+        // DRY_57530 button styles
         'bg-primary-bg',
         'hover:bg-primary-bg-hover',
         'active:bg-primary-bg-active',
@@ -17,6 +18,7 @@ const buttonCVA = cva('button px-4 py-3 rounded text-sm', {
         'disabled:text-primary-txt-disabled',
       ],
       secondary: [
+        // DRY_57530 button styles
         'bg-secondary-bg',
         'hover:bg-secondary-bg-hover',
         'active:bg-secondary-bg-active',

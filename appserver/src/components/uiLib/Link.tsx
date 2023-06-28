@@ -9,15 +9,15 @@ const linkCVA = cva('link', {
         'underline',
         'text-links',
         'hover:text-links-hover',
-        'visited:text-links',
         'active:text-links-active',
+        'visited:text-links-visited',
       ],
       internalNav: [ // this used to be different from just regular 'link'
         'underline',
         'text-links',
         'hover:text-links-hover',
-        'visited:text-links',
         'active:text-links-active',
+        'visited:text-links-visited',
       ],
       logo: [
         'text-yellow-500',
@@ -27,6 +27,7 @@ const linkCVA = cva('link', {
         'active:text-links-active',
       ],
       primary: [
+        // DRY_57530 button styles
         'inline-block',
         'text-center',
         'text-sm',
@@ -43,6 +44,7 @@ const linkCVA = cva('link', {
         'disabled:text-primary-txt-disabled',
       ],
       secondary: [
+        // DRY_57530 button styles
         'inline-block',
         'text-center',
         'text-sm',
