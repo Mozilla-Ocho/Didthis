@@ -8,10 +8,24 @@ import type {
 } from './apiConstants'
 import { sessionCookieName, csrfCookieName } from './apiConstants'
 
-// endpoint is the scheme, domain, and port of the api backend
-const endpoint = process.env.NEXT_PUBLIC_API_ENDPOINT;
-
 const inBrowserContext = typeof window !== 'undefined'
+
+const getLocationBase = () => {
+  const u = new URL(window.location.href)
+  u.pathname = '/'
+  u.hash = ''
+  u.search = ''
+  return u.toString().replace(/\/$/, '')
+}
+
+// endpoint is the scheme, domain, and port of the api backend. in browser
+// context in dev, it uses the browser location, so that in dev we can load the
+// app from various domains (localhost, ip address, aliases, etc). otherwise
+// it uses NEXT_PUBLIC_API_ENDPOINT
+const endpoint =
+  inBrowserContext && process.env.NODE_ENV === 'development'
+    ? getLocationBase()
+    : process.env.NEXT_PUBLIC_API_ENDPOINT
 
 type QueryParams = { [key: string]: string }
 
@@ -30,7 +44,7 @@ type FetchArgs = {
 
 type ApiInfo = {
   // these fields can be undefined if we never got a resposne, or the response
-  // had no valid wrapper 
+  // had no valid wrapper
   errorId?: ErrorId
   errorMsg?: string
   fetchArgs?: FetchArgs
@@ -48,10 +62,7 @@ const mkUrl = (action: string, queryParams?: QueryParams) => {
 class ApiError extends Error {
   apiInfo: ApiInfo
 
-  constructor(
-    message: string,
-    theInfo: ApiInfo,
-  ) {
+  constructor(message: string, theInfo: ApiInfo) {
     super(message)
     this.name = 'ApiError'
     this.apiInfo = theInfo
@@ -79,7 +90,9 @@ const wrapFetch = async (fetchArgs: FetchArgs): Promise<SuccessWrapper> => {
     expectErrorIds,
     expectErrorStatuses,
   } = fetchArgs
-  const queryParams = fetchArgs.queryParams ? JSON.parse(JSON.stringify(fetchArgs.queryParams)) as QueryParams : {}
+  const queryParams = fetchArgs.queryParams
+    ? (JSON.parse(JSON.stringify(fetchArgs.queryParams)) as QueryParams)
+    : {}
   if (csrfCookie) {
     // in ssr
     queryParams.csrf = csrfCookie
@@ -112,11 +125,11 @@ const wrapFetch = async (fetchArgs: FetchArgs): Promise<SuccessWrapper> => {
       cookieBits.push(sessionCookieName + '=' + sessionCookie)
     }
     if (csrfCookie) {
-      cookieBits.push(csrfCookieName+ '=' + csrfCookie)
+      cookieBits.push(csrfCookieName + '=' + csrfCookie)
     }
     if (cookieBits.length) {
       config.headers['Cookie'] = cookieBits.join('; ')
-    } 
+    }
     if (typeof body !== undefined) {
       config.headers['Content-Type'] = 'application/json'
       if (typeof config.body === 'string') {
