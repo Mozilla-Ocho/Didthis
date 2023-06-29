@@ -21,7 +21,7 @@ import PostCard from '../PostCard'
 import { useStore } from '@/lib/store'
 import { useLocalStorage } from 'usehooks-ts'
 import Breadcrumbs from '../Breadcrumbs'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import copyToClipboard from 'copy-to-clipboard'
 import { specialAssetIds } from '@/lib/cloudinaryConfig'
 
@@ -58,18 +58,18 @@ const ProjectPage = observer(
       copyToClipboard(shareUrl)
       setShareModalOpen(true)
     }
-    const handleCloseShare = () => {
+    const handleCloseShare = useCallback(() => {
       setShareModalOpen(false)
-    }
+    }, [setShareModalOpen])
     const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
       e.target.select()
     }
     return (
       <>
         <Modal
-          id="share-proj"
           isOpen={shareModalOpen}
-          title="Link copied"
+          srTitle="Link copied"
+          renderTitleHeading
           handleClose={handleCloseShare}
         >
           <p>The link for this project has been copied to the clipboard.</p>
@@ -148,7 +148,7 @@ const ProjectPage = observer(
             </Button>
           </div>
 
-          <Divider light className="my-6"/>
+          <Divider light className="my-6" />
 
           <div className="flex flex-row items-baseline gap-4 mb-4">
             <label htmlFor="block sortby">Sort by:</label>

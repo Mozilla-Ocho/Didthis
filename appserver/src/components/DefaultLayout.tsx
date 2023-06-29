@@ -5,7 +5,8 @@ import StaticLayout from './StaticLayout'
 import { observer } from 'mobx-react-lite'
 import HomeUnsolicited from './pages/HomeUnsolicited'
 import DeletionConfirmationModal from './DeletionConfirmationModal'
-import {useRouter} from 'next/router'
+import { useRouter } from 'next/router'
+import { appRootDivId } from './uiLib/Modal'
 
 // Inner is separate because it has to be a store observer for when
 // headerFooter=authed and the outer layer is the store provider itself.
@@ -14,7 +15,7 @@ const Inner = observer(
     children,
     unauthHomepage,
   }: {
-    children: ReactNode,
+    children: ReactNode
     unauthHomepage?: boolean
   }) => {
     const store = useStore()
@@ -22,7 +23,9 @@ const Inner = observer(
       return (
         <StoreLoadingWrapper>
           <LoginGlobalOverlay />
-          <StaticLayout><HomeUnsolicited /></StaticLayout>
+          <StaticLayout>
+            <HomeUnsolicited />
+          </StaticLayout>
         </StoreLoadingWrapper>
       )
     }
@@ -45,12 +48,14 @@ export default function DefaultLayout({
   authUser: ApiUser | false
   signupCode: false | string
   children: ReactNode // ReactNode not ReactElement
-  unauthHomepage?: boolean,
+  unauthHomepage?: boolean
 }) {
   const router = useRouter()
   return (
-    <StoreWrapper authUser={authUser} signupCode={signupCode} router={router}>
-      <Inner unauthHomepage={unauthHomepage}>{children}</Inner>
-    </StoreWrapper>
+    <div id={appRootDivId}>
+      <StoreWrapper authUser={authUser} signupCode={signupCode} router={router}>
+        <Inner unauthHomepage={unauthHomepage}>{children}</Inner>
+      </StoreWrapper>
+    </div>
   )
 }

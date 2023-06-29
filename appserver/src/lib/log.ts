@@ -11,6 +11,7 @@ const channelNames = [
   'sql',
   'tracking',
   'serverApi',
+  'debug',
 ] as const
 
 //type Channel = typeof channelNames[number];
@@ -25,6 +26,7 @@ type ChannelName =
   | 'sql'
   | 'tracking'
   | 'serverApi'
+  | 'debug'
 
 type LoggingEnv = 'default' | 'test' | 'inProdBrowser' | 'ssr'
 
@@ -119,6 +121,12 @@ const channelConfig: ChannelConfig = {
     test: false,
     inProdBrowser: false,
     ssr: true,
+  },
+  debug: {
+    default: true,
+    test: false,
+    inProdBrowser: false,
+    ssr: false,
   },
 }
 

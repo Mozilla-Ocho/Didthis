@@ -1,11 +1,10 @@
-import { ReactNode, useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { ConfirmationModal, Modal, Button } from '@/components/uiLib'
 import { observer } from 'mobx-react-lite'
 import log from '@/lib/log'
 import { useStore } from '@/lib/store'
 import { StyledFirebaseAuth } from '@/components/auth/StyledFirebaseAuth'
 
-// XXX_SKELETON
 const LoginGlobalOverlay = observer(() => {
   const store = useStore()
   useEffect(() => {
@@ -13,13 +12,7 @@ const LoginGlobalOverlay = observer(() => {
     store.initFirebase()
   })
 
-  // XXX_PORTING i deleted the confirmation modals for now
-
-  let styledFbUi: ReactNode = <></>
-  if (store.firebaseModalOpen) {
-    // note the store loads firebase async, so this is inside the
-    // firebaseModalOpen condition, outside this it could fail w/ uninitialized
-    // firebase instance.
+  const getFbConfig = useCallback(() => {
     const firebaseUiConfig = {
       signInFlow: 'popup',
       signInOptions: [
@@ -50,19 +43,17 @@ const LoginGlobalOverlay = observer(() => {
         },
       },
     }
-    /* note global/styles.css has an override for the firebase auth ui */
-    styledFbUi = (
-      <StyledFirebaseAuth
-        uiConfig={firebaseUiConfig}
-        firebaseAuth={store.firebaseRef.auth()}
-      />
-    )
+    return firebaseUiConfig
+  }, [store])
+
+  if (!store.firebaseRef) {
+    // not initialized yet
+    return <></>
   }
 
   return (
     <div>
       <ConfirmationModal
-        id="code-inactive"
         isOpen={store.loginErrorMode === '_inactive_code_'}
         title="Expired invite code"
         noText="Ok"
@@ -85,14 +76,15 @@ const LoginGlobalOverlay = observer(() => {
         </div>
       </ConfirmationModal>
       <Modal
-        id="fbUI"
-        title={'Log in or Sign up'}
-        hideTitle
+        srTitle={'Log in or Sign up'}
         noPad
         isOpen={store.firebaseModalOpen}
         handleClose={store.cancelGlobalLoginOverlay}
       >
-        {styledFbUi}
+        <StyledFirebaseAuth
+          uiConfig={getFbConfig()}
+          firebaseAuth={store.firebaseRef.auth()}
+        />
       </Modal>
     </div>
   )

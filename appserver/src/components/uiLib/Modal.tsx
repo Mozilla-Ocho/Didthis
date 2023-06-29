@@ -1,117 +1,78 @@
-import classNames from 'classnames'
-import React, { useRef, useEffect, ReactNode, useState } from 'react'
-import ReactDOM from 'react-dom'
-import H from './H'
+// import classNames from 'classnames'
+import React, { useEffect, ReactNode, useState, useRef } from 'react'
+import ReactModal from 'react-modal'
+import { twMerge } from 'tailwind-merge'
+import { H } from '.'
+
+const appRootDivId = 'approot' // exported, used in default layout
+
+ReactModal.setAppElement('#' + appRootDivId)
 
 interface ModalProps {
-  id: string
   isOpen: boolean
   handleClose: () => void
-  title: string
-  hideTitle?: boolean
+  srTitle: string
+  renderTitleHeading?: boolean
   noPad?: boolean
   children: ReactNode
 }
 
 const Modal: React.FC<ModalProps> = ({
-  id,
   isOpen,
   handleClose,
-  title,
-  hideTitle,
+  srTitle,
+  renderTitleHeading,
   noPad,
   children,
 }) => {
-  const modalRef = useRef<HTMLDivElement | null>(null)
-  const elRef = useRef<HTMLDivElement | null>(null)
-  const [initialOpenState] = useState(() => isOpen)
-  const [rerenderHack, setRerenderHack] = useState(false)
-  //console.log("modal render", id)
+  // see globals.css for ReactModal__Body--open (hides overflow to prevent document scroll)
 
-  useEffect(() => {
-    // portal node creation must happen inside useeffect due to nextjs SSR
-    const div = document.createElement('div')
-    div.className = `modal-root-${id}`
-    div.id = id
-    elRef.current = div
-    const modalRoot = document.body
-    modalRoot.appendChild(elRef.current)
-    //console.log("modal useEffect mk portal element", id)
-    // if the modal element is created and mounted with isOpen initially true,
-    // because we're building this portal element in the useEffect and
-    // asserting it's truthy in the render below, we have to re-render after
-    // creating it.
-    if (initialOpenState) setRerenderHack(true)
-    return () => {
-      modalRoot.removeChild(elRef.current as HTMLDivElement)
-    }
-  }, [id, setRerenderHack, initialOpenState])
-
+  // TODO: for some reason, the shouldCloseOnOverlayClick is not working with
+  // ReactModal. it's supposed to do this by default. i'm implementing my own
+  // check for click events outside the modal here...
+  const contentRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     function handleOutsideClick(event: MouseEvent) {
       if (
-        modalRef.current &&
-        !modalRef.current.contains(event.target as Node)
+        contentRef &&
+        contentRef.current &&
+        !contentRef.current.contains(event.target as Node)
       ) {
         if (isOpen) {
           handleClose()
         }
       }
     }
-
-    function handleEscapeKeydown(event: KeyboardEvent) {
-      if (event.code === 'Escape') {
-        handleClose()
-      }
-    }
-
     window.addEventListener('mousedown', handleOutsideClick)
-    window.addEventListener('keydown', handleEscapeKeydown)
-
     return () => {
       window.removeEventListener('mousedown', handleOutsideClick)
-      window.removeEventListener('keydown', handleEscapeKeydown)
     }
   }, [isOpen, handleClose])
 
-  //console.log("modal render isOpen, elRef.current:",isOpen,!!elRef.current)
-  return isOpen && elRef.current
-    ? ReactDOM.createPortal(
-        <div
-          className="fixed z-50 inset-0 overflow-y-auto"
-          aria-labelledby="modal-title"
-          role="dialog"
-          aria-modal="true"
-        >
-          <div className={`absolute grid min-h-screen w-screen`}>
-            <div
-              className="bg-gray-500 bg-opacity-75 min-h-screen min-y-screen"
-              aria-hidden="true"
-            ></div>
-          </div>
-          <div className="absolute flex justify-center items-center min-h-screen w-screen">
-            <div
-              className={classNames(
-                'bg-white rounded-lg overflow-hidden shadow-xl min-w-[320px] m-4',
-                noPad ? '' : 'px-4 pt-5 pb-4 sm:p-6'
-              )}
-              ref={modalRef}
-            >
-              <div>
-                <H.H4
-                  className={`m-0 mb-4 ${hideTitle ? 'hidden' : ''}`}
-                  id="modal-title"
-                >
-                  {title}
-                </H.H4>
-                <div>{children}</div>
-              </div>
-            </div>
-          </div>
-        </div>,
-        elRef.current as HTMLDivElement
-      )
-    : null
+  return (
+    <ReactModal
+      isOpen={isOpen}
+      bodyOpenClassName="ReactModal__Body--open"
+      onRequestClose={handleClose}
+      contentLabel={srTitle}
+      overlayClassName="fixed z-50 inset-0 top-0 right-0 left-0 bottom-0 bg-gray-500 bg-opacity-75 overflow-y-auto"
+      className="absolute flex justify-center items-center min-h-screen w-screen"
+      shouldCloseOnOverlayClick={true}
+    >
+      <div
+        ref={contentRef}
+        className={twMerge(
+          'bg-white rounded-lg overflow-hidden shadow-xl min-w-[320px] m-4',
+          noPad ? '' : 'px-4 pt-5 pb-4 sm:p-6'
+        )}
+      >
+        {renderTitleHeading && <H.H4 className={`m-0 mb-4`}>{srTitle}</H.H4>}
+        {children}
+      </div>
+    </ReactModal>
+  )
 }
 
 export default Modal
+
+export { appRootDivId }

@@ -3,7 +3,6 @@ import Modal from './Modal'
 import Button from './Button'
 
 interface ConfirmationModalProps {
-  id: string,
   isOpen: boolean
   title: string
   body?: string
@@ -16,7 +15,6 @@ interface ConfirmationModalProps {
 }
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
-  id,
   isOpen,
   title,
   body,
@@ -28,7 +26,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   onClose,
 }) => {
   return (
-    <Modal id={id} title={title} isOpen={isOpen} handleClose={onClose}>
+    <Modal srTitle={title} renderTitleHeading isOpen={isOpen} handleClose={onClose}>
       <div className="max-w-[320px]">
         {body && <p id="confirm-modal-body">{body}</p>}
         {!body && (

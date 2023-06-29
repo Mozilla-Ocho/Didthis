@@ -14,8 +14,8 @@ const Scratch = observer(() => {
   const hc = () => setIsOpen(false)
   return (
     <>
-      <Modal id="scratch" isOpen={isOpen} title="foo" handleClose={hc}>
-        hi
+      <Modal isOpen={isOpen} srTitle="modal test" renderTitleHeading handleClose={hc}>
+        this is a test modal
       </Modal>
       <Button onClick={launchModal}>open modal</Button>
     </>

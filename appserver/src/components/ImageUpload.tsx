@@ -54,8 +54,9 @@ const ImageUpload = ({
       config,
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       (error: any, result: any) => {
+        // log.debug('cloudinary widget cb', error, result)
         if (!error && result && result.event === 'success') {
-          log.api('cloudinary result', result)
+          log.debug('cloudinary result', result)
           /*
            * note: to get the image_metadata object, the "image metadata"
            * switch must be enabled for the upload preset under the "media
@@ -156,10 +157,12 @@ const ImageUpload = ({
             info: result.info,
           })
         }
-        setTimeout(() => {
-          // this is insane. but cloudinary widget doesn't clean up properly.
-          document.body.style.overflow = 'auto'
-        }, 100)
+        if (result && result.info === 'hidden') {
+          setTimeout(() => {
+            // this is insane. but cloudinary widget doesn't clean up properly.
+            document.body.style.removeProperty('overflow')
+          }, 100)
+        }
       }
     ) as Widget
     setWidget(theWidget)

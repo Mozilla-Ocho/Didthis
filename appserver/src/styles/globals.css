@@ -63,3 +63,7 @@ body {
   max-height: 400px;
 }
 
+
+.ReactModal__Body--open {
+    overflow: hidden;
+}
