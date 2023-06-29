@@ -135,7 +135,6 @@ module "appserver_main" {
 
 module "lb_main" {
   source = "./modules/lb"
-  prefix = var.app_name
   name = "main"
   region = var.region
   gcr_service_name = module.appserver_main[0].service_name
