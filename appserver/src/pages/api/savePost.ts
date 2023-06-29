@@ -10,7 +10,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const [user] = await getAuthUser(req, res)
-  log.serverApi('savePost user', user)
+  // log.serverApi('savePost user', user)
   if (!user) {
     const wrapper: ErrorWrapper = {
       action: 'authentication',
@@ -24,9 +24,9 @@ export default async function handler(
   }
   const millis = new Date().getTime()
   const profile = user.profile
-  log.serverApi('savePost user profile:', profile)
+  // log.serverApi('savePost user profile:', profile)
   const inputPost = req.body.post as ApiPost
-  log.serverApi('savePost input:', inputPost)
+  // log.serverApi('savePost input:', inputPost)
   // XXX validation of post
   const post = {
     ...inputPost,
@@ -60,7 +60,7 @@ export default async function handler(
   post.updatedAt = millis
   project.posts[post.id] = post
   project.updatedAt = millis
-  log.serverApi('savePost saving:', profile)
+  // log.serverApi('savePost saving:', profile)
   await knex('users')
     .update({
       last_read_from_user: millis,
@@ -76,6 +76,6 @@ export default async function handler(
     success: true,
     payload: { user, post },
   }
-  log.serverApi('savePost resp:', wrapper)
+  // log.serverApi('savePost resp:', wrapper)
   res.status(200).json(wrapper)
 }

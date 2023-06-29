@@ -9,7 +9,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const [user] = await getAuthUser(req, res)
-  log.serverApi('saveProject user', user)
+  // log.serverApi('saveProject user', user)
   if (!user) {
     const wrapper: ErrorWrapper = {
       action: 'authentication',
@@ -23,9 +23,9 @@ export default async function handler(
   }
   const millis = new Date().getTime()
   const profile = user.profile
-  log.serverApi('saveProject user profile:', profile)
+  // log.serverApi('saveProject user profile:', profile)
   const inputProject = req.body.project
-  log.serverApi('saveProject input:', inputProject)
+  // log.serverApi('saveProject input:', inputProject)
   // XXX validation
   // XXX project writes don't behave like post writes
   // XXX rename to putProject (create+update)
@@ -47,7 +47,7 @@ export default async function handler(
     project.createdAt = millis
   }
   profile.projects[project.id] = project
-  log.serverApi('saveProject saving:', profile)
+  // log.serverApi('saveProject saving:', profile)
   await knex('users')
     .update({
       last_read_from_user: millis,
@@ -63,6 +63,6 @@ export default async function handler(
     success: true,
     payload: { user, project },
   }
-  log.serverApi('saveProject resp:', wrapper)
+  // log.serverApi('saveProject resp:', wrapper)
   res.status(200).json(wrapper)
 }
