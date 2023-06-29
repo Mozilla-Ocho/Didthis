@@ -315,11 +315,11 @@ const ImageField = observer(({ postStore }: { postStore: PostStore }) => {
           className="mb-4"
         />
       )}
-      <div className="flex flex-row gap-4 w-full sm:w-auto">
+      <div className="flex flex-row gap-4 w-full">
         <ImageUpload
           intent="post"
           onUploadWithUseCallback={onResult}
-          className="grow sm:grow-0"
+          className="grow"
           isReplace={!!postStore.imageAssetId}
           required
         />
@@ -327,7 +327,7 @@ const ImageField = observer(({ postStore }: { postStore: PostStore }) => {
           <Button
             intent="secondary"
             onClick={deleteImage}
-            className="grow sm:grow-0"
+            className="grow"
           >
             Remove
           </Button>
@@ -374,6 +374,9 @@ const PostForm = observer((props: Props) => {
       'cursor-pointer hover:font-bold text-lg text-black-300',
       postStore.mediaType === t && 'font-bold text-yellow-700'
     )
+  }
+  const handleCancel = () => {
+    store.goBack()
   }
   return (
     <div>
@@ -427,7 +430,7 @@ const PostForm = observer((props: Props) => {
         {postStore.mediaType === 'link' && <LinkField postStore={postStore} />}
         <DescriptionField postStore={postStore} />
 
-        <div className="flex flex-col sm:flex-row gap-4 sm:gap-10">
+        <div className="flex flex-col sm:flex-row gap-4 mt-8">
           <Button
             type="submit"
             disabled={!postStore.isPostable()}
@@ -435,6 +438,13 @@ const PostForm = observer((props: Props) => {
             className="w-full sm:w-[150px]"
           >
             {mode === 'new' ? 'Add' : 'Update'}
+          </Button>
+          <Button
+            intent="secondary"
+            onClick={handleCancel}
+            className="w-full sm:w-[150px]"
+          >
+            {mode === 'edit' ? 'Discard changes' : 'Cancel' }
           </Button>
           {mode === 'edit' && (
             <Button

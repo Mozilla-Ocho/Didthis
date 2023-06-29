@@ -510,7 +510,7 @@ const UserForm = observer(() => {
             />
           </label>
         </div>
-        <div>
+        <div className="flex flex-col sm:flex-row gap-4">
           <Button
             spinning={formStore.spinning}
             type="submit"
@@ -518,6 +518,13 @@ const UserForm = observer(() => {
             className="w-full sm:w-[150px]"
           >
             Save
+          </Button>
+          <Button
+            intent="secondary"
+            onClick={() => store.goBack()}
+            className="w-full sm:w-[150px]"
+          >
+            Discard changes
           </Button>
         </div>
       </form>

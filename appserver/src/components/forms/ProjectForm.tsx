@@ -154,6 +154,9 @@ const ProjectForm = observer((props: Props) => {
   const deleteImage = () => {
     projectStore.setImageAssetId('', undefined)
   }
+  const handleCancel = () => {
+    store.goBack()
+  }
   return (
     <div>
       <form
@@ -263,7 +266,7 @@ const ProjectForm = observer((props: Props) => {
             </span>
           </label>
         </div>
-        <div className="flex flex-col sm:flex-row gap-4 sm:gap-10">
+        <div className="flex flex-col sm:flex-row gap-4">
           <Button
             spinning={projectStore.spinning}
             type="submit"
@@ -271,6 +274,13 @@ const ProjectForm = observer((props: Props) => {
             className="w-full sm:w-[150px]"
           >
             {mode === 'new' ? 'Create' : 'Update'}
+          </Button>
+          <Button
+            intent="secondary"
+            onClick={handleCancel}
+            className="w-full sm:w-[150px]"
+          >
+            {mode === 'edit' ? 'Discard changes' : 'Cancel'}
           </Button>
           {mode === 'edit' && (
             <Button

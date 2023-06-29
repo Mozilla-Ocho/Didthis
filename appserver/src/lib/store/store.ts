@@ -346,6 +346,10 @@ class Store {
     })
   }
 
+  goBack() {
+    this.router.back()
+  }
+
   promptDeletePost(post: ApiPost) {
     this.confirmingDelete = {
       kind: 'post',
