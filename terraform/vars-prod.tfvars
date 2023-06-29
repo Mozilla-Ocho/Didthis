@@ -20,5 +20,5 @@ vpc_remote_name="common"
 # temporary outage while the load balancer cert is being provisioned.
 # TODO: zero-downtime changes to domain names / certs...
 lb_ssl_domain_names=["didthat.app","www.didthat.app"]
-lb_cert_domain_change_increment_outage=2
+lb_cert_domain_change_increment_outage=3
 

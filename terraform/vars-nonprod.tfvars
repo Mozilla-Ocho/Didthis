@@ -16,4 +16,4 @@ region="us-central1"
 vpc_remote_bucket="tfstate-vpcs-5ec7945d96f"
 vpc_remote_name="common"
 lb_ssl_domain_names=["test.didthat.app","www.test.didthat.app"]
-lb_cert_domain_change_increment_outage=2
+lb_cert_domain_change_increment_outage=3
