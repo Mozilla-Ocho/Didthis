@@ -8,12 +8,16 @@ const appRootDivId = 'approot' // exported, used in default layout
 
 ReactModal.setAppElement('#' + appRootDivId)
 
+// DRY_62447 modal transition time
+const modalTransitionTime = 200
+
 interface ModalProps {
   isOpen: boolean
   handleClose: () => void
   srTitle: string
   renderTitleHeading?: boolean
   noPad?: boolean
+  maxEdge?: boolean
   children: ReactNode
 }
 
@@ -23,6 +27,7 @@ const Modal: React.FC<ModalProps> = ({
   srTitle,
   renderTitleHeading,
   noPad,
+  maxEdge,
   children,
 }) => {
   // see globals.css for ReactModal__Body--open (hides overflow to prevent document scroll)
@@ -30,7 +35,7 @@ const Modal: React.FC<ModalProps> = ({
   // TODO: for some reason, the shouldCloseOnOverlayClick is not working with
   // ReactModal. it's supposed to do this by default. i'm implementing my own
   // check for click events outside the modal here...
-  const contentRef = useRef<HTMLDivElement | null>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null)
   useEffect(() => {
     function handleOutsideClick(event: MouseEvent) {
       if (
@@ -55,15 +60,17 @@ const Modal: React.FC<ModalProps> = ({
       bodyOpenClassName="ReactModal__Body--open"
       onRequestClose={handleClose}
       contentLabel={srTitle}
-      overlayClassName="fixed z-50 inset-0 top-0 right-0 left-0 bottom-0 bg-gray-500 bg-opacity-75 overflow-y-auto"
+      overlayClassName="fixed z-50 inset-0 top-0 right-0 left-0 bottom-0 bg-gray-800 bg-opacity-80 overflow-y-auto"
       className="absolute flex justify-center items-center min-h-screen w-screen"
       shouldCloseOnOverlayClick={true}
+      closeTimeoutMS={modalTransitionTime}
     >
       <div
         ref={contentRef}
         className={twMerge(
-          'bg-white rounded-lg overflow-hidden shadow-xl min-w-[320px] m-4',
-          noPad ? '' : 'px-4 pt-5 pb-4 sm:p-6'
+          'modal_content_container overflow-hidden shadow-xl min-w-[320px]',
+          maxEdge ? 'w-full' : 'm-4 bg-white rounded-lg',
+          noPad || maxEdge ? '' : 'px-4 pt-5 pb-4 sm:p-6'
         )}
       >
         {renderTitleHeading && <H.H4 className={`m-0 mb-4`}>{srTitle}</H.H4>}

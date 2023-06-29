@@ -16,6 +16,9 @@ type LoginErrorMode = false | '_inactive_code_'
 
 let moduleGlobalFirebaseInitialized = false
 
+// DRY_62447 modal transition time
+const modalTransitionTime = 200
+
 // XXX_PORTING review for non-singleton changes
 
 class Store {
@@ -34,6 +37,7 @@ class Store {
     | false
     | { kind: 'post'; thing: ApiPost; deleting: boolean }
     | { kind: 'project'; thing: ApiProject; deleting: boolean } = false
+  showConfirmDeleteModal = false
   router: NextRouter
 
   constructor({
@@ -356,6 +360,7 @@ class Store {
       thing: post,
       deleting: false,
     }
+    this.showConfirmDeleteModal = true
   }
 
   promptDeleteProject(project: ApiProject) {
@@ -364,6 +369,7 @@ class Store {
       thing: project,
       deleting: false,
     }
+    this.showConfirmDeleteModal = true
   }
 
   onDeleteResult(res: 'yes' | 'no') {
@@ -378,7 +384,8 @@ class Store {
           .then(wrapper => {
             if (this.confirmingDelete && this.confirmingDelete.kind === "post") {
               const projectId = this.confirmingDelete.thing.projectId
-              this.confirmingDelete = false
+              this.showConfirmDeleteModal = false
+              setTimeout(() => {this.confirmingDelete = false}, modalTransitionTime)
               this.setUser(wrapper.payload.user)
               this.router.push(pathBuilder.project(wrapper.payload.user.systemSlug, projectId))
             }
@@ -388,7 +395,8 @@ class Store {
         apiClient
           .deleteProject({ projectId: this.confirmingDelete.thing.id })
           .then(wrapper => {
-            this.confirmingDelete = false
+            this.showConfirmDeleteModal = false
+            setTimeout(() => {this.confirmingDelete = false}, modalTransitionTime)
             // note: upating the user here causes a flash of "not found" page
             // this.setUser(wrapper.payload)
             // we can actually just rely on nextjs's server side props behavior
@@ -397,7 +405,8 @@ class Store {
           })
       }
     } else {
-      this.confirmingDelete = false
+      this.showConfirmDeleteModal = false
+      setTimeout(() => {this.confirmingDelete = false}, modalTransitionTime)
     }
   }
 

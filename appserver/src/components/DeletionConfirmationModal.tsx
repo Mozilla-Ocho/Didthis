@@ -13,7 +13,7 @@ const DeletionConfirmationModal = observer(() => {
     : undefined
   return (
     <Modal
-      isOpen={!!store.confirmingDelete}
+      isOpen={store.showConfirmDeleteModal}
       handleClose={handleClose}
       srTitle={`Are you sure your want to delete this ${kind || ''}?`}
       renderTitleHeading

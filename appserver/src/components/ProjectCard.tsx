@@ -14,7 +14,7 @@ const ProjectCard = observer(
     return (
       <div className="border border-edges rounded-md overflow-hidden w-full basis-full sm:w-[373px] sm:basis-[373px]">
         {hasImage ? (
-          <CloudinaryImage assetId={project.imageAssetId} intent="project" />
+          <CloudinaryImage lightbox assetId={project.imageAssetId} intent="project" />
         ) : (
           <CloudinaryImage
             assetId={specialAssetIds.defaultAvatarID}

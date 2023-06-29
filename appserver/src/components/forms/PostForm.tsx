@@ -313,6 +313,7 @@ const ImageField = observer(({ postStore }: { postStore: PostStore }) => {
           imageMeta={postStore.imageMeta}
           intent="post"
           className="mb-4"
+          lightbox
         />
       )}
       <div className="flex flex-row gap-4 w-full">

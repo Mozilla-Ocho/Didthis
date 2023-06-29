@@ -111,6 +111,7 @@ const ProjectPage = observer(
               <CloudinaryImage
                 assetId={project.imageAssetId}
                 intent="project"
+                lightbox
               />
             ) : (
               <CloudinaryImage

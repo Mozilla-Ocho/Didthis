@@ -63,7 +63,28 @@ body {
   max-height: 400px;
 }
 
-
 .ReactModal__Body--open {
-    overflow: hidden;
+  overflow: hidden;
+}
+.ReactModal__Overlay {
+  opacity: 0;
+  /* DRY_62447 modal transition time */
+  transition: opacity 200ms ease-in-out;
+}
+.ReactModal__Overlay--after-open {
+  opacity: 1;
+}
+.ReactModal__Overlay--before-close {
+  opacity: 0;
+}
+.ReactModal__Overlay .modal_content_container {
+  /* DRY_62447 modal transition time */
+  transition: transform 200ms ease-in-out;
+  transform: scale(0.9);
+}
+.ReactModal__Overlay--after-open .modal_content_container {
+  transform: scale(1);
+}
+.ReactModal__Overlay--before-close .modal_content_container {
+  transform: scale(0.9);
 }

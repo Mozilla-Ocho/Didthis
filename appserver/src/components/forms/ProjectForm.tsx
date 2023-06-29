@@ -224,6 +224,7 @@ const ProjectForm = observer((props: Props) => {
             <CloudinaryImage
               assetId={projectStore.imageAssetId}
               intent="project"
+              lightbox
             />
           )}
           <div className="flex flex-row gap-4 mt-4 w-full sm:w-auto">
