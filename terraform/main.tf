@@ -131,16 +131,16 @@ module "appserver_main" {
   ]
 }
 
-# module "lb_main" {
-#   source = "./modules/lb"
-#   prefix = var.app_name
-#   name = "main"
-#   region = var.region
-#   gcr_service_name = module.appserver_main[0].service_name
-#   domains = ["..."]
-#   lb_cert_domain_change_increment_outage = var.lb_cert_domain_change_increment_outage
-#   depends_on = [module.gcp_apis, module.appserver_main[0]]
-# }
+module "lb_main" {
+  source = "./modules/lb"
+  prefix = var.app_name
+  name = "main"
+  region = var.region
+  gcr_service_name = module.appserver_main[0].service_name
+  domains = var.lb_ssl_domain_names
+  lb_cert_domain_change_increment_outage = var.lb_cert_domain_change_increment_outage
+  depends_on = [module.gcp_apis, module.appserver_main[0]]
+}
 
 output "gcr_service_url" {
   value = var.flag_destroy ? "" : module.appserver_main[0].service_url
@@ -150,13 +150,11 @@ output "gcr_image_deployed" {
   value = var.flag_destroy ? "" : module.appserver_main[0].image_deployed
 }
 
-# output "public_ip_address" {
-#   value = module.lb_main.public_ip_address
-# }
-
-# output "dns_records_lb" {
-#   value = module.lb_main.dns_records
-# }
+output "dns_records_lb" {
+  # this is a list of domains->IP address that should be managed in the dns
+  # config in the shared vpc project.
+  value = module.lb_main.dns_records
+}
 
 output "db_proxy_public_ip" {
   value = var.flag_use_db ? module.db_proxy[0].public_ip : "none"

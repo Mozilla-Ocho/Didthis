@@ -15,3 +15,5 @@ gcp_project_number="984891837435"
 region="us-central1"
 vpc_remote_bucket="tfstate-vpcs-5ec7945d96f"
 vpc_remote_name="common"
+lb_ssl_domain_names=["test.didthat.com","www.test.didthat.com"]
+lb_cert_domain_change_increment_outage=1
