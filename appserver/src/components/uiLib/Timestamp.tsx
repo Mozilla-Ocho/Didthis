@@ -19,9 +19,9 @@ const humanize = (millis: number) => {
   const diffMin = Math.floor(diffSec / 60)
   if (diffMin < 60) return diffMin + handlePlural(' minuteS ago', diffMin)
   const diffHr = Math.floor(diffMin / 60)
-  if (diffHr < 24) return diffHr + handlePlural(' hourS ago', diffMin)
+  if (diffHr < 24) return diffHr + handlePlural(' hourS ago', diffHr)
   const diffDay = Math.floor(diffHr / 24)
-  if (diffDay < 7) return diffHr + handlePlural(' dayS ago', diffMin)
+  if (diffDay < 7) return diffDay + handlePlural(' dayS ago', diffDay)
   return absDate(date)
 }
 
