@@ -2,7 +2,6 @@
 # https://cloud.google.com/blog/topics/developers-practitioners/serverless-load-balancing-terraform-hard-way
 
 variable "app_name" {
-  default = ""
   type = string
 }
 variable "name" {
