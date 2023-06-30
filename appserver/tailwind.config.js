@@ -124,13 +124,25 @@ module.exports = {
         80: '320px',
         96: '384px',
       },
-      typography: { // prose, for legal pages
+      typography: ({theme}) => ({ // prose, for legal pages
         DEFAULT: {
           css: {
             'line-height': 1.3,
+             a: {
+              color: theme('colors.links'),
+              '&:hover': {
+                color: theme('colors.links-hover'),
+              },
+              '&:active': {
+                color: theme('colors.links-active'),
+              },
+              '&:visited': {
+                color: theme('colors.links-visited'),
+              },
+            },
           }
         }
-      },
+      }),
     },
   },
   plugins: [
