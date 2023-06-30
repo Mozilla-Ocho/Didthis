@@ -61,16 +61,16 @@ const LoginGlobalOverlay = observer(() => {
     <div>
       <ConfirmationModal
         isOpen={store.loginErrorMode === '_inactive_code_'}
-        title="Expired invite code"
+        title="Invalid invite code"
         noText="Ok"
         onNo={store.cancelGlobalLoginOverlay}
         onClose={store.cancelGlobalLoginOverlay}
       >
         <div>
           <p>
-            The sign-up invite code you used is no longer active for creating
-            new accounts. If you already have an account, you can still log in
-            normally:
+            The sign-up invite code on this link is not valid for creating new
+            accounts. It may have been copy/pasted incorrectly, or has expired.
+            If you already have an account, you can still log in normally:
           </p>
           <Button
             intent="primary"

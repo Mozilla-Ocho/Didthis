@@ -2,13 +2,6 @@ export const sessionCookieName = '_h3y_sess'
 
 export const csrfCookieName = '_h3y_csrf' // DRY_86325 crsf cookie name. TODO: put this in a non-typescript shared const file?
 
-export const signupCodes: { [key: string]: { active: boolean; name: string } } = {
-  '1234': {
-    active: true,
-    name: 'devdefault',
-  },
-}
-
 type GenericErrorId =
   | 'ERR_UNAUTHORIZED'
   | 'ERR_CSRF_TOKEN'

@@ -1,23 +1,24 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type { ValidateSignupCodeWrapper } from '@/lib/apiConstants'
-import { signupCodes } from '@/lib/apiConstants';
+import { getValidCodeInfo } from '@/lib/serverAuth';
+import {getParamString} from '@/lib/nextUtils';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const code = (req.query.code || '') + ''
+  const userCode = getParamString(req,'code')
   // DRY_47693 signup code logic
-  const data = signupCodes[code]
-  if (data && data.active) {
+  const validCode = getValidCodeInfo(userCode)
+  if (validCode) {
     const wrapper: ValidateSignupCodeWrapper = {
       action: 'validateSignupCode',
       status: 200,
       success: true,
       payload: {
-        code,
-        name: data.name,
-        active: data.active,
+        code: userCode,
+        name: validCode.name,
+        active: validCode.active,
       },
     }
     res.status(200).json(wrapper)
@@ -27,7 +28,7 @@ export default async function handler(
       status: 200,
       success: true,
       payload: {
-        code,
+        code: userCode,
         name: 'unknown',
         active: false,
       },

@@ -5,8 +5,38 @@ import profileUtils from './profileUtils'
 import Cookies from 'cookies'
 import knex from '@/knex'
 import log from '@/lib/log'
-import { sessionCookieName, signupCodes } from './apiConstants'
-import {getParamString} from './nextUtils'
+import { sessionCookieName } from './apiConstants'
+import { getParamString } from './nextUtils'
+
+export const signupCodes: {
+  [key: string]: { active: boolean; name: string; envNames: string[] }
+} = {
+  '1234': {
+    active: true,
+    name: 'dev',
+    envNames: ['dev'],
+  },
+  a6fd47b9: {
+    active: true,
+    name: 'intshare1',
+    envNames: ['dev', 'test', 'prod'],
+  },
+  b469b534: {
+    active: true,
+    name: 'campaign1',
+    envNames: ['prod'],
+  },
+}
+
+export const getValidCodeInfo = (userCode: string | undefined | false) => {
+  if (!userCode) return undefined
+  const check = signupCodes[userCode]
+  if (!check) return undefined
+  if (!check.active) return undefined
+  if (check.envNames.indexOf(process.env.NEXT_PUBLIC_ENV_NAME as string) < 0)
+    return undefined
+  return check
+}
 
 let firebaseApp: ReturnType<typeof initializeApp>
 
@@ -63,9 +93,10 @@ const generateRandomAvailableSystemSlug = async () => {
   let available = false
   let slug = mkRandSlug()
   while (!available) {
-    const dbRow = (await knex('users').where('user_slug_lc', slug.toLowerCase()).orWhere('system_slug', slug).first()) as
-      | UserDbRow
-      | undefined
+    const dbRow = (await knex('users')
+      .where('user_slug_lc', slug.toLowerCase())
+      .orWhere('system_slug', slug)
+      .first()) as UserDbRow | undefined
     if (dbRow) {
       slug = mkRandSlug()
     } else {
@@ -83,29 +114,28 @@ const getOrCreateUser = async ({
   id: string
   email: string
   signupCode: string | false
-}): Promise<[ApiUser,UserDbRow]> => {
+}): Promise<[ApiUser, UserDbRow]> => {
   const millis = new Date().getTime()
   let dbRow = (await knex('users').where('id', id).first()) as
     | UserDbRow
     | undefined
-  // XXX_PORTING
-  const codeInfo = signupCode ? signupCodes[signupCode] : undefined
+  const validCode = getValidCodeInfo(signupCode)
   if (dbRow) {
     // found
-    if (codeInfo && codeInfo.active && !dbRow.signup_code_name) {
+    if (validCode && !dbRow.signup_code_name) {
       // link the user to the valid sign up code present on the request if they
       // don't have one.
       dbRow = (
-        await knex("users")
+        await knex('users')
           .update({
-            signup_code_name: codeInfo ? codeInfo.name : null,
+            signup_code_name: validCode.name,
             updated_at_millis: millis,
             last_write_from_user: millis,
             last_read_from_user: millis,
           })
-          .where("id", dbRow.id)
-          .returning("*")
-      )[0] as UserDbRow; // "as" to coerce type as never undef, we can be sure we will get a record.
+          .where('id', dbRow.id)
+          .returning('*')
+      )[0] as UserDbRow // "as" to coerce type as never undef, we can be sure we will get a record.
     }
     return [userFromDbRow(dbRow, { publicFilter: false }), dbRow]
   }
@@ -120,7 +150,7 @@ const getOrCreateUser = async ({
     user_slug: null,
     user_slug_lc: null,
     profile: profileUtils.mkDefaultProfile(),
-    signup_code_name: codeInfo ? codeInfo.name : null,
+    signup_code_name: validCode ? validCode.name : null,
     created_at_millis: millis,
     updated_at_millis: millis,
     last_write_from_user: millis,
@@ -133,7 +163,7 @@ const getOrCreateUser = async ({
   // XXX_PORTING
   // setReqAuthentication(req, dbRow); // have to set this early here so track event can obtain the new auth user id
   // trackEventReqEvtOpts(req, trackingEvents.caSignup, {
-  //   signupCodeName: codeInfo ? codeInfo.name : "none",
+  //   signupCodeName: validCode ? validCode.name : "none",
   // });
   return [userFromDbRow(dbRow, { publicFilter: false }), dbRow]
 }
@@ -143,7 +173,7 @@ const getOrCreateUser = async ({
 const getAuthUser = (
   req: NextApiRequest,
   res: NextApiResponse
-): Promise<[ApiUser,UserDbRow] | [false,false]> => {
+): Promise<[ApiUser, UserDbRow] | [false, false]> => {
   const cookies = new Cookies(req, res, {
     // explicitly tell cookies lib whether to use secure cookies, rather
     // than having it inspect the request, which won't work due to
@@ -153,8 +183,8 @@ const getAuthUser = (
   // DRY_r9725 session cookie name
   const sessionCookie = cookies.get(sessionCookieName) || ''
   // log.serverApi('sessionCookie', sessionCookie);
-  if (!sessionCookie) return Promise.resolve([false,false])
-  const signupCode = getParamString(req,'signupCode') || false
+  if (!sessionCookie) return Promise.resolve([false, false])
+  const signupCode = getParamString(req, 'signupCode') || false
   return (
     getAuth(firebaseApp)
       // XXX TODO: false here is insecure in that is doesn't deal with password
@@ -189,11 +219,11 @@ const getAuthUser = (
           signupCode,
         })
       })
-      .catch((e) => {
+      .catch(e => {
         log.serverApi('sessionCookie failed firebase verification')
-        log.serverApi('caught error:',e)
+        log.serverApi('caught error:', e)
         // TODO: delete cookie here?
-        return [false,false]
+        return [false, false]
       })
   )
 }
