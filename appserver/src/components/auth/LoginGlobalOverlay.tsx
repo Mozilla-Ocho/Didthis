@@ -1,9 +1,11 @@
 import { useEffect, useMemo } from 'react'
-import { ConfirmationModal, Modal, Button } from '@/components/uiLib'
+import { ConfirmationModal, Modal, Button, Link } from '@/components/uiLib'
 import { observer } from 'mobx-react-lite'
 import log from '@/lib/log'
 import { useStore } from '@/lib/store'
 import { StyledFirebaseAuth } from '@/components/auth/StyledFirebaseAuth'
+import branding from '@/lib/branding'
+import pathBuilder from '@/lib/pathBuilder'
 
 const LoginGlobalOverlay = observer(() => {
   const store = useStore()
@@ -17,7 +19,8 @@ const LoginGlobalOverlay = observer(() => {
       signInFlow: 'popup',
       signInOptions: [
         {
-          provider: store.firebaseRefNonReactive.auth.EmailAuthProvider.PROVIDER_ID,
+          provider:
+            store.firebaseRefNonReactive.auth.EmailAuthProvider.PROVIDER_ID,
           requireDisplayName: false,
         },
       ],
@@ -89,7 +92,11 @@ const LoginGlobalOverlay = observer(() => {
           uiConfig={firebaseUiConfig}
           firebaseAuth={store.firebaseRefNonReactive.auth()}
         />
-        <p className="p-3 text-center text-sm">Legal message here TODO</p>
+        <p className="p-3 text-center text-sm">
+          By proceeding, you agree to the {branding.productName}<br/>
+          <Link newTab href={pathBuilder.legal('tos')}>Terms of Service</Link> and{' '}
+          <Link newTab href={pathBuilder.legal('pp')}>Privacy Notice</Link>
+        </p>
       </Modal>
     </div>
   )

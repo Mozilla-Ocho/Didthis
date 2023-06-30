@@ -12,7 +12,8 @@ const linkCVA = cva('link', {
         'active:text-links-active',
         'visited:text-links-visited',
       ],
-      internalNav: [ // this used to be different from just regular 'link'
+      internalNav: [
+        // this used to be different from just regular 'link'
         'underline',
         'text-links',
         'hover:text-links-hover',
@@ -76,6 +77,7 @@ interface LinkProps extends VariantProps<typeof linkCVA> {
   children: ReactNode
   className?: string
   external?: boolean
+  newTab?: boolean
 }
 
 const Link: React.FC<LinkProps> = ({
@@ -84,6 +86,7 @@ const Link: React.FC<LinkProps> = ({
   className,
   children,
   external,
+  newTab,
 }) => {
   if (external) {
     return (
@@ -98,7 +101,11 @@ const Link: React.FC<LinkProps> = ({
     )
   }
   return (
-    <NextLink className={linkCVA({ intent, className })} href={href}>
+    <NextLink
+      target={newTab ? '_blank' : undefined}
+      className={linkCVA({ intent, className })}
+      href={href}
+    >
       {children}
     </NextLink>
   )

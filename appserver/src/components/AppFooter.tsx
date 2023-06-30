@@ -17,7 +17,7 @@ const AppFooter = observer(
               <Link href={pathBuilder.legal('pp')}>Privacy notice</Link>
             </p>
             <p>
-              <Link href={pathBuilder.legal('au')}>Content policies</Link>
+              <Link href={pathBuilder.legal('cp')}>Content policies</Link>
             </p>
             <p>A Mozilla Ocho Idea</p>
           </div>

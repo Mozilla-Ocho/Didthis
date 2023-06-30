@@ -1,5 +1,5 @@
 const branding = {
-  productName: "DidThat",
+  productName: "Didthat",
 
 }
 
