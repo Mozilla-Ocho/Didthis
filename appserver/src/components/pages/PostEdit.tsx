@@ -10,7 +10,7 @@ import { useStore } from '@/lib/store'
 import PostForm from '@/components/forms/PostForm'
 import Breadcrumbs from '../Breadcrumbs'
 import pathBuilder from '@/lib/pathBuilder'
-import { H, PagePad } from '../uiLib'
+import { PagePad } from '../uiLib'
 
 const PostEditPage = observer(() => {
   const store = useStore()
@@ -35,7 +35,7 @@ const PostEditPage = observer(() => {
         ]}
       />
       <PagePad>
-        <H.H3>Edit post</H.H3>
+        <h3>Edit post</h3>
         <PostForm mode="edit" post={post} />
       </PagePad>
     </>

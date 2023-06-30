@@ -2,7 +2,6 @@
 import React, { useEffect, ReactNode, useState, useRef } from 'react'
 import ReactModal from 'react-modal'
 import { twMerge } from 'tailwind-merge'
-import { H } from '.'
 
 const appRootDivId = 'approot' // exported, used in default layout
 
@@ -73,7 +72,7 @@ const Modal: React.FC<ModalProps> = ({
           noPad || maxEdge ? '' : 'px-4 pt-5 pb-4 sm:p-6'
         )}
       >
-        {renderTitleHeading && <H.H4 className={`m-0 mb-4`}>{srTitle}</H.H4>}
+        {renderTitleHeading && <h4 className={`m-0 mb-4`}>{srTitle}</h4>}
         {children}
       </div>
     </ReactModal>

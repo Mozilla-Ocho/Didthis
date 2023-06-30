@@ -2,7 +2,7 @@ import { specialAssetIds } from '@/lib/cloudinaryConfig'
 import pathBuilder from '@/lib/pathBuilder'
 import { useStore } from '@/lib/store'
 import { observer } from 'mobx-react-lite'
-import { H, Link } from './uiLib'
+import { Link } from './uiLib'
 import { CloudinaryImage } from './uiLib'
 
 const ProjectCard = observer(
@@ -38,7 +38,7 @@ const ProjectCard = observer(
             </p>
           </div>
 
-          <H.H5 className="mt-4 mb-2">
+          <h5 className="mt-4 mb-2">
             <Link
               intent="internalNav"
               href={pathBuilder.project(targetUser.publicPageSlug, project.id)}
@@ -46,9 +46,9 @@ const ProjectCard = observer(
             >
               {project.title}
             </Link>
-          </H.H5>
+          </h5>
 
-          <p className="break-words my-2 whitespace-pre-line line-clamp-1 text-sm">
+          <p className="break-words my-2 whitespace-pre-line line-clamp-2 min-h-[44px] text-sm">
             {project.description ? (
               project.description
             ) : (

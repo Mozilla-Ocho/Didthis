@@ -20,6 +20,15 @@ body {
   font-family: Rubik, sans-serif;
 }
 
+@layer base {
+  h1 { @apply font-bold my-1 text-6xl; }
+  h2 { @apply font-bold my-1 text-5xl; }
+  h3 { @apply font-bold my-1 text-4xl; }
+  h4 { @apply font-bold my-1 text-3xl; }
+  h5 { @apply font-bold my-1 text-2xl; }
+  /* ... */
+}
+
 /* hack the firebase ui card to fit the modal */
 .firebaseui-container {
   max-width: none;

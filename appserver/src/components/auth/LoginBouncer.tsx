@@ -1,11 +1,13 @@
-import { H } from '@/components/uiLib'
+import {PagePad} from "../uiLib"
+import {LoginButton} from "./LoginButton"
 
-// XXX_SKELETON
 const LoginBouncer = () => {
   return (
-    <div>
-      <H.H1>auth required; please login</H.H1>
-    </div>
+    <PagePad>
+      <h4 className="my-8">Sign in required</h4>
+      <p className="my-8">To access this page, please sign in.</p>
+      <LoginButton />
+    </PagePad>
   )
 }
 

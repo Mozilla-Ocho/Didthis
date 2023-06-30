@@ -9,7 +9,7 @@ import { action, makeAutoObservable } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useState } from 'react'
 import ImageUpload, { UploadCallback } from '../ImageUpload'
-import { Button, CloudinaryImage, H, Input, Textarea } from '../uiLib'
+import { Button, CloudinaryImage, Input, Textarea } from '../uiLib'
 
 class FormStore {
   name: string
@@ -280,7 +280,7 @@ const ImageField = observer(({ formStore }: { formStore: FormStore }) => {
   }
   return (
     <div>
-      <H.H5 className="mb-4">Avatar</H.H5>
+      <h5 className="mb-4">Avatar</h5>
       <div>
         <p className="w-[150px]">
           {formStore.imageAssetId ? (
@@ -360,7 +360,7 @@ const UserForm = observer(() => {
         className="flex flex-col gap-8"
       >
         <div>
-          <H.H3>Account Details</H.H3>
+          <h3>Account Details</h3>
           <p>
             The information you add here will be publicly visible to anyone who
             visits your page.
@@ -368,7 +368,7 @@ const UserForm = observer(() => {
         </div>
         <div>
           <label htmlFor="nameField">
-            <H.H5>Real name</H.H5>
+            <h5>Real name</h5>
             <p className="text-form-labels text-sm">Your full display name</p>
             <Input
               id="nameField"
@@ -385,7 +385,7 @@ const UserForm = observer(() => {
         </div>
         <div>
           <label htmlFor="slugField">
-            <H.H5>Username</H.H5>
+            <h5>Username</h5>
             <p className="text-form-labels text-sm">
               Your unique handle on {branding.productName}
               {formStore.suggestedSlug() && (
@@ -413,7 +413,7 @@ const UserForm = observer(() => {
         </div>
         <ImageField formStore={formStore} />
         <div>
-          <H.H5>Social links</H.H5>
+          <h5>Social links</h5>
           <label
             htmlFor="sl_twitter"
             className="block mt-2 text-form-labels text-sm"
@@ -499,7 +499,7 @@ const UserForm = observer(() => {
         </div>
         <div>
           <label htmlFor="bio">
-            <H.H5>Short bio</H.H5>
+            <h5>Short bio</h5>
             <Textarea
               name="bio"
               onChange={setBio}

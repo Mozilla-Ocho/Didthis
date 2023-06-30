@@ -2,7 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { useStore } from '@/lib/store'
 import ProjectForm from '../forms/ProjectForm'
 import LoginBouncer from '@/components/auth/LoginBouncer'
-import { H, PagePad } from '@/components/uiLib'
+import { PagePad } from '@/components/uiLib'
 import Breadcrumbs from '../Breadcrumbs'
 
 const NewProjectPage = observer(() => {
@@ -12,7 +12,7 @@ const NewProjectPage = observer(() => {
     <>
       <Breadcrumbs crumbs={[{ name: 'New project' }]} />
       <PagePad>
-        <H.H3>Create a project</H.H3>
+        <h3>Create a project</h3>
         <div className="pt-8" />
         <ProjectForm mode="new" />
       </PagePad>

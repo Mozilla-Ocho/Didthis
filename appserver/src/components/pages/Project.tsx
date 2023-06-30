@@ -2,9 +2,7 @@
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
 import {
-  H,
   Link,
-  Timestamp,
   Divider,
   CloudinaryImage,
   Button,
@@ -121,7 +119,7 @@ const ProjectPage = observer(
             )}
           </div>
 
-          <H.H4 className="mt-4 mb-2">{project.title}</H.H4>
+          <h4 className="mt-4 mb-2">{project.title}</h4>
 
           {project.description && (
             <p className="break-words whitespace-pre-line my-2">

@@ -8,7 +8,7 @@ import { getParamString } from '@/lib/nextUtils'
 import NotFound from './NotFound'
 import { useStore } from '@/lib/store'
 import ProjectForm from '../forms/ProjectForm'
-import { H, PagePad } from '../uiLib'
+import { PagePad } from '../uiLib'
 import Breadcrumbs from '../Breadcrumbs'
 import pathBuilder from '@/lib/pathBuilder'
 
@@ -32,7 +32,7 @@ const ProjectEditPage = observer(() => {
         ]}
       />
       <PagePad>
-        <H.H3>Edit project</H.H3>
+        <h3>Edit project</h3>
         <div className="pt-8" />
         <ProjectForm mode="edit" project={project} />
       </PagePad>

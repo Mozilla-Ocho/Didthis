@@ -1,6 +1,5 @@
 import Button from './Button'
 import Divider from './Divider'
-import H from './H'
 import Link from './Link'
 import Select from './Select'
 import Textarea from './Textarea'
@@ -14,7 +13,6 @@ import PagePad from './PagePad'
 import Spinner from './Spinner'
 
 export {
-  H,
   Button,
   Divider,
   Link,

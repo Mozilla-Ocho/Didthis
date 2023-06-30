@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@/lib/store'
-import { H, PagePad } from '@/components/uiLib'
+import { PagePad } from '@/components/uiLib'
 import LoginBouncer from '@/components/auth/LoginBouncer'
 import PostForm from '@/components/forms/PostForm'
 import Breadcrumbs from '../Breadcrumbs'
@@ -35,7 +35,7 @@ const NewPostPage = observer(() => {
         ]}
       />
       <PagePad>
-        <H.H3>Add post</H.H3>
+        <h3>Add post</h3>
         <PostForm mode="new" />
       </PagePad>
     </>

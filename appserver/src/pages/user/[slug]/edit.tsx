@@ -1,7 +1,7 @@
 import DefaultLayout from '@/components/DefaultLayout'
-import { getServerSideProps as indexPageGetServerSideProps } from '@/pages/index'
+import { getServerSideProps as userPageGetServerSideProps } from '@/pages/user/[slug]'
 import UserEditPage from '@/components/pages/UserEdit'
-import NotFound from '@/components/pages/NotFound'
+import { GetServerSidePropsContext } from 'next'
 
 const Wrapper = ({
   authUser,
@@ -10,12 +10,8 @@ const Wrapper = ({
   authUser: ApiUser | false
   signupCode: string | false
 }) => {
-  if (!authUser) return <NotFound />
   return (
-    <DefaultLayout
-      authUser={authUser}
-      signupCode={signupCode}
-    >
+    <DefaultLayout authUser={authUser} signupCode={signupCode}>
       <UserEditPage />
     </DefaultLayout>
   )
@@ -23,5 +19,20 @@ const Wrapper = ({
 
 export default Wrapper
 
-export const getServerSideProps = indexPageGetServerSideProps
-
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
+  // first fetch auth user via imported fn
+  const indexProps = await userPageGetServerSideProps(context)
+  if (indexProps.notFound) return indexProps
+  // TODO i don't understand why ts is being so dense here
+  if (
+    !indexProps?.props?.authUser ||
+    !indexProps?.props?.targetUser ||
+    indexProps?.props?.targetUser === true || // this will never happen, ts thinks its possible
+    indexProps?.props?.authUser?.id !== indexProps?.props?.targetUser?.id
+  ) {
+    return { notFound: true }
+  }
+  return indexProps
+}

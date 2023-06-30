@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@/lib/store'
 import ProjectList from '@/components/ProjectList'
-import { Button, Divider, H, Link, PagePad } from '@/components/uiLib'
+import { Button, Divider, Link, PagePad } from '@/components/uiLib'
 import pathBuilder from '@/lib/pathBuilder'
 import UserPreview from '../UserPreview'
 import { useLocalStorage } from 'usehooks-ts'
@@ -65,7 +65,7 @@ const HomeAuth = observer(() => {
     return (
       <>
         <PagePad>
-          <H.H3 className="mt-10 mb-4">Account created!</H.H3>
+          <h3 className="mt-10 mb-4">Account created!</h3>
           <p className="mb-6">
             Now that you’ve created an account, let’s create your first post!
           </p>
@@ -83,7 +83,7 @@ const HomeAuth = observer(() => {
         <Divider light className="my-10" />
         <PagePad wide noPadY>
           <div>
-            <H.H3 className="my-2">Your projects:</H.H3>
+            <h3 className="my-2">Your projects:</h3>
             {addCreatBtns}
             <ProjectList targetUser={store.user} />
           </div>

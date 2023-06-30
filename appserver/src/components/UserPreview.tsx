@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@/lib/store'
-import { CloudinaryImage, H, Link } from './uiLib'
+import { CloudinaryImage, Link } from './uiLib'
 import pathBuilder from '@/lib/pathBuilder'
 import { specialAssetIds } from '@/lib/cloudinaryConfig'
 import profileUtils from '@/lib/profileUtils'
@@ -62,7 +62,7 @@ const UserPreview = observer(
             />
           </p>
         )}
-        <H.H5 className="m-0">{user.profile.name || 'Unnamed user'}</H.H5>
+        <h5 className="m-0">{user.profile.name || 'Unnamed user'}</h5>
         {user.profile.bio && (
           <p className="text-md text-bodytext my2 break-words whitespace-pre-line">
             {user.profile.bio}

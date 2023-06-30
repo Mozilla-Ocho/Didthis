@@ -1,5 +1,5 @@
 import DefaultLayout from '@/components/DefaultLayout'
-import { getServerSideProps as indexPageGetServerSideProps } from '@/pages/index'
+import { getServerSideProps as userAuthPageGetServerSideProps } from '@/pages/user/[slug]/edit'
 import NewPostPage from '@/components/pages/PostNew'
 
 const Wrapper = ({
@@ -21,4 +21,4 @@ const Wrapper = ({
 
 export default Wrapper
 
-export const getServerSideProps = indexPageGetServerSideProps
+export const getServerSideProps = userAuthPageGetServerSideProps
