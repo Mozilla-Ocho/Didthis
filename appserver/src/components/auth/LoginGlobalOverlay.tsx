@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { ConfirmationModal, Modal, Button } from '@/components/uiLib'
 import { observer } from 'mobx-react-lite'
 import log from '@/lib/log'
@@ -11,8 +11,8 @@ const LoginGlobalOverlay = observer(() => {
     // client only, not on server
     store.initFirebase()
   })
-
-  const getFbConfig = useCallback(() => {
+  const firebaseUiConfig = useMemo(() => {
+    if (!store.firebaseRef) return {}
     const firebaseUiConfig = {
       signInFlow: 'popup',
       signInOptions: [
@@ -44,7 +44,10 @@ const LoginGlobalOverlay = observer(() => {
       },
     }
     return firebaseUiConfig
-  }, [store])
+    // eslint doesn't understand that store is a context object and the
+    // firebaseRef property can change without the top level store changing.
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
+  }, [store, store.firebaseRef])
 
   if (!store.firebaseRef) {
     // not initialized yet
@@ -68,6 +71,7 @@ const LoginGlobalOverlay = observer(() => {
           </p>
           <Button
             intent="primary"
+            className="w-full mt-4"
             loading={store.loginButtonsSpinning}
             onClick={() => store.launchGlobalLoginOverlay(true)}
           >
@@ -82,9 +86,10 @@ const LoginGlobalOverlay = observer(() => {
         handleClose={store.cancelGlobalLoginOverlay}
       >
         <StyledFirebaseAuth
-          uiConfig={getFbConfig()}
+          uiConfig={firebaseUiConfig}
           firebaseAuth={store.firebaseRef.auth()}
         />
+        <p className="p-3 text-center text-sm">Legal message here TODO</p>
       </Modal>
     </div>
   )

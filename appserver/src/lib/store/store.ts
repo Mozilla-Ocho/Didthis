@@ -9,6 +9,7 @@ import { trackingEvents } from '@/lib/trackingEvents'
 import { useEffect } from 'react'
 import {NextRouter} from 'next/router'
 import pathBuilder from '../pathBuilder'
+import {ValidateSignupCodeWrapper} from '../apiConstants'
 // import { UrlMetaWrapper } from '../apiConstants'
 
 type GeneralError = false | '_get_me_first_fail_' | '_api_fail_'
@@ -39,6 +40,8 @@ class Store {
     | { kind: 'project'; thing: ApiProject; deleting: boolean } = false
   showConfirmDeleteModal = false
   router: NextRouter
+  debugObjId = (Math.random()+'').replace('0.','')
+  stashedCodeValid: ValidateSignupCodeWrapper | false = false
 
   constructor({
     authUser,
@@ -63,6 +66,7 @@ class Store {
     )
     if (signupCode) this.setSignupCode(signupCode)
     if (authUser) this.setUser(authUser)
+    log.debug("store constructed. id=",this.debugObjId)
   }
 
   setSignupCode(code: string | false) {
@@ -77,7 +81,11 @@ class Store {
 
   initFirebase() {
     let firebaseConfig
-    if (moduleGlobalFirebaseInitialized) return
+    if (moduleGlobalFirebaseInitialized) {
+      // log.debug('skipping firebase init, already done')
+      return
+    }
+    log.debug('initializing firebase')
     moduleGlobalFirebaseInitialized = true
 
     // DRY_63816 firebase client config (not secret, but does depend on
@@ -181,6 +189,7 @@ class Store {
   }
 
   launchGlobalLoginOverlay(overrideCodeCheck: boolean) {
+
     this.trackEvent(trackingEvents.bcLoginSignup)
     this.loginErrorMode = false
     // DRY_47693 signup code logic
@@ -190,6 +199,7 @@ class Store {
       // if they do sign up this way, which is allowed via firebase, they end
       // up in the unsolicited state, same as if they used the signupCode=false
       // flow.
+      // log.debug('overrideCodeCheck=true so just open modal')
       this.firebaseModalOpen = true
       return
     }
@@ -197,23 +207,54 @@ class Store {
       // with no code present, we don't show any special case ui, we just let
       // them sign in and if they sign up for a new account, they'll land on
       // an unsolicited user page.
+      // log.debug('code is falsy so just open modal')
       this.firebaseModalOpen = true
       return
     }
     this.loginButtonsSpinning = true
+
+    if (this.stashedCodeValid) {
+      // TODO: okay get this, totally weird bug: if i render the
+      // StyledFirebaseAuth UI (see LoginGlobalOverlay) on a promise handler
+      // after an API call (the call to validate the signup code) that works
+      // ONCE and ONLY ONCE. if you close the modal, then click the button
+      // again, the UI makes this wierd full page content flash and then
+      // vanishes. however, if i launch the auth modal synchronously with the
+      // button click, it can be opened/closed repeatedly and indefinitely.
+      // SOOOO, i'm doing it async the first time and then stashing the api
+      // call so that the next time, it can be sync with the button click. this
+      // is some insane weird SPA magic voodoo bug stuff.  took hours to
+      // meticulously narrow down that this was the issue.
+      if (this.stashedCodeValid.payload.active) {
+        this.firebaseModalOpen = true
+        return
+      } else {
+        this.loginErrorMode = '_inactive_code_'
+        return
+      }
+    }
     apiClient
       .validateSignupCode({ code: this.signupCode || '' })
       .then(
         action(res => {
+          // log.debug('validate code result',res)
           this.loginButtonsSpinning = false
           if (res.payload.active) {
+            this.stashedCodeValid = res
+            // log.debug('active, open the modal')
             this.firebaseModalOpen = true
           } else if (res.payload.active === false) {
+            this.stashedCodeValid = res
+            // log.debug('inactive/bad, open the error modal')
             this.loginErrorMode = '_inactive_code_'
+          } else {
+            log.error('unexpected data from validation api',res)
+            this.setGeneralError('_api_fail_')
           }
         })
       )
-      .catch(() => {
+      .catch((e) => {
+        log.error('api fail on validate code',e)
         this.setGeneralError('_api_fail_')
       })
   }

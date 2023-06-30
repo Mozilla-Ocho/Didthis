@@ -77,31 +77,31 @@ const channelConfig: ChannelConfig = {
   auth: {
     default: true,
     test: false,
-    inProdBrowser: false,
+    inProdBrowser: true,
     ssr: false,
   },
   readiness: {
     default: true,
     test: false,
-    inProdBrowser: false,
+    inProdBrowser: true,
     ssr: false,
   },
   api: {
     default: true,
     test: false,
-    inProdBrowser: false,
+    inProdBrowser: true,
     ssr: false,
   },
   unfurl: {
     default: true,
     test: false,
-    inProdBrowser: false,
+    inProdBrowser: true,
     ssr: true,
   },
   location: {
     default: true,
     test: false,
-    inProdBrowser: false,
+    inProdBrowser: true,
     ssr: false,
   },
   sql: {
@@ -113,7 +113,7 @@ const channelConfig: ChannelConfig = {
   tracking: {
     default: true,
     test: false,
-    inProdBrowser: false,
+    inProdBrowser: true,
     ssr: false,
   },
   serverApi: {
@@ -125,7 +125,7 @@ const channelConfig: ChannelConfig = {
   debug: {
     default: true,
     test: false,
-    inProdBrowser: false,
+    inProdBrowser: true,
     ssr: false,
   },
 }
