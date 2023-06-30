@@ -87,7 +87,6 @@ const wrapFetch = async (fetchArgs: FetchArgs): Promise<SuccessWrapper> => {
     body,
     sessionCookie,
     csrfCookie,
-    asTestUser,
     expectErrorIds,
     expectErrorStatuses,
   } = fetchArgs
@@ -102,13 +101,6 @@ const wrapFetch = async (fetchArgs: FetchArgs): Promise<SuccessWrapper> => {
     queryParams.csrf = Cookies.get(csrfCookieName) || ''
   }
   try {
-    if (process.env.NODE_ENV === 'development') {
-      if (asTestUser) {
-        // XXX_PORTING setup var, setup test users
-        queryParams.testKey = process.env.DEV_KEY_FOR_API_TEST_USERS || ''
-        queryParams.asTestUser = asTestUser
-      }
-    }
     const url = mkUrl(action, queryParams)
     // i really don't know how to type the options for fetch... apparently it's
     // a RequestInit type but that type doesn't let me assign headers by

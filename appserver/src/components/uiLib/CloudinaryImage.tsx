@@ -21,7 +21,7 @@ const CloudinaryImage = ({
     if (lightbox) {
       setIsOpen(true)
     }
-  }, [setIsOpen])
+  }, [setIsOpen, lightbox])
   const handleClose = useCallback(() => {
     setIsOpen(false)
   }, [setIsOpen])

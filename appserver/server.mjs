@@ -4,8 +4,7 @@ import next from 'next'
 import Cookies from 'cookies'
 import crypto from 'crypto'
 
-const dev = process.env.NODE_ENV !== 'production'
-const app = next({ dev })
+const app = next({ dev: process.env.NODE_ENV !== 'production' })
 const handle = app.getRequestHandler()
 
 const csrfCookieName = '_h3y_csrf' // DRY_86325 crsf cookie name. TODO: put this in a non-typescript shared const file?

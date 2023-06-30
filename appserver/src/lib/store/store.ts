@@ -15,7 +15,8 @@ import {ValidateSignupCodeWrapper} from '../apiConstants'
 type GeneralError = false | '_get_me_first_fail_' | '_api_fail_'
 type LoginErrorMode = false | '_inactive_code_'
 
-let moduleGlobalFirebaseInitialized = false
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+let moduleGlobalFirebaseRef: any | false = false
 
 // DRY_62447 modal transition time
 const modalTransitionTime = 200
@@ -26,7 +27,8 @@ class Store {
   user: false | ApiUser = false
   // we don't have a type for the firebase ref
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  firebaseRef: undefined | any = undefined
+  firebaseRefNonReactive: undefined | any = undefined // nonreactive
+  hasFirebaseRef = false // reactive
   signupCode: false | string = false
   trackedPageEvent: false | string = false
   generalError: GeneralError = false
@@ -58,7 +60,7 @@ class Store {
     makeAutoObservable(
       this,
       {
-        firebaseRef: false,
+        firebaseRefNonReactive: false,
         trackedPageEvent: false,
         router: false,
       },
@@ -81,12 +83,14 @@ class Store {
 
   initFirebase() {
     let firebaseConfig
-    if (moduleGlobalFirebaseInitialized) {
+    if (moduleGlobalFirebaseRef) {
       // log.debug('skipping firebase init, already done')
+      if (!this.firebaseRefNonReactive) {
+        this.firebaseRefNonReactive = moduleGlobalFirebaseRef
+      }
       return
     }
     log.debug('initializing firebase')
-    moduleGlobalFirebaseInitialized = true
 
     // DRY_63816 firebase client config (not secret, but does depend on
     // environment)
@@ -131,7 +135,9 @@ class Store {
     }
 
     if (firebaseConfig) firebase.initializeApp(firebaseConfig)
-    this.firebaseRef = firebase
+    this.firebaseRefNonReactive = firebase
+    moduleGlobalFirebaseRef = firebase
+    this.hasFirebaseRef = true
 
     // we disable client-side auth because we're using our own cookie session
     // auth instead.

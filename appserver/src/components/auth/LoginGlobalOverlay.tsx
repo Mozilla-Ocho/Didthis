@@ -12,12 +12,12 @@ const LoginGlobalOverlay = observer(() => {
     store.initFirebase()
   })
   const firebaseUiConfig = useMemo(() => {
-    if (!store.firebaseRef) return {}
+    if (!store.firebaseRefNonReactive) return {}
     const firebaseUiConfig = {
       signInFlow: 'popup',
       signInOptions: [
         {
-          provider: store.firebaseRef.auth.EmailAuthProvider.PROVIDER_ID,
+          provider: store.firebaseRefNonReactive.auth.EmailAuthProvider.PROVIDER_ID,
           requireDisplayName: false,
         },
       ],
@@ -47,9 +47,9 @@ const LoginGlobalOverlay = observer(() => {
     // eslint doesn't understand that store is a context object and the
     // firebaseRef property can change without the top level store changing.
     /* eslint-disable-next-line react-hooks/exhaustive-deps */
-  }, [store, store.firebaseRef])
+  }, [store, store.firebaseRefNonReactive])
 
-  if (!store.firebaseRef) {
+  if (!store.hasFirebaseRef) {
     // not initialized yet
     return <></>
   }
@@ -87,7 +87,7 @@ const LoginGlobalOverlay = observer(() => {
       >
         <StyledFirebaseAuth
           uiConfig={firebaseUiConfig}
-          firebaseAuth={store.firebaseRef.auth()}
+          firebaseAuth={store.firebaseRefNonReactive.auth()}
         />
         <p className="p-3 text-center text-sm">Legal message here TODO</p>
       </Modal>
