@@ -5,6 +5,7 @@ const Privacy = () => {
     <PagePad semiWide>
       <div className="prose text-md text-bodytext">
         <h4>Privacy Notice</h4>
+        <p><em>Last Updated: June 29, 2023.</em><br/><br/></p>
         <h3>At Mozilla, we design products with your privacy in mind.</h3>
         <p>We care about your privacy. The <a href="https://www.mozilla.org/privacy/">Mozilla Privacy Policy</a> describes how we handle any information that we collect about you.  This Privacy Notice provides more information about what data Didthat collects and shares, and why.</p>
         <h3>Things you should know:</h3>
