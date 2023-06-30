@@ -26,7 +26,7 @@ const pathBuilder = {
     // DRY_86188 legal page routes
     if (doc === "tos") return '/terms'
     if (doc === "pp") return '/privacy'
-    if (doc === "au") return '/acceptable-use'
+    if (doc === "au") return '/content'
     return '/terms'
   },
   makeFullUrl: (path: string) => {

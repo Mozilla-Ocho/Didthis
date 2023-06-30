@@ -1,5 +1,5 @@
 import DefaultLayout from '@/components/DefaultLayout'
-import AcceptableUse from '@/components/pages/AcceptableUse'
+import Content from '@/components/pages/Content'
 import { getServerSideProps as indexPageGetServerSideProps } from '@/pages/index'
 
 const Wrapper = ({
@@ -14,7 +14,7 @@ const Wrapper = ({
       authUser={authUser}
       signupCode={signupCode}
     >
-     <AcceptableUse />
+     <Content />
     </DefaultLayout>
   )
 }
