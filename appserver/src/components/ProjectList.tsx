@@ -9,7 +9,7 @@ const ProjectList = observer(({ targetUser }: { targetUser: ApiUser }) => {
   projects.sort((a, b) => b.createdAt - a.createdAt)
   if (projects.length === 0) {
     if (store.user && store.user.id === targetUser.id) {
-      return <p>Looks like you have no projects</p>
+      return <p>Looks like you have no projects yet</p>
     } else {
       return <p>No projects</p>
     }

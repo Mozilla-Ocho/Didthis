@@ -77,6 +77,18 @@ class Store {
 
   // {{{ auth
 
+  // resetBlankSlateIfNewUser() {
+  //   // very approximately detect if the user is new, and clear the blank state
+  //   // localstorage. really meant for local testing w/ multiple users.
+  //   if (this.user && typeof window !== 'undefined') {
+  //     const now = new Date().getTime()
+  //     const age = (now - this.user.createdAt)
+  //     if (age < 1000 * 60 * 5) {
+  //       window.localStorage.removeItem('skipBlankSlate') // DRY_26502 
+  //     }
+  //   }
+  // }
+
   setFullPageLoading(x: boolean) {
     this.fullpageLoading = x
   }
@@ -165,6 +177,7 @@ class Store {
             .then(wrapper => {
               log.readiness('acquired getMe user after firebase auth')
               this.setUser(wrapper.payload)
+              // this.resetBlankSlateIfNewUser()
               this.trackEvent(trackingEvents.caLogin)
               // this.setFullPageLoading(false)
               // TODO: HBY-70 need to full page reload here otherwise layout

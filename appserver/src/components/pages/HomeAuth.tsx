@@ -67,7 +67,7 @@ const HomeAuth = observer(() => {
         <PagePad>
           <h3 className="mt-10 mb-4">Account created!</h3>
           <p className="mb-6">
-            Now that you’ve created an account, let’s create your first post!
+            Let’s get started. Are you working on a hobby project right now? Click “Add post”, pick a photo from your camera roll, and start tracking your journey!
           </p>
           {addCreatBtns}
         </PagePad>
