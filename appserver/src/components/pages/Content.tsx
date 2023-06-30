@@ -5,7 +5,7 @@ const Content = () => {
     <PagePad semiWide>
       <div className="prose text-md text-bodytext">
         <h3>Content Policies</h3>
-        <p><em>Last Updated: June 29, 2023.</em></p>
+        <p><em>Last Updated: June 29, 2023.</em><br/><br/></p>
         <h4>Copyright</h4>
         <h5>How to submit a copyright notice</h5>
         <p>Mozilla will respond to takedown requests that comply with the Digital Millennium Copyright Act (DMCA). If you believe that content shared on Didthat infringes a copyright owned by you, or by someone that you legally represent, you may submit a takedown notice, using the procedures outlined on <a href="https://www.mozilla.org/en-US/about/legal/report-infringement/">Mozilla’s copyright page</a>.</p>
