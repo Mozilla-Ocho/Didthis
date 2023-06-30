@@ -87,6 +87,7 @@ class Store {
       // log.debug('skipping firebase init, already done')
       if (!this.firebaseRefNonReactive) {
         this.firebaseRefNonReactive = moduleGlobalFirebaseRef
+        this.hasFirebaseRef = true
       }
       return
     }
