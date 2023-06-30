@@ -281,7 +281,7 @@ class Store {
       // amplitude.setUserId(x.id);
       // DRY_47693 signup code logic
       // if we have a signup code on the url, clear it
-      if (this.signupCode) {
+      if (this.signupCode && typeof window !== 'undefined') {
         log.location('removing signupCode from url')
         const url = new URL(window.location.toString())
         url.searchParams.delete('signupCode')
