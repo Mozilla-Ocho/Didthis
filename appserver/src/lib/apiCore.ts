@@ -19,13 +19,14 @@ const getLocationBase = () => {
 }
 
 // endpoint is the scheme, domain, and port of the api backend. in browser
-// context in dev, it uses the browser location, so that in dev we can load the
-// app from various domains (localhost, ip address, aliases, etc). otherwise
-// it uses NEXT_PUBLIC_API_ENDPOINT
-const endpoint =
-  inBrowserContext && process.env.NODE_ENV === 'development'
-    ? getLocationBase()
-    : process.env.NEXT_PUBLIC_API_ENDPOINT
+// context, it uses the browser location, so that this just works on various
+// domains (localhost, test., the regular top level, etc). in SSR it has no
+// location context so it uses NEXT_PUBLIC_API_ENDPOINT. note that
+// NEXT_PUBLIC_API_ENDPOINT is also used when generating full share urls in the
+// client.
+const endpoint = inBrowserContext
+  ? getLocationBase()
+  : process.env.NEXT_PUBLIC_API_ENDPOINT
 
 type QueryParams = { [key: string]: string }
 
