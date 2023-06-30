@@ -2,8 +2,8 @@ import { PagePad } from '@/components/uiLib'
 
 const Content = () => {
   return (
-    <PagePad>
-      <div className="flex flex-col gap-2 text-md text-bodytext">
+    <PagePad semiWide>
+      <div className="prose text-md text-bodytext">
         <h3>Content Policies</h3>
         <p><em>Last Updated: June 29, 2023.</em></p>
         <h4>Copyright</h4>

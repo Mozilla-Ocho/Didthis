@@ -1,3 +1,4 @@
+
 import type { ReactNode } from 'react'
 import { twMerge } from 'tailwind-merge'
 
@@ -7,6 +8,7 @@ const PagePad = ({
   children,
   className,
   wide,
+  semiWide,
   noPadY,
   narrowColControlOnly,
   yControlOnly,
@@ -14,6 +16,7 @@ const PagePad = ({
   children: ReactNode
   className?: string
   wide?: boolean
+  semiWide?: boolean
   noPadY?: boolean
   narrowColControlOnly?: boolean
   yControlOnly?: boolean
@@ -28,6 +31,7 @@ const PagePad = ({
       <div className={twMerge('sm:max-w-[450px]', className)}>{children}</div>
     )
   }
+  const maxW = semiWide ? "sm:max-w-[650px]" : wide ? "" : "sm:max-w-[450px]"
   return (
     <div
       className={twMerge(
@@ -36,7 +40,7 @@ const PagePad = ({
         className
       )}
     >
-      {wide ? children : <div className="sm:max-w-[450px]">{children}</div>}
+      {maxW ? <div className={maxW}>{children}</div> : children}
     </div>
   )
 }

@@ -2,8 +2,8 @@ import { PagePad } from '@/components/uiLib'
 
 const Terms = () => {
   return (
-    <PagePad>
-      <div className="flex flex-col gap-2 text-md text-bodytext">
+    <PagePad semiWide>
+      <div className="prose text-md text-bodytext">
         <h3>Didthat Terms of Service</h3>
         <p><em>Last Updated: June 29, 2023.</em><br/><br/></p>
         <p>Didthat is a platform that allows you to document and share your hobbies and projects (“Didthat”). Didthat is currently in the beta phase and is available for select beta users only.</p>
