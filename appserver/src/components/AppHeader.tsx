@@ -3,43 +3,42 @@ import { useStore } from '@/lib/store'
 import { LogoutButton } from '@/components/auth/LogoutButton'
 import { Divider, Link, PagePad } from './uiLib'
 import branding from '@/lib/branding'
+import LogoWordmarkSvg from '@/assets/img/didthat-logo-wordmark.svg'
+import Image from 'next/image'
+import { LoginButton } from './auth/LoginButton'
 
 const AppHeader = observer(() => {
   const store = useStore()
-  if (store.user) {
-    return (
-      <div>
-        <PagePad wide noPadY>
-          <div className="flex items-baseline py-4">
-            <div className="bg-yellow-300 pt-2 px-1 inline-block text-xl">
-              <Link intent="logo" href="/">
-                <h1 className="text-3xl leading-none">{branding.productName}</h1>
-              </Link>
-            </div>
+  return (
+    <div>
+      <PagePad wide noPadY>
+        {store.user ? (
+          <div className="flex items-center py-4">
+            <Link intent="internalNav" href="/">
+              <h1 className="text-3xl leading-none">
+                <Image src={LogoWordmarkSvg} alt={branding.productName} />
+              </h1>
+            </Link>
             <div className="text-right text-sm flex-grow">
-              {store.user ? <LogoutButton intent="headerNav" /> : ''}
+              <LogoutButton intent="headerNav" />
             </div>
           </div>
-        </PagePad>
-        <Divider className="m-0" />
-      </div>
-    )
-  } else {
-    return (
-      <div>
-        <PagePad wide noPadY>
-          <div className="py-4 text-center">
-            <span className="bg-yellow-300 pt-2 px-1 inline-block text-xl mx-auto">
-              <Link intent="logo" href="/">
-                <h1 className="text-3xl leading-none">{branding.productName}</h1>
-              </Link>
-            </span>
+        ) : (
+          <div className="flex items-center py-4 justify-center md:justify-full">
+            <Link intent="internalNav" href="/">
+              <h1 className="text-3xl leading-none">
+                <Image src={LogoWordmarkSvg} alt={branding.productName} />
+              </h1>
+            </Link>
+            <div className="hidden md:block text-right text-sm flex-grow">
+              <LoginButton intent="link" />
+            </div>
           </div>
-        </PagePad>
-        <Divider className="m-0" />
-      </div>
-    )
-  }
+        )}
+      </PagePad>
+      <Divider className="m-0" />
+    </div>
+  )
 })
 
 export default AppHeader

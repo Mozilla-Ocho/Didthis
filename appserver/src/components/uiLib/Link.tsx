@@ -20,13 +20,6 @@ const linkCVA = cva('link', {
         'active:text-links-active',
         'visited:text-links-visited',
       ],
-      logo: [
-        'text-yellow-500',
-        'hover:text-yellow-500',
-        'hover:underline',
-        'visited:text-yellow-500',
-        'active:text-links-active',
-      ],
       primary: [
         // DRY_57530 button styles
         'inline-block',

@@ -6,19 +6,26 @@ import pathBuilder from '@/lib/pathBuilder'
 const AppFooter = observer(
   ({ unauthHomepage }: { unauthHomepage?: boolean }) => {
     return (
-      <div className={unauthHomepage ? 'bg-yellow-home' : 'bg-white'}>
+      <div className="bg-white">
         <Divider className="my-0" />
         <PagePad wide={true} noPadY>
-          <div className={classNames('py-4', 'leading-10', 'h-full')}>
+          <div className="flex flex-col md:flex-row gap-2 md:gap-8 p-6 md:justify-center text-sm">
             <p>
-              <Link href={pathBuilder.legal('tos')}>Terms of service</Link>
+              <Link intent="internalNav" href={pathBuilder.legal('tos')}>
+                Terms of service
+              </Link>
             </p>
             <p>
-              <Link href={pathBuilder.legal('pp')}>Privacy notice</Link>
+              <Link intent="internalNav" href={pathBuilder.legal('pp')}>
+                Privacy notice
+              </Link>
             </p>
             <p>
-              <Link href={pathBuilder.legal('cp')}>Content policies</Link>
+              <Link intent="internalNav" href={pathBuilder.legal('cp')}>
+                Content policies
+              </Link>
             </p>
+            <p className="hidden md:block">&bull;</p>
             <p>A Mozilla Ocho Idea</p>
           </div>
         </PagePad>
