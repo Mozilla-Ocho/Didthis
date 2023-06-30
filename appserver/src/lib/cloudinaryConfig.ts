@@ -58,7 +58,6 @@ const getCloudinaryConfig = (intent: CldImageIntent) => {
       ...base,
       tags: ['avatar'],
       uploadPreset: 'avatar_uploads',
-      folder: 'avatars',
     }
   }
   if (intent === 'post') {
@@ -69,8 +68,8 @@ const getCloudinaryConfig = (intent: CldImageIntent) => {
       croppingCoordinatesMode: undefined,
       showSkipCropButton: undefined,
       tags: ['post'],
-      uploadPreset: 'dabbler_posts',
-      folder: 'dabberposts',
+      uploadPreset: 'obyw5ywa',
+      folder: 'posts',
     }
     return x
   }
@@ -79,7 +78,7 @@ const getCloudinaryConfig = (intent: CldImageIntent) => {
       ...base,
       tags: ['project'],
       croppingAspectRatio: 1.5,
-      uploadPreset: 'prompter_uploads',
+      uploadPreset: 'wuty6ww4',
       folder: 'projects',
     }
     return x

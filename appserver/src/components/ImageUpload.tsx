@@ -69,7 +69,7 @@ const ImageUpload = ({
             "id": "uw-file9",
             "batchId": "uw-batch8",
             "asset_id": "21ca891add0ab4ba7fb11c049c3d39f4",
-            "public_id": "dabblerposts/niaqzg3bsfdhw2j0qwxn",
+            "public_id": "posts/niaqzg3bsfdhw2j0qwxn",
             "version": 1687817193,
             "version_id": "7ed1234ce6925f956cc34fadf3e22cbe",
             "signature": "2c96ad8ba98ea770231961214b53f4d9f91df570",
@@ -86,9 +86,9 @@ const ImageUpload = ({
             "type": "upload",
             "etag": "8a56fa3a9239d97eacd9a839f14c4e07",
             "placeholder": false,
-            "url": "http://res.cloudinary.com/dbpulyvbq/image/upload/v1687817193/dabblerposts/niaqzg3bsfdhw2j0qwxn.jpg",
-            "secure_url": "https://res.cloudinary.com/dbpulyvbq/image/upload/v1687817193/dabblerposts/niaqzg3bsfdhw2j0qwxn.jpg",
-            "folder": "dabblerposts",
+            "url": "http://res.cloudinary.com/dbpulyvbq/image/upload/v1687817193/posts/niaqzg3bsfdhw2j0qwxn.jpg",
+            "secure_url": "https://res.cloudinary.com/dbpulyvbq/image/upload/v1687817193/posts/niaqzg3bsfdhw2j0qwxn.jpg",
+            "folder": "posts",
             "access_mode": "public",
             "image_metadata": {
               "Make": "Apple",
@@ -148,8 +148,8 @@ const ImageUpload = ({
             "grayscale": false,
             "original_filename": "IMG_5299",
             "original_extension": "jpeg",
-            "path": "v1687817193/dabblerposts/niaqzg3bsfdhw2j0qwxn.jpg",
-            "thumbnail_url": "https://res.cloudinary.com/dbpulyvbq/image/upload/c_limit,h_60,w_90/v1687817193/dabblerposts/niaqzg3bsfdhw2j0qwxn.jpg"
+            "path": "v1687817193/posts/niaqzg3bsfdhw2j0qwxn.jpg",
+            "thumbnail_url": "https://res.cloudinary.com/dbpulyvbq/image/upload/c_limit,h_60,w_90/v1687817193/posts/niaqzg3bsfdhw2j0qwxn.jpg"
           }
           */
           onUploadWithUseCallback({

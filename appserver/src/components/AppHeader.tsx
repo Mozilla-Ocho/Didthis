@@ -13,7 +13,7 @@ const AppHeader = observer(() => {
           <div className="flex items-baseline py-4">
             <div className="bg-yellow-300 pt-2 px-1 inline-block text-xl">
               <Link intent="logo" href="/">
-                <h1 className="text-3xl leading-none">{branding.productName.toUpperCase()}</h1>
+                <h1 className="text-3xl leading-none">{branding.productName}</h1>
               </Link>
             </div>
             <div className="text-right text-sm flex-grow">
@@ -31,7 +31,7 @@ const AppHeader = observer(() => {
           <div className="py-4 text-center">
             <span className="bg-yellow-300 pt-2 px-1 inline-block text-xl mx-auto">
               <Link intent="logo" href="/">
-                <h1 className="text-3xl leading-none">{branding.productName.toUpperCase()}</h1>
+                <h1 className="text-3xl leading-none">{branding.productName}</h1>
               </Link>
             </span>
           </div>

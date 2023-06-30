@@ -1,6 +1,7 @@
 import { LoginButton } from '@/components/auth/LoginButton'
 import AppHeader from '@/components/AppHeader'
 import AppFooter from '@/components/AppFooter'
+import branding from '@/lib/branding'
 
 // DRY_20334 outer page width styles
 const HomeUnauth = () => {
@@ -10,9 +11,9 @@ const HomeUnauth = () => {
       <div className="bg-yellow-home-light">
         <div className="bg-yellow-home p-4 text-center">
           <p className="text-5xl">You’ve been invited to join</p>
-          <h1>Dabbler</h1>
+          <h1>{branding.productName}</h1>
           <LoginButton />
-          <h4>What is Dabbler?</h4>
+          <h4>What is {branding.productName}?</h4>
           <p>lorum ipsum</p>
         </div>
         <div className="bg-yellow-home-light p-4 text-center">
