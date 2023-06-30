@@ -7,6 +7,8 @@ import HomeUnsolicited from './pages/HomeUnsolicited'
 import DeletionConfirmationModal from './DeletionConfirmationModal'
 import { useRouter } from 'next/router'
 import { appRootDivId } from './uiLib/Modal'
+import Head from 'next/head'
+import branding from '@/lib/branding'
 
 // Inner is separate because it has to be a store observer for when
 // headerFooter=authed and the outer layer is the store provider itself.
@@ -53,6 +55,7 @@ export default function DefaultLayout({
   const router = useRouter()
   return (
     <div id={appRootDivId}>
+      <Head><title>{branding.productName}</title></Head>
       <StoreWrapper authUser={authUser} signupCode={signupCode} router={router}>
         <Inner unauthHomepage={unauthHomepage}>{children}</Inner>
       </StoreWrapper>
