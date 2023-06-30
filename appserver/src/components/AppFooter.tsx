@@ -26,7 +26,9 @@ const AppFooter = observer(
               </Link>
             </p>
             <p className="hidden md:block">&bull;</p>
-            <p>A Mozilla Ocho Idea</p>
+            <p>
+              A <Link newTab href="https://future.mozilla.org">Mozilla Ocho</Link> Idea
+            </p>
           </div>
         </PagePad>
       </div>

@@ -26,7 +26,7 @@ class PostStore {
   // they all show up externally if the project is public.
   scope: ApiScope
   projectId: ApiProjectId
-  mediaType: MediaType = 'text'
+  mediaType: MediaType = 'image'
   linkUrl: string
   linkTouched = false
   fetchingUrl = ''
@@ -238,6 +238,7 @@ const ProjectSelector = observer(({ postStore }: { postStore: PostStore }) => {
           ))}
         </Select>
       </label>
+      {postStore.projectId === 'new' && <p className="text-sm mt-2 text-form-labels">Don't worry, all projects are private by default! It's up to you to decide if and when you share your work with others.</p>}
     </div>
   )
 })
@@ -389,17 +390,6 @@ const PostForm = observer((props: Props) => {
         {defaultPid === 'new' && <ProjectSelector postStore={postStore} />}
         {mode === 'new' && (
           <div className="grid grid-cols-3 gap-4 text-center mt-8">
-            <label htmlFor="mediaText" className={labelClass('text')}>
-              <input
-                id="mediaText"
-                onChange={handleMediaType}
-                className="sr-only"
-                type="radio"
-                value="text"
-                checked={postStore.mediaType === 'text'}
-              />{' '}
-              Text
-            </label>
             <label htmlFor="mediaImage" className={labelClass('image')}>
               <input
                 id="mediaImage"
@@ -410,6 +400,17 @@ const PostForm = observer((props: Props) => {
                 checked={postStore.mediaType === 'image'}
               />{' '}
               Image
+            </label>
+            <label htmlFor="mediaText" className={labelClass('text')}>
+              <input
+                id="mediaText"
+                onChange={handleMediaType}
+                className="sr-only"
+                type="radio"
+                value="text"
+                checked={postStore.mediaType === 'text'}
+              />{' '}
+              Text
             </label>
             <label htmlFor="mediaLink" className={labelClass('link')}>
               <input

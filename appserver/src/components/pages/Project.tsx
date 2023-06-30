@@ -113,7 +113,8 @@ const ProjectPage = observer(
               />
             ) : (
               <CloudinaryImage
-                assetId={specialAssetIds.defaultAvatarID}
+                assetId={specialAssetIds.placholderProjectID}
+                rounded
                 intent="project"
               />
             )}

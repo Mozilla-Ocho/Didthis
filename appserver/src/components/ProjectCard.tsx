@@ -11,13 +11,16 @@ const ProjectCard = observer(
     const isSelf = store.user && store.user.id === targetUser.id
     const nUpdates = Object.keys(project.posts).length
     const hasImage = !!project.imageAssetId
+    const projUrl = pathBuilder.project(targetUser.publicPageSlug, project.id)
     return (
       <div className="border border-edges rounded-md overflow-hidden w-full basis-full sm:w-[373px] sm:basis-[373px]">
         {hasImage ? (
-          <CloudinaryImage lightbox assetId={project.imageAssetId} intent="project" />
+          <CloudinaryImage linkTo={projUrl} assetId={project.imageAssetId} intent="project" />
         ) : (
           <CloudinaryImage
-            assetId={specialAssetIds.defaultAvatarID}
+            linkTo={projUrl}
+            assetId={specialAssetIds.placholderProjectID}
+            rounded
             intent="project"
           />
         )}
@@ -41,7 +44,7 @@ const ProjectCard = observer(
           <h5 className="mt-4 mb-2">
             <Link
               intent="internalNav"
-              href={pathBuilder.project(targetUser.publicPageSlug, project.id)}
+              href={projUrl}
               className="break-words"
             >
               {project.title}

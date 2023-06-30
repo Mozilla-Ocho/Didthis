@@ -1,4 +1,5 @@
 import { cloudinaryUrlDirect } from '@/lib/cloudinaryConfig'
+import Link from 'next/link'
 import { useCallback, useState } from 'react'
 import { twMerge } from 'tailwind-merge'
 import Modal from './Modal'
@@ -9,12 +10,16 @@ const CloudinaryImage = ({
   intent,
   className,
   lightbox,
+  linkTo,
+  rounded,
 }: {
   assetId: string | undefined | false
   imageMeta?: CldImageMetaAny
   intent: CldImageIntent
   className?: string
   lightbox?: boolean
+  linkTo?: string,
+  rounded?: boolean,
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const handleClick = useCallback(() => {
@@ -40,19 +45,22 @@ const CloudinaryImage = ({
   // leading-none fixes space after images
   /* eslint-disable @next/next/no-img-element */
 
+  const loadingBgColor = intent === 'post' ? 'bg-black-100' : ''
+
   const regularImageContent = (
     <>
       <span
         className={twMerge(
-          'leading-none block',
+          'leading-none block text-black-300 [&>img]:text-center [&>img]:leading-10',
           aspect,
-          intent !== 'avatar' && 'bg-black-100',
+          loadingBgColor,
           intent === 'avatar' && '[&>img]:rounded-full',
+          rounded ? '[&>img]:rounded-md' : '',
           className
         )}
       >
         <img
-          alt="user uploaded image"
+          alt="user-uploaded image"
           width={imageMeta?.width || null}
           height={imageMeta?.height || null}
           src={cloudinaryUrlDirect(assetId, intent, imageMeta)}
@@ -91,6 +99,8 @@ const CloudinaryImage = ({
         {regularImageContent}
       </span>
     )
+  } else if (linkTo) {
+    return <Link href={linkTo}><span className="block w-full">{regularImageContent}</span></Link>
   } else {
     return <span className="block w-full">{regularImageContent}</span>
   }
