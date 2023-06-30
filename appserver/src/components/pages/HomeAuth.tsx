@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react'
 const HomeAuth = observer(() => {
   const store = useStore()
   const [skipBlankSlate, setSkipBlankSlate] = useLocalStorage(
-    'skipBlankSlate',
+    'skipBlankSlate', // DRY_26502 
     false
   )
   const [rendered, setRendered] = useState(false)
