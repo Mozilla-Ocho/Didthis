@@ -6,7 +6,7 @@ const nextConfig = {
       // DRY_86188 legal page routes
       { source: '/terms', destination: '/legal/terms' },
       { source: '/privacy', destination: '/legal/privacy' },
-      { source: '/acceptable-use', destination: '/legal/acceptable-use' },
+      { source: '/content', destination: '/legal/content' },
     ]
   },
 }
