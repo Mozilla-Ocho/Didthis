@@ -7,7 +7,7 @@ import LogoWordmarkSvg from '@/assets/img/didthat-logo-wordmark.svg'
 import Image from 'next/image'
 import { LoginButton } from './auth/LoginButton'
 
-const AppHeader = observer(() => {
+const AppHeader = observer(({ isThe404 }: { isThe404?: boolean }) => {
   const store = useStore()
   return (
     <div>
@@ -30,9 +30,11 @@ const AppHeader = observer(() => {
                 <Image src={LogoWordmarkSvg} alt={branding.productName} />
               </h1>
             </Link>
-            <div className="hidden md:block text-right text-sm flex-grow">
-              <LoginButton intent="link" />
-            </div>
+            {!isThe404 && (
+              <div className="hidden md:block text-right text-sm flex-grow">
+                <LoginButton intent="link" />
+              </div>
+            )}
           </div>
         )}
       </PagePad>

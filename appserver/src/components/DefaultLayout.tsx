@@ -16,16 +16,18 @@ const Inner = observer(
   ({
     children,
     unauthHomepage,
+    isThe404,
   }: {
     children: ReactNode
     unauthHomepage?: boolean
+    isThe404?: boolean
   }) => {
     const store = useStore()
     if (store.user && store.user.unsolicited) {
       return (
         <StoreLoadingWrapper>
           <LoginGlobalOverlay />
-          <StaticLayout>
+          <StaticLayout isThe404={isThe404}>
             <HomeUnsolicited />
           </StaticLayout>
         </StoreLoadingWrapper>
@@ -35,7 +37,7 @@ const Inner = observer(
       <StoreLoadingWrapper>
         <LoginGlobalOverlay />
         <DeletionConfirmationModal />
-        <StaticLayout unauthHomepage={unauthHomepage}>{children}</StaticLayout>
+        <StaticLayout isThe404={isThe404} unauthHomepage={unauthHomepage}>{children}</StaticLayout>
       </StoreLoadingWrapper>
     )
   }
@@ -46,18 +48,20 @@ export default function DefaultLayout({
   signupCode,
   children,
   unauthHomepage,
+  isThe404,
 }: {
   authUser: ApiUser | false
   signupCode: false | string
   children: ReactNode // ReactNode not ReactElement
   unauthHomepage?: boolean
+  isThe404?: boolean
 }) {
   const router = useRouter()
   return (
     <div id={appRootDivId}>
       <Head><title>{branding.productName}</title></Head>
       <StoreWrapper authUser={authUser} signupCode={signupCode} router={router}>
-        <Inner unauthHomepage={unauthHomepage}>{children}</Inner>
+        <Inner isThe404={isThe404} unauthHomepage={unauthHomepage}>{children}</Inner>
       </StoreWrapper>
     </div>
   )
