@@ -294,7 +294,7 @@ const ImageField = observer(({ formStore }: { formStore: FormStore }) => {
         </p>
         <div className="flex flex-row gap-4 mt-4 w-full sm:w-auto">
           <ImageUpload
-            intent="project"
+            intent="avatar"
             onUploadWithUseCallback={onResult}
             isReplace={!!formStore.imageAssetId}
             className="grow sm:grow-0"
