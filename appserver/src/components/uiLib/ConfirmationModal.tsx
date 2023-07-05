@@ -28,7 +28,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   return (
     <Modal srTitle={title} renderTitleHeading isOpen={isOpen} handleClose={onClose}>
       <div className="max-w-[320px]">
-        {body && <p id="confirm-modal-body">{body}</p>}
+        {body && <p id="confirm-modal-body" className="mb-4">{body}</p>}
         {!body && (
           <div id="confirm-modal-body" style={{ marginBottom: '16px' }}>
             {children}

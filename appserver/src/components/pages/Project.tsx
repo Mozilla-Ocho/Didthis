@@ -10,6 +10,7 @@ import {
   Modal,
   Input,
   PagePad,
+  ConfirmationModal,
 } from '../uiLib'
 import UserPreview from '../UserPreview'
 import pathBuilder from '@/lib/pathBuilder'
@@ -30,6 +31,7 @@ const ProjectPage = observer(
     const router = useRouter()
     const store = useStore()
     const [shareModalOpen, setShareModalOpen] = useState(false)
+    const [sharePrivModalOpen, setSharePrivModalOpen] = useState(false)
     const [sort, setSort] = useLocalStorage<'asc' | 'desc'>(
       'projectSortDefault',
       'desc'
@@ -46,19 +48,24 @@ const ProjectPage = observer(
     )
     const nUpdates = posts.length
     const hasImage = !!project.imageAssetId
+    const isPrivate = project.scope !== 'public'
     const changeSort = (e: React.ChangeEvent<HTMLSelectElement>) => {
       setSort(e.target.value as 'asc' | 'desc')
     }
     const shareUrl = pathBuilder.makeFullUrl(
       pathBuilder.project(targetUser.publicPageSlug, project.id)
     )
+    const handleSharePriv = () => {
+      setSharePrivModalOpen(true)
+    }
     const handleShare = () => {
       copyToClipboard(shareUrl)
       setShareModalOpen(true)
     }
     const handleCloseShare = useCallback(() => {
       setShareModalOpen(false)
-    }, [setShareModalOpen])
+      setSharePrivModalOpen(false)
+    }, [setShareModalOpen, setSharePrivModalOpen])
     const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
       e.target.select()
     }
@@ -84,16 +91,33 @@ const ProjectPage = observer(
             </Button>
           </div>
         </Modal>
+        <ConfirmationModal
+          isOpen={sharePrivModalOpen}
+          title="This project is private"
+          yesText="OK"
+          onYes={handleCloseShare}
+          onClose={handleCloseShare}
+        >
+          This project is currently set private. To get a shareable link, edit
+          the project and set it to public.
+          <Link
+            intent="secondary"
+            className="my-4 w-full"
+            href={pathBuilder.projectEdit(
+              targetUser.publicPageSlug,
+              project.id
+            )}
+          >
+            Edit project
+          </Link>
+        </ConfirmationModal>
         <Breadcrumbs crumbs={[{ name: project.title }]} />
         <PagePad>
           <UserPreview user={targetUser} compact={true} />
 
           <div className="grid grid-cols-[66%_34%] my-4">
             <p className="body-bs">
-              <strong>
-                {project.scope === 'public' ? 'Public' : 'Private'}
-              </strong>{' '}
-              &mdash;{' '}
+              <strong>{isPrivate ? 'Private' : 'Public'}</strong> &mdash;{' '}
               {project.currentStatus === 'active' && <span>In progress</span>}
               {project.currentStatus === 'complete' && <span>Completed</span>}
               {project.currentStatus === 'paused' && <span>Paused</span>}
@@ -142,7 +166,7 @@ const ProjectPage = observer(
             <Button
               className="grow basis-1 sm:grow-0 sm:basis-auto"
               intent="secondary"
-              onClick={handleShare}
+              onClick={isPrivate ? handleSharePriv : handleShare}
             >
               Share project
             </Button>
