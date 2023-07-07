@@ -434,7 +434,7 @@ const PostForm = observer((props: Props) => {
         {postStore.mediaType === 'link' && <LinkField postStore={postStore} />}
         <DescriptionField postStore={postStore} />
 
-        <div className="flex flex-col sm:flex-row gap-4 mt-8">
+        <div className="flex flex-col sm:flex-row gap-4 mt-8 flex-wrap">
           <Button
             type="submit"
             disabled={!postStore.isPostable()}
@@ -453,13 +453,15 @@ const PostForm = observer((props: Props) => {
             {mode === 'edit' ? 'Discard changes' : 'Cancel' }
           </Button>
           {mode === 'edit' && (
-            <Button
-              intent="link"
-              className="text-red-500"
-              onClick={() => store.promptDeletePost(postStore.getApiPost())}
-            >
-              Delete post
-            </Button>
+            <div className="text-center sm:w-full sm:text-left">
+              <Button
+                intent="link"
+                className="text-red-500"
+                onClick={() => store.promptDeletePost(postStore.getApiPost())}
+              >
+                Delete post
+              </Button>
+            </div>
           )}
         </div>
       </form>

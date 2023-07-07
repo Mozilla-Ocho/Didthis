@@ -14,7 +14,7 @@ import { useRouter } from 'next/router'
 import ImageUpload from '../ImageUpload'
 import type { UploadCallback } from '../ImageUpload'
 import { makeAutoObservable } from 'mobx'
-import {trackingEvents} from '@/lib/trackingEvents'
+import { trackingEvents } from '@/lib/trackingEvents'
 
 class ProjectStore {
   title: string
@@ -247,7 +247,7 @@ const ProjectForm = observer((props: Props) => {
                 onClick={deleteImage}
                 className="grow sm:grow-0 leading-tight"
                 trackEvent={trackingEvents.bcRemoveImage}
-                trackEventOpts={{imgIntent:'project'}}
+                trackEventOpts={{ imgIntent: 'project' }}
               >
                 Remove image
               </Button>
@@ -276,7 +276,7 @@ const ProjectForm = observer((props: Props) => {
             </span>
           </label>
         </div>
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-col sm:flex-row gap-4 flex-wrap">
           <Button
             spinning={projectStore.spinning}
             type="submit"
@@ -290,20 +290,22 @@ const ProjectForm = observer((props: Props) => {
             onClick={handleCancel}
             className="w-full sm:w-[150px]"
             trackEvent={trackingEvents.bcDiscardChanges}
-            trackEventOpts={{fromPage:'projectEdit'}}
+            trackEventOpts={{ fromPage: 'projectEdit' }}
           >
             {mode === 'edit' ? 'Discard changes' : 'Cancel'}
           </Button>
           {mode === 'edit' && (
-            <Button
-              intent="link"
-              className="text-red-500"
-              onClick={() =>
-                store.promptDeleteProject(projectStore.getApiProject())
-              }
-            >
-              Delete project
-            </Button>
+            <div className="text-center sm:w-full sm:text-left">
+              <Button
+                intent="link"
+                className="text-red-500"
+                onClick={() =>
+                  store.promptDeleteProject(projectStore.getApiProject())
+                }
+              >
+                Delete project
+              </Button>
+            </div>
           )}
         </div>
       </form>
