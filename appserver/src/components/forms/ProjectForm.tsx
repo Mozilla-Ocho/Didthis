@@ -245,11 +245,11 @@ const ProjectForm = observer((props: Props) => {
               <Button
                 intent="secondary"
                 onClick={deleteImage}
-                className="grow sm:grow-0"
+                className="grow sm:grow-0 leading-tight"
                 trackEvent={trackingEvents.bcRemoveImage}
                 trackEventOpts={{imgIntent:'project'}}
               >
-                Remove
+                Remove image
               </Button>
             )}
           </div>

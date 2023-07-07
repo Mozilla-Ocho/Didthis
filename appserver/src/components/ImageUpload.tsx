@@ -4,6 +4,7 @@ import { Button } from './uiLib'
 import log from '@/lib/log'
 import {useStore} from '@/lib/store'
 import {trackingEvents} from '@/lib/trackingEvents'
+import {twMerge} from 'tailwind-merge'
 
 type UploadResult = {
   cloudinaryAssetId: string
@@ -175,8 +176,8 @@ const ImageUpload = ({
   }, [intent, onUploadWithUseCallback, store])
 
   return (
-    <Button className={className} intent={required && !isReplace ? "primary" : "secondary"} onClick={launchWidget}>
-      {isReplace ? "Replace" : "Upload image"}
+    <Button className={twMerge('leading-tight',className)} intent={required && !isReplace ? "primary" : "secondary"} onClick={launchWidget}>
+      {isReplace ? "Replace image" : "Upload image"}
     </Button>
   )
 }

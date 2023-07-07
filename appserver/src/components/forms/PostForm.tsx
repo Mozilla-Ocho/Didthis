@@ -329,11 +329,11 @@ const ImageField = observer(({ postStore }: { postStore: PostStore }) => {
           <Button
             intent="secondary"
             onClick={deleteImage}
-            className="grow"
+            className="grow leading-tight"
             trackEvent={trackingEvents.bcRemoveImage}
             trackEventOpts={{imgIntent:'post'}}
           >
-            Remove
+            Remove image
           </Button>
         )}
       </div>
