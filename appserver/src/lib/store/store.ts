@@ -430,18 +430,18 @@ class Store {
     this.generalError = false
   }
 
-  async savePost(post: ApiPost, mode: 'new' | 'edit'): Promise<ApiPost> {
+  async savePost(post: ApiPost, mode: 'new' | 'edit', mediaType: PostMediaType): Promise<ApiPost> {
     if (!this.user) throw new Error('must be authed')
     return apiClient.savePost({ post }).then(wrapper => {
       this.setUser(wrapper.payload.user)
       if (mode === 'new') {
         if (post.projectId === 'new') {
-          this.trackEvent(trackingEvents.caNewPostNewProj)
+          this.trackEvent(trackingEvents.caNewPostNewProj, {mediaType})
         } else {
-          this.trackEvent(trackingEvents.caNewPost)
+          this.trackEvent(trackingEvents.caNewPost, {mediaType})
         }
       } else {
-        this.trackEvent(trackingEvents.edPost)
+        this.trackEvent(trackingEvents.edPost, {mediaType})
       }
       return wrapper.payload.post
     })

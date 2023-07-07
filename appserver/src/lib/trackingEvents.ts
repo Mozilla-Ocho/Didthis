@@ -43,11 +43,11 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   caProfileAll: { eventName: 'completeAllProfileFields', opts: {} },
   caNewPostNewProj: {
     eventName: 'newPost',
-    opts: { newProject: 'y' },
+    opts: { newProject: 'y' /* mediaType */ },
   },
   caNewPost: {
     eventName: 'newPost',
-    opts: { newProject: 'n' },
+    opts: { newProject: 'n' /* mediaType */ },
   },
   caNewProject: {
     eventName: 'newProject',
@@ -68,7 +68,7 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   edPost: {
     eventName: 'editPost',
     opts: {
-      /* field */
+      /* mediaType */
     },
   },
 

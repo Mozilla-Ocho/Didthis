@@ -112,6 +112,8 @@ type ApiProfile = {
   projects: { [key: string]: ApiProject }
 }
 
+type PostMediaType = 'text' | 'image' | 'link'
+
 type EventSpec = {
   eventName: string
   key: string
@@ -122,6 +124,7 @@ type EventSpec = {
     signupCodeName?: string
     id?: string
     newProject?: 'y' | 'n'
+    mediaType?: PostMediaType
   }
 }
 

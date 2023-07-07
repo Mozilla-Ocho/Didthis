@@ -16,8 +16,6 @@ import type { UploadCallback } from '../ImageUpload'
 import profileUtils from '@/lib/profileUtils'
 import { twMerge } from 'tailwind-merge'
 
-type MediaType = 'text' | 'image' | 'link'
-
 class PostStore {
   id: string
   description: string
@@ -26,7 +24,7 @@ class PostStore {
   // they all show up externally if the project is public.
   scope: ApiScope
   projectId: ApiProjectId
-  mediaType: MediaType = 'image'
+  mediaType: PostMediaType = 'image'
   linkUrl: string
   linkTouched = false
   fetchingUrl = ''
@@ -152,7 +150,7 @@ class PostStore {
     this.linkTouched = true
     this.fetchUrlMetaAndUpdateDebounced()
   }
-  setMediaType(x: MediaType) {
+  setMediaType(x: PostMediaType) {
     this.mediaType = x
   }
   setSpinning(x: boolean) {
@@ -358,7 +356,7 @@ const PostForm = observer((props: Props) => {
     e.preventDefault()
     e.stopPropagation()
     postStore.setSpinning(true)
-    store.savePost(postStore.getApiPost(), mode).then(newPost => {
+    store.savePost(postStore.getApiPost(), mode, postStore.mediaType).then(newPost => {
       // keep it spinning while next page loads
       // postStore.setSpinning(false)
       if (!store.user) return
@@ -370,9 +368,9 @@ const PostForm = observer((props: Props) => {
   }
   const handleMediaType = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log('handleMediaType', e)
-    postStore.setMediaType(e.target.value as MediaType)
+    postStore.setMediaType(e.target.value as PostMediaType)
   }
-  const labelClass = (t: MediaType) => {
+  const labelClass = (t: PostMediaType) => {
     return twMerge(
       'cursor-pointer hover:font-bold text-lg text-black-300',
       postStore.mediaType === t && 'font-bold text-yellow-700'
