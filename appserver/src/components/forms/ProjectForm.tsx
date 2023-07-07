@@ -15,7 +15,6 @@ import ImageUpload from '../ImageUpload'
 import type { UploadCallback } from '../ImageUpload'
 import { makeAutoObservable } from 'mobx'
 import {trackingEvents} from '@/lib/trackingEvents'
-import {fromPairs} from 'lodash-es'
 
 class ProjectStore {
   title: string
@@ -148,7 +147,7 @@ const ProjectForm = observer((props: Props) => {
   }
   const setVisibility = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log('checkbox', e)
-    projectStore.setScope(e.target.checked ? 'private' : 'public')
+    projectStore.setScope(e.target.checked ? 'public' : 'private')
   }
   const setStatus = (e: React.ChangeEvent<HTMLSelectElement>) => {
     projectStore.setCurrentStatus(e.target.value as ApiProjectStatus)
@@ -261,7 +260,7 @@ const ProjectForm = observer((props: Props) => {
             className="inline-flex flex-row items-center cursor-pointer"
           >
             <span className="mr-3 text-sm text-form-labels inline-block cursor-pointer">
-              Private project:
+              Public project:
             </span>
             <span className="relative inline-flex items-center inline-block">
               <input
@@ -269,7 +268,7 @@ const ProjectForm = observer((props: Props) => {
                 id="visibility"
                 value="private"
                 className="sr-only peer"
-                checked={projectStore.scope === 'private'}
+                checked={projectStore.scope !== 'private'}
                 onChange={setVisibility}
               />
               {/* https://flowbite.com/docs/forms/toggle/ */}
