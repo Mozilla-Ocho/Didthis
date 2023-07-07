@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react'
+
 const absDate = (date: Date) =>
   date
     .toLocaleString()
@@ -25,8 +27,21 @@ const humanize = (millis: number) => {
   return absDate(date)
 }
 
-const Timestamp = ({ millis }: { millis: number }) => (
-  <span>{humanize(millis)}</span>
-)
+const Timestamp = ({ millis }: { millis: number }) => {
+  // timestamps are client-side. render empty on SSR
+  // TODO: do this better so that SSR fetches actually have the content. the
+  // issue is that time zones can vary and the toLocaleString() isn't
+  // guaranteed to be the same client/server. maybe i could render them
+  // using a fixed timezone and locale first, then re-render client side?
+  const [rendered, setRendered] = useState(false)
+  useEffect(() => {
+    setRendered(true)
+  }, [setRendered])
+  if (rendered) {
+    return <span>{humanize(millis)}</span>
+  } else {
+    return <span>&nbsp;</span>
+  }
+}
 
 export default Timestamp
