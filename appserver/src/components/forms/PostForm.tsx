@@ -53,6 +53,7 @@ class PostStore {
       this.urlMeta = false
       this.imageMeta = undefined
     } else if (post) {
+      this.mediaType = 'text'
       this.id = post.id
       this.projectId = post.projectId
       this.description = post.description || ''
