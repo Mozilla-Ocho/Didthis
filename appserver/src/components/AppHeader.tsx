@@ -3,7 +3,7 @@ import { useStore } from '@/lib/store'
 import { LogoutButton } from '@/components/auth/LogoutButton'
 import { Divider, Link, PagePad } from './uiLib'
 import branding from '@/lib/branding'
-import LogoWordmarkSvg from '@/assets/img/didthat-logo-wordmark.svg'
+import LogoWordmarkSvg from '@/assets/img/didthis_wordmark_light.svg'
 import Image from 'next/image'
 import { LoginButton } from './auth/LoginButton'
 
