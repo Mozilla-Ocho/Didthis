@@ -71,6 +71,7 @@ interface ButtonProps extends VariantProps<typeof buttonCVA> {
 }
 
 const Button: FC<ButtonProps> = ({
+  type,
   onClick,
   children,
   intent,
@@ -81,7 +82,7 @@ const Button: FC<ButtonProps> = ({
   trackEventOpts,
   ...props
 }) => {
-  const bType = props.type || 'button'
+  const bType = type || 'button'
   const store = useStore()
   const ourOnClick: React.MouseEventHandler = e => {
     if (trackEvent) store.trackEvent(trackEvent, trackEventOpts)
@@ -93,6 +94,7 @@ const Button: FC<ButtonProps> = ({
       className={twMerge('relative', buttonCVA({ intent }), className)}
       onClick={ourOnClick}
       disabled={!!disabled || !!spinning}
+      {...props}
     >
       <span className={spinning ? 'opacity-0' : ''}>{children}</span>
       {spinning && (

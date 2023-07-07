@@ -1,9 +1,10 @@
 import { cloudinaryUrlDirect } from '@/lib/cloudinaryConfig'
-import {useStore} from '@/lib/store'
-import {trackingEvents} from '@/lib/trackingEvents'
+import { useStore } from '@/lib/store'
+import { trackingEvents } from '@/lib/trackingEvents'
 import Link from 'next/link'
 import { useCallback, useState } from 'react'
 import { twMerge } from 'tailwind-merge'
+import { Button } from '.'
 import Modal from './Modal'
 
 const CloudinaryImage = ({
@@ -20,14 +21,14 @@ const CloudinaryImage = ({
   intent: CldImageIntent
   className?: string
   lightbox?: boolean
-  linkTo?: string,
-  rounded?: boolean,
+  linkTo?: string
+  rounded?: boolean
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const store = useStore()
   const handleClick = useCallback(() => {
     if (lightbox) {
-      store.trackEvent(trackingEvents.caLightbox, {imgIntent: intent})
+      store.trackEvent(trackingEvents.caLightbox, { imgIntent: intent })
       setIsOpen(true)
     }
   }, [setIsOpen, lightbox, store, intent])
@@ -98,13 +99,25 @@ const CloudinaryImage = ({
           srTitle="User uploaded image lightbox"
           maxEdge
         >
+          <Button
+            className="absolute top-2 right-4 leading-none text-black-100 no-underline text-4xl drop-shadow-[0_0px_3px_rgba(0,0,0,1)] hover:text-white"
+            intent="link"
+            aria-label="close"
+            onClick={handleClose}
+          >
+            &#x2715;
+          </Button>
           {lightboxImageContent}
         </Modal>
         {regularImageContent}
       </span>
     )
   } else if (linkTo) {
-    return <Link href={linkTo}><span className="block w-full">{regularImageContent}</span></Link>
+    return (
+      <Link href={linkTo}>
+        <span className="block w-full">{regularImageContent}</span>
+      </Link>
+    )
   } else {
     return <span className="block w-full">{regularImageContent}</span>
   }
