@@ -57,7 +57,7 @@ const ProjectPage = observer(
         ? b.createdAt - a.createdAt
         : a.createdAt - b.createdAt
     )
-    const nUpdates = posts.length
+    const numPosts = posts.length
     const hasImage = !!project.imageAssetId
     const isPrivate = project.scope !== 'public'
     const changeSort = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -139,7 +139,7 @@ const ProjectPage = observer(
               {project.currentStatus === 'paused' && <span>Paused</span>}
             </p>
             <p className="body-bs text-right">
-              {nUpdates} update{nUpdates === 1 ? '' : 's'}
+              {numPosts} post{numPosts === 1 ? '' : 's'}
             </p>
           </div>
 

@@ -6,7 +6,7 @@ import { CloudinaryImage } from './uiLib'
 
 const ProjectCard = observer(
   ({ project, targetUser }: { project: ApiProject; targetUser: ApiUser }) => {
-    const nUpdates = Object.keys(project.posts).length
+    const numPosts = Object.keys(project.posts).length
     const hasImage = !!project.imageAssetId
     const projUrl = pathBuilder.project(targetUser.publicPageSlug, project.id)
     return (
@@ -34,7 +34,7 @@ const ProjectCard = observer(
               {project.currentStatus === 'paused' && <span>Paused</span>}
             </p>
             <p className="body-bs text-right">
-              {nUpdates} update{nUpdates === 1 ? '' : 's'}
+              {numPosts} post{numPosts === 1 ? '' : 's'}
             </p>
           </div>
 
