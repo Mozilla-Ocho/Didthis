@@ -2,7 +2,9 @@ import { observer } from 'mobx-react-lite'
 import { Timestamp, CloudinaryImage, Link, Button } from './uiLib'
 import pathBuilder from '@/lib/pathBuilder'
 import LinkPreview from './LinkPreview'
-import {trackingEvents} from '@/lib/trackingEvents'
+import { trackingEvents } from '@/lib/trackingEvents'
+import { twMerge } from 'tailwind-merge'
+import { useEffect, useState } from 'react'
 
 const PostCard = observer(
   ({
@@ -17,13 +19,52 @@ const PostCard = observer(
     focused: boolean
   }) => {
     const isSelf = authUser && authUser.id === targetUser.id
+    const [highlight, setHighlight] = useState(false)
+    useEffect(() => {
+      if (focused && window && window.document) {
+        const div = window.document.querySelector('#focused-post')
+        if (div) {
+          const timer1 = setTimeout(() => {
+            div.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center',
+            })
+          }, 200)
+          const timer2 = setTimeout(() => {
+            setHighlight(true)
+          }, 400)
+          const timer3 = setTimeout(() => {
+            setHighlight(false)
+          }, 800)
+          return () => {
+            clearTimeout(timer1)
+            clearTimeout(timer2)
+            clearTimeout(timer3)
+          }
+        }
+      }
+    }, [focused, setHighlight])
     return (
-      <div>
+      <div
+        id={focused ? 'focused-post' : ''}
+        className={twMerge(
+          'transition duration-500',
+          highlight
+            ? 'bg-yellow-300 drop-shadow-[0px_0px_2px_#f4c005]'
+            : ''
+        )}
+        tabIndex={-1}
+      >
         <p className="text-sm text-timestamps mb-2">
           <Timestamp millis={post.createdAt} />
         </p>
         {post.imageAssetId && (
-          <CloudinaryImage lightbox assetId={post.imageAssetId} intent="post" imageMeta={post.imageMeta}/>
+          <CloudinaryImage
+            lightbox
+            assetId={post.imageAssetId}
+            intent="post"
+            imageMeta={post.imageMeta}
+          />
         )}
         {post.linkUrl && (
           <LinkPreview linkUrl={post.linkUrl} urlMeta={post.urlMeta} />
