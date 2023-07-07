@@ -6,17 +6,24 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   // note most events will include an isAuthed:y|n parameter by default.
 
   // pageviews
+  // will also contain isAuthed:y|n, slug:string
   pvHomeUnauth: { eventName: 'pageview', opts: { name: 'homeUnauth' } },
   pvHomeAuth: { eventName: 'pageview', opts: { name: 'homeAuth' } },
+  pvUser: { eventName: 'pageview', opts: { name: 'user' } },
   pvUnsolicited: { eventName: 'pageview', opts: { name: 'unsolicited' } },
   pvPrivacyPolicy: { eventName: 'pageview', opts: { name: 'privacyPolicy' } },
   pvTerms: { eventName: 'pageview', opts: { name: 'terms' } },
-  pvAcceptableUse: { eventName: 'pageview', opts: { name: 'acceptableUse' } },
+  pvContentPolicy: { eventName: 'pageview', opts: { name: 'contentPolicy' } },
   pvNotFound: { eventName: 'pageview', opts: { name: 'notFound' } },
-  pvPublicHomepage: {
-    eventName: 'pageview',
-    opts: { name: 'publicHomepage' /* isAuthed:y|n, isSelfView:y|n */ },
-  },
+  pvPublicUser: { eventName: 'pageview', opts: { name: 'publicUser' }, },
+  pvPublicProject: { eventName: 'pageview', opts: { name: 'publicProject' }, },
+  pvNewPost: { eventName: 'pageview', opts: { name: 'newPost' }, },
+  pvEditPost: { eventName: 'pageview', opts: { name: 'editPost' }, },
+  pvProject: { eventName: 'pageview', opts: { name: 'project' }, },
+  pvNewProject: { eventName: 'pageview', opts: { name: 'newProject' }, },
+  pvEditProject: { eventName: 'pageview', opts: { name: 'editProject' }, },
+  pvEditAccount: { eventName: 'pageview', opts: { name: 'editAccount' }, },
+
 
   // completed actions
   caJoinWaitlist: { eventName: 'joinWaitlist', opts: {} },
@@ -27,19 +34,13 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
     },
   },
   caLogin: { eventName: 'login', opts: {} },
-  caProfileBasicsName: {
-    eventName: 'completeBasicField',
-    opts: { name: 'name' },
+  caProfileField: {
+    eventName: 'completeProfileField',
+    opts: {
+      /* name: */
+    },
   },
-  caProfileBasicsSlug: {
-    eventName: 'completeBasicField',
-    opts: { name: 'slug' },
-  },
-  caProfileBasicsAvatar: {
-    eventName: 'completeBasicField',
-    opts: { name: 'avatar' },
-  },
-  caProfileBasicsAll: { eventName: 'completeAllBasicFields', opts: {} },
+  caProfileAll: { eventName: 'completeAllProfileFields', opts: {} },
   caNewPostNewProj: {
     eventName: 'newPost',
     opts: { newProject: 'y' },
@@ -50,21 +51,25 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   },
   caNewProject: {
     eventName: 'newProject',
-    opts: { },
+    opts: {},
   },
 
   // edit actions
-  edProfileBasicsName: {
-    eventName: 'editBasicField',
-    opts: { name: 'name' },
+  edProfile: {
+    eventName: 'editProfile',
+    opts: {},
   },
-  edProfileBasicsSlug: {
-    eventName: 'editBasicField',
-    opts: { name: 'slug' },
+  edProject: {
+    eventName: 'editProject',
+    opts: {
+      /* field */
+    },
   },
-  edProfileBasicsAvatar: {
-    eventName: 'editBasicField',
-    opts: { name: 'avatar' },
+  edPost: {
+    eventName: 'editPost',
+    opts: {
+      /* field */
+    },
   },
 
   // button clicks (not necessarily resulting in a completed action)
@@ -73,14 +78,13 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
     opts: { name: 'loginSignup' },
   },
   bcLogout: { eventName: 'buttonClick', opts: { name: 'logout' } },
-  bcViewPage: { eventName: 'buttonClick', opts: { name: 'viewPage' } },
-  bcFeedback: { eventName: 'buttonClick', opts: { name: 'feedback' } },
   bcWaitlist: {
     eventName: 'buttonClick',
     opts: { name: 'joinWaitlist' },
   },
 
   // errors
+  // TODO: implement better api error handling and tracking
   apiError: {
     eventName: 'apiError',
     opts: {

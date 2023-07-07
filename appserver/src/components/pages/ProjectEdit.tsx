@@ -11,12 +11,16 @@ import ProjectForm from '../forms/ProjectForm'
 import { PagePad } from '../uiLib'
 import Breadcrumbs from '../Breadcrumbs'
 import pathBuilder from '@/lib/pathBuilder'
+import {trackingEvents} from '@/lib/trackingEvents'
 
 const ProjectEditPage = observer(() => {
   const store = useStore()
+  store.useTrackedPageEvent(trackingEvents.pvEditProject)
   const router = useRouter()
   const user = store.user
-  if (!user) return <NotFound>user not found</NotFound>
+  // this condition is really just for typescript to assert user is present,
+  // this component wont be rendered w/o a user.
+  if (!user) return <NotFound />
   const projectId = getParamString(router, 'projectId')
   const project = user.profile.projects[projectId]
   if (!project) return <NotFound>project not found</NotFound>

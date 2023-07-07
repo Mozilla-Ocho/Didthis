@@ -209,6 +209,26 @@ const hasAnySocialUrls = (profile: ApiProfile) => {
   )
 }
 
+const newFieldCompare = (a: ApiProfile, b: ApiProfile) => {
+  const newFields = []
+  if (a.imageAssetId && !b.imageAssetId) newFields.push('avatar')
+  if (a.bio && !b.bio) newFields.push('bio')
+  if (a.name && !b.name) newFields.push('name')
+  if (
+    (a.socialUrls?.twitter && !b.socialUrls?.twitter) ||
+    (a.socialUrls?.facebook && !b.socialUrls?.facebook) ||
+    (a.socialUrls?.instagram && !b.socialUrls?.instagram) ||
+    (a.socialUrls?.reddit && !b.socialUrls?.reddit)
+  ) {
+    newFields.push('socialUrls')
+  }
+  return newFields
+}
+
+const hasAllFields = (a: ApiProfile) => {
+  return !!(a.imageAssetId && a.bio && a.name && hasAnySocialUrls(a))
+}
+
 const profileUtils = {
   mkDefaultProfile,
   privacyFilteredCopy,
@@ -219,6 +239,8 @@ const profileUtils = {
   generateRandomAvailablePostId,
   slugStringValidation,
   hasAnySocialUrls,
+  newFieldCompare,
+  hasAllFields,
 }
 
 export default profileUtils

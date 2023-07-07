@@ -32,6 +32,8 @@ type ApiUser = {
   lastFullPageLoad?: number
   lastWrite?: number
   updatedAt?: number
+  // true if the user being returned was created/added to the db in the request
+  justCreated?: boolean
 }
 
 interface UserDbRow {
@@ -116,7 +118,7 @@ type EventSpec = {
   opts: {
     name?: string
     isAuthed?: 'y' | 'n'
-    isSelfView?: 'y' | 'n'
+    slug?: string
     signupCodeName?: string
     id?: string
     newProject?: 'y' | 'n'

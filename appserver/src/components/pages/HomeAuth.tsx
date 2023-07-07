@@ -6,6 +6,7 @@ import pathBuilder from '@/lib/pathBuilder'
 import UserPreview from '../UserPreview'
 import { useLocalStorage } from 'usehooks-ts'
 import { useEffect, useState } from 'react'
+import {trackingEvents} from '@/lib/trackingEvents'
 
 const HomeAuth = observer(() => {
   const store = useStore()
@@ -14,6 +15,7 @@ const HomeAuth = observer(() => {
     false
   )
   const [rendered, setRendered] = useState(false)
+  store.useTrackedPageEvent(trackingEvents.pvHomeAuth)
   useEffect(() => {
     // this is a hack to prevent a failure of client vs server rendering state,
     // by just rendering blank initially, and then using useState (which is

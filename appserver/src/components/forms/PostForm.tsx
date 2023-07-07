@@ -53,6 +53,7 @@ class PostStore {
       this.urlMeta = false
       this.imageMeta = undefined
     } else if (post) {
+      this.mediaType = 'text'
       this.id = post.id
       this.projectId = post.projectId
       this.description = post.description || ''
@@ -357,7 +358,7 @@ const PostForm = observer((props: Props) => {
     e.preventDefault()
     e.stopPropagation()
     postStore.setSpinning(true)
-    store.savePost(postStore.getApiPost()).then(newPost => {
+    store.savePost(postStore.getApiPost(), mode).then(newPost => {
       // keep it spinning while next page loads
       // postStore.setSpinning(false)
       if (!store.user) return

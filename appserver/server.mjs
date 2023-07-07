@@ -3,6 +3,7 @@ import morgan from 'morgan'
 import next from 'next'
 import Cookies from 'cookies'
 import crypto from 'crypto'
+import proxy from 'express-http-proxy';
 
 const app = next({ dev: process.env.NODE_ENV !== 'production' })
 const handle = app.getRequestHandler()
@@ -14,6 +15,13 @@ app
   .then(() => {
     const server = express()
 
+    if (
+      process.env.NEXT_PUBLIC_ENV_NAME === 'prod' ||
+      process.env.NEXT_PUBLIC_ENV_NAME === 'nonprod'
+    ) {
+      server.set('trust proxy', true)
+    }
+
     server.use(
       morgan('combined', {
         skip: req => {
@@ -21,6 +29,29 @@ app
         },
       })
     )
+
+    const amplitudeProxy = express.Router();
+    amplitudeProxy.use(
+      '/amplitude', // DRY_61169 
+      proxy('https://api2.amplitude.com/', {
+        proxyReqPathResolver: function () {
+          return '/2/httpapi'
+        },
+        proxyReqBodyDecorator: function (bodyContent) {
+          let json = (bodyContent instanceof Buffer) ? bodyContent.toString('utf-8') : bodyContent
+          console.log('amplitudeProxy body content:', json)
+          // let parsed
+          // try {
+          //   parsed = JSON.parse(json)
+          // } catch(e) {
+          //   parsed = json
+          // }
+          // console.log('amplitudeProxy body content:', JSON.stringify(parsed,null,2));
+          return bodyContent;
+        },
+      })
+    );
+    server.use(amplitudeProxy)
 
     // ensure client has a crsf cookie. any client who doesn't have one gets
     // assigned one. just a random uuid. POST requests require the api client to

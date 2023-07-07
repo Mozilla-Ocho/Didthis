@@ -1,15 +1,17 @@
 import { action, makeAutoObservable } from 'mobx'
 import apiClient from '@/lib/apiClient'
+import { amplitudeProxyEndpoint } from '@/lib/apiCore'
 import log from '@/lib/log'
 import { isEqual } from 'lodash-es'
 import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth'
-// import * as amplitude from '@amplitude/analytics-browser';
+import * as amplitude from '@amplitude/analytics-browser'
 import { trackingEvents } from '@/lib/trackingEvents'
 import { useEffect } from 'react'
-import {NextRouter} from 'next/router'
+import { NextRouter } from 'next/router'
 import pathBuilder from '../pathBuilder'
-import {ValidateSignupCodeWrapper} from '../apiConstants'
+import { ValidateSignupCodeWrapper } from '../apiConstants'
+import profileUtils from '../profileUtils'
 // import { UrlMetaWrapper } from '../apiConstants'
 
 type GeneralError = false | '_get_me_first_fail_' | '_api_fail_'
@@ -17,6 +19,7 @@ type LoginErrorMode = false | '_inactive_code_'
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 let moduleGlobalFirebaseRef: any | false = false
+let moduleGlobalAmpIdentFiredForUid = ''
 
 // DRY_62447 modal transition time
 const modalTransitionTime = 200
@@ -30,7 +33,7 @@ class Store {
   firebaseRefNonReactive: undefined | any = undefined // nonreactive
   hasFirebaseRef = false // reactive
   signupCode: false | string = false
-  trackedPageEvent: false | string = false
+  trackedPageEvent: false | EventSpec = false
   generalError: GeneralError = false
   firebaseModalOpen = false
   loginButtonsSpinning = false
@@ -42,7 +45,7 @@ class Store {
     | { kind: 'project'; thing: ApiProject; deleting: boolean } = false
   showConfirmDeleteModal = false
   router: NextRouter
-  debugObjId = (Math.random()+'').replace('0.','')
+  debugObjId = (Math.random() + '').replace('0.', '')
   stashedCodeValid: ValidateSignupCodeWrapper | false = false
 
   constructor({
@@ -68,7 +71,28 @@ class Store {
     )
     if (signupCode) this.setSignupCode(signupCode)
     if (authUser) this.setUser(authUser)
-    log.debug("store constructed. id=",this.debugObjId)
+    if (typeof window !== 'undefined') {
+      amplitude.init(process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY as string, '', {
+        serverUrl: amplitudeProxyEndpoint,
+        defaultTracking: {
+          pageViews: false,
+          sessions: true,
+          formInteractions: false,
+        },
+      })
+      const pt = window.localStorage.getItem('pendingTrack')
+      if (pt === 'signup') {
+        this.trackEvent(trackingEvents.caSignup, {
+          signupCodeName: authUser ? authUser.signupCodeName : undefined,
+        })
+        window.localStorage.removeItem('pendingTrack')
+      }
+      if (pt === 'login') {
+        this.trackEvent(trackingEvents.caLogin)
+        window.localStorage.removeItem('pendingTrack')
+      }
+    }
+    log.debug('store constructed. id=', this.debugObjId)
   }
 
   setSignupCode(code: string | false) {
@@ -84,7 +108,7 @@ class Store {
   //     const now = new Date().getTime()
   //     const age = (now - this.user.createdAt)
   //     if (age < 1000 * 60 * 5) {
-  //       window.localStorage.removeItem('skipBlankSlate') // DRY_26502 
+  //       window.localStorage.removeItem('skipBlankSlate') // DRY_26502
   //     }
   //   }
   // }
@@ -137,14 +161,14 @@ class Store {
     }
     if (process.env.NEXT_PUBLIC_ENV_NAME === 'prod') {
       firebaseConfig = {
-        apiKey: "AIzaSyCBrJmCmx2HA2Q70m5P6oS4XGPGb9z9xBo",
-        authDomain: "moz-fx-future-products-prod.firebaseapp.com",
-        projectId: "moz-fx-future-products-prod",
-        storageBucket: "moz-fx-future-products-prod.appspot.com",
-        messagingSenderId: "29393258446",
-        appId: "1:29393258446:web:d65749a402414d9e140d9f",
-        measurementId: "G-SN8CNC7RYJ"
-      };
+        apiKey: 'AIzaSyCBrJmCmx2HA2Q70m5P6oS4XGPGb9z9xBo',
+        authDomain: 'moz-fx-future-products-prod.firebaseapp.com',
+        projectId: 'moz-fx-future-products-prod',
+        storageBucket: 'moz-fx-future-products-prod.appspot.com',
+        messagingSenderId: '29393258446',
+        appId: '1:29393258446:web:d65749a402414d9e140d9f',
+        measurementId: 'G-SN8CNC7RYJ',
+      }
     }
 
     if (firebaseConfig) firebase.initializeApp(firebaseConfig)
@@ -177,12 +201,21 @@ class Store {
             .then(wrapper => {
               log.readiness('acquired getMe user after firebase auth')
               this.setUser(wrapper.payload)
-              // this.resetBlankSlateIfNewUser()
-              this.trackEvent(trackingEvents.caLogin)
-              // this.setFullPageLoading(false)
+              // because we're about to reload and can't trust the amplitude
+              // stuff to finish, we stash the tracking intent in localstorage
+              // and do it on the next page render. (does amplitude sdk do that
+              // internally?)
+              if (wrapper.payload.justCreated) {
+                log.auth('user is justCreated=true')
+                window.localStorage.setItem('pendingTrack', 'signup')
+                window.localStorage.removeItem('skipBlankSlate') // DRY_26502
+              } else {
+                localStorage.setItem('pendingTrack', 'login')
+              }
               // TODO: HBY-70 need to full page reload here otherwise layout
               // doesn't update because layout component props that are driven
               // by ssr auth are not refreshed.
+              // this.setFullPageLoading(false)
               window.location.reload()
             })
             .catch(e => {
@@ -209,7 +242,6 @@ class Store {
   }
 
   launchGlobalLoginOverlay(overrideCodeCheck: boolean) {
-
     this.trackEvent(trackingEvents.bcLoginSignup)
     this.loginErrorMode = false
     // DRY_47693 signup code logic
@@ -268,13 +300,13 @@ class Store {
             // log.debug('inactive/bad, open the error modal')
             this.loginErrorMode = '_inactive_code_'
           } else {
-            log.error('unexpected data from validation api',res)
+            log.error('unexpected data from validation api', res)
             this.setGeneralError('_api_fail_')
           }
         })
       )
-      .catch((e) => {
-        log.error('api fail on validate code',e)
+      .catch(e => {
+        log.error('api fail on validate code', e)
         this.setGeneralError('_api_fail_')
       })
   }
@@ -290,8 +322,7 @@ class Store {
     if (x) {
       log.auth('store acquired user', x)
       this.user = x
-      // XXX_PORTING
-      // amplitude.setUserId(x.id);
+      amplitude.setUserId(x.id)
       // DRY_47693 signup code logic
       // if we have a signup code on the url, clear it
       if (this.signupCode && typeof window !== 'undefined') {
@@ -303,13 +334,17 @@ class Store {
         this.signupCode = false
       }
       if (x.signupCodeName) {
-        // if the user has a signup code, make sure it's set in the amplitude user properties
-        log.tracking('identify() signupCode')
-        // XXX_PORTING
-        // const identifyOps = new amplitude.Identify();
-        // identifyOps.setOnce('signupCodeName', x.signupCodeName);
-        // identifyOps.setOnce('hasSignupCode', '1');
-        // amplitude.identify(identifyOps);
+        if (moduleGlobalAmpIdentFiredForUid !== x.id) {
+          // for now the store gets recreated a lot, setuser gets called a lot,
+          // don't want to spam the amplitude events.
+          moduleGlobalAmpIdentFiredForUid = x.id
+          // if the user has a signup code, make sure it's set in the amplitude user properties
+          log.tracking('identify() signupCode')
+          const identifyOps = new amplitude.Identify()
+          identifyOps.setOnce('signupCodeName', x.signupCodeName)
+          identifyOps.setOnce('hasSignupCode', '1')
+          amplitude.identify(identifyOps)
+        }
       }
     } else {
       log.auth('store clearing user')
@@ -333,17 +368,23 @@ class Store {
   // }}}
 
   trackEvent(evt: EventSpec, opts?: EventSpec['opts']) {
-    // XXX_PORTING
-    // const key = evt.key;
-    // const fullEvent = JSON.parse(JSON.stringify(trackingEvents[key]));
-    // if (!fullEvent) {
-    //   log.error(`tracked event is not in trackingEvents (${evt})`);
-    //   return;
-    // }
-    // fullEvent.opts = { ...fullEvent.opts, ...opts };
-    // fullEvent.opts.isAuthed = this.user ? 'y' : 'n';
-    // log.tracking(fullEvent.eventName, fullEvent.opts.name, JSON.stringify(fullEvent));
-    // amplitude.track(fullEvent.eventName, fullEvent.opts);
+    const key = evt.key
+    const fullEvent = JSON.parse(JSON.stringify(trackingEvents[key]))
+    if (!fullEvent) {
+      log.error(`tracked event is not in trackingEvents (${evt})`)
+      return
+    }
+    fullEvent.opts = { ...fullEvent.opts, ...opts }
+    fullEvent.opts.isAuthed = this.user ? 'y' : 'n'
+    if (!fullEvent.opts.slug && this.user) {
+      fullEvent.opts.slug = this.user.publicPageSlug
+    }
+    log.tracking(
+      fullEvent.eventName,
+      fullEvent.opts.name,
+      JSON.stringify(fullEvent)
+    )
+    amplitude.track(fullEvent.eventName, fullEvent.opts)
   }
 
   setTrackedPageEvent(evt: EventSpec, opts?: EventSpec['opts']) {
@@ -389,24 +430,33 @@ class Store {
     this.generalError = false
   }
 
-  async savePost(post: ApiPost): Promise<ApiPost> {
+  async savePost(post: ApiPost, mode: 'new' | 'edit'): Promise<ApiPost> {
     if (!this.user) throw new Error('must be authed')
     return apiClient.savePost({ post }).then(wrapper => {
       this.setUser(wrapper.payload.user)
-      if (post.projectId === 'new') {
-        this.trackEvent(trackingEvents.caNewPostNewProj)
+      if (mode === 'new') {
+        if (post.projectId === 'new') {
+          this.trackEvent(trackingEvents.caNewPostNewProj)
+        } else {
+          this.trackEvent(trackingEvents.caNewPost)
+        }
       } else {
-        this.trackEvent(trackingEvents.caNewPost)
+        this.trackEvent(trackingEvents.edPost)
       }
       return wrapper.payload.post
     })
   }
 
-  async saveProject(project: ApiProject): Promise<ApiProject> {
+  async saveProject(
+    project: ApiProject,
+    mode: 'new' | 'edit'
+  ): Promise<ApiProject> {
     if (!this.user) throw new Error('must be authed')
     return apiClient.saveProject({ project }).then(wrapper => {
       this.setUser(wrapper.payload.user)
-      this.trackEvent(trackingEvents.caNewProject)
+      this.trackEvent(
+        mode === 'new' ? trackingEvents.caNewProject : trackingEvents.edProject
+      )
       return wrapper.payload.project
     })
   }
@@ -443,12 +493,19 @@ class Store {
             projectId: this.confirmingDelete.thing.projectId,
           })
           .then(wrapper => {
-            if (this.confirmingDelete && this.confirmingDelete.kind === "post") {
+            if (
+              this.confirmingDelete &&
+              this.confirmingDelete.kind === 'post'
+            ) {
               const projectId = this.confirmingDelete.thing.projectId
               this.showConfirmDeleteModal = false
-              setTimeout(() => {this.confirmingDelete = false}, modalTransitionTime)
+              setTimeout(() => {
+                this.confirmingDelete = false
+              }, modalTransitionTime)
               this.setUser(wrapper.payload.user)
-              this.router.push(pathBuilder.project(wrapper.payload.user.systemSlug, projectId))
+              this.router.push(
+                pathBuilder.project(wrapper.payload.user.systemSlug, projectId)
+              )
             }
           })
       }
@@ -457,7 +514,9 @@ class Store {
           .deleteProject({ projectId: this.confirmingDelete.thing.id })
           .then(wrapper => {
             this.showConfirmDeleteModal = false
-            setTimeout(() => {this.confirmingDelete = false}, modalTransitionTime)
+            setTimeout(() => {
+              this.confirmingDelete = false
+            }, modalTransitionTime)
             // note: upating the user here causes a flash of "not found" page
             // this.setUser(wrapper.payload)
             // we can actually just rely on nextjs's server side props behavior
@@ -467,21 +526,36 @@ class Store {
       }
     } else {
       this.showConfirmDeleteModal = false
-      setTimeout(() => {this.confirmingDelete = false}, modalTransitionTime)
+      setTimeout(() => {
+        this.confirmingDelete = false
+      }, modalTransitionTime)
     }
   }
 
   async saveProfile(profile: ApiProfile, userSlug?: string): Promise<void> {
     if (!this.user) throw new Error('must be authed')
+    const trackFields = profileUtils.newFieldCompare(profile, this.user.profile)
+    if (userSlug && !this.user.userSlug) {
+      trackFields.push('slug')
+    }
+    trackFields.forEach(field => {
+      this.trackEvent(trackingEvents.caProfileField, { name: field })
+    })
+    if (
+      profileUtils.hasAllFields(profile) &&
+      (userSlug || this.user.userSlug)
+    ) {
+      this.trackEvent(trackingEvents.caProfileAll)
+    }
     return apiClient.saveProfile({ profile, userSlug }).then(wrapper => {
       this.setUser(wrapper.payload)
+      this.trackEvent(trackingEvents.edProfile)
       // XXX tracking
       // this.trackEvent(trackingEvents.caNewProject)
       this.router.push(pathBuilder.user(wrapper.payload.systemSlug))
       // return wrapper.payload
     })
   }
-
 }
 
 export default Store

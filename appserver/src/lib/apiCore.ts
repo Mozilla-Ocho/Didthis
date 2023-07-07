@@ -18,15 +18,17 @@ const getLocationBase = () => {
   return u.toString().replace(/\/$/, '')
 }
 
-// endpoint is the scheme, domain, and port of the api backend. in browser
+// apiEndpoint is the scheme, domain, and port of the api backend. in browser
 // context, it uses the browser location, so that this just works on various
 // domains (localhost, test., the regular top level, etc). in SSR it has no
 // location context so it uses NEXT_PUBLIC_API_ENDPOINT. note that
 // NEXT_PUBLIC_API_ENDPOINT is also used when generating full share urls in the
 // client.
-const endpoint = inBrowserContext
+const apiEndpoint: string = inBrowserContext
   ? getLocationBase()
-  : process.env.NEXT_PUBLIC_API_ENDPOINT
+  : (process.env.NEXT_PUBLIC_API_ENDPOINT as string)
+
+const amplitudeProxyEndpoint = apiEndpoint + '/amplitude' // DRY_61169
 
 type QueryParams = { [key: string]: string }
 
@@ -57,7 +59,7 @@ type ApiInfo = {
 // build a complete api endpoint url given an api action name
 const mkUrl = (action: string, queryParams?: QueryParams) => {
   const qs = new URLSearchParams(queryParams || {}).toString()
-  return endpoint + '/api/' + action + (qs ? '?' + qs : '')
+  return apiEndpoint + '/api/' + action + (qs ? '?' + qs : '')
 }
 
 class ApiError extends Error {
@@ -194,6 +196,6 @@ const wrapFetch = async (fetchArgs: FetchArgs): Promise<SuccessWrapper> => {
   }
 }
 
-export { wrapFetch, ApiError }
+export { wrapFetch, ApiError, apiEndpoint, amplitudeProxyEndpoint }
 
 export type { FetchArgs, ApiInfo }

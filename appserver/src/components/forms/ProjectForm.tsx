@@ -123,7 +123,7 @@ const ProjectForm = observer((props: Props) => {
     e.stopPropagation()
     e.preventDefault()
     projectStore.setSpinning(true)
-    store.saveProject(projectStore.getApiProject()).then(newProject => {
+    store.saveProject(projectStore.getApiProject(), mode).then(newProject => {
       // note that saving projects ignores the posts property. for a new
       // project the backend sets that to {}, and on updates it keeps
       // whatever is currently in the user's profile for that project and
