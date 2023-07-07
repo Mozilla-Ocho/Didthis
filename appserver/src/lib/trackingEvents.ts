@@ -15,15 +15,14 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   pvTerms: { eventName: 'pageview', opts: { name: 'terms' } },
   pvContentPolicy: { eventName: 'pageview', opts: { name: 'contentPolicy' } },
   pvNotFound: { eventName: 'pageview', opts: { name: 'notFound' } },
-  pvPublicUser: { eventName: 'pageview', opts: { name: 'publicUser' }, },
-  pvPublicProject: { eventName: 'pageview', opts: { name: 'publicProject' }, },
-  pvNewPost: { eventName: 'pageview', opts: { name: 'newPost' }, },
-  pvEditPost: { eventName: 'pageview', opts: { name: 'editPost' }, },
-  pvProject: { eventName: 'pageview', opts: { name: 'project' }, },
-  pvNewProject: { eventName: 'pageview', opts: { name: 'newProject' }, },
-  pvEditProject: { eventName: 'pageview', opts: { name: 'editProject' }, },
-  pvEditAccount: { eventName: 'pageview', opts: { name: 'editAccount' }, },
-
+  pvPublicUser: { eventName: 'pageview', opts: { name: 'publicUser' } },
+  pvPublicProject: { eventName: 'pageview', opts: { name: 'publicProject' } },
+  pvNewPost: { eventName: 'pageview', opts: { name: 'newPost' } },
+  pvEditPost: { eventName: 'pageview', opts: { name: 'editPost' } },
+  pvProject: { eventName: 'pageview', opts: { name: 'project' } },
+  pvNewProject: { eventName: 'pageview', opts: { name: 'newProject' } },
+  pvEditProject: { eventName: 'pageview', opts: { name: 'editProject' } },
+  pvEditAccount: { eventName: 'pageview', opts: { name: 'editAccount' } },
 
   // completed actions
   caJoinWaitlist: { eventName: 'joinWaitlist', opts: {} },
@@ -35,23 +34,27 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   },
   caLogin: { eventName: 'login', opts: {} },
   caProfileField: {
+    /* fired when a user first saves any content in a given profile field, will be
+     * fired once for any/all applicable fields eg bio, avatar, name, slug, etc */
     eventName: 'completeProfileField',
     opts: {
       /* name: */
     },
   },
-  caProfileAll: { eventName: 'completeAllProfileFields', opts: {} },
-  caNewPostNewProj: {
-    eventName: 'newPost',
-    opts: { newProject: 'y' /* mediaType */ },
+  caProfileAll: {
+    /* fired when a user completes all profile fields: name, slug, avatar, bio,
+     * one or more social urls */
+    eventName: 'completeAllProfileFields',
+    opts: {},
   },
   caNewPost: {
     eventName: 'newPost',
-    opts: { newProject: 'n' /* mediaType */ },
+    opts: { /* newProject y|n, mediaType */ },
   },
   caNewProject: {
     eventName: 'newProject',
-    opts: {},
+    opts: { /* asPartOfNewPost y|n - y when created as a result of making a new
+      post with the 'create new project' option  */ },
   },
   caSetProjectPublic: {
     eventName: 'setProjectPublic',
@@ -63,15 +66,21 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   },
   caSetProjectSort: {
     eventName: 'setProjectSort',
-    opts: { /* direction */ },
+    opts: {
+      /* direction */
+    },
   },
   caUploadImage: {
     eventName: 'uploadImage',
-    opts: { /* imgIntent */ },
+    opts: {
+      /* imgIntent */
+    },
   },
   caLightbox: {
     eventName: 'lightbox',
-    opts: { /* imgIntent */ },
+    opts: {
+      /* imgIntent */
+    },
   },
 
   // edit actions
@@ -81,18 +90,14 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   },
   edProject: {
     eventName: 'editProject',
-    opts: {
-      /* field */
-    },
+    opts: {},
   },
   edPost: {
     eventName: 'editPost',
-    opts: {
-      /* mediaType */
-    },
+    opts: { /* mediaType */ },
   },
 
-  // button clicks (not necessarily resulting in a completed action)
+  // button or link clicks (not necessarily resulting in a completed action)
   bcLoginSignup: {
     eventName: 'buttonClick',
     opts: { name: 'loginSignup' },
@@ -112,7 +117,7 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   },
   bcAddPost: {
     eventName: 'buttonClick',
-    opts: { name: 'bcAddPost', /* fromPage */  },
+    opts: { name: 'bcAddPost' /* fromPage */ },
   },
   bcCreatProjectHomeAuth: {
     eventName: 'buttonClick',

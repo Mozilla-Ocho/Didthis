@@ -114,20 +114,23 @@ type ApiProfile = {
 
 type PostMediaType = 'text' | 'image' | 'link'
 
+type YorN = 'y' | 'n'
+
 type EventSpec = {
   eventName: string
   key: string
   opts: {
     name?: string
-    isAuthed?: 'y' | 'n'
+    isAuthed?: YorN
     slug?: string
     signupCodeName?: string
     id?: string
-    newProject?: 'y' | 'n'
+    newProject?: YorN
     mediaType?: PostMediaType
     fromPage?: string // for buttons/actions that might be on various pages
     direction?: 'asc' | 'desc'
     imgIntent?: CldImageIntent,
+    asPartOfNewPost?: YorN
   }
 }
 

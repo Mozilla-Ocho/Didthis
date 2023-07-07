@@ -9,9 +9,14 @@ import worksHobby from '@/assets/img/works-with-any-hobby-img-desktop.png'
 import shareCelebDesktop from '@/assets/img/share-and-celebrate-desktop-crop.png'
 import shareCelebMobile from '@/assets/img/share-and-celebrate-img-mobile-crop.png'
 import Image from 'next/image'
+import {useStore} from '@/lib/store'
+import {trackingEvents} from '@/lib/trackingEvents'
 
 // DRY_20334 outer page width styles
 const HomeUnauth = () => {
+  const store = useStore()
+  store.useTrackedPageEvent(trackingEvents.pvHomeUnauth)
+
   const contentColX = 'max-w-[1280px] mx-auto text-center'
   const chunks = 'mx-auto max-w-[580px] flex flex-col items-center'
 

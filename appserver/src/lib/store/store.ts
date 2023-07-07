@@ -430,18 +430,32 @@ class Store {
     this.generalError = false
   }
 
-  async savePost(post: ApiPost, mode: 'new' | 'edit', mediaType: PostMediaType): Promise<ApiPost> {
+  async savePost(
+    post: ApiPost,
+    mode: 'new' | 'edit',
+    mediaType: PostMediaType
+  ): Promise<ApiPost> {
     if (!this.user) throw new Error('must be authed')
     return apiClient.savePost({ post }).then(wrapper => {
       this.setUser(wrapper.payload.user)
       if (mode === 'new') {
         if (post.projectId === 'new') {
-          this.trackEvent(trackingEvents.caNewPostNewProj, {mediaType})
+          this.trackEvent(trackingEvents.caNewPost, {
+            newProject: 'y',
+            mediaType,
+          })
+          this.trackEvent(trackingEvents.caNewProject, {
+            asPartOfNewPost: 'y',
+            mediaType,
+          })
         } else {
-          this.trackEvent(trackingEvents.caNewPost, {mediaType})
+          this.trackEvent(trackingEvents.caNewPost, {
+            newProject: 'n',
+            mediaType,
+          })
         }
       } else {
-        this.trackEvent(trackingEvents.edPost, {mediaType})
+        this.trackEvent(trackingEvents.edPost, { mediaType })
       }
       return wrapper.payload.post
     })
@@ -450,7 +464,7 @@ class Store {
   async saveProject(
     project: ApiProject,
     mode: 'new' | 'edit',
-    originalProject?: ApiProject,
+    originalProject?: ApiProject
   ): Promise<ApiProject> {
     if (!this.user) throw new Error('must be authed')
     if (originalProject && originalProject.scope !== project.scope) {
@@ -462,9 +476,11 @@ class Store {
     }
     return apiClient.saveProject({ project }).then(wrapper => {
       this.setUser(wrapper.payload.user)
-      this.trackEvent(
-        mode === 'new' ? trackingEvents.caNewProject : trackingEvents.edProject
-      )
+      if (mode === 'new') {
+        this.trackEvent(trackingEvents.caNewProject, { asPartOfNewPost: 'n' })
+      } else {
+        this.trackEvent(trackingEvents.edProject)
+      }
       return wrapper.payload.project
     })
   }
@@ -558,8 +574,6 @@ class Store {
     return apiClient.saveProfile({ profile, userSlug }).then(wrapper => {
       this.setUser(wrapper.payload)
       this.trackEvent(trackingEvents.edProfile)
-      // XXX tracking
-      // this.trackEvent(trackingEvents.caNewProject)
       this.router.push(pathBuilder.user(wrapper.payload.systemSlug))
       // return wrapper.payload
     })
