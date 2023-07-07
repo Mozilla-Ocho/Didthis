@@ -15,6 +15,7 @@ import ImageUpload from '../ImageUpload'
 import type { UploadCallback } from '../ImageUpload'
 import profileUtils from '@/lib/profileUtils'
 import { twMerge } from 'tailwind-merge'
+import {trackingEvents} from '@/lib/trackingEvents'
 
 class PostStore {
   id: string
@@ -329,6 +330,8 @@ const ImageField = observer(({ postStore }: { postStore: PostStore }) => {
             intent="secondary"
             onClick={deleteImage}
             className="grow"
+            trackEvent={trackingEvents.bcRemoveImage}
+            trackEventOpts={{imgIntent:'post'}}
           >
             Remove
           </Button>
@@ -444,6 +447,8 @@ const PostForm = observer((props: Props) => {
             intent="secondary"
             onClick={handleCancel}
             className="w-full sm:w-[150px]"
+            trackEvent={trackingEvents.bcDiscardChanges}
+            trackEventOpts={{fromPage:'postEdit'}}
           >
             {mode === 'edit' ? 'Discard changes' : 'Cancel' }
           </Button>

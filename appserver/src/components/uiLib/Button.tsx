@@ -1,7 +1,8 @@
-import { ReactNode, FC, MouseEventHandler } from 'react'
+import { ReactNode, FC } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { twMerge } from 'tailwind-merge'
 import Spinner from './Spinner'
+import {useStore} from '@/lib/store'
 
 const buttonCVA = cva('button px-4 py-3 rounded text-sm', {
   variants: {
@@ -65,6 +66,8 @@ interface ButtonProps extends VariantProps<typeof buttonCVA> {
   'data-testid'?: string // XXX_PORTING
   disabled?: boolean
   spinning?: boolean
+  trackEvent?: EventSpec
+  trackEventOpts?: EventSpec['opts']
 }
 
 const Button: FC<ButtonProps> = ({
@@ -74,10 +77,14 @@ const Button: FC<ButtonProps> = ({
   className,
   disabled,
   spinning,
+  trackEvent,
+  trackEventOpts,
   ...props
 }) => {
   const bType = props.type || 'button'
-  const ourOnClick: MouseEventHandler = e => {
+  const store = useStore()
+  const ourOnClick: React.MouseEventHandler = e => {
+    if (trackEvent) store.trackEvent(trackEvent, trackEventOpts)
     if (onClick) onClick(e)
   }
   return (

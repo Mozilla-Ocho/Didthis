@@ -1,6 +1,7 @@
 import { specialAssetIds } from '@/lib/cloudinaryConfig'
 import pathBuilder from '@/lib/pathBuilder'
 import { useStore } from '@/lib/store'
+import {trackingEvents} from '@/lib/trackingEvents'
 import { observer } from 'mobx-react-lite'
 import { Link } from './uiLib'
 import { CloudinaryImage } from './uiLib'
@@ -32,7 +33,7 @@ const ProjectCard = observer(
                 {project.scope === 'public' ? 'Public' : 'Private'}
               </strong>{' '}
               &mdash;{' '}
-              {project.currentStatus === 'active' && <span>In progress</span>}
+              {project.currentStatus === 'active' && <span>In Progress</span>}
               {project.currentStatus === 'complete' && <span>Completed</span>}
               {project.currentStatus === 'paused' && <span>Paused</span>}
             </p>
@@ -68,6 +69,7 @@ const ProjectCard = observer(
                   store.user.systemSlug,
                   project.id
                 )}
+                trackEvent={trackingEvents.bcEditProjectFromCard}
               >
                 Edit
               </Link>

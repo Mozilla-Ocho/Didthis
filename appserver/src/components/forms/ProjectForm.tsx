@@ -14,6 +14,8 @@ import { useRouter } from 'next/router'
 import ImageUpload from '../ImageUpload'
 import type { UploadCallback } from '../ImageUpload'
 import { makeAutoObservable } from 'mobx'
+import {trackingEvents} from '@/lib/trackingEvents'
+import {fromPairs} from 'lodash-es'
 
 class ProjectStore {
   title: string
@@ -123,14 +125,20 @@ const ProjectForm = observer((props: Props) => {
     e.stopPropagation()
     e.preventDefault()
     projectStore.setSpinning(true)
-    store.saveProject(projectStore.getApiProject(), mode).then(newProject => {
-      // note that saving projects ignores the posts property. for a new
-      // project the backend sets that to {}, and on updates it keeps
-      // whatever is currently in the user's profile for that project and
-      // only updates the project's attributes.
-      if (!store.user) return
-      router.push(pathBuilder.project(store.user.systemSlug, newProject.id))
-    })
+    store
+      .saveProject(
+        projectStore.getApiProject(),
+        mode,
+        mode === 'edit' ? props.project : undefined
+      )
+      .then(newProject => {
+        // note that saving projects ignores the posts property. for a new
+        // project the backend sets that to {}, and on updates it keeps
+        // whatever is currently in the user's profile for that project and
+        // only updates the project's attributes.
+        if (!store.user) return
+        router.push(pathBuilder.project(store.user.systemSlug, newProject.id))
+      })
   }
   const setTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
     projectStore.setTitle(e.target.value)
@@ -239,6 +247,8 @@ const ProjectForm = observer((props: Props) => {
                 intent="secondary"
                 onClick={deleteImage}
                 className="grow sm:grow-0"
+                trackEvent={trackingEvents.bcRemoveImage}
+                trackEventOpts={{imgIntent:'project'}}
               >
                 Remove
               </Button>
@@ -280,6 +290,8 @@ const ProjectForm = observer((props: Props) => {
             intent="secondary"
             onClick={handleCancel}
             className="w-full sm:w-[150px]"
+            trackEvent={trackingEvents.bcDiscardChanges}
+            trackEventOpts={{fromPage:'projectEdit'}}
           >
             {mode === 'edit' ? 'Discard changes' : 'Cancel'}
           </Button>

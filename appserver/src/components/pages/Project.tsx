@@ -20,10 +20,10 @@ import PostCard from '../PostCard'
 import { useStore } from '@/lib/store'
 import { useLocalStorage } from 'usehooks-ts'
 import Breadcrumbs from '../Breadcrumbs'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import copyToClipboard from 'copy-to-clipboard'
 import { specialAssetIds } from '@/lib/cloudinaryConfig'
-import {trackingEvents} from '@/lib/trackingEvents'
+import { trackingEvents } from '@/lib/trackingEvents'
 
 const ProjectPage = observer(
   ({ targetUser }: { targetUser: ApiUser | false }) => {
@@ -31,13 +31,21 @@ const ProjectPage = observer(
     if (!targetUser) return <NotFound>user not found</NotFound>
     const router = useRouter()
     const store = useStore()
-    store.useTrackedPageEvent(trackingEvents.pvProject,{slug: targetUser.publicPageSlug})
+    store.useTrackedPageEvent(trackingEvents.pvProject, {
+      slug: targetUser.publicPageSlug,
+    })
     const [shareModalOpen, setShareModalOpen] = useState(false)
     const [sharePrivModalOpen, setSharePrivModalOpen] = useState(false)
-    const [sort, setSort] = useLocalStorage<'asc' | 'desc'>(
+    const [savedSort, setSavedSort] = useLocalStorage<'asc' | 'desc'>(
       'projectSortDefault',
       'desc'
     )
+    const [actualSort, setActualSort] = useState<'asc' | 'desc'>('desc')
+    useEffect(() => {
+      // SSR consistency. reflow sort after render if different from default,
+      // because server doesn't know the local storage preference.
+      if (actualSort !== savedSort) setActualSort(savedSort)
+    }, [actualSort, setActualSort, savedSort])
     const isSelf = store.user && store.user.id === targetUser.id
     if (isSelf && store.user) targetUser = store.user // important for mobx reactivity when authed
     const projectId = getParamString(router, 'projectId')
@@ -46,13 +54,18 @@ const ProjectPage = observer(
     if (!project) return <NotFound>project not found</NotFound>
     const posts = Object.values(project.posts)
     posts.sort((a, b) =>
-      sort === 'desc' ? b.createdAt - a.createdAt : a.createdAt - b.createdAt
+      actualSort === 'desc'
+        ? b.createdAt - a.createdAt
+        : a.createdAt - b.createdAt
     )
     const nUpdates = posts.length
     const hasImage = !!project.imageAssetId
     const isPrivate = project.scope !== 'public'
     const changeSort = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setSort(e.target.value as 'asc' | 'desc')
+      const direction = e.target.value as 'asc' | 'desc'
+      setSavedSort(direction)
+      setActualSort(direction)
+      store.trackEvent(trackingEvents.caSetProjectSort, { direction })
     }
     const shareUrl = pathBuilder.makeFullUrl(
       pathBuilder.project(targetUser.publicPageSlug, project.id)
@@ -122,7 +135,7 @@ const ProjectPage = observer(
           <div className="grid grid-cols-[66%_34%] my-4">
             <p className="body-bs">
               <strong>{isPrivate ? 'Private' : 'Public'}</strong> &mdash;{' '}
-              {project.currentStatus === 'active' && <span>In progress</span>}
+              {project.currentStatus === 'active' && <span>In Progress</span>}
               {project.currentStatus === 'complete' && <span>Completed</span>}
               {project.currentStatus === 'paused' && <span>Paused</span>}
             </p>
@@ -163,6 +176,8 @@ const ProjectPage = observer(
                   className="grow basis-1 sm:grow-0 sm:basis-auto"
                   intent="primary"
                   href={pathBuilder.newPost(store.user.systemSlug, project.id)}
+                  trackEvent={trackingEvents.bcAddPost}
+                  trackEventOpts={{ fromPage: 'project' }}
                 >
                   Add post
                 </Link>
@@ -170,7 +185,11 @@ const ProjectPage = observer(
             <Button
               className="grow basis-1 sm:grow-0 sm:basis-auto"
               intent="secondary"
-              onClick={isPrivate ? handleSharePriv : handleShare}
+              onClick={
+                isPrivate /* tracking handled in these handler fns */
+                  ? handleSharePriv
+                  : handleShare
+              }
             >
               Share project
             </Button>
@@ -184,7 +203,7 @@ const ProjectPage = observer(
               <Select
                 id="sortby"
                 onChange={changeSort}
-                value={sort}
+                value={actualSort}
                 className="text-bodytext"
               >
                 <option key="desc" value="desc">

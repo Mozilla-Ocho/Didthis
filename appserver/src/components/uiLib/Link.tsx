@@ -1,6 +1,8 @@
 import NextLink from 'next/link'
 import React, { ReactNode } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
+import { track } from '@amplitude/analytics-browser'
+import { useStore } from '@/lib/store'
 
 const linkCVA = cva('link', {
   variants: {
@@ -71,6 +73,9 @@ interface LinkProps extends VariantProps<typeof linkCVA> {
   className?: string
   external?: boolean
   newTab?: boolean
+  trackEvent?: EventSpec
+  trackEventOpts?: EventSpec['opts']
+  onClick?: React.MouseEventHandler
 }
 
 const Link: React.FC<LinkProps> = ({
@@ -80,7 +85,15 @@ const Link: React.FC<LinkProps> = ({
   children,
   external,
   newTab,
+  trackEvent,
+  trackEventOpts,
+  onClick,
 }) => {
+  const store = useStore()
+  const ourOnClick: React.MouseEventHandler = e => {
+    if (trackEvent) store.trackEvent(trackEvent, trackEventOpts)
+    if (onClick) onClick(e)
+  }
   if (external) {
     return (
       <a
@@ -88,6 +101,7 @@ const Link: React.FC<LinkProps> = ({
         target="_blank"
         className={linkCVA({ intent, className })}
         href={href}
+        onClick={ourOnClick}
       >
         {children}
       </a>
@@ -98,6 +112,7 @@ const Link: React.FC<LinkProps> = ({
       target={newTab ? '_blank' : undefined}
       className={linkCVA({ intent, className })}
       href={href}
+      onClick={ourOnClick}
     >
       {children}
     </NextLink>

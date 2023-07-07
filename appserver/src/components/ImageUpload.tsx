@@ -2,6 +2,8 @@ import { getCloudinaryConfig } from '@/lib/cloudinaryConfig'
 import { useEffect, useState } from 'react'
 import { Button } from './uiLib'
 import log from '@/lib/log'
+import {useStore} from '@/lib/store'
+import {trackingEvents} from '@/lib/trackingEvents'
 
 type UploadResult = {
   cloudinaryAssetId: string
@@ -35,9 +37,11 @@ const ImageUpload = ({
 }) => {
   const [widget, setWidget] = useState<Widget>()
   const [, setRerenderDummyFn] = useState(0)
+  const store = useStore()
 
   const launchWidget = () => {
     if (widget) widget.open()
+    store.trackEvent(trackingEvents.bcImageUpload,{imgIntent:intent})
   }
 
   useEffect(() => {
@@ -152,6 +156,7 @@ const ImageUpload = ({
             "thumbnail_url": "https://res.cloudinary.com/dbpulyvbq/image/upload/c_limit,h_60,w_90/v1687817193/posts/niaqzg3bsfdhw2j0qwxn.jpg"
           }
           */
+          store.trackEvent(trackingEvents.caUploadImage, { imgIntent:intent })
           onUploadWithUseCallback({
             cloudinaryAssetId: result.info.public_id,
             info: result.info,
@@ -167,7 +172,7 @@ const ImageUpload = ({
     ) as Widget
     setWidget(theWidget)
     return () => theWidget.destroy()
-  }, [intent, onUploadWithUseCallback])
+  }, [intent, onUploadWithUseCallback, store])
 
   return (
     <Button className={className} intent={required && !isReplace ? "primary" : "secondary"} onClick={launchWidget}>

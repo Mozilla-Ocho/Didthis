@@ -53,6 +53,26 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
     eventName: 'newProject',
     opts: {},
   },
+  caSetProjectPublic: {
+    eventName: 'setProjectPublic',
+    opts: {},
+  },
+  caSetProjectPrivate: {
+    eventName: 'setProjectPrivate',
+    opts: {},
+  },
+  caSetProjectSort: {
+    eventName: 'setProjectSort',
+    opts: { /* direction */ },
+  },
+  caUploadImage: {
+    eventName: 'uploadImage',
+    opts: { /* imgIntent */ },
+  },
+  caLightbox: {
+    eventName: 'lightbox',
+    opts: { /* imgIntent */ },
+  },
 
   // edit actions
   edProfile: {
@@ -84,11 +104,55 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   },
   bcSharePublicProject: {
     eventName: 'buttonClick',
-    opts: { name: 'shaePublicProject' },
+    opts: { name: 'sharePublicProject' },
   },
   bcSharePrivateProject: {
     eventName: 'buttonClick',
-    opts: { name: 'shaePrivateProject' },
+    opts: { name: 'sharePrivateProject' },
+  },
+  bcAddPost: {
+    eventName: 'buttonClick',
+    opts: { name: 'bcAddPost', /* fromPage */  },
+  },
+  bcCreatProjectHomeAuth: {
+    eventName: 'buttonClick',
+    opts: { name: 'bcCreatProjectHomeAuth' },
+  },
+  bcSkipBlankSlate: {
+    eventName: 'buttonClick',
+    opts: { name: 'bcSkipBlankSlate' },
+  },
+  bcEditProjectFromCard: {
+    eventName: 'buttonClick',
+    opts: { name: 'bcEditProjectFromCard' },
+  },
+  bcEditPostFromCard: {
+    eventName: 'buttonClick',
+    opts: { name: 'bcEditPostFromCard' },
+  },
+  bcDiscord: {
+    eventName: 'buttonClick',
+    opts: { name: 'bcDiscord' },
+  },
+  bcOchoIdea: {
+    eventName: 'buttonClick',
+    opts: { name: 'bcOchoIdea' },
+  },
+  bcHeaderLogo: {
+    eventName: 'buttonClick',
+    opts: { name: 'bcHeaderLogo' },
+  },
+  bcImageUpload: {
+    eventName: 'buttonClick',
+    opts: { name: 'bcImageUpload' /* imgIntent */ },
+  },
+  bcRemoveImage: {
+    eventName: 'buttonClick',
+    opts: { name: 'bcRemoveImage' /* imgIntent */ },
+  },
+  bcDiscardChanges: {
+    eventName: 'buttonClick',
+    opts: { name: 'bcDiscardChanges' /* fromPage */ },
   },
 
   // errors

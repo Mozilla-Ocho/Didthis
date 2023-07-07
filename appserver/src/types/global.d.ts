@@ -125,6 +125,9 @@ type EventSpec = {
     id?: string
     newProject?: 'y' | 'n'
     mediaType?: PostMediaType
+    fromPage?: string // for buttons/actions that might be on various pages
+    direction?: 'asc' | 'desc'
+    imgIntent?: CldImageIntent,
   }
 }
 

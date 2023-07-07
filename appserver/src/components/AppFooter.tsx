@@ -4,6 +4,7 @@ import pathBuilder from '@/lib/pathBuilder'
 import discordLogo from '@/assets/img/discord-logo.svg'
 import Image from 'next/image'
 import { useStore } from '@/lib/store'
+import { trackingEvents } from '@/lib/trackingEvents'
 
 const AppFooter = observer(
   ({ unauthHomepage }: { unauthHomepage?: boolean }) => {
@@ -16,7 +17,11 @@ const AppFooter = observer(
         <strong>Have feedback?</strong>{' '}
         <span className="whitespace-nowrap">
           {discordIcon}{' '}
-          <Link external href="https://discord.gg/Z9f8UjdfJx">
+          <Link
+            external
+            href="https://discord.gg/Z9f8UjdfJx"
+            trackEvent={trackingEvents.bcDiscord}
+          >
             Join our Discord server!
           </Link>
         </span>
@@ -47,7 +52,11 @@ const AppFooter = observer(
     const ochoLink = (
       <p className="whitespace-nowrap">
         A{' '}
-        <Link newTab href="https://future.mozilla.org">
+        <Link
+          newTab
+          href="https://future.mozilla.org"
+          trackEvent={trackingEvents.bcOchoIdea}
+        >
           Mozilla Ocho
         </Link>{' '}
         Idea

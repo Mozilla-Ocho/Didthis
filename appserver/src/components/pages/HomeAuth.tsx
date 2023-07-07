@@ -41,6 +41,8 @@ const HomeAuth = observer(() => {
         intent="primary"
         className="grow basis-1 sm:grow-0 sm:basis-auto"
         href={pathBuilder.newPost(store.user.systemSlug)}
+        trackEvent={trackingEvents.bcAddPost}
+        trackEventOpts={{fromPage:'homeAuth'}}
       >
         Add post
       </Link>
@@ -49,6 +51,7 @@ const HomeAuth = observer(() => {
           intent="secondary"
           className="grow basis-1 sm:grow-0 sm:basis-auto"
           onClick={handleSkip}
+          trackEvent={trackingEvents.bcSkipBlankSlate}
         >
           Skip for now
         </Button>
@@ -57,6 +60,7 @@ const HomeAuth = observer(() => {
           intent="secondary"
           className="grow basis-1 sm:grow-0 sm:basis-auto"
           href={pathBuilder.newProject(store.user.systemSlug)}
+          trackEvent={trackingEvents.bcCreatProjectHomeAuth}
         >
           Create project
         </Link>

@@ -1,4 +1,6 @@
 import { cloudinaryUrlDirect } from '@/lib/cloudinaryConfig'
+import {useStore} from '@/lib/store'
+import {trackingEvents} from '@/lib/trackingEvents'
 import Link from 'next/link'
 import { useCallback, useState } from 'react'
 import { twMerge } from 'tailwind-merge'
@@ -22,11 +24,13 @@ const CloudinaryImage = ({
   rounded?: boolean,
 }) => {
   const [isOpen, setIsOpen] = useState(false)
+  const store = useStore()
   const handleClick = useCallback(() => {
     if (lightbox) {
+      store.trackEvent(trackingEvents.caLightbox, {imgIntent: intent})
       setIsOpen(true)
     }
-  }, [setIsOpen, lightbox])
+  }, [setIsOpen, lightbox, store, intent])
   const handleClose = useCallback(() => {
     setIsOpen(false)
   }, [setIsOpen])

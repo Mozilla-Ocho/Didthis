@@ -449,9 +449,17 @@ class Store {
 
   async saveProject(
     project: ApiProject,
-    mode: 'new' | 'edit'
+    mode: 'new' | 'edit',
+    originalProject?: ApiProject,
   ): Promise<ApiProject> {
     if (!this.user) throw new Error('must be authed')
+    if (originalProject && originalProject.scope !== project.scope) {
+      if (project.scope === 'public') {
+        this.trackEvent(trackingEvents.caSetProjectPublic)
+      } else {
+        this.trackEvent(trackingEvents.caSetProjectPrivate)
+      }
+    }
     return apiClient.saveProject({ project }).then(wrapper => {
       this.setUser(wrapper.payload.user)
       this.trackEvent(

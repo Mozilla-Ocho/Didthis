@@ -4,6 +4,7 @@ import branding from '@/lib/branding'
 import { specialAssetIds } from '@/lib/cloudinaryConfig'
 import profileUtils from '@/lib/profileUtils'
 import { useStore } from '@/lib/store'
+import {trackingEvents} from '@/lib/trackingEvents'
 import { debounce } from 'lodash-es'
 import { action, makeAutoObservable } from 'mobx'
 import { observer } from 'mobx-react-lite'
@@ -304,6 +305,8 @@ const ImageField = observer(({ formStore }: { formStore: FormStore }) => {
               intent="secondary"
               onClick={deleteImage}
               className="grow sm:grow-0"
+              trackEvent={trackingEvents.bcRemoveImage}
+              trackEventOpts={{imgIntent:'avatar'}}
             >
               Remove
             </Button>
@@ -523,6 +526,8 @@ const UserForm = observer(() => {
             intent="secondary"
             onClick={() => store.goBack()}
             className="w-full sm:w-[150px]"
+            trackEvent={trackingEvents.bcDiscardChanges}
+            trackEventOpts={{fromPage:'userEdit'}}
           >
             Discard changes
           </Button>

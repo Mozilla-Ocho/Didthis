@@ -6,6 +6,7 @@ import branding from '@/lib/branding'
 import LogoWordmarkSvg from '@/assets/img/didthis_wordmark_light.svg'
 import Image from 'next/image'
 import { LoginButton } from './auth/LoginButton'
+import { trackingEvents } from '@/lib/trackingEvents'
 
 const AppHeader = observer(({ isThe404 }: { isThe404?: boolean }) => {
   const store = useStore()
@@ -14,7 +15,11 @@ const AppHeader = observer(({ isThe404 }: { isThe404?: boolean }) => {
       <PagePad wide noPadY>
         {store.user ? (
           <div className="flex items-center py-4">
-            <Link intent="internalNav" href="/">
+            <Link
+              intent="internalNav"
+              href="/"
+              trackEvent={trackingEvents.bcHeaderLogo}
+            >
               <h1 className="text-3xl leading-none">
                 <Image src={LogoWordmarkSvg} alt={branding.productName} />
               </h1>
@@ -25,7 +30,11 @@ const AppHeader = observer(({ isThe404 }: { isThe404?: boolean }) => {
           </div>
         ) : (
           <div className="flex items-center py-4 justify-center md:justify-full">
-            <Link intent="internalNav" href="/">
+            <Link
+              intent="internalNav"
+              href="/"
+              trackEvent={trackingEvents.bcHeaderLogo}
+            >
               <h1 className="text-3xl leading-none">
                 <Image src={LogoWordmarkSvg} alt={branding.productName} />
               </h1>

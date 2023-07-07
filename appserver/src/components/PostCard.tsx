@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite'
 import { Timestamp, CloudinaryImage, Link, Button } from './uiLib'
 import pathBuilder from '@/lib/pathBuilder'
 import LinkPreview from './LinkPreview'
+import {trackingEvents} from '@/lib/trackingEvents'
 
 const PostCard = observer(
   ({
@@ -40,6 +41,7 @@ const PostCard = observer(
                 post.projectId,
                 post.id
               )}
+              trackEvent={trackingEvents.bcEditPostFromCard}
             >
               Edit
             </Link>
