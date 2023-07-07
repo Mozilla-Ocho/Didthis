@@ -30,6 +30,14 @@ app
       })
     )
 
+    server.use((req,res,next) => {
+      if (req.hostname.match(/didthat\.app/)) {
+        res.status(404).send('404 Page Not Found')
+      } else {
+        next()
+      }
+    })
+
     const amplitudeProxy = express.Router();
     amplitudeProxy.use(
       '/amplitude', // DRY_61169 
