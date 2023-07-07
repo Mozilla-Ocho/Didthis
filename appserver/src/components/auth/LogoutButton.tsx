@@ -1,6 +1,7 @@
 import { Button } from '@/components/uiLib'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@/lib/store'
+import {trackingEvents} from '@/lib/trackingEvents'
 
 const LogoutButton = observer(
   ({
@@ -16,6 +17,9 @@ const LogoutButton = observer(
   }) => {
     const store = useStore()
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+      // TODO: does this logout event get reliably tracked? because we will
+      // reload the page after this.
+      store.trackEvent(trackingEvents.bcLogout)
       store.logOut()
       onLogout && onLogout()
     }

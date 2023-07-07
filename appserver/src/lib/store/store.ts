@@ -11,7 +11,6 @@ import { useEffect } from 'react'
 import { NextRouter } from 'next/router'
 import pathBuilder from '../pathBuilder'
 import { ValidateSignupCodeWrapper } from '../apiConstants'
-import { auth } from 'firebaseui'
 import profileUtils from '../profileUtils'
 // import { UrlMetaWrapper } from '../apiConstants'
 
@@ -21,7 +20,6 @@ type LoginErrorMode = false | '_inactive_code_'
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 let moduleGlobalFirebaseRef: any | false = false
 let moduleGlobalAmpIdentFiredForUid = ''
-let moduleGlobalAmpUrl = ''
 
 // DRY_62447 modal transition time
 const modalTransitionTime = 200
@@ -432,24 +430,33 @@ class Store {
     this.generalError = false
   }
 
-  async savePost(post: ApiPost): Promise<ApiPost> {
+  async savePost(post: ApiPost, mode: 'new' | 'edit'): Promise<ApiPost> {
     if (!this.user) throw new Error('must be authed')
     return apiClient.savePost({ post }).then(wrapper => {
       this.setUser(wrapper.payload.user)
-      if (post.projectId === 'new') {
-        this.trackEvent(trackingEvents.caNewPostNewProj)
+      if (mode === 'new') {
+        if (post.projectId === 'new') {
+          this.trackEvent(trackingEvents.caNewPostNewProj)
+        } else {
+          this.trackEvent(trackingEvents.caNewPost)
+        }
       } else {
-        this.trackEvent(trackingEvents.caNewPost)
+        this.trackEvent(trackingEvents.edPost)
       }
       return wrapper.payload.post
     })
   }
 
-  async saveProject(project: ApiProject): Promise<ApiProject> {
+  async saveProject(
+    project: ApiProject,
+    mode: 'new' | 'edit'
+  ): Promise<ApiProject> {
     if (!this.user) throw new Error('must be authed')
     return apiClient.saveProject({ project }).then(wrapper => {
       this.setUser(wrapper.payload.user)
-      this.trackEvent(trackingEvents.caNewProject)
+      this.trackEvent(
+        mode === 'new' ? trackingEvents.caNewProject : trackingEvents.edProject
+      )
       return wrapper.payload.project
     })
   }
@@ -532,13 +539,17 @@ class Store {
       trackFields.push('slug')
     }
     trackFields.forEach(field => {
-      this.trackEvent(trackingEvents.caProfileField, {name: field})
+      this.trackEvent(trackingEvents.caProfileField, { name: field })
     })
-    if (profileUtils.hasAllFields(profile) && (userSlug || this.user.userSlug)) {
+    if (
+      profileUtils.hasAllFields(profile) &&
+      (userSlug || this.user.userSlug)
+    ) {
       this.trackEvent(trackingEvents.caProfileAll)
     }
     return apiClient.saveProfile({ profile, userSlug }).then(wrapper => {
       this.setUser(wrapper.payload)
+      this.trackEvent(trackingEvents.edProfile)
       // XXX tracking
       // this.trackEvent(trackingEvents.caNewProject)
       this.router.push(pathBuilder.user(wrapper.payload.systemSlug))

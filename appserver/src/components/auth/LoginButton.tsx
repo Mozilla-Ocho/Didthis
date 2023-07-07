@@ -1,6 +1,7 @@
 import { Button } from '@/components/uiLib'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@/lib/store'
+import {trackingEvents} from '@/lib/trackingEvents'
 
 const LoginButton = observer(
   ({
@@ -21,6 +22,7 @@ const LoginButton = observer(
       overrideCodeCheck = overrideCodeCheck || overrideCodeCheckIfNoSignupCode
     }
     const handleClick = () => {
+      store.trackEvent(trackingEvents.bcLoginSignup)
       store.launchGlobalLoginOverlay(!!overrideCodeCheck)
     }
     const defaultText = store.signupCode ? 'Create account' : 'Sign in'

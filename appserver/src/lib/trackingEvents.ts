@@ -57,9 +57,7 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   // edit actions
   edProfile: {
     eventName: 'editProfile',
-    opts: {
-      /* field */
-    },
+    opts: {},
   },
   edProject: {
     eventName: 'editProject',
@@ -86,6 +84,7 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   },
 
   // errors
+  // TODO: implement better api error handling and tracking
   apiError: {
     eventName: 'apiError',
     opts: {
