@@ -11,9 +11,11 @@ import PostForm from '@/components/forms/PostForm'
 import Breadcrumbs from '../Breadcrumbs'
 import pathBuilder from '@/lib/pathBuilder'
 import { PagePad } from '../uiLib'
+import {trackingEvents} from '@/lib/trackingEvents'
 
 const PostEditPage = observer(() => {
   const store = useStore()
+  store.useTrackedPageEvent(trackingEvents.pvEditPost)
   const router = useRouter()
   const user = store.user
   if (!user) return <NotFound>user not found</NotFound>

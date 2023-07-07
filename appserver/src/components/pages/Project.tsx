@@ -23,6 +23,7 @@ import Breadcrumbs from '../Breadcrumbs'
 import { useCallback, useState } from 'react'
 import copyToClipboard from 'copy-to-clipboard'
 import { specialAssetIds } from '@/lib/cloudinaryConfig'
+import {trackingEvents} from '@/lib/trackingEvents'
 
 const ProjectPage = observer(
   ({ targetUser }: { targetUser: ApiUser | false }) => {
@@ -30,6 +31,7 @@ const ProjectPage = observer(
     if (!targetUser) return <NotFound>user not found</NotFound>
     const router = useRouter()
     const store = useStore()
+    store.useTrackedPageEvent(trackingEvents.pvProject,{slug: targetUser.publicPageSlug})
     const [shareModalOpen, setShareModalOpen] = useState(false)
     const [sharePrivModalOpen, setSharePrivModalOpen] = useState(false)
     const [sort, setSort] = useLocalStorage<'asc' | 'desc'>(

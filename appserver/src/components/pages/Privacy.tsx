@@ -1,6 +1,10 @@
 import { PagePad } from '@/components/uiLib'
+import { useStore } from '@/lib/store'
+import { trackingEvents } from '@/lib/trackingEvents'
 
 const Privacy = () => {
+  const store = useStore()
+  store.useTrackedPageEvent(trackingEvents.pvTerms)
   return (
     <PagePad semiWide>
       <div className="prose text-md text-bodytext">

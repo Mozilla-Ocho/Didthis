@@ -1,7 +1,12 @@
-import { createContext, useContext, useState, ReactNode } from 'react'
+import {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+} from 'react'
 import { observer } from 'mobx-react-lite'
 import Store from './store'
-import {NextRouter} from 'next/router'
+import { NextRouter } from 'next/router'
 import Loading from '@/components/pages/Loading'
 
 const StoreContext = createContext<Store | null>(null)
@@ -35,7 +40,11 @@ const StoreLoadingWrapper = observer(
   ({ children }: { children: ReactNode }) => {
     const store = useStore()
     if (store.fullpageLoading)
-      return <div data-testid="fullPageLoading"><Loading/></div>
+      return (
+        <div data-testid="fullPageLoading">
+          <Loading />
+        </div>
+      )
     return (
       <div
         data-testid="storeReady"

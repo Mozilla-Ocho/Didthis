@@ -51,7 +51,7 @@ try {
 
 const userFromDbRow = (
   dbRow: UserDbRow,
-  opts: { publicFilter: boolean; includeAdminUIFields?: boolean }
+  opts: { publicFilter: boolean; includeAdminUIFields?: boolean; justCreated?: boolean }
 ): ApiUser => {
   const profile = opts.publicFilter
     ? profileUtils.privacyFilteredCopy(dbRow.profile)
@@ -78,6 +78,7 @@ const userFromDbRow = (
     user.lastWrite = dbRow.last_write_from_user || undefined
     user.updatedAt = dbRow.updated_at_millis
   }
+  if (opts.justCreated) user.justCreated = true
   return user
 }
 
@@ -160,12 +161,7 @@ const getOrCreateUser = async ({
   }
   dbRow = (await knex('users').insert(columns).returning('*'))[0] as UserDbRow
   log.serverApi('created user', dbRow.id)
-  // XXX_PORTING
-  // setReqAuthentication(req, dbRow); // have to set this early here so track event can obtain the new auth user id
-  // trackEventReqEvtOpts(req, trackingEvents.caSignup, {
-  //   signupCodeName: validCode ? validCode.name : "none",
-  // });
-  return [userFromDbRow(dbRow, { publicFilter: false }), dbRow]
+  return [userFromDbRow(dbRow, { publicFilter: false, justCreated: true }), dbRow]
 }
 
 // reads the Authorization header for the bearer token and validates it, looks

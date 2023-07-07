@@ -3,12 +3,18 @@ import { Divider, PagePad } from '@/components/uiLib'
 import ProjectList from '../ProjectList'
 import UserPreview from '../UserPreview'
 import NotFound from './NotFound'
+import { useStore } from '@/lib/store'
+import { trackingEvents } from '@/lib/trackingEvents'
 
 // TODO: rename this to NonAuthUser or something, it's shown even in auth but
 // when looking at someone else's page
 const UnauthUser = observer(
   ({ targetUser }: { targetUser: ApiUser | false }) => {
+    const store = useStore()
     if (!targetUser) return <NotFound />
+    store.useTrackedPageEvent(trackingEvents.pvUser, {
+      slug: targetUser.publicPageSlug,
+    })
     return (
       <>
         <PagePad>

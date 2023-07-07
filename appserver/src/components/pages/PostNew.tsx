@@ -7,6 +7,7 @@ import Breadcrumbs from '../Breadcrumbs'
 import { getParamString } from '@/lib/nextUtils'
 import { useRouter } from 'next/router'
 import pathBuilder from '@/lib/pathBuilder'
+import {trackingEvents} from '@/lib/trackingEvents'
 
 const NewPostPage = observer(() => {
   const store = useStore()
@@ -16,6 +17,7 @@ const NewPostPage = observer(() => {
   }
   const projPid = getParamString(router, 'projectId')
   const project = store.user.profile.projects[projPid] // possibly undef
+  store.useTrackedPageEvent(trackingEvents.pvNewPost,{newProject:projPid ? "n" : "y"})
   // note the PostForm component will look at the router path and get the
   // project id if any.
   return (

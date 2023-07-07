@@ -1,13 +1,13 @@
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@/lib/store'
 import ProjectForm from '../forms/ProjectForm'
-import LoginBouncer from '@/components/auth/LoginBouncer'
 import { PagePad } from '@/components/uiLib'
 import Breadcrumbs from '../Breadcrumbs'
+import { trackingEvents } from '@/lib/trackingEvents'
 
 const NewProjectPage = observer(() => {
   const store = useStore()
-  if (!store.user) return <LoginBouncer />
+  store.useTrackedPageEvent(trackingEvents.pvNewProject)
   return (
     <>
       <Breadcrumbs crumbs={[{ name: 'New project' }]} />

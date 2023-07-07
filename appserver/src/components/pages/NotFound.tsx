@@ -1,7 +1,11 @@
 import { PagePad } from '@/components/uiLib'
+import {useStore} from '@/lib/store'
+import {trackingEvents} from '@/lib/trackingEvents'
 import { ReactNode } from 'react'
 
 const NotFound = ({ children }: { children?: ReactNode }) => {
+  const store = useStore()
+  store.useTrackedPageEvent(trackingEvents.pvNotFound)
   return (
     <PagePad wide>
       <div className="pt-10 text-center">
