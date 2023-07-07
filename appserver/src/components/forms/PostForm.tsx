@@ -441,7 +441,7 @@ const PostForm = observer((props: Props) => {
             spinning={postStore.spinning}
             className="w-full sm:w-[150px]"
           >
-            {mode === 'new' ? 'Add' : 'Update'}
+            {mode === 'new' ? 'Add' : 'Save'}
           </Button>
           <Button
             intent="secondary"

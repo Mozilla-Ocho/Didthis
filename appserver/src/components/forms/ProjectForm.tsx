@@ -283,7 +283,7 @@ const ProjectForm = observer((props: Props) => {
             disabled={!projectStore.isPostable()}
             className="w-full sm:w-[150px]"
           >
-            {mode === 'new' ? 'Create' : 'Update'}
+            {mode === 'new' ? 'Create' : 'Save'}
           </Button>
           <Button
             intent="secondary"
