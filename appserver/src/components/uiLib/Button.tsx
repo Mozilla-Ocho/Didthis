@@ -2,7 +2,7 @@ import { ReactNode, FC } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { twMerge } from 'tailwind-merge'
 import Spinner from './Spinner'
-import {useStore} from '@/lib/store'
+import { useStore } from '@/lib/store'
 
 const buttonCVA = cva('button px-4 py-3 rounded text-sm', {
   variants: {
@@ -62,8 +62,8 @@ interface ButtonProps extends VariantProps<typeof buttonCVA> {
   className?: string
   type?: 'submit' | undefined
   onClick?: React.MouseEventHandler
-  loading?: boolean // XXX_PORTING
-  'data-testid'?: string // XXX_PORTING
+  loading?: boolean
+  'data-testid'?: string
   disabled?: boolean
   spinning?: boolean
   trackEvent?: EventSpec
@@ -78,6 +78,7 @@ const Button: FC<ButtonProps> = ({
   className,
   disabled,
   spinning,
+  loading,
   trackEvent,
   trackEventOpts,
   ...props
@@ -93,11 +94,11 @@ const Button: FC<ButtonProps> = ({
       type={bType}
       className={twMerge('relative', buttonCVA({ intent }), className)}
       onClick={ourOnClick}
-      disabled={!!disabled || !!spinning}
+      disabled={!!disabled || !!spinning || !!loading}
       {...props}
     >
-      <span className={spinning ? 'opacity-0' : ''}>{children}</span>
-      {spinning && (
+      <span className={spinning || loading ? 'opacity-0' : ''}>{children}</span>
+      {(spinning || loading) && (
         <span className="absolute top-[50%] left-[50%]">
           <span className="inline-block -translate-y-1/2 -translate-x-1/2">
             <Spinner />
