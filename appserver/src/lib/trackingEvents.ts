@@ -82,6 +82,14 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
     eventName: 'buttonClick',
     opts: { name: 'joinWaitlist' },
   },
+  bcSharePublicProject: {
+    eventName: 'buttonClick',
+    opts: { name: 'shaePublicProject' },
+  },
+  bcSharePrivateProject: {
+    eventName: 'buttonClick',
+    opts: { name: 'shaePrivateProject' },
+  },
 
   // errors
   // TODO: implement better api error handling and tracking

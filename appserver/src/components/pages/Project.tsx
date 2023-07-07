@@ -58,9 +58,11 @@ const ProjectPage = observer(
       pathBuilder.project(targetUser.publicPageSlug, project.id)
     )
     const handleSharePriv = () => {
+      store.trackEvent(trackingEvents.bcSharePrivateProject)
       setSharePrivModalOpen(true)
     }
     const handleShare = () => {
+      store.trackEvent(trackingEvents.bcSharePublicProject)
       copyToClipboard(shareUrl)
       setShareModalOpen(true)
     }
