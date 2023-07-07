@@ -169,21 +169,20 @@ const ProjectPage = observer(
             </p>
           )}
 
-          <div className="my-4 flex flex-row items-center gap-4">
+          <div className="my-4 flex flex-col sm:flex-row items-center gap-4">
             {store.user && // store.user redundant when isSelf but tsserver needs it
               isSelf && (
                 <Link
-                  className="grow basis-1 sm:grow-0 sm:basis-auto"
-                  intent="primary"
-                  href={pathBuilder.newPost(store.user.systemSlug, project.id)}
-                  trackEvent={trackingEvents.bcAddPost}
-                  trackEventOpts={{ fromPage: 'project' }}
+                  className="w-full sm:w-auto"
+                  intent="secondary"
+                  href={pathBuilder.projectEdit(store.user.systemSlug, project.id)}
+                  trackEvent={trackingEvents.bcEditProject}
                 >
-                  Add post
+                  Edit project
                 </Link>
               )}
             <Button
-              className="grow basis-1 sm:grow-0 sm:basis-auto"
+              className="w-full sm:w-auto"
               intent="secondary"
               onClick={
                 isPrivate /* tracking handled in these handler fns */
@@ -196,6 +195,21 @@ const ProjectPage = observer(
           </div>
 
           <Divider light className="my-6" />
+
+          {store.user && // store.user redundant when isSelf but tsserver needs it
+            isSelf && (
+              <div className="my-4 flex flex-row items-center gap-4">
+                <Link
+                  className="grow basis-1 sm:grow-0 sm:basis-auto"
+                  intent="primary"
+                  href={pathBuilder.newPost(store.user.systemSlug, project.id)}
+                  trackEvent={trackingEvents.bcAddPost}
+                  trackEventOpts={{ fromPage: 'project' }}
+                >
+                  Add post
+                </Link>
+              </div>
+            )}
 
           <div className="flex flex-row items-baseline gap-4 mb-4">
             <label htmlFor="block sortby">Sort by:</label>

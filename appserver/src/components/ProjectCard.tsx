@@ -1,15 +1,11 @@
 import { specialAssetIds } from '@/lib/cloudinaryConfig'
 import pathBuilder from '@/lib/pathBuilder'
-import { useStore } from '@/lib/store'
-import {trackingEvents} from '@/lib/trackingEvents'
 import { observer } from 'mobx-react-lite'
 import { Link } from './uiLib'
 import { CloudinaryImage } from './uiLib'
 
 const ProjectCard = observer(
   ({ project, targetUser }: { project: ApiProject; targetUser: ApiUser }) => {
-    const store = useStore()
-    const isSelf = store.user && store.user.id === targetUser.id
     const nUpdates = Object.keys(project.posts).length
     const hasImage = !!project.imageAssetId
     const projUrl = pathBuilder.project(targetUser.publicPageSlug, project.id)
@@ -60,21 +56,6 @@ const ProjectCard = observer(
             )}
           </p>
 
-          {isSelf && store.user && (
-            <p className="mt-4">
-              <Link
-                intent="secondary"
-                className="px-4 py-1"
-                href={pathBuilder.projectEdit(
-                  store.user.systemSlug,
-                  project.id
-                )}
-                trackEvent={trackingEvents.bcEditProjectFromCard}
-              >
-                Edit
-              </Link>
-            </p>
-          )}
         </div>
       </div>
     )

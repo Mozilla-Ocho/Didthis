@@ -127,13 +127,13 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
     eventName: 'buttonClick',
     opts: { name: 'bcSkipBlankSlate' },
   },
-  bcEditProjectFromCard: {
+  bcEditProject: {
     eventName: 'buttonClick',
-    opts: { name: 'bcEditProjectFromCard' },
+    opts: { name: 'editProject' },
   },
-  bcEditPostFromCard: {
+  bcEditPost: {
     eventName: 'buttonClick',
-    opts: { name: 'bcEditPostFromCard' },
+    opts: { name: 'bcEditPost' },
   },
   bcDiscord: {
     eventName: 'buttonClick',
