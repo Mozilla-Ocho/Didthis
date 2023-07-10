@@ -14,6 +14,7 @@ const StyledLinkPreview = ({
   urlMeta?: ApiUrlMeta
 }) => {
   /* eslint-disable @next/next/no-img-element */
+  // TODO: these don't look great when being flash-highlighted on project page
   return (
     <div className="grid grid-rows-[auto_auto] sm:grid-rows-1 sm:grid-cols-[auto_1fr] items-center border border-edges">
       <div className="text-center bg-black-100">

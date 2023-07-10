@@ -191,6 +191,7 @@ class Store {
           this.cancelGlobalLoginOverlay()
           // and switch to our own loading state
           this.setFullPageLoading(true)
+          amplitude.flush()
           firebaseUser
             .getIdToken()
             .then(idToken => apiClient.sessionLogin({ idToken }))
@@ -355,6 +356,8 @@ class Store {
     // we have to call the api to delete the cookie because it's httpOnly
     log.auth('store logOut')
     this.trackEvent(trackingEvents.bcLogout)
+    amplitude.setUserId(undefined)
+    amplitude.flush()
     return apiClient
       .sessionLogout()
       .then(() => {
