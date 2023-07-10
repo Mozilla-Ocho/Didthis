@@ -33,6 +33,7 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
     },
   },
   caLogin: { eventName: 'login', opts: {} },
+  authSession: { eventName: 'authSession', opts: {} },
   caProfileField: {
     /* fired when a user first saves any content in a given profile field, will be
      * fired once for any/all applicable fields eg bio, avatar, name, slug, etc */
@@ -49,12 +50,16 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   },
   caNewPost: {
     eventName: 'newPost',
-    opts: { /* newProject y|n, mediaType */ },
+    opts: {
+      /* newProject y|n, mediaType */
+    },
   },
   caNewProject: {
     eventName: 'newProject',
-    opts: { /* asPartOfNewPost y|n - y when created as a result of making a new
-      post with the 'create new project' option  */ },
+    opts: {
+      /* asPartOfNewPost y|n - y when created as a result of making a new
+      post with the 'create new project' option  */
+    },
   },
   caSetProjectPublic: {
     eventName: 'setProjectPublic',
@@ -94,7 +99,9 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   },
   edPost: {
     eventName: 'editPost',
-    opts: { /* mediaType */ },
+    opts: {
+      /* mediaType */
+    },
   },
 
   // button or link clicks (not necessarily resulting in a completed action)

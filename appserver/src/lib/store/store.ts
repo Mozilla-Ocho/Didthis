@@ -81,14 +81,24 @@ class Store {
         },
       })
       const pt = window.localStorage.getItem('pendingTrack')
+      // in addition to specific login or signup events, its useful in
+      // ampltidue to have a meta event that flags this session as
+      // authenticated so we can easily report on auth vs unauth session
+      // activity.
       if (pt === 'signup') {
         this.trackEvent(trackingEvents.caSignup, {
+          signupCodeName: authUser ? authUser.signupCodeName : undefined,
+        })
+        this.trackEvent(trackingEvents.authSession, {
           signupCodeName: authUser ? authUser.signupCodeName : undefined,
         })
         window.localStorage.removeItem('pendingTrack')
       }
       if (pt === 'login') {
         this.trackEvent(trackingEvents.caLogin)
+        this.trackEvent(trackingEvents.authSession, {
+          signupCodeName: authUser ? authUser.signupCodeName : undefined,
+        })
         window.localStorage.removeItem('pendingTrack')
       }
     }
