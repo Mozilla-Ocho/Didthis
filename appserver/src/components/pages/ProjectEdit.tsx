@@ -12,6 +12,7 @@ import { PagePad } from '../uiLib'
 import Breadcrumbs from '../Breadcrumbs'
 import pathBuilder from '@/lib/pathBuilder'
 import {trackingEvents} from '@/lib/trackingEvents'
+import PageTitle from '../PageTitle'
 
 const ProjectEditPage = observer(() => {
   const store = useStore()
@@ -26,6 +27,7 @@ const ProjectEditPage = observer(() => {
   if (!project) return <NotFound>project not found</NotFound>
   return (
     <>
+      <PageTitle title="Edit project" />
       <Breadcrumbs
         crumbs={[
           {

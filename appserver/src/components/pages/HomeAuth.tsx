@@ -6,12 +6,13 @@ import pathBuilder from '@/lib/pathBuilder'
 import UserPreview from '../UserPreview'
 import { useLocalStorage } from 'usehooks-ts'
 import { useEffect, useState } from 'react'
-import {trackingEvents} from '@/lib/trackingEvents'
+import { trackingEvents } from '@/lib/trackingEvents'
+import PageTitle from '../PageTitle'
 
 const HomeAuth = observer(() => {
   const store = useStore()
   const [skipBlankSlate, setSkipBlankSlate] = useLocalStorage(
-    'skipBlankSlate', // DRY_26502 
+    'skipBlankSlate', // DRY_26502
     false
   )
   const [rendered, setRendered] = useState(false)
@@ -42,7 +43,7 @@ const HomeAuth = observer(() => {
         className="grow basis-1 sm:grow-0 sm:basis-auto"
         href={pathBuilder.newPost(store.user.systemSlug)}
         trackEvent={trackingEvents.bcAddPost}
-        trackEventOpts={{fromPage:'homeAuth'}}
+        trackEventOpts={{ fromPage: 'homeAuth' }}
       >
         Add post
       </Link>
@@ -73,7 +74,9 @@ const HomeAuth = observer(() => {
         <PagePad>
           <h3 className="mt-10 mb-4">Account created!</h3>
           <p className="mb-6">
-            Let’s get started. Are you working on a hobby project right now? Click “Add post”, pick a photo from your camera roll, and start tracking your journey!
+            Let’s get started. Are you working on a hobby project right now?
+            Click “Add post”, pick a photo from your camera roll, and start
+            tracking your journey!
           </p>
           {addCreatBtns}
         </PagePad>
@@ -82,6 +85,7 @@ const HomeAuth = observer(() => {
   }
   return (
     <>
+      <PageTitle title={store.user.userSlug || store.user.profile.name} />
       <PagePad yControlOnly>
         <PagePad noPadY>
           <UserPreview user={store.user} compact={false} />

@@ -12,6 +12,7 @@ import Breadcrumbs from '../Breadcrumbs'
 import pathBuilder from '@/lib/pathBuilder'
 import { PagePad } from '../uiLib'
 import {trackingEvents} from '@/lib/trackingEvents'
+import PageTitle from '../PageTitle'
 
 const PostEditPage = observer(() => {
   const store = useStore()
@@ -27,6 +28,7 @@ const PostEditPage = observer(() => {
   if (!post) return <NotFound>post not found</NotFound>
   return (
     <>
+      <PageTitle title="Edit post" />
       <Breadcrumbs
         crumbs={[
           {

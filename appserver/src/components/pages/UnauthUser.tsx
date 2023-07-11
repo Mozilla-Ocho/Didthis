@@ -5,6 +5,7 @@ import UserPreview from '../UserPreview'
 import NotFound from './NotFound'
 import { useStore } from '@/lib/store'
 import { trackingEvents } from '@/lib/trackingEvents'
+import PageTitle from '../PageTitle'
 
 // TODO: rename this to NonAuthUser or something, it's shown even in auth but
 // when looking at someone else's page
@@ -18,6 +19,7 @@ const UnauthUser = observer(
     return (
       <>
         <PagePad>
+          <PageTitle title={targetUser.userSlug || targetUser.profile.name} />
           <UserPreview user={targetUser} compact={false} />
           <Divider light />
           <h3>Projects</h3>

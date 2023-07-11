@@ -1,12 +1,14 @@
 import { PagePad } from '@/components/uiLib'
 import { useStore } from '@/lib/store'
 import { trackingEvents } from '@/lib/trackingEvents'
+import PageTitle from '../PageTitle'
 
 const Privacy = () => {
   const store = useStore()
   store.useTrackedPageEvent(trackingEvents.pvTerms)
   return (
     <PagePad semiWide>
+      <PageTitle title="Privacy Notice" />
       <div className="prose text-md text-bodytext">
         <h4>Privacy Notice</h4>
         <p><em>Last Updated: June 29, 2023.</em><br/><br/></p>

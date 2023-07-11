@@ -23,6 +23,7 @@ import { useCallback, useEffect, useState } from 'react'
 import copyToClipboard from 'copy-to-clipboard'
 import { specialAssetIds } from '@/lib/cloudinaryConfig'
 import { trackingEvents } from '@/lib/trackingEvents'
+import PageTitle from '../PageTitle'
 
 const ProjectPage = observer(
   ({ targetUser }: { targetUser: ApiUser | false }) => {
@@ -87,6 +88,7 @@ const ProjectPage = observer(
     }
     return (
       <>
+        <PageTitle title={project.title} />
         <Modal
           isOpen={shareModalOpen}
           srTitle="Link copied"

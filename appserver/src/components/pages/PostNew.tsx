@@ -8,6 +8,7 @@ import { getParamString } from '@/lib/nextUtils'
 import { useRouter } from 'next/router'
 import pathBuilder from '@/lib/pathBuilder'
 import {trackingEvents} from '@/lib/trackingEvents'
+import PageTitle from '../PageTitle'
 
 const NewPostPage = observer(() => {
   const store = useStore()
@@ -22,6 +23,7 @@ const NewPostPage = observer(() => {
   // project id if any.
   return (
     <>
+      <PageTitle title="New post" />
       <Breadcrumbs
         crumbs={[
           project
