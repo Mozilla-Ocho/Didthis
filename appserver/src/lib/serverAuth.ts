@@ -23,16 +23,52 @@ export const signupCodes: {
     name: 'intshare1',
     envNames: ['dev', 'test', 'prod'],
   },
-  b469b534: {
+  '011bda94': {
     active: true,
-    value: 'b469b534',
-    name: 'campaign1',
+    value: '011bda94',
+    name: 'ads-knitting',
+    envNames: ['prod'],
+  },
+  d887cd80: {
+    active: true,
+    value: 'd887cd80',
+    name: 'ads-woodworking',
+    envNames: ['prod'],
+  },
+  '45ab2f54': {
+    active: true,
+    value: '45ab2f54',
+    name: 'ads-cooking',
+    envNames: ['prod'],
+  },
+  eedc6995: {
+    active: true,
+    value: 'eedc6995',
+    name: 'ads-hiking',
+    envNames: ['prod'],
+  },
+  fc7e57f7: {
+    active: true,
+    value: 'fc7e57f7',
+    name: 'ads-fixing',
+    envNames: ['prod'],
+  },
+  '37deb374': {
+    active: true,
+    value: '37deb374',
+    name: 'ads-travel',
+    envNames: ['prod'],
+  },
+  '6fda0933': {
+    active: true,
+    value: '6fda0933',
+    name: 'ads-pottery',
     envNames: ['prod'],
   },
 }
 
 export const getValidCodeInfo = (userCode: string | undefined | false) => {
-  const badCode = {active: false, value: userCode, name: '', envNames:[]}
+  const badCode = { active: false, value: userCode, name: '', envNames: [] }
   if (!userCode) return badCode
   const check = signupCodes[userCode]
   if (!check) return badCode
@@ -55,7 +91,11 @@ try {
 
 const userFromDbRow = (
   dbRow: UserDbRow,
-  opts: { publicFilter: boolean; includeAdminUIFields?: boolean; justCreated?: boolean }
+  opts: {
+    publicFilter: boolean
+    includeAdminUIFields?: boolean
+    justCreated?: boolean
+  }
 ): ApiUser => {
   const profile = opts.publicFilter
     ? profileUtils.privacyFilteredCopy(dbRow.profile)
@@ -165,7 +205,10 @@ const getOrCreateUser = async ({
   }
   dbRow = (await knex('users').insert(columns).returning('*'))[0] as UserDbRow
   log.serverApi('created user', dbRow.id)
-  return [userFromDbRow(dbRow, { publicFilter: false, justCreated: true }), dbRow]
+  return [
+    userFromDbRow(dbRow, { publicFilter: false, justCreated: true }),
+    dbRow,
+  ]
 }
 
 // reads the Authorization header for the bearer token and validates it, looks
