@@ -8,6 +8,7 @@ import { useLocalStorage } from 'usehooks-ts'
 import { useEffect, useState } from 'react'
 import { trackingEvents } from '@/lib/trackingEvents'
 import PageTitle from '../PageTitle'
+import OgMeta from '../OgMeta'
 
 const HomeAuth = observer(() => {
   const store = useStore()
@@ -83,9 +84,12 @@ const HomeAuth = observer(() => {
       </>
     )
   }
+  const ugcUsername = store.user.userSlug || store.user.profile.name
+  const title = (ugcUsername ? ugcUsername+'’s projects' : 'My projects')
   return (
     <>
-      <PageTitle title={store.user.userSlug || store.user.profile.name} />
+      <PageTitle title={title} />
+      <OgMeta user={store.user} />
       <PagePad yControlOnly>
         <PagePad noPadY>
           <UserPreview user={store.user} compact={false} />

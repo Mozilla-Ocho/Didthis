@@ -6,6 +6,7 @@ import NotFound from './NotFound'
 import { useStore } from '@/lib/store'
 import { trackingEvents } from '@/lib/trackingEvents'
 import PageTitle from '../PageTitle'
+import OgMeta from '../OgMeta'
 
 // TODO: rename this to NonAuthUser or something, it's shown even in auth but
 // when looking at someone else's page
@@ -19,6 +20,7 @@ const UnauthUser = observer(
     return (
       <>
         <PagePad>
+          <OgMeta user={targetUser} />
           <PageTitle title={targetUser.userSlug || targetUser.profile.name} />
           <UserPreview user={targetUser} compact={false} />
           <Divider light />

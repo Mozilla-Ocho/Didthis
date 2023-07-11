@@ -24,6 +24,7 @@ import copyToClipboard from 'copy-to-clipboard'
 import { specialAssetIds } from '@/lib/cloudinaryConfig'
 import { trackingEvents } from '@/lib/trackingEvents'
 import PageTitle from '../PageTitle'
+import OgMeta from '../OgMeta'
 
 const ProjectPage = observer(
   ({ targetUser }: { targetUser: ApiUser | false }) => {
@@ -89,6 +90,7 @@ const ProjectPage = observer(
     return (
       <>
         <PageTitle title={project.title} />
+        <OgMeta user={targetUser} project={project} />
         <Modal
           isOpen={shareModalOpen}
           srTitle="Link copied"

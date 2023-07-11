@@ -7,7 +7,7 @@ const specialAssetIds = {
   // images in the app via these ID constants.
   // TODO: can we mark these as undeletable somehow in cloudinary?
   mockAvatarID: 'cypress-avatar-dont-delete',
-  defaultAvatarID: 'avatars/default_avatar_ollijf.svg',
+  defaultAvatarID: 'avatars/default_avatar_ollijf',
   placholderProjectID: 'projects/us5yrx4knugpg6ym4wjl',
 }
 
@@ -121,7 +121,7 @@ const cloudinaryUrlDirect = (
    * c_limit,h_NNN,w_NNN out of the url-gen library from any docs... */
   const config = getCloudinaryConfig(intent)
   // note the assetId already contains the folder path
-  const url = `https://res.cloudinary.com/${config.cloudName}/image/upload/c_limit,h_2000,w_2000/v1/${assetId}`
+  const url = `https://res.cloudinary.com/${config.cloudName}/image/upload/c_limit,h_2000,w_2000,f_jpg,q_auto/v1/${assetId}`
   return url
 }
 

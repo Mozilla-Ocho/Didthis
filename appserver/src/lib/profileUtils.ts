@@ -229,6 +229,17 @@ const hasAllFields = (a: ApiProfile) => {
   return !!(a.imageAssetId && a.bio && a.name && hasAnySocialUrls(a))
 }
 
+const mostRecentPublicProjectImageAssetId = (p: ApiProfile) : string | undefined=> {
+  const projects = Object.values(p.projects)
+  projects.sort((a, b) => b.createdAt - a.createdAt)
+  for (const proj of projects) {
+    if (proj.scope === 'public' && proj.imageAssetId) {
+      return proj.imageAssetId
+    }
+  }
+  return undefined
+}
+
 const profileUtils = {
   mkDefaultProfile,
   privacyFilteredCopy,
@@ -241,6 +252,7 @@ const profileUtils = {
   hasAnySocialUrls,
   newFieldCompare,
   hasAllFields,
+  mostRecentPublicProjectImageAssetId,
 }
 
 export default profileUtils
