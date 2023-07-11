@@ -224,10 +224,10 @@ const ProjectPage = observer(
                 className="text-bodytext"
               >
                 <option key="desc" value="desc">
-                  newest first
+                  Newest first
                 </option>
                 <option key="asc" value="asc">
-                  oldest first
+                  Oldest first
                 </option>
               </Select>
             </div>

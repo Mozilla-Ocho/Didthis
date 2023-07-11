@@ -212,13 +212,13 @@ const ProjectForm = observer((props: Props) => {
               className="mt-2 text-bodytext"
             >
               <option key="active" value="active">
-                active
+                Active
               </option>
               <option key="complete" value="complete">
-                complete
+                Complete
               </option>
               <option key="paused" value="paused">
-                paused
+                Paused
               </option>
             </Select>
           </label>

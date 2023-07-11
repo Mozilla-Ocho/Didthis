@@ -97,7 +97,7 @@ const HomeAuth = observer(() => {
         <Divider light className="my-10" />
         <PagePad wide noPadY>
           <div>
-            <h3 className="my-2">Your projects:</h3>
+            <h3 className="my-2">Your projects</h3>
             {addCreatBtns}
             <ProjectList targetUser={store.user} />
           </div>

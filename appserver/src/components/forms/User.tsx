@@ -233,7 +233,7 @@ class FormStore {
         return 'a-z, 0-9, dashes and underscores only'
       }
       if (err === 'ERR_SLUG_UNAVAILABLE') {
-        return 'unavailable'
+        return 'Unavailable'
       }
     }
     if (
@@ -255,7 +255,7 @@ class FormStore {
         return 'a-z, 0-9, dashes and underscores only'
       }
       if (err === 'ERR_SLUG_UNAVAILABLE') {
-        return 'unavailable'
+        return 'Unavailable'
       }
     }
     return false
@@ -407,9 +407,9 @@ const UserForm = observer(() => {
               touched={formStore.slugTouched}
               maxLen={profileUtils.maxChars.slug}
               minLen={profileUtils.minChars.slug}
-              greenText={formStore.slugGreen() ? 'available' : undefined}
+              greenText={formStore.slugGreen() ? 'Available' : undefined}
               checkingText={
-                formStore.checkingSlug ? 'checking availability...' : ''
+                formStore.checkingSlug ? 'Checking availability...' : ''
               }
             />
           </label>

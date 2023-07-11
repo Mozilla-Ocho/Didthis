@@ -74,7 +74,7 @@ const UserPreview = observer(
           user.profile.socialUrls && (
             <>
               <p className="text-form-labels text-sm mt-4 mb-0">Find me on:</p>
-              <div className="flex flex-row gap-8 justify-between w-[90%]">
+              <div className="flex flex-row gap-8 w-[90%]">
                 {user.profile.socialUrls.twitter && (
                   <p className="">
                     <Link external href={user.profile.socialUrls.twitter}>
