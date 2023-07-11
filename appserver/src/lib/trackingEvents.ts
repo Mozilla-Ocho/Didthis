@@ -8,6 +8,8 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   // pageviews
   // will also contain isAuthed:y|n, slug:string
   pvHomeUnauth: { eventName: 'pageview', opts: { name: 'homeUnauth' } },
+  validCodeHomeUnauth: { eventName: 'validCodeHomeUnauth', opts: { name:
+    'validCodeHomeUnauth', /* signupCodeName */ } },
   pvHomeAuth: { eventName: 'pageview', opts: { name: 'homeAuth' } },
   pvUser: { eventName: 'pageview', opts: { name: 'user' } },
   pvUnsolicited: { eventName: 'pageview', opts: { name: 'unsolicited' } },

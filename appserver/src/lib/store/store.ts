@@ -18,7 +18,6 @@ type LoginErrorMode = false | '_inactive_code_'
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 let moduleGlobalFirebaseRef: any | false = false
-let moduleGlobalAmpIdentFiredForUid = ''
 
 // DRY_62447 modal transition time
 const modalTransitionTime = 200
@@ -89,6 +88,7 @@ class Store {
         this.trackEvent(trackingEvents.authSession, {
           signupCodeName: authUser ? authUser.signupCodeName : undefined,
         })
+        this.setAmplitudeUserAttrs()
         window.localStorage.removeItem('pendingTrack')
       }
       if (pt === 'login') {
@@ -96,6 +96,7 @@ class Store {
         this.trackEvent(trackingEvents.authSession, {
           signupCodeName: authUser ? authUser.signupCodeName : undefined,
         })
+        this.setAmplitudeUserAttrs()
         window.localStorage.removeItem('pendingTrack')
       }
     }
@@ -227,6 +228,7 @@ class Store {
             .then(wrapper => {
               log.readiness('acquired getMe user after firebase auth')
               this.setUser(wrapper.payload)
+              this.setAmplitudeUserAttrs()
               // because we're about to reload and can't trust the amplitude
               // stuff to finish, we stash the tracking intent in localstorage
               // and do it on the next page render. (does amplitude sdk do that
@@ -334,22 +336,24 @@ class Store {
         window.history.replaceState({}, '', url.toString())
         this.signupCodeInfo = false
       }
-      if (x.signupCodeName) {
-        if (moduleGlobalAmpIdentFiredForUid !== x.id) {
-          // for now the store gets recreated a lot, setuser gets called a lot,
-          // don't want to spam the amplitude events.
-          moduleGlobalAmpIdentFiredForUid = x.id
-          // if the user has a signup code, make sure it's set in the amplitude user properties
-          log.tracking('identify() signupCode')
-          const identifyOps = new amplitude.Identify()
-          identifyOps.setOnce('signupCodeName', x.signupCodeName)
-          identifyOps.setOnce('hasSignupCode', '1')
-          amplitude.identify(identifyOps)
-        }
-      }
     } else {
       log.auth('store clearing user')
     }
+  }
+
+  setAmplitudeUserAttrs() {
+    if (!this.user) return false
+    const identifyOps = new amplitude.Identify()
+    if (this.user.signupCodeName) {
+      // if the user has a signup code, make sure it's set in the amplitude user properties
+      log.tracking('identify() signupCode')
+      identifyOps.setOnce('signupCodeName', this.user.signupCodeName)
+      identifyOps.setOnce('hasSignupCode', '1')
+    }
+    log.tracking('identify() slugs')
+    identifyOps.setOnce('systemSlug', this.user.systemSlug)
+    if (this.user.userSlug) identifyOps.set('userSlug', this.user.userSlug)
+    amplitude.identify(identifyOps)
   }
 
   async logOut() {
@@ -578,6 +582,7 @@ class Store {
       this.setUser(wrapper.payload)
       this.trackEvent(trackingEvents.edProfile)
       this.router.push(pathBuilder.user(wrapper.payload.systemSlug))
+      this.setAmplitudeUserAttrs()
       // return wrapper.payload
     })
   }

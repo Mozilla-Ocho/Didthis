@@ -1,4 +1,3 @@
-
 import { LoginButton } from '@/components/auth/LoginButton'
 import AppHeader from '@/components/AppHeader'
 import AppFooter from '@/components/AppFooter'
@@ -9,13 +8,24 @@ import worksHobby from '@/assets/img/works-with-any-hobby-img-desktop.png'
 import shareCelebDesktop from '@/assets/img/share-and-celebrate-desktop-crop.png'
 import shareCelebMobile from '@/assets/img/share-and-celebrate-img-mobile-crop.png'
 import Image from 'next/image'
-import {useStore} from '@/lib/store'
-import {trackingEvents} from '@/lib/trackingEvents'
+import { useStore } from '@/lib/store'
+import { trackingEvents } from '@/lib/trackingEvents'
+import { useEffect } from 'react'
 
 // DRY_20334 outer page width styles
 const HomeUnauth = () => {
   const store = useStore()
   store.useTrackedPageEvent(trackingEvents.pvHomeUnauth)
+  useEffect(() => {
+    // special tracking event for campaign conversion, if user viewed unauth
+    // landing page unauth with a valid sign up code, mark that, and we'll
+    // put it in a funnel with a signup (or authSession) event.
+    if (store.signupCodeInfo && store.signupCodeInfo.active) {
+      store.trackEvent(trackingEvents.validCodeHomeUnauth, {
+        signupCodeName: store.signupCodeInfo.name,
+      })
+    }
+  })
 
   const contentColX = 'max-w-[1280px] mx-auto text-center'
   const chunks = 'mx-auto max-w-[580px] flex flex-col items-center'
@@ -62,7 +72,7 @@ const HomeUnauth = () => {
         <div className="bg-yellow-home-light">
           <div className={contentColX + ' pt-10 pb-16 px-8'}>
             <div className="md:max-w-[1000px] px-4 md:px-10 mx-auto">
-              <h2 className={h2text + " mb-8"}>How it works</h2>
+              <h2 className={h2text + ' mb-8'}>How it works</h2>
 
               <div className={flexPairRev}>
                 <div className={howWorksImgCont}>
