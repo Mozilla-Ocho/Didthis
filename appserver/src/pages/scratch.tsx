@@ -24,15 +24,12 @@ const Scratch = observer(() => {
 
 const Wrapper = ({
   authUser,
-  signupCode,
 }: {
   authUser: ApiUser | false
-  signupCode: string | false
 }) => {
   return (
     <DefaultLayout
       authUser={authUser}
-      signupCode={signupCode}
     >
       <Scratch />
     </DefaultLayout>

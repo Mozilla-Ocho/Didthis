@@ -45,13 +45,13 @@ const Inner = observer(
 
 export default function DefaultLayout({
   authUser,
-  signupCode,
+  signupCodeInfo,
   children,
   unauthHomepage,
   isThe404,
 }: {
   authUser: ApiUser | false
-  signupCode: false | string
+  signupCodeInfo?: false | ApiSignupCodeInfo
   children: ReactNode // ReactNode not ReactElement
   unauthHomepage?: boolean
   isThe404?: boolean
@@ -60,7 +60,7 @@ export default function DefaultLayout({
   return (
     <div id={appRootDivId}>
       <Head><title>{branding.productName}</title></Head>
-      <StoreWrapper authUser={authUser} signupCode={signupCode} router={router}>
+      <StoreWrapper authUser={authUser} signupCodeInfo={signupCodeInfo || false} router={router}>
         <Inner isThe404={isThe404} unauthHomepage={unauthHomepage}>{children}</Inner>
       </StoreWrapper>
     </div>

@@ -9,7 +9,7 @@ const The404 = ({}) => {
     <DefaultLayout
       isThe404
       authUser={false}
-      signupCode={''}
+      signupCodeInfo={false}
     >
       <NotFound />
     </DefaultLayout>

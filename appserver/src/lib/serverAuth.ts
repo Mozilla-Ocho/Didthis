@@ -9,32 +9,36 @@ import { sessionCookieName } from './apiConstants'
 import { getParamString } from './nextUtils'
 
 export const signupCodes: {
-  [key: string]: { active: boolean; name: string; envNames: string[] }
+  [key: string]: ApiSignupCodeInfo
 } = {
   '1234': {
     active: true,
+    value: '1234',
     name: 'dev',
     envNames: ['dev'],
   },
   a6fd47b9: {
     active: true,
+    value: 'a6fd47b9',
     name: 'intshare1',
     envNames: ['dev', 'test', 'prod'],
   },
   b469b534: {
     active: true,
+    value: 'b469b534',
     name: 'campaign1',
     envNames: ['prod'],
   },
 }
 
 export const getValidCodeInfo = (userCode: string | undefined | false) => {
-  if (!userCode) return undefined
+  const badCode = {active: false, value: userCode, name: '', envNames:[]}
+  if (!userCode) return badCode
   const check = signupCodes[userCode]
-  if (!check) return undefined
-  if (!check.active) return undefined
+  if (!check) return badCode
+  if (!check.active) return badCode
   if (check.envNames.indexOf(process.env.NEXT_PUBLIC_ENV_NAME as string) < 0)
-    return undefined
+    return badCode
   return check
 }
 
@@ -120,16 +124,16 @@ const getOrCreateUser = async ({
   let dbRow = (await knex('users').where('id', id).first()) as
     | UserDbRow
     | undefined
-  const validCode = getValidCodeInfo(signupCode)
+  const codeInfo = getValidCodeInfo(signupCode)
   if (dbRow) {
     // found
-    if (validCode && !dbRow.signup_code_name) {
+    if (codeInfo.active && !dbRow.signup_code_name) {
       // link the user to the valid sign up code present on the request if they
       // don't have one.
       dbRow = (
         await knex('users')
           .update({
-            signup_code_name: validCode.name,
+            signup_code_name: codeInfo.name,
             updated_at_millis: millis,
             last_write_from_user: millis,
             last_read_from_user: millis,
@@ -151,7 +155,7 @@ const getOrCreateUser = async ({
     user_slug: null,
     user_slug_lc: null,
     profile: profileUtils.mkDefaultProfile(),
-    signup_code_name: validCode ? validCode.name : null,
+    signup_code_name: codeInfo && codeInfo.active ? codeInfo.name : null,
     created_at_millis: millis,
     updated_at_millis: millis,
     last_write_from_user: millis,

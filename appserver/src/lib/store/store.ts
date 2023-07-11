@@ -1,4 +1,4 @@
-import { action, makeAutoObservable } from 'mobx'
+import { action, makeAutoObservable, toJS } from 'mobx'
 import apiClient from '@/lib/apiClient'
 import { amplitudeProxyEndpoint } from '@/lib/apiCore'
 import log from '@/lib/log'
@@ -10,7 +10,6 @@ import { trackingEvents } from '@/lib/trackingEvents'
 import { useEffect } from 'react'
 import { NextRouter } from 'next/router'
 import pathBuilder from '../pathBuilder'
-import { ValidateSignupCodeWrapper } from '../apiConstants'
 import profileUtils from '../profileUtils'
 // import { UrlMetaWrapper } from '../apiConstants'
 
@@ -32,11 +31,10 @@ class Store {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   firebaseRefNonReactive: undefined | any = undefined // nonreactive
   hasFirebaseRef = false // reactive
-  signupCode: false | string = false
+  signupCodeInfo: false | ApiSignupCodeInfo = false
   trackedPageEvent: false | EventSpec = false
   generalError: GeneralError = false
   firebaseModalOpen = false
-  loginButtonsSpinning = false
   loginErrorMode: LoginErrorMode = false
   fullpageLoading = false // used when signing in
   confirmingDelete:
@@ -46,15 +44,14 @@ class Store {
   showConfirmDeleteModal = false
   router: NextRouter
   debugObjId = (Math.random() + '').replace('0.', '')
-  stashedCodeValid: ValidateSignupCodeWrapper | false = false
 
   constructor({
     authUser,
-    signupCode,
+    signupCodeInfo,
     router,
   }: {
     authUser?: ApiUser | false
-    signupCode?: false | string
+    signupCodeInfo?: false | ApiSignupCodeInfo
     router: NextRouter
   }) {
     this.router = router
@@ -69,7 +66,7 @@ class Store {
       },
       { autoBind: true }
     )
-    if (signupCode) this.setSignupCode(signupCode)
+    if (signupCodeInfo) this.setSignupCodeInfo(signupCodeInfo)
     if (authUser) this.setUser(authUser)
     if (typeof window !== 'undefined') {
       amplitude.init(process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY as string, '', {
@@ -105,8 +102,24 @@ class Store {
     log.debug('store constructed. id=', this.debugObjId)
   }
 
-  setSignupCode(code: string | false) {
-    this.signupCode = code
+  setSignupCodeInfo(info: ApiSignupCodeInfo | false) {
+    this.signupCodeInfo = info
+    if (info && typeof window !== 'undefined') {
+      window.sessionStorage.setItem('signupCodeInfo', JSON.stringify(toJS(this.signupCodeInfo)))
+    }
+  }
+
+  loadSignupInfoFromSessionStorage() {
+    // called on useeffect so as not to break SSR
+    if (typeof window !== 'undefined') {
+      try {
+        const json = window.sessionStorage.getItem('signupCodeInfo')
+        if (json) {
+          const info = JSON.parse(json) as ApiSignupCodeInfo
+          this.signupCodeInfo = info
+        }
+      } catch(e) { }
+    }
   }
 
   // {{{ auth
@@ -208,7 +221,9 @@ class Store {
             // the GET me call here needs the signup code because it will
             // actually auto-vivify the user and register the signup event in
             // amplitude, which we want to associated with the code.
-            .then(() => apiClient.getMe({ signupCode: this.signupCode }))
+            .then(() => apiClient.getMe({
+              signupCode: this.signupCodeInfo ? this.signupCodeInfo.value : false
+            }))
             .then(wrapper => {
               log.readiness('acquired getMe user after firebase auth')
               this.setUser(wrapper.payload)
@@ -255,7 +270,16 @@ class Store {
   launchGlobalLoginOverlay(overrideCodeCheck: boolean) {
     this.trackEvent(trackingEvents.bcLoginSignup)
     this.loginErrorMode = false
+    console.log("signupCodeInfo",this.signupCodeInfo)
     // DRY_47693 signup code logic
+    if (this.signupCodeInfo === false) {
+      // with no code present, we don't show any special case ui, we just let
+      // them sign in and if they sign up for a new account, they'll land on
+      // an unsolicited user page.
+      // log.debug('code is falsy so just open modal')
+      this.firebaseModalOpen = true
+      return
+    }
     if (overrideCodeCheck) {
       // when overrideCodeCheck is true, we found the signupCode was invalid
       // but presented the user with a "login with existing account" button.
@@ -266,29 +290,21 @@ class Store {
       this.firebaseModalOpen = true
       return
     }
-    if (this.signupCode === false) {
-      // with no code present, we don't show any special case ui, we just let
-      // them sign in and if they sign up for a new account, they'll land on
-      // an unsolicited user page.
-      // log.debug('code is falsy so just open modal')
-      this.firebaseModalOpen = true
-      return
-    }
-    this.loginButtonsSpinning = true
 
-    if (this.stashedCodeValid) {
-      // TODO: okay get this, totally weird bug: if i render the
-      // StyledFirebaseAuth UI (see LoginGlobalOverlay) on a promise handler
-      // after an API call (the call to validate the signup code) that works
-      // ONCE and ONLY ONCE. if you close the modal, then click the button
-      // again, the UI makes this wierd full page content flash and then
-      // vanishes. however, if i launch the auth modal synchronously with the
-      // button click, it can be opened/closed repeatedly and indefinitely.
-      // SOOOO, i'm doing it async the first time and then stashing the api
-      // call so that the next time, it can be sync with the button click. this
-      // is some insane weird SPA magic voodoo bug stuff.  took hours to
-      // meticulously narrow down that this was the issue.
-      if (this.stashedCodeValid.payload.active) {
+    // TODO: okay get this, totally weird bug: if i render the
+    // StyledFirebaseAuth UI (see LoginGlobalOverlay) on a promise handler
+    // after an API call (the call to validate the signup code) that works
+    // ONCE and ONLY ONCE. if you close the modal, then click the button
+    // again, the UI makes this wierd full page content flash and then
+    // vanishes. however, if i launch the auth modal synchronously with the
+    // button click, it can be opened/closed repeatedly and indefinitely.
+    // SOOOO, i'm doing it async the first time and then stashing the api
+    // call so that the next time, it can be sync with the button click. this
+    // is some insane weird SPA magic voodoo bug stuff.  took hours to
+    // meticulously narrow down that this was the issue.
+
+    if (this.signupCodeInfo) {
+      if (this.signupCodeInfo.active) {
         this.firebaseModalOpen = true
         return
       } else {
@@ -296,36 +312,11 @@ class Store {
         return
       }
     }
-    apiClient
-      .validateSignupCode({ code: this.signupCode || '' })
-      .then(
-        action(res => {
-          // log.debug('validate code result',res)
-          this.loginButtonsSpinning = false
-          if (res.payload.active) {
-            this.stashedCodeValid = res
-            // log.debug('active, open the modal')
-            this.firebaseModalOpen = true
-          } else if (res.payload.active === false) {
-            this.stashedCodeValid = res
-            // log.debug('inactive/bad, open the error modal')
-            this.loginErrorMode = '_inactive_code_'
-          } else {
-            log.error('unexpected data from validation api', res)
-            this.setGeneralError('_api_fail_')
-          }
-        })
-      )
-      .catch(e => {
-        log.error('api fail on validate code', e)
-        this.setGeneralError('_api_fail_')
-      })
   }
 
   cancelGlobalLoginOverlay() {
     this.firebaseModalOpen = false
     this.loginErrorMode = false
-    this.loginButtonsSpinning = false
   }
 
   setUser(x: ApiUser | false) {
@@ -336,13 +327,12 @@ class Store {
       amplitude.setUserId(x.id)
       // DRY_47693 signup code logic
       // if we have a signup code on the url, clear it
-      if (this.signupCode && typeof window !== 'undefined') {
+      if (this.signupCodeInfo && typeof window !== 'undefined') {
         log.location('removing signupCode from url')
         const url = new URL(window.location.toString())
         url.searchParams.delete('signupCode')
-        // XXX_PORTING
         window.history.replaceState({}, '', url.toString())
-        this.signupCode = false
+        this.signupCodeInfo = false
       }
       if (x.signupCodeName) {
         if (moduleGlobalAmpIdentFiredForUid !== x.id) {

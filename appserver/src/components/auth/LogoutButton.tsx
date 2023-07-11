@@ -16,7 +16,7 @@ const LogoutButton = observer(
     'data-testid'?: string
   }) => {
     const store = useStore()
-    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleClick = () => {
       // TODO: does this logout event get reliably tracked? because we will
       // reload the page after this.
       store.trackEvent(trackingEvents.bcLogout)
@@ -28,7 +28,6 @@ const LogoutButton = observer(
       <Button
         onClick={handleClick}
         intent={intent}
-        loading={store.loginButtonsSpinning}
         data-testid={dataTestid || 'loginButton'}
       >
         {text || defaultText}

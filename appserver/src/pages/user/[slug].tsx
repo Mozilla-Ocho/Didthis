@@ -8,15 +8,13 @@ import pathBuilder from '@/lib/pathBuilder'
 
 const Wrapper = ({
   authUser,
-  signupCode,
   targetUser,
 }: {
   authUser: ApiUser | false
-  signupCode: string | false
   targetUser: ApiUser | false
 }) => {
   return (
-    <DefaultLayout authUser={authUser} signupCode={signupCode}>
+    <DefaultLayout authUser={authUser} >
       {authUser && targetUser && authUser.id === targetUser.id ? (
         <HomeAuth />
       ) : (

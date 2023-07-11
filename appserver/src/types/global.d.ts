@@ -14,6 +14,13 @@ type ApiUrlMeta = {
   imageMeta?: CldImageMetaUrl
 }
 
+type ApiSignupCodeInfo = {
+  active: boolean;
+  value: string;
+  name: string;
+  envNames: string[]
+}
+
 type ApiUser = {
   id: ApiUserId
   email: string

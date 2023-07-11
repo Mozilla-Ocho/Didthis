@@ -5,8 +5,6 @@ import {trackingEvents} from '@/lib/trackingEvents'
 
 const LoginButton = observer(
   ({
-    overrideCodeCheck,
-    overrideCodeCheckIfNoSignupCode,
     intent,
     text,
     'data-testid': dataTestid,
@@ -18,19 +16,15 @@ const LoginButton = observer(
     'data-testid'?: string
   }) => {
     const store = useStore()
-    if (!store.signupCode) {
-      overrideCodeCheck = overrideCodeCheck || overrideCodeCheckIfNoSignupCode
-    }
     const handleClick = () => {
       store.trackEvent(trackingEvents.bcLoginSignup)
-      store.launchGlobalLoginOverlay(!!overrideCodeCheck)
+      store.launchGlobalLoginOverlay(false)
     }
-    const defaultText = store.signupCode ? 'Create account' : 'Sign in'
+    const defaultText = store.signupCodeInfo ? 'Create account' : 'Sign in'
     return (
       <Button
         onClick={handleClick}
         intent={intent}
-        loading={store.loginButtonsSpinning}
         data-testid={dataTestid || 'loginButton'}
       >
         {text || defaultText}

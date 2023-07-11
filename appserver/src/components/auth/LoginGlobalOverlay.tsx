@@ -75,7 +75,6 @@ const LoginGlobalOverlay = observer(() => {
           <Button
             intent="primary"
             className="w-full mt-4"
-            loading={store.loginButtonsSpinning}
             onClick={() => store.launchGlobalLoginOverlay(true)}
           >
             Log in with existing account

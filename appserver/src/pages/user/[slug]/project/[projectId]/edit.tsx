@@ -4,15 +4,12 @@ import ProjectEditPage from '@/components/pages/ProjectEdit'
 
 const Wrapper = ({
   authUser,
-  signupCode,
 }: {
   authUser: ApiUser | false
-  signupCode: string | false
 }) => {
   return (
     <DefaultLayout
       authUser={authUser}
-      signupCode={signupCode}
     >
       <ProjectEditPage />
     </DefaultLayout>

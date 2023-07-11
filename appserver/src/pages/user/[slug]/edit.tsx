@@ -5,13 +5,11 @@ import { GetServerSidePropsContext } from 'next'
 
 const Wrapper = ({
   authUser,
-  signupCode,
 }: {
   authUser: ApiUser | false
-  signupCode: string | false
 }) => {
   return (
-    <DefaultLayout authUser={authUser} signupCode={signupCode}>
+    <DefaultLayout authUser={authUser} >
       <UserEditPage />
     </DefaultLayout>
   )
