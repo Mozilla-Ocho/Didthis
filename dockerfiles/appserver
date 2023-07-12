@@ -57,6 +57,10 @@ COPY appserver /appserver
 
 WORKDIR /appserver
 
+# TODO: best practice is not to bake secrets into docker files, however, our
+# docker repo is private to the GCP project and that's good enough for now
+# until i can work out an overall better environment and secret management
+# approach.
 ARG CLOUDINARY_JSON_SECRET_B64
 ENV CLOUDINARY_JSON_SECRET_B64=$CLOUDINARY_JSON_SECRET_B64
 ARG ZYTE_SPLASH_USERNAME
@@ -67,6 +71,8 @@ ARG NEXT_PUBLIC_API_ENDPOINT
 ENV NEXT_PUBLIC_API_ENDPOINT=$NEXT_PUBLIC_API_ENDPOINT
 ARG NEXT_PUBLIC_AMPLITUDE_API_KEY
 ENV NEXT_PUBLIC_AMPLITUDE_API_KEY=$NEXT_PUBLIC_AMPLITUDE_API_KEY
+ARG SESSION_COOKIE_SECRET
+ENV SESSION_COOKIE_SECRET=$SESSION_COOKIE_SECRET
 
 # build next.js app in production mode
 RUN yarn next build

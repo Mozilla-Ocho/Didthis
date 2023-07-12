@@ -1,9 +1,9 @@
 import apiClient from '@/lib/apiClient'
 import DefaultLayout from '@/components/DefaultLayout'
 import Home from '@/components/pages/Home'
-import { GetServerSidePropsContext } from 'next'
+import { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from 'next'
 import { sessionCookieName, csrfCookieName } from '@/lib/apiConstants'
-import { getValidCodeInfo } from '@/lib/serverAuth';
+import { getAuthUser, getValidCodeInfo } from '@/lib/serverAuth';
 // import log from '@/lib/log'
 
 const Wrapper = ({
@@ -38,13 +38,21 @@ export const getServerSideProps = async (
   const csrfCookie = context.req.cookies[csrfCookieName]
 
   if (sessionCookie) {
-    authUser = (
-      await apiClient
-        .getMe({ sessionCookie, csrfCookie, signupCode, expectUnauth: true })
-        .catch(() => {
-          return { payload: false }
-        })
-    ).payload as ApiUser | false
+    // in SSR, we call getAuthUser directly, forcibly coercing the
+    // NextApiRequest-ish context.req object and NextApiResponse-ish
+    // context.req objects. the coercion works for our use case in
+    // getAuthUser, which is about reading/writing cookies, not
+    // request content that doesn't have the same interface. otherwise, if we
+    // made a fetch call to the api, it would be slower and also we couldn't
+    // set cookies.
+    [authUser] = await getAuthUser(context.req as NextApiRequest, context.res as NextApiResponse)
+    // authUser = (
+    //   await apiClient
+    //     .getMe({ sessionCookie, csrfCookie, signupCode, expectUnauth: true })
+    //     .catch(() => {
+    //       return { payload: false }
+    //     })
+    // ).payload as ApiUser | false
   }
   return {
     props: {

@@ -103,6 +103,7 @@ jobs:
           --build-arg NEXT_PUBLIC_ENV_NAME="${{vars.NEXT_PUBLIC_ENV_NAME}}" \
           --build-arg NEXT_PUBLIC_API_ENDPOINT="${{vars.NEXT_PUBLIC_API_ENDPOINT}}" \
           --build-arg NEXT_PUBLIC_AMPLITUDE_API_KEY="${{vars.NEXT_PUBLIC_AMPLITUDE_API_KEY}}" \
+          --build-arg SESSION_COOKIE_SECRET="${{secrets.SESSION_COOKIE_SECRET}}" \
           .
         docker push $IMAGE_PATH/appserver:$IMAGE_TAG
         docker push $IMAGE_PATH/appserver:latest
