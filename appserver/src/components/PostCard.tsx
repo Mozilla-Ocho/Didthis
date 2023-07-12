@@ -55,7 +55,7 @@ const PostCard = observer(
         )}
         tabIndex={-1}
       >
-        <p className="text-sm text-timestamps mb-2">
+        <p className="text-sm text-timestamps mb-4">
           <Timestamp millis={post.createdAt} />
         </p>
         {post.imageAssetId && (
@@ -69,7 +69,7 @@ const PostCard = observer(
         {post.linkUrl && (
           <LinkPreview linkUrl={post.linkUrl} urlMeta={post.urlMeta} />
         )}
-        <p className="my-2 break-words whitespace-pre-line">
+        <p className="my-4 break-words whitespace-pre-line">
           {post.description}
         </p>
         {isSelf && (

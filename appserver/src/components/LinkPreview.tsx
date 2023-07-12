@@ -16,21 +16,21 @@ const StyledLinkPreview = ({
   /* eslint-disable @next/next/no-img-element */
   // TODO: these don't look great when being flash-highlighted on project page
   return (
-    <div className="grid grid-rows-[auto_auto] sm:grid-rows-1 sm:grid-cols-[auto_1fr] items-center border border-edges">
-      <div className="text-center bg-black-100">
+    <div className="grid grid-rows-[auto_auto] overflow-hidden border rounded-lg border-black-100">
+      <div className="text-center bg-yellow-100">
         {urlMeta?.imageUrl ? (
           <img
             src={urlMeta?.imageUrl}
             alt="thumbnail"
             width={urlMeta?.imageMeta?.width || null}
             height={urlMeta?.imageMeta?.height || null}
-            className="inline-block max-h-[200px] max-w-[200px]"
+            className="inline-block object-contain max-h-[150px] max-w-[200px]"
           />
         ) : (
           <Icon.Link className="inline-block w-10 h-10 m-4 text-black-300" />
         )}
       </div>
-      <div className="overflow-hidden p-3 bg-white">
+      <div className="overflow-hidden p-4 bg-white">
         <p>
           {loading && <span><Spinner className="inline-block mr-2 align-text-bottom" /> Loading preview...</span>}
           {error && <span className="text-black-300"><em>
@@ -41,10 +41,8 @@ const StyledLinkPreview = ({
             'Oops, there was an unexpected error fetching this link.'}
           </em></span>}
           {!loading && !error && urlMeta?.host && (
-            <span className="text-linkpreview-host">{urlMeta?.host}</span>
+            <span className="text-linkpreview-host">{urlMeta?.host} &mdash; </span>
           )}
-        </p>
-        <p className="truncate">
           {!loading && !error && url && (
             <strong>
               <Link external href={url}>
