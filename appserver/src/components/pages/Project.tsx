@@ -214,14 +214,14 @@ const ProjectPage = observer(
               </div>
             )}
 
-          <div className="flex flex-row items-baseline gap-4 mb-4">
+          <div className="flex flex-row items-baseline gap-4 my-12 text-sm">
             <label htmlFor="block sortby">Sort by:</label>
             <div className="grow sm:grow-0">
               <Select
                 id="sortby"
                 onChange={changeSort}
                 value={actualSort}
-                className="text-bodytext"
+                className="text-bodytext text-sm"
               >
                 <option key="desc" value="desc">
                   Newest first
@@ -233,7 +233,7 @@ const ProjectPage = observer(
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-16 mt-16">
+          <div className="grid grid-cols-1 gap-16">
             {/* even though we return above if targetUser is falsy, because map is
            passed a function, typescript can't assert that inside that function
            scope that targetUser is still surely not false. hence "as ApiUser"*/}
