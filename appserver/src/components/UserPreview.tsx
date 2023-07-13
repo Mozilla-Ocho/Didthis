@@ -4,6 +4,11 @@ import { CloudinaryImage, Link } from './uiLib'
 import pathBuilder from '@/lib/pathBuilder'
 import { specialAssetIds } from '@/lib/cloudinaryConfig'
 import profileUtils from '@/lib/profileUtils'
+import Image from 'next/image'
+import twIcon from '@/assets/img/twitter_2x.png'
+import rdIcon from '@/assets/img/reddit_2x.png'
+import fbIcon from '@/assets/img/facebook_2x.png'
+import igIcon from '@/assets/img/instagram_2x.png'
 
 const UserPreview = observer(
   ({ user, compact }: { user: ApiUser; compact: boolean }) => {
@@ -74,30 +79,50 @@ const UserPreview = observer(
           user.profile.socialUrls && (
             <>
               <p className="text-form-labels text-sm mt-4 mb-0">Find me on:</p>
-              <div className="flex flex-row gap-8 w-[90%]">
+              <div className="flex flex-row gap-x-8 gap-y-4 w-[90%] flex-wrap">
                 {user.profile.socialUrls.twitter && (
-                  <p className="">
+                  <p className="whitespace-nowrap">
+                    <Image
+                      src={twIcon}
+                      alt="Twitter icon"
+                      className='w-auto h-8 inline mr-2'
+                    />
                     <Link external href={user.profile.socialUrls.twitter}>
                       Twitter
                     </Link>
                   </p>
                 )}
                 {user.profile.socialUrls.facebook && (
-                  <p className="">
+                  <p className="whitespace-nowrap">
+                    <Image
+                      src={fbIcon}
+                      alt="Facebook icon"
+                      className='w-auto h-8 inline mr-2'
+                    />
                     <Link external href={user.profile.socialUrls.facebook}>
                       Facebook
                     </Link>
                   </p>
                 )}
                 {user.profile.socialUrls.reddit && (
-                  <p className="">
+                  <p className="whitespace-nowrap">
+                    <Image
+                      src={rdIcon}
+                      alt="Reddit icon"
+                      className='w-auto h-8 inline mr-2'
+                    />
                     <Link external href={user.profile.socialUrls.reddit}>
                       Reddit
                     </Link>
                   </p>
                 )}
                 {user.profile.socialUrls.instagram && (
-                  <p className="">
+                  <p className="whitespace-nowrap">
+                    <Image
+                      src={igIcon}
+                      alt="Instagram icon"
+                      className='w-auto h-8 inline mr-2'
+                    />
                     <Link external href={user.profile.socialUrls.instagram}>
                       Instagram
                     </Link>

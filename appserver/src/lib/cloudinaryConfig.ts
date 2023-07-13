@@ -8,7 +8,7 @@ const specialAssetIds = {
   // TODO: can we mark these as undeletable somehow in cloudinary?
   mockAvatarID: 'cypress-avatar-dont-delete',
   defaultAvatarID: 'avatars/default_avatar_ollijf',
-  placholderProjectID: 'projects/us5yrx4knugpg6ym4wjl',
+  placholderProjectID: 'projects/owj4cttaiwevemryev8x',
 }
 
 const getCloudinaryConfig = (intent: CldImageIntent) => {

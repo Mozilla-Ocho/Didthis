@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { Icon, Link } from '@/components/uiLib'
 import Spinner from './uiLib/Spinner'
+import urlBg from '@/assets/img/url-bgfill_2x.png'
 
 const StyledLinkPreview = ({
   loading,
@@ -17,7 +18,7 @@ const StyledLinkPreview = ({
   // TODO: these don't look great when being flash-highlighted on project page
   return (
     <div className="grid grid-rows-[auto_auto] overflow-hidden border rounded-lg border-black-100">
-      <div className="text-center bg-yellow-100">
+      <div className="text-center bg-yellow-100" style={{backgroundImage:`url(${urlBg.src})`, backgroundSize:'cover'}}>
         {urlMeta?.imageUrl ? (
           <img
             src={urlMeta?.imageUrl}
