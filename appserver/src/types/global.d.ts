@@ -57,8 +57,6 @@ interface UserDbRow {
   ban_status: string | null
   last_write_from_user: number | null
   last_read_from_user: number | null
-  is_admin: boolean
-  is_ghosted: boolean
 }
 
 // on publicly returned data for user image uploads, we restrict the image meta
