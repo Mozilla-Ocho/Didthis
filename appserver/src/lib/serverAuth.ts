@@ -22,7 +22,7 @@ export const signupCodes: {
     active: true,
     value: 'a6fd47b9',
     name: 'intshare1',
-    envNames: ['dev', 'test', 'prod'],
+    envNames: ['dev', 'nonprod', 'prod'],
   },
   '011bda94': {
     active: true,
