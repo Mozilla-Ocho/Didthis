@@ -15,7 +15,7 @@ import ImageUpload from '../ImageUpload'
 import type { UploadCallback } from '../ImageUpload'
 import profileUtils from '@/lib/profileUtils'
 import { twMerge } from 'tailwind-merge'
-import {trackingEvents} from '@/lib/trackingEvents'
+import { trackingEvents } from '@/lib/trackingEvents'
 
 class PostStore {
   id: string
@@ -238,7 +238,12 @@ const ProjectSelector = observer(({ postStore }: { postStore: PostStore }) => {
           ))}
         </Select>
       </label>
-      {postStore.projectId === 'new' && <p className="text-sm mt-2 text-form-labels">Don't worry, all projects are private by default! It's up to you to decide if and when you share your work with others.</p>}
+      {postStore.projectId === 'new' && (
+        <p className="text-sm mt-2 text-form-labels">
+          Don’t worry, all projects are private by default! It’s up to you to
+          decide if and when you share your work with others.
+        </p>
+      )}
     </div>
   )
 })
@@ -331,7 +336,7 @@ const ImageField = observer(({ postStore }: { postStore: PostStore }) => {
             onClick={deleteImage}
             className="grow leading-tight"
             trackEvent={trackingEvents.bcRemoveImage}
-            trackEventOpts={{imgIntent:'post'}}
+            trackEventOpts={{ imgIntent: 'post' }}
           >
             Remove image
           </Button>
@@ -359,15 +364,17 @@ const PostForm = observer((props: Props) => {
     e.preventDefault()
     e.stopPropagation()
     postStore.setSpinning(true)
-    store.savePost(postStore.getApiPost(), mode, postStore.mediaType).then(newPost => {
-      // keep it spinning while next page loads
-      // postStore.setSpinning(false)
-      if (!store.user) return
-      console.log('ok done', newPost)
-      router.push(
-        pathBuilder.post(store.user.systemSlug, newPost.projectId, newPost.id)
-      )
-    })
+    store
+      .savePost(postStore.getApiPost(), mode, postStore.mediaType)
+      .then(newPost => {
+        // keep it spinning while next page loads
+        // postStore.setSpinning(false)
+        if (!store.user) return
+        console.log('ok done', newPost)
+        router.push(
+          pathBuilder.post(store.user.systemSlug, newPost.projectId, newPost.id)
+        )
+      })
   }
   const handleMediaType = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log('handleMediaType', e)
@@ -448,9 +455,9 @@ const PostForm = observer((props: Props) => {
             onClick={handleCancel}
             className="w-full sm:w-[150px]"
             trackEvent={trackingEvents.bcDiscardChanges}
-            trackEventOpts={{fromPage:'postEdit'}}
+            trackEventOpts={{ fromPage: 'postEdit' }}
           >
-            {mode === 'edit' ? 'Discard changes' : 'Cancel' }
+            {mode === 'edit' ? 'Discard changes' : 'Cancel'}
           </Button>
           {mode === 'edit' && (
             <div className="text-center sm:w-full sm:text-left">
