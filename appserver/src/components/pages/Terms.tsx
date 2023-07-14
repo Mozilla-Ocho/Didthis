@@ -87,7 +87,7 @@ const Terms = () => {
           <p>
             You may cancel your Didthis account at any time. You can do this by
             emailing{' '}
-            <a href="mailto:support@Didthis.app">support@Didthis.app</a>. If you
+            <a href="mailto:didthis@mozilla.com">didthis@mozilla.com</a>. If you
             choose to cancel, we may delete your Didthis account and any of your
             personal information associated with your Didthis account. However,
             we may retain such data to the extent necessary in order to enforce
@@ -188,7 +188,7 @@ const Terms = () => {
           <p>
             If you encounter content on Didthis that you believe is illegal or
             violates these Terms, you can email us at{' '}
-            <a href="mailto:support@Didthis.app">support@Didthis.app</a>.
+            <a href="mailto:didthis@mozilla.com">didthis@mozilla.com</a>.
           </p>
           <p>
             To learn more about how Mozilla responds to claims of intellectual

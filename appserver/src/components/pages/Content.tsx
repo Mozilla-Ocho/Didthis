@@ -193,7 +193,7 @@ const Content = () => {
             If you discover an account that you believe is impersonating another
             person, or is purporting to represent a person or entity that it is
             not entitled to represent, you can report that account to us by
-            emailing <a href="support@Didthis.app">support@Didthis.app</a>.
+            emailing <a href="didthis@mozilla.com">didthis@mozilla.com</a>.
             Please identify the specific account in question, as well as the
             account, individual, or entity that you believe is being
             impersonated without authorization.
@@ -442,7 +442,7 @@ const Content = () => {
             Before sharing information, double check its source and practice
             good digital literacy measures. If you think that anything is in
             violation of this policy, please report it to{' '}
-            <a href="mailto:support@Didthis.app">support@Didthis.app</a>.
+            <a href="mailto:didthis@mozilla.com">didthis@mozilla.com</a>.
           </p>
           <h4>Promotion of illegal goods</h4>
           <p>
