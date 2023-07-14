@@ -37,7 +37,7 @@ const getProjects = async (page: number, limit: number): Promise<GetProjectsResu
     WHERE
         scope = 'public'
     ORDER BY
-        updatedat ASC
+        updatedat DESC
     OFFSET ?
     LIMIT ?
     `,
