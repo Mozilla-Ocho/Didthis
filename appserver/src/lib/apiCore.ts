@@ -115,6 +115,9 @@ const wrapFetch = async (fetchArgs: FetchArgs): Promise<SuccessWrapper> => {
         Accept: 'application/json',
       },
     }
+    // generally, cookies are sent automatically by the browser. however,
+    // sometimes it is useful to actually assign them in a fetch, when
+    // calling from nodejs for example.
     const cookieBits: string[] = []
     if (sessionCookie) {
       cookieBits.push(sessionCookieName + '=' + sessionCookie)

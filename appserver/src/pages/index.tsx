@@ -35,8 +35,6 @@ export const getServerSideProps = async (
   const signupCodeInfo = signupCode ? getValidCodeInfo(signupCode) : false
   let authUser: ApiUser | false = false
   const sessionCookie = context.req.cookies[sessionCookieName]
-  const csrfCookie = context.req.cookies[csrfCookieName]
-
   if (sessionCookie) {
     // in SSR, we call getAuthUser directly, forcibly coercing the
     // NextApiRequest-ish context.req object and NextApiResponse-ish
@@ -46,13 +44,6 @@ export const getServerSideProps = async (
     // made a fetch call to the api, it would be slower and also we couldn't
     // set cookies.
     [authUser] = await getAuthUser(context.req as NextApiRequest, context.res as NextApiResponse)
-    // authUser = (
-    //   await apiClient
-    //     .getMe({ sessionCookie, csrfCookie, signupCode, expectUnauth: true })
-    //     .catch(() => {
-    //       return { payload: false }
-    //     })
-    // ).payload as ApiUser | false
   }
   return {
     props: {

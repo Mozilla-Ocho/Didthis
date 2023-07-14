@@ -21,26 +21,27 @@ const getMe = async ({
   asTestUser,
   signupCode,
   expectUnauth,
-  // this call accepts a sessionCookie value because in SSR, the
-  // getServerSideProps function will call the api from the server, and needs
-  // to pass the client's cookie value in. in browser context, the cookie
-  // is sent automatically. likewise for csrf cookie.
-  sessionCookie,
-  csrfCookie,
+  idToken,
 }: {
   asTestUser?: string
   signupCode?: string | false
   expectUnauth?: boolean
-  sessionCookie?: string
-  csrfCookie?: string
+  idToken?: string
 }): Promise<MeWrapper> => {
   const fetchOpts: FetchArgs = {
     action: 'getMe',
     asTestUser,
     expectErrorIds: expectUnauth ? ['ERR_UNAUTHORIZED'] : undefined,
     queryParams: signupCode ? { signupCode } : undefined,
-    sessionCookie,
-    csrfCookie,
+  }
+  if (idToken) {
+    // for our wonky handling for firebase idTokens that generate session
+    // cookies, when idToken is present (as is the case after firebase ui sign
+    // in completes), send it in the request body and set method to POST. auth
+    // logic on the server will use this to retreive or create the user and set
+    // a session cookie. otherwise, session cookie is expected.
+    fetchOpts.method = 'POST'
+    fetchOpts.body = {idToken}
   }
   const wrapper = (await wrapFetch(fetchOpts)) as MeWrapper
   return wrapper
@@ -56,19 +57,6 @@ const getPublicUser = async ({
     queryParams: { urlSlug },
   }
   const wrapper = (await wrapFetch(fetchOpts)) as PublicUserWrapper
-  return wrapper
-}
-
-const sessionLogin = async ({
-  idToken,
-}: {
-  idToken: string
-}): Promise<EmptySuccessWrapper> => {
-  const wrapper = (await wrapFetch({
-    action: 'sessionLogin',
-    method: 'POST',
-    body: { idToken },
-  })) as EmptySuccessWrapper
   return wrapper
 }
 
@@ -221,7 +209,6 @@ const apiClient = {
   saveProfile,
   saveProject,
   saveWaitlist,
-  sessionLogin,
   sessionLogout,
   validateSignupCode,
 }

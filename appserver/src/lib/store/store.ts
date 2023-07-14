@@ -218,11 +218,12 @@ class Store {
           amplitude.flush()
           firebaseUser
             .getIdToken()
-            .then(idToken => apiClient.sessionLogin({ idToken }))
-            // the GET me call here needs the signup code because it will
-            // actually auto-vivify the user and register the signup event in
-            // amplitude, which we want to associated with the code.
-            .then(() => apiClient.getMe({
+            .then(idToken => apiClient.getMe({
+              // auth on server detects idToken and uses it instead of session
+              // cookie if present, note this turns it into a POST request
+              idToken,
+              // send the signup code because it will also assign that to the
+              // user in the backend if they don't have one set yet.
               signupCode: this.signupCodeInfo ? this.signupCodeInfo.value : false
             }))
             .then(wrapper => {

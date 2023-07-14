@@ -45,18 +45,18 @@ app
         proxyReqPathResolver: function () {
           return '/2/httpapi'
         },
-        // proxyReqBodyDecorator: function (bodyContent) {
-        //   const json = (bodyContent instanceof Buffer) ? bodyContent.toString('utf-8') : bodyContent
-        //   console.log('amplitudeProxy body content:', json)
-        //   // let parsed
-        //   // try {
-        //   //   parsed = JSON.parse(json)
-        //   // } catch(e) {
-        //   //   parsed = json
-        //   // }
-        //   // console.log('amplitudeProxy body content:', JSON.stringify(parsed,null,2));
-        //   return bodyContent;
-        // },
+        proxyReqBodyDecorator: function (bodyContent) {
+          const json = (bodyContent instanceof Buffer) ? bodyContent.toString('utf-8') : bodyContent
+          console.log('amplitudeProxy body content:', json)
+          // let parsed
+          // try {
+          //   parsed = JSON.parse(json)
+          // } catch(e) {
+          //   parsed = json
+          // }
+          // console.log('amplitudeProxy body content:', JSON.stringify(parsed,null,2));
+          return bodyContent;
+        },
       })
     );
     server.use(amplitudeProxy)
