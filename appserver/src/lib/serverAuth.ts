@@ -115,6 +115,9 @@ const userFromDbRow = (
     profile,
     createdAt: dbRow.created_at_millis,
   }
+  if (opts.publicFilter) {
+    delete user.email
+  }
   // only set the prop if defined
   if (dbRow.user_slug) user.userSlug = dbRow.user_slug
   if (!opts.publicFilter && !opts.includeAdminUIFields) {

@@ -34,6 +34,7 @@ const minChars = {
 const mkDefaultProfile = () => {
   return {
     projects: {},
+    updatedAt: new Date().getTime(),
   } as ApiProfile
 }
 
@@ -54,8 +55,10 @@ const privacyFilteredCopy = (original: ApiProfile): ApiProfile => {
   const filtered = mkDefaultProfile()
   filtered.name = original.name
   filtered.bio = original.bio
+  filtered.socialUrls = original.socialUrls
   filtered.imageAssetId = original.imageAssetId
   filtered.imageMeta = filteredImageMeta(original.imageMeta)
+  filtered.updatedAt = original.updatedAt
   filtered.projects = {}
   Object.values(original.projects || {}).forEach(origProj => {
     if (origProj.scope === 'public') {

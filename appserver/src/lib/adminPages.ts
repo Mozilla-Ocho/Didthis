@@ -1,6 +1,6 @@
 // import profileUtils from './profileUtils'
 import knex from '@/knex'
-import {userFromDbRow} from './serverAuth'
+import { userFromDbRow } from './serverAuth'
 // import log from '@/lib/log'
 
 type projList = [ApiUserId, ApiProjectId][]
@@ -16,9 +16,12 @@ type projDbResult = {
   scope: ApiScope
   updatedat: number
 }
-const getProjects = async (page: number, limit: number): Promise<GetProjectsResult> => {
+const getProjects = async (
+  page: number,
+  limit: number
+): Promise<GetProjectsResult> => {
   const projects: projList = []
-  const users:userList = {}
+  const users: userList = {}
   const uids = new Set()
   const projQuery = await knex.raw(
     `
@@ -50,8 +53,10 @@ const getProjects = async (page: number, limit: number): Promise<GetProjectsResu
     projects.push([row.userid, row.projectid])
   })
   // console.log(projects)
-  const userRows = await knex<UserDbRow>('users')
-    .whereIn('id', Array.from(uids) as [])
+  const userRows = await knex<UserDbRow>('users').whereIn(
+    'id',
+    Array.from(uids) as []
+  )
   userRows.forEach(dbRow => {
     users[dbRow.id] = userFromDbRow(dbRow, { publicFilter: true })
   })
@@ -59,7 +64,7 @@ const getProjects = async (page: number, limit: number): Promise<GetProjectsResu
     // nextjs is somewhat bizarre and forces all data to lack explicit undefined
     // values with an error about not being able to serialize them.
     users: JSON.parse(JSON.stringify(users)) as userList,
-    projects
+    projects,
   }
 }
 
@@ -75,9 +80,12 @@ type GetPostsResult = {
   users: userList
   posts: postList
 }
-const getPosts = async (page: number, limit: number): Promise<GetPostsResult> => {
+const getPosts = async (
+  page: number,
+  limit: number
+): Promise<GetPostsResult> => {
   const posts: postList = []
-  const users:userList = {}
+  const users: userList = {}
   const uids = new Set()
   const postQuery = await knex.raw(
     `
@@ -111,8 +119,10 @@ const getPosts = async (page: number, limit: number): Promise<GetPostsResult> =>
     posts.push(row)
   })
   // console.log(posts)
-  const userRows = await knex<UserDbRow>('users')
-    .whereIn('id', Array.from(uids) as [])
+  const userRows = await knex<UserDbRow>('users').whereIn(
+    'id',
+    Array.from(uids) as []
+  )
   userRows.forEach(dbRow => {
     users[dbRow.id] = userFromDbRow(dbRow, { publicFilter: true })
   })
@@ -120,13 +130,29 @@ const getPosts = async (page: number, limit: number): Promise<GetPostsResult> =>
     // nextjs is somewhat bizarre and forces all data to lack explicit undefined
     // values with an error about not being able to serialize them.
     users: JSON.parse(JSON.stringify(users)) as userList,
-    posts
+    posts,
   }
+}
+
+const getUsers = async (page: number, limit: number): Promise<ApiUser[]> => {
+  const users: ApiUser[] = []
+  const q = await knex('users')
+    .orderByRaw("(profile->>'updatedAt')::BIGINT DESC")
+    .limit(limit)
+    .offset((page - 1) * limit)
+  q.forEach((row:UserDbRow) => {
+    users.push(userFromDbRow(row, { publicFilter: true }))
+  })
+  // get rid of undefined to appease weird nextjs strictness
+  console.log( users)
+  // console.log( JSON.parse(JSON.stringify(users)))
+  return JSON.parse(JSON.stringify(users)) as ApiUser[]
 }
 
 const adminPages = {
   getProjects,
   getPosts,
+  getUsers,
 }
 
 export default adminPages

@@ -23,7 +23,7 @@ type ApiSignupCodeInfo = {
 
 type ApiUser = {
   id: ApiUserId
-  email: string
+  email?: string // not present on public records
   // use systemSlug for editing/writes/forms because it's stable
   systemSlug: string
   // use userSlug when linking to the page in a way that could be shared/public
@@ -116,6 +116,7 @@ type ApiProfile = {
   socialUrls?: ApiSocialUrls
   imageAssetId?: string
   imageMeta?: CldImageMetaPrivate | CldImageMetaPublic
+  updatedAt: number // updated when user account details are modified (not projects)
   projects: { [key: string]: ApiProject }
 }
 

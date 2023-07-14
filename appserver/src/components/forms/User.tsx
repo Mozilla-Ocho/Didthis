@@ -109,6 +109,7 @@ class FormStore {
       imageAssetId: contentOrUndef(this.imageAssetId),
       imageMeta: this.imageMeta,
       projects: {}, // ignored
+      updatedAt: new Date().getTime(), // ignored, server assigned
       socialUrls: {
         twitter: normUrl(this.twitter),
         facebook: normUrl(this.facebook),

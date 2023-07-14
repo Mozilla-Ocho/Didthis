@@ -1,6 +1,6 @@
 import DefaultLayout from '@/components/DefaultLayout'
-import PostCard from '@/components/PostCard'
-import { Link, PagePad } from '@/components/uiLib'
+import UserPreview from '@/components/UserPreview'
+import { Link, PagePad, Timestamp } from '@/components/uiLib'
 import adminPages from '@/lib/adminPages'
 import { sessionCookieName } from '@/lib/apiConstants'
 import { getParamString } from '@/lib/nextUtils'
@@ -19,44 +19,29 @@ const Wrapper = ({
   limit,
 }: {
   authUser: ApiUser | false
-  data: Awaited<ReturnType<typeof adminPages.getPosts>>
+  data: Awaited<ReturnType<typeof adminPages.getUsers>>
   page: number
   limit: number
 }) => {
-  const nPosts = data.posts.length
+  const nUsers = data.length
   return (
     <DefaultLayout authUser={authUser}>
       <PagePad wide>
-        <h4 className="my-4">[admin] public posts by last modified</h4>
+        <h4 className="my-4">[admin] user profiles by last modified</h4>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-          {data.posts.map(p => {
-            const uid = p.userid
-            const projid = p.projectid
-            const postid = p.postid
-            const user = data.users[uid]
-            const proj = user.profile.projects[projid]
-            const post = proj.posts[postid]
+          {data.map(user => {
             return (
-              <div key={postid} className="border border-[#aaa]">
+              <div key={user.id} className="border border-[#aaa]">
                 <div className="bg-[#ddd] text-sm px-2 py-1">
                   <Link external href={pathBuilder.user(user.publicPageSlug)}>
                     @{user.publicPageSlug}
                   </Link>{' '}
-                  &raquo;{' '}
-                  <Link
-                    external
-                    href={pathBuilder.post(user.publicPageSlug, proj.id, postid)}
-                  >
-                    {proj.title}
-                  </Link>
+                  <span className="opacity-50">
+                    (<Timestamp millis={user.profile.updatedAt} />)
+                  </span>
                 </div>
                 <div className="p-2">
-                  <PostCard
-                    post={post}
-                    targetUser={user}
-                    authUser={false}
-                    focused={false}
-                  />
+                  <UserPreview user={user} compact={false} />
                 </div>
               </div>
             )
@@ -64,14 +49,14 @@ const Wrapper = ({
         </div>
         <div className="flex justify-between mt-4">
           {page > 1 ? (
-            <Link intent="internalNav" href={'/admin/posts?page=' + (page - 1)}>
+            <Link intent="internalNav" href={'/admin/users?page=' + (page - 1)}>
               &larr; previous
             </Link>
           ) : (
             <div />
           )}
-          {nPosts === limit ? (
-            <Link intent="internalNav" href={'/admin/posts?page=' + (page + 1)}>
+          {nUsers === limit ? (
+            <Link intent="internalNav" href={'/admin/users?page=' + (page + 1)}>
               next &rarr;
             </Link>
           ) : (
@@ -103,7 +88,7 @@ export const getServerSideProps = async (
     return { notFound: true }
   }
   const limit = 25
-  const data = await adminPages.getPosts(page, limit)
+  const data = await adminPages.getUsers(page, limit)
   return {
     props: {
       authUser,
