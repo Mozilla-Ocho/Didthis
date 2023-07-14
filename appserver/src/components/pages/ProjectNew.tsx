@@ -5,6 +5,7 @@ import { PagePad } from '@/components/uiLib'
 import Breadcrumbs from '../Breadcrumbs'
 import { trackingEvents } from '@/lib/trackingEvents'
 import PageTitle from '../PageTitle'
+import DiscordNag from '../DiscordNag'
 
 const NewProjectPage = observer(() => {
   const store = useStore()
@@ -13,6 +14,7 @@ const NewProjectPage = observer(() => {
     <>
       <PageTitle title="New project" />
       <Breadcrumbs crumbs={[{ name: 'New project' }]} />
+      <DiscordNag/>
       <PagePad>
         <h3>Create a project</h3>
         <div className="pt-8" />

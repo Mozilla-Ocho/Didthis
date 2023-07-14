@@ -25,6 +25,7 @@ import { specialAssetIds } from '@/lib/cloudinaryConfig'
 import { trackingEvents } from '@/lib/trackingEvents'
 import PageTitle from '../PageTitle'
 import OgMeta from '../OgMeta'
+import DiscordNag from '../DiscordNag'
 
 const ProjectPage = observer(
   ({ targetUser }: { targetUser: ApiUser | false }) => {
@@ -132,6 +133,7 @@ const ProjectPage = observer(
           </Link>
         </ConfirmationModal>
         <Breadcrumbs crumbs={[{ name: project.title }]} />
+        <DiscordNag/>
         <PagePad>
           <UserPreview user={targetUser} compact={true} />
 

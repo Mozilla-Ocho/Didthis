@@ -7,6 +7,7 @@ import { useStore } from '@/lib/store'
 import { trackingEvents } from '@/lib/trackingEvents'
 import PageTitle from '../PageTitle'
 import OgMeta from '../OgMeta'
+import DiscordNag from '../DiscordNag'
 
 // TODO: rename this to NonAuthUser or something, it's shown even in auth but
 // when looking at someone else's page
@@ -19,6 +20,7 @@ const UnauthUser = observer(
     })
     return (
       <>
+        <DiscordNag />
         <PagePad>
           <OgMeta user={targetUser} />
           <PageTitle title={targetUser.userSlug || targetUser.profile.name} />

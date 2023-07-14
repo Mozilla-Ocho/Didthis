@@ -9,6 +9,7 @@ import { useRouter } from 'next/router'
 import pathBuilder from '@/lib/pathBuilder'
 import {trackingEvents} from '@/lib/trackingEvents'
 import PageTitle from '../PageTitle'
+import DiscordNag from '../DiscordNag'
 
 const NewPostPage = observer(() => {
   const store = useStore()
@@ -24,6 +25,7 @@ const NewPostPage = observer(() => {
   return (
     <>
       <PageTitle title="New post" />
+      <DiscordNag/>
       <Breadcrumbs
         crumbs={[
           project

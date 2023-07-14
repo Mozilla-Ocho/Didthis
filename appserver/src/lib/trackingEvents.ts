@@ -148,6 +148,10 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
     eventName: 'buttonClick',
     opts: { name: 'bcDiscord' },
   },
+  bcDiscordNag: {
+    eventName: 'buttonClick',
+    opts: { name: 'bcDiscordNag' },
+  },
   bcOchoIdea: {
     eventName: 'buttonClick',
     opts: { name: 'bcOchoIdea' },

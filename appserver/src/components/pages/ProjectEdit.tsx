@@ -13,6 +13,7 @@ import Breadcrumbs from '../Breadcrumbs'
 import pathBuilder from '@/lib/pathBuilder'
 import {trackingEvents} from '@/lib/trackingEvents'
 import PageTitle from '../PageTitle'
+import DiscordNag from '../DiscordNag'
 
 const ProjectEditPage = observer(() => {
   const store = useStore()
@@ -37,6 +38,7 @@ const ProjectEditPage = observer(() => {
           { name: 'Edit' },
         ]}
       />
+      <DiscordNag/>
       <PagePad>
         <h3>Edit project</h3>
         <div className="pt-8" />
