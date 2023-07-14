@@ -122,8 +122,8 @@ const userFromDbRow = (
     user.signupCodeName = dbRow.signup_code_name || ''
     if (!dbRow.signup_code_name) user.unsolicited = true
   }
-  if (dbRow.admin_status === 'admin') user.isAdmin = true
-  if (dbRow.ban_status === 'banned') user.isBanned = true
+  if (dbRow.admin_status  === 'admin') user.isAdmin = true
+  if (dbRow.ban_status === 'ghosted') user.isGhosted = true
   if (opts.includeAdminUIFields) {
     // signupCodeName was in here but is now just always returned
     if (dbRow.last_read_from_user)
