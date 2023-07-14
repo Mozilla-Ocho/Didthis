@@ -35,7 +35,7 @@ type ApiUser = {
   signupCodeName?: string
   unsolicited?: true
   isAdmin?: true
-  isGhosted?: true
+  isFlagged?: true
   lastFullPageLoad?: number
   lastWrite?: number
   updatedAt?: number
@@ -53,8 +53,8 @@ interface UserDbRow { // for reads (numbers are strings)
   created_at_millis: string
   updated_at_millis: string
   signup_code_name: string | null
-  admin_status: string | null
-  ban_status: string | null
+  admin_status: 'admin' | null
+  ban_status: 'flagged' | null
   last_write_from_user: string | null
   last_read_from_user: string | null
 }
@@ -73,8 +73,8 @@ interface UserDbRowForWrite { // for writes (numbers are numbers)
   created_at_millis: number
   updated_at_millis: number
   signup_code_name: string | null
-  admin_status: string | null
-  ban_status: string | null
+  admin_status: 'admin' | null
+  ban_status: 'flagged' | null
   last_write_from_user: number | null
   last_read_from_user: number | null
 }

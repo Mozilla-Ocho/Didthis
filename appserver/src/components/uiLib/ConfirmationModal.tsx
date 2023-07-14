@@ -12,6 +12,7 @@ interface ConfirmationModalProps {
   onYes?: () => void
   onNo?: () => void
   onClose: () => void
+  spinning?: boolean
 }
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
@@ -24,6 +25,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   onYes,
   onNo,
   onClose,
+  spinning,
 }) => {
   return (
     <Modal srTitle={title} renderTitleHeading isOpen={isOpen} handleClose={onClose}>
@@ -41,7 +43,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             </Button>
           )}
           {yesText && (
-            <Button intent="primary" onClick={onYes}>
+            <Button intent="primary" onClick={onYes} spinning={spinning}>
               {yesText}
             </Button>
           )}

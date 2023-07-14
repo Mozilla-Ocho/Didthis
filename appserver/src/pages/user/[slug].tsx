@@ -52,8 +52,13 @@ export const getServerSideProps = async (
           return { payload: false }
         })
       ).payload as ApiUser | false
+      if (!targetUser) {
+        return { notFound: true }
+      }
+      if (targetUser.isFlagged) {
+        return { notFound: true }
+      }
       if (
-        targetUser &&
         targetUser.userSlug !== urlSlug &&
         targetUser.systemSlug !== urlSlug
       ) {
@@ -67,9 +72,6 @@ export const getServerSideProps = async (
             permanent: true,
           },
         }
-      }
-      if (!targetUser) {
-        return { notFound: true }
       }
     }
   }

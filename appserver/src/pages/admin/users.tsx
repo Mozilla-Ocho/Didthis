@@ -33,12 +33,13 @@ const Wrapper = ({
             return (
               <div key={user.id} className="border border-[#aaa]">
                 <div className="bg-[#ddd] text-sm px-2 py-1">
-                  <Link external href={pathBuilder.user(user.publicPageSlug)}>
+                  <Link href={pathBuilder.adminUser(user.publicPageSlug)}>
                     @{user.publicPageSlug}
                   </Link>{' '}
                   <span className="opacity-50">
                     (<Timestamp millis={user.profile.updatedAt} />)
                   </span>
+                  {user.isFlagged && <span className='text-[#f00]'> <strong>FLAGGED</strong></span>}
                 </div>
                 <div className="p-2">
                   <UserPreview user={user} compact={false} />

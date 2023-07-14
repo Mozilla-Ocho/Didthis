@@ -10,6 +10,7 @@ import type {
   UrlMetaWrapper,
   SlugCheckWrapper,
   WaitlistWrapper,
+  SuccessWrapper,
 } from './apiConstants'
 
 // const getHealthCheck = async () => {
@@ -197,6 +198,22 @@ const saveWaitlist = async ({
   return wrapper
 }
 
+const flagUser = async({
+  userId,
+  flagged,
+}:{
+  userId: ApiUserId,
+  flagged: boolean,
+}) => {
+  // this is an admin api method
+  const wrapper = await wrapFetch({
+    action: 'flagUser',
+    method: 'POST',
+    body: { userId, flagged },
+  }) as EmptySuccessWrapper
+  return wrapper
+}
+
 const apiClient = {
   deletePost,
   deleteProject,
@@ -211,6 +228,7 @@ const apiClient = {
   saveWaitlist,
   sessionLogout,
   validateSignupCode,
+  flagUser,
 }
 
 export default apiClient

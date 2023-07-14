@@ -4,6 +4,7 @@ import { Link, PagePad } from '@/components/uiLib'
 import adminPages from '@/lib/adminPages'
 import { sessionCookieName } from '@/lib/apiConstants'
 import { getParamString } from '@/lib/nextUtils'
+import pathBuilder from '@/lib/pathBuilder'
 import { getAuthUser } from '@/lib/serverAuth'
 import {
   GetServerSidePropsContext,
@@ -34,7 +35,20 @@ const Wrapper = ({
           const user = data.users[uid]
           const proj = user.profile.projects[pid]
           return (
-            <div key={pid}>
+            <div key={pid} className="">
+              <div className="bg-[#ddd] text-sm px-2 py-1">
+                <Link href={pathBuilder.adminUser(user.publicPageSlug)}>
+                  @{user.publicPageSlug}
+                </Link>{' '}
+                &raquo;{' '}
+                <Link
+                  external
+                  href={pathBuilder.project(user.publicPageSlug, proj.id)}
+                >
+                  {proj.title}
+                </Link>
+                {user.isFlagged && <span className='text-[#f00]'> <strong>FLAGGED</strong></span>}
+              </div>
               <ProjectCard project={proj} targetUser={user} />
             </div>
           )

@@ -125,7 +125,7 @@ const userFromDbRow = (
     if (!dbRow.signup_code_name) user.unsolicited = true
   }
   if (dbRow.admin_status  === 'admin') user.isAdmin = true
-  if (dbRow.ban_status === 'ghosted') user.isGhosted = true
+  if (dbRow.ban_status === 'flagged') user.isFlagged = true
   if (opts.justCreated) user.justCreated = true
   return user
 }

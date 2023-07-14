@@ -39,7 +39,7 @@ const Wrapper = ({
             return (
               <div key={postid} className="border border-[#aaa]">
                 <div className="bg-[#ddd] text-sm px-2 py-1">
-                  <Link external href={pathBuilder.user(user.publicPageSlug)}>
+                  <Link href={pathBuilder.adminUser(user.publicPageSlug)}>
                     @{user.publicPageSlug}
                   </Link>{' '}
                   &raquo;{' '}
@@ -49,6 +49,7 @@ const Wrapper = ({
                   >
                     {proj.title}
                   </Link>
+                  {user.isFlagged && <span className='text-[#f00]'> <strong>FLAGGED</strong></span>}
                 </div>
                 <div className="p-2">
                   <PostCard
