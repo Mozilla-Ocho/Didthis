@@ -1,6 +1,6 @@
 import DefaultLayout from '@/components/DefaultLayout'
 import ProjectCard from '@/components/ProjectCard'
-import { Link } from '@/components/uiLib'
+import { Link, PagePad } from '@/components/uiLib'
 import adminPages from '@/lib/adminPages'
 import { sessionCookieName } from '@/lib/apiConstants'
 import { getParamString } from '@/lib/nextUtils'
@@ -25,6 +25,7 @@ const Wrapper = ({
   const nProjects = data.projects.length
   return (
     <DefaultLayout authUser={authUser}>
+      <PagePad wide>
       <h4 className="my-4">[admin] public projects by last modified</h4>
       <div className="flex flex-row flex-wrap gap-4">
         {data.projects.map(p => {
@@ -39,7 +40,7 @@ const Wrapper = ({
           )
         })}
       </div>
-      <div className="flex justify-between">
+      <div className="flex justify-between mt-4">
         {page > 1 ? (
           <Link
             intent="internalNav"
@@ -61,6 +62,7 @@ const Wrapper = ({
           <div />
         )}
       </div>
+      </PagePad>
     </DefaultLayout>
   )
 }
