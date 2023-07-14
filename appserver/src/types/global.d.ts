@@ -43,7 +43,27 @@ type ApiUser = {
   justCreated?: boolean
 }
 
-interface UserDbRow {
+interface UserDbRow { // for reads (numbers are strings)
+  id: ApiUserid
+  email: string
+  system_slug: string
+  user_slug: string | null
+  user_slug_lc: string | null
+  profile: ApiProfile
+  created_at_millis: string
+  updated_at_millis: string
+  signup_code_name: string | null
+  admin_status: string | null
+  ban_status: string | null
+  last_write_from_user: string | null
+  last_read_from_user: string | null
+}
+interface UserDbRowForWrite { // for writes (numbers are numbers)
+  // because knex (or the postgres lib underneath) is asymmetrical with respect
+  // to number values in the db columns. you write them as numbers, but they
+  // come back as strings on reads, presumably because it's trying to avoid
+  // overflows/corruption for large numbers that the db could potentially
+  // represent but javscript can't?
   id: ApiUserid
   email: string
   system_slug: string

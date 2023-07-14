@@ -96,7 +96,6 @@ const userFromDbRow = (
   dbRow: UserDbRow,
   opts: {
     publicFilter: boolean
-    includeAdminUIFields?: boolean
     justCreated?: boolean
   }
 ): ApiUser => {
@@ -113,28 +112,20 @@ const userFromDbRow = (
     systemSlug: dbRow.system_slug,
     publicPageSlug: dbRow.user_slug || dbRow.system_slug,
     profile,
-    createdAt: dbRow.created_at_millis,
+    createdAt: parseInt(dbRow.created_at_millis as string,10),
   }
   if (opts.publicFilter) {
     delete user.email
   }
   // only set the prop if defined
   if (dbRow.user_slug) user.userSlug = dbRow.user_slug
-  if (!opts.publicFilter && !opts.includeAdminUIFields) {
+  if (!opts.publicFilter) {
     // DRY_47693 signup code logic
     user.signupCodeName = dbRow.signup_code_name || ''
     if (!dbRow.signup_code_name) user.unsolicited = true
   }
   if (dbRow.admin_status  === 'admin') user.isAdmin = true
   if (dbRow.ban_status === 'ghosted') user.isGhosted = true
-  if (opts.includeAdminUIFields) {
-    // signupCodeName was in here but is now just always returned
-    if (dbRow.last_read_from_user)
-      user.lastFullPageLoad = dbRow.last_read_from_user
-    if (dbRow.last_write_from_user)
-      user.lastWrite = dbRow.last_write_from_user
-    user.updatedAt = dbRow.updated_at_millis
-  }
   if (opts.justCreated) user.justCreated = true
   return user
 }
@@ -207,7 +198,7 @@ const getOrCreateUser = async ({
   }
   log.serverApi('no user found, potentially a new signup, autovivifying')
   const systemSlug = await generateRandomAvailableSystemSlug()
-  const columns: UserDbRow = {
+  const columns: UserDbRowForWrite = {
     id,
     email: autoVivifyWithEmail,
     system_slug: systemSlug,

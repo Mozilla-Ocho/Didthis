@@ -144,15 +144,75 @@ const getUsers = async (page: number, limit: number): Promise<ApiUser[]> => {
     users.push(userFromDbRow(row, { publicFilter: true }))
   })
   // get rid of undefined to appease weird nextjs strictness
-  console.log( users)
-  // console.log( JSON.parse(JSON.stringify(users)))
+  // console.log(users)
   return JSON.parse(JSON.stringify(users)) as ApiUser[]
+}
+
+type UserAdminOverview = ApiUser & {
+  // this is public api user record plus the following fields specially added
+  // for admin UI:
+  email: string
+  signupCodeName?: string
+  numPublicProjects: number
+  numPrivateProjects: number
+  numPublicPosts: number
+  numPrivatePosts: number
+  lastPostedAt: number
+  lastRead: number
+  lastWrite: number
+}
+const getUserOverview = async (urlSlug: string): Promise<UserAdminOverview | false> => {
+  const userRowPrivData = (await knex('users')
+    .where('user_slug_lc', urlSlug.toLowerCase())
+    .orWhere('system_slug', urlSlug)
+    .first()) as UserDbRow | undefined
+  // console.log("userRowPrivData",userRowPrivData)
+  if (!userRowPrivData) {
+    return false
+  }
+  const apiUserPubData = userFromDbRow(userRowPrivData, {publicFilter: true})
+  let numPublicProjects = 0
+  let numPublicPosts = 0
+  let numPrivateProjects = 0
+  let numPrivatePosts = 0
+  let lastPostedAt = 0
+  const lastRead = parseInt(userRowPrivData.last_read_from_user || '0', 10)
+  const lastWrite = parseInt(userRowPrivData.last_write_from_user || '0', 10)
+  // traverse all content incl private, for counts
+  for (const projid in userRowPrivData.profile.projects) {
+    const project = userRowPrivData.profile.projects[projid]
+    const numPosts = Object.keys(project.posts).length
+    for (const postid in project.posts) {
+      lastPostedAt = Math.max(lastPostedAt, project.posts[postid].createdAt)
+    }
+    if (project.scope === 'public') {
+      numPublicProjects++;
+      numPublicPosts = numPublicPosts + numPosts
+    } else {
+      numPrivateProjects++;
+      numPrivatePosts = numPrivatePosts + numPosts
+    }
+  }
+  const overview: UserAdminOverview = {
+    ...apiUserPubData,
+    email: userRowPrivData.email,
+    numPublicProjects,
+    numPrivateProjects,
+    numPublicPosts,
+    numPrivatePosts,
+    lastPostedAt,
+    lastRead,
+    lastWrite,
+    signupCodeName: userRowPrivData.signup_code_name || undefined
+  }
+  return JSON.parse(JSON.stringify(overview)) as UserAdminOverview
 }
 
 const adminPages = {
   getProjects,
   getPosts,
   getUsers,
+  getUserOverview,
 }
 
 export default adminPages

@@ -53,6 +53,7 @@ export default async function handler(
   await knex('users')
     .update({
       last_read_from_user: millis,
+      last_write_from_user: millis,
       updated_at_millis: millis,
       profile: profile,
     })
