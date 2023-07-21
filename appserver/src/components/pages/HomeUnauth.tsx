@@ -11,6 +11,7 @@ import Image from 'next/image'
 import { useStore } from '@/lib/store'
 import { trackingEvents } from '@/lib/trackingEvents'
 import { useEffect } from 'react'
+import {WaitlistButton} from '../WaitlistButton'
 
 // DRY_20334 outer page width styles
 const HomeUnauth = () => {
@@ -26,6 +27,8 @@ const HomeUnauth = () => {
       })
     }
   })
+
+  const invited = store.signupCodeInfo && store.signupCodeInfo.active
 
   const contentColX = 'max-w-[1280px] mx-auto text-center'
   const chunks = 'mx-auto max-w-[580px] flex flex-col items-center'
@@ -47,14 +50,23 @@ const HomeUnauth = () => {
         <div className={contentColX + ' pt-5 pb-10 px-4'}>
           <div className={chunks}>
             <p className="text-5xl md:text-6xl">
-              You’ve been invited to join{' '}
-              <strong>{branding.productName}</strong>
+              {invited ? (
+                <span>
+                  You’ve been invited to join{' '}
+                  <strong>{branding.productName}</strong>
+                </span>
+              ) : (
+                <span>
+                  Did you see this? Yes they{' '}
+                  <strong>{branding.productName}</strong>
+                </span>
+              )}
             </p>
             <Image
               src={phoneHero}
               alt="an iPhone screen of a user’s project page with snapshots of their woodworking project to build a step stool"
             />
-            <LoginButton />
+            {invited ?  <LoginButton /> : <WaitlistButton />}
           </div>
         </div>
         <div className="bg-white">
@@ -134,7 +146,7 @@ const HomeUnauth = () => {
                   </p>
                 </div>
               </div>
-              <LoginButton />
+              {invited ?  <LoginButton /> : <WaitlistButton />}
             </div>
           </div>
         </div>
