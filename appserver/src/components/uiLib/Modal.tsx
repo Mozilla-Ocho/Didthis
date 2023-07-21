@@ -14,6 +14,7 @@ const modalTransitionTime = 200
 interface ModalProps {
   isOpen: boolean
   handleClose: () => void
+  handleAfterClose?: () => void,
   srTitle: string
   renderTitleHeading?: boolean
   noPad?: boolean
@@ -25,6 +26,7 @@ interface ModalProps {
 const Modal: React.FC<ModalProps> = ({
   isOpen,
   handleClose,
+  handleAfterClose,
   srTitle,
   renderTitleHeading,
   noPad,
@@ -66,6 +68,7 @@ const Modal: React.FC<ModalProps> = ({
       className="absolute flex justify-center items-center min-h-screen w-screen"
       shouldCloseOnOverlayClick={true}
       closeTimeoutMS={modalTransitionTime}
+      onAfterClose={handleAfterClose}
     >
       <div
         ref={contentRef}

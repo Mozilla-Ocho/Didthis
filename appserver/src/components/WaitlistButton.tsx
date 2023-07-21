@@ -39,6 +39,8 @@ const WaitlistButton = observer(({}) => {
   const [isOpen, setIsOpen] = useState(false)
   const onClose = () => {
     setIsOpen(false)
+  }
+  const onAfterClose = () => {
     setEmail('')
     setValidEmail(false)
     setSpinning(false)
@@ -110,10 +112,11 @@ const WaitlistButton = observer(({}) => {
   return (
     <>
       <Modal
-        srTitle={success ? 'Thank you!' : 'Join the waitlist'}
+        srTitle={success ? 'Thank you!' : 'Join the wait list'}
         renderTitleHeading
         isOpen={isOpen}
         handleClose={onClose}
+        handleAfterClose={onAfterClose}
         closeX
       >
         <div className="max-w-sm">
@@ -126,7 +129,7 @@ const WaitlistButton = observer(({}) => {
             <>
               <p>
                 {branding.productName} test accounts are limited right now —
-                join our waitlist and we’ll notify you when you’re in!
+                join our wait list and we’ll notify you when you’re in!
               </p>
               <form
                 method="POST"
