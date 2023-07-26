@@ -8,7 +8,7 @@ export default function Document() {
       <Head>
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=optional"
+          href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=swap"
         />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/logo.svg" type="image/svg+xml" />
