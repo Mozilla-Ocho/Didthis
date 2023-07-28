@@ -51,7 +51,7 @@ const HomeUnauth = () => {
         <div className={contentColX + ' py-8 md:py-10 px-4'}>
           <div className={chunks}>
             <p className="text-4xl md:text-5xl">
-              <strong>A work in progress is worth celebrating</strong>
+              <strong>A work in progress is worth celebrating.</strong>
             </p>
             {ctaButton}
             <picture>
