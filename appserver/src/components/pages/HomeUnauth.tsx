@@ -41,7 +41,7 @@ const HomeUnauth = () => {
   const howWorksTextCont = 'text-center md:text-left basis-2/5'
   const howWorksImg = 'inline'
   const h2text = 'text-4xl md:text-5xl my-0'
-  const h3text = 'text-3xl md:text-4xl my-0'
+  const h3text = 'text-3xl md:text-4xl mt-0 mb-4'
   const para = 'text-md leading-[24px] md:text-lg md:leading-[32px]'
   const ctaButton = <LoginButton className="my-6 px-6 py-4 text-lg" />
   return (
