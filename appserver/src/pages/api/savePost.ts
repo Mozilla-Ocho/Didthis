@@ -57,6 +57,7 @@ export default async function handler(
   } else {
     post.createdAt = millis
   }
+  if (!post.didThisAt || post.didThisAt === 0) post.didThisAt = post.createdAt
   post.updatedAt = millis
   project.posts[post.id] = post
   project.updatedAt = millis

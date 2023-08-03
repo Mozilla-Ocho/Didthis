@@ -56,7 +56,7 @@ const PostCard = observer(
         tabIndex={-1}
       >
         <p className="text-sm text-timestamps mb-4">
-          <Timestamp millis={post.createdAt} />
+          <Timestamp millis={post.didThisAt} />
         </p>
         {post.imageAssetId && (
           <CloudinaryImage

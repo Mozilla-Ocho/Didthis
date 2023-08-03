@@ -101,6 +101,7 @@ type ApiPost = {
   id: ApiPostId
   projectId: ApiProjectId
   createdAt: ApiTimestamp
+  didThisAt: ApiTimestamp
   updatedAt: ApiTimestamp
   scope: ApiScope
   description?: string

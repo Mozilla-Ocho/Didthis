@@ -57,8 +57,8 @@ const ProjectPage = observer(
     const posts = Object.values(project.posts)
     posts.sort((a, b) =>
       actualSort === 'desc'
-        ? b.createdAt - a.createdAt
-        : a.createdAt - b.createdAt
+        ? b.didThisAt - a.didThisAt
+        : a.didThisAt - b.didThisAt
     )
     const numPosts = posts.length
     const hasImage = !!project.imageAssetId

@@ -16,6 +16,8 @@ import type { UploadCallback } from '../ImageUpload'
 import profileUtils from '@/lib/profileUtils'
 import { twMerge } from 'tailwind-merge'
 import { trackingEvents } from '@/lib/trackingEvents'
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import dayjs, {Dayjs} from 'dayjs'
 
 class PostStore {
   id: string
@@ -36,6 +38,7 @@ class PostStore {
   urlMeta: ApiUrlMeta | false
   fetchUrlMetaAndUpdateDebounced: () => void
   spinning = false
+  didThisAtFormValue: Dayjs | null = null // for the controlled mui element
 
   constructor(
     mode: 'edit' | 'new',
@@ -64,6 +67,7 @@ class PostStore {
       this.imageMeta = post.imageMeta
       this.urlMeta = post.urlMeta || false
       if (this.imageAssetId) this.mediaType = 'image'
+      this.didThisAtFormValue = dayjs(post.didThisAt)
     } else {
       throw new Error(
         'post store must be initialized with "new", or "edit" and an api post obj'
@@ -87,7 +91,8 @@ class PostStore {
     return {
       id: this.id,
       createdAt: 0, // ignored / assigned at backend
-      updatedAt: 0, // ignored / assigned at backend
+      didThisAt: this.didThisAtFormValue ? this.didThisAtFormValue.valueOf() : 0,
+      updatedAt: 0, // ignored / assigned at backend 
       projectId: this.projectId,
       scope: this.scope,
       description: this.description.trim(),
@@ -113,6 +118,15 @@ class PostStore {
     }
   }
 
+  dateTimeIsInvalid() {
+    const nowMillis = new Date().getTime()
+    if (!this.didThisAtFormValue) return false
+    if (this.didThisAtFormValue.valueOf() > nowMillis) {
+      return true
+    }
+    return false
+  }
+
   isPostable() {
     // XXX length validations
     const hasText = !!this.description.trim()
@@ -130,6 +144,7 @@ class PostStore {
     if (this.mediaType === 'image') {
       return hasImage
     }
+    if (this.dateTimeIsInvalid()) return false
     return hasText
   }
 
@@ -153,6 +168,9 @@ class PostStore {
   }
   setMediaType(x: PostMediaType) {
     this.mediaType = x
+  }
+  setDidThisAtDayjs(x: Dayjs | null) {
+    this.didThisAtFormValue = x
   }
   setSpinning(x: boolean) {
     this.spinning = x
@@ -346,6 +364,27 @@ const ImageField = observer(({ postStore }: { postStore: PostStore }) => {
   )
 })
 
+const DateTimeField = observer(({ postStore }: { postStore: PostStore }) => {
+  const handleChange = (x: Dayjs | null) => {
+    postStore.setDidThisAtDayjs(x)
+  }
+  const err = postStore.dateTimeIsInvalid()
+  return (
+    <>
+      <label htmlFor="datetime-field">
+        <span>Did this when:</span>
+            <DateTimePicker
+              disableFuture
+          label={postStore.didThisAtFormValue === null ? "now" : ""}
+          value={postStore.didThisAtFormValue}
+          onChange={handleChange}
+        />
+        {err && <p>values in the future are not allowed</p>}
+      </label>
+    </>
+  )
+})
+
 type Props = { mode: 'new' } | { mode: 'edit'; post: ApiPost }
 
 const PostForm = observer((props: Props) => {
@@ -440,6 +479,8 @@ const PostForm = observer((props: Props) => {
         )}
         {postStore.mediaType === 'link' && <LinkField postStore={postStore} />}
         <DescriptionField postStore={postStore} />
+
+        <DateTimeField postStore={postStore} />
 
         <div className="flex flex-col sm:flex-row gap-4 mt-8 flex-wrap">
           <Button
