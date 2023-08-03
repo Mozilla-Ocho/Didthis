@@ -122,13 +122,13 @@ const WaitlistButton = observer(({}) => {
         <div className="max-w-sm">
           {success && (
             <p>
-              We’ll send you an email when registration opens up. Stay tuned.
+              Please <strong>check your inbox</strong> for a verification email, and click the “Confirm” button in the email. (The email will be from “Mozilla” &mdash; we’re the folks behind Didthis!)
             </p>
           )}
           {!success && (
             <>
               <p>
-                {branding.productName} test accounts are limited right now —
+                {branding.productName} accounts are limited right now —
                 join our wait list and we’ll notify you when you’re in!
               </p>
               <form
