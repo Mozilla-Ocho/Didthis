@@ -67,6 +67,8 @@ module.exports = {
         'linkpreview-host': '#909090',
 
         'breadcrumbs': '#FFFCE3',
+
+        'discordnag': '#EFFBFF',
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
