@@ -1,4 +1,4 @@
-name: Tests (Jest)
+name: "Tests (Jest)"
 on: push
 jobs:
   test:
@@ -7,19 +7,14 @@ jobs:
       run:
         working-directory: appserver
     steps:
-
       - uses: actions/checkout@v3
-
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: "lts/*"
           cache: "yarn"
           cache-dependency-path: "appserver/yarn.lock"
-
       - name: Install Dependencies
         run: yarn install
-
       - name: Run the tests
-        working-directory: appserver
         run: yarn test:ci

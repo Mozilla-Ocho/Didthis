@@ -11,3 +11,6 @@ node_modules
 
 # credentials
 .*.json
+
+# storybook static build
+storybook-static
