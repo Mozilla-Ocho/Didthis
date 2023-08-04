@@ -20,7 +20,7 @@ const AppHeader = observer(({ isThe404 }: { isThe404?: boolean }) => {
               href="/"
               trackEvent={trackingEvents.bcHeaderLogo}
             >
-              <h1 className="text-3xl leading-none">
+              <h1 className="text-3xl leading-none p-0 m-0">
                 <Image src={LogoWordmarkSvg} alt={branding.productName} />
               </h1>
             </Link>
@@ -29,13 +29,13 @@ const AppHeader = observer(({ isThe404 }: { isThe404?: boolean }) => {
             </div>
           </div>
         ) : (
-          <div className="flex items-center py-4 justify-center md:justify-full">
+          <div className="flex items-center py-2 justify-center md:justify-full">
             <Link
               intent="internalNav"
               href="/"
               trackEvent={trackingEvents.bcHeaderLogo}
             >
-              <h1 className="text-3xl leading-none">
+              <h1 className="text-3xl leading-none p-0 m-0">
                 <Image src={LogoWordmarkSvg} alt={branding.productName} />
               </h1>
             </Link>

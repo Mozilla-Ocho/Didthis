@@ -171,7 +171,7 @@ const WaitlistButton = observer(({}) => {
           )}
         </div>
       </Modal>
-      <Button onClick={handleClick} data-testid="waitlistbutton">
+      <Button onClick={handleClick} data-testid="waitlistbutton" className='my-6 px-6 py-4 text-lg'>
         Join the wait list
       </Button>
     </>
