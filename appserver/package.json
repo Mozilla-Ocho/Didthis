@@ -9,7 +9,9 @@
     "lint": "next lint",
     "validate": "next lint; tsc --noEmit",
     "prettier-check": "prettier --ignore-path .gitignore -c **/*.{mjs,js,jsx,ts,tsx}",
-    "prettier-clobber": "prettier --ignore-path .gitignore --write **/*.{mjs,js,jsx,ts,tsx}"
+    "prettier-clobber": "prettier --ignore-path .gitignore --write **/*.{mjs,js,jsx,ts,tsx}",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@amplitude/analytics-browser": "^2.1.2",
@@ -74,5 +76,17 @@
     "tailwindcss": "3.3.1",
     "typescript": "5.0.4",
     "usehooks-ts": "^2.9.1"
+  },
+  "devDependencies": {
+    "@storybook/addon-essentials": "^7.2.1",
+    "@storybook/addon-interactions": "^7.2.1",
+    "@storybook/addon-links": "^7.2.1",
+    "@storybook/addon-onboarding": "^1.0.8",
+    "@storybook/blocks": "^7.2.1",
+    "@storybook/nextjs": "^7.2.1",
+    "@storybook/react": "^7.2.1",
+    "@storybook/testing-library": "^0.2.0",
+    "eslint-plugin-storybook": "^0.6.13",
+    "storybook": "^7.2.1"
   }
 }
