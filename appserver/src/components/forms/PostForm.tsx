@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@/lib/store'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   Button,
   Input,
@@ -378,35 +378,62 @@ const DateTimeField = observer(({ postStore }: { postStore: PostStore }) => {
   const handleChange = (x: Dayjs | null) => {
     postStore.setDidThisAtDayjs(x)
   }
+  const [flash,setFlash] = useState(false)
+  useEffect(() => {
+    if (flash) {
+      const timer = setTimeout(() => {
+        setFlash(false)
+      }, 400)
+      return () => {
+        clearTimeout(timer)
+      }
+    }
+  }, [flash])
   const err = postStore.dateTimeIsInvalid()
-  const exifMillis = postStore.imageMeta
+  const exifMillis = postStore.mediaType === 'image' && postStore.imageMeta
     ? getExifCreatedAtMillis(postStore.imageMeta)
     : null
   const useTheExif = () => {
     postStore.setDidThisAtDayjs(dayjs(exifMillis))
+    setFlash(true)
   }
+  const canShowDateTip = !!exifMillis
   const showDateTip =
-    !!exifMillis &&
+    canShowDateTip &&
     (!postStore.didThisAtFormValue ||
       postStore.didThisAtFormValue.valueOf() !== exifMillis)
+  const tipClasses = showDateTip
+    ? 'mt-2 p-4 h-[76px] opacity-100'
+    : 'mt-0 px-4 h-0 opacity-0'
+  const pickerBgClass = flash ? "bg-yellow-300" : ""
   return (
     <>
-      <label htmlFor="datetime-field">
-        <span>Did this when:</span>
-        <DateTimePicker
-          disableFuture
-          label={postStore.didThisAtFormValue === null ? 'now' : ''}
-          value={postStore.didThisAtFormValue}
-          onChange={handleChange}
-        />
-        {err && <p>values in the future are not allowed</p>}
-        {showDateTip && (
-          <p>
-            This image was taken <Timestamp millis={exifMillis} /> -{' '}
-            <Button intent="link" onClick={useTheExif}>
-              use this datetime
-            </Button>
-          </p>
+      <label htmlFor="datetime-field" className="text-form-labels text-sm">
+        <p>Did this when?</p>
+        <div className={"grid grid-cols-1 transition-colors duration-300 "+pickerBgClass}>
+          <DateTimePicker
+            disableFuture
+            label={postStore.didThisAtFormValue === null ? 'now' : ''}
+            value={postStore.didThisAtFormValue}
+            onChange={handleChange}
+          />
+        </div>
+        {err && <p className="text-red-400 text-xs text-right">Post dates can’t be in the future</p>}
+        {canShowDateTip && (
+          <div
+            className={
+              'bg-breadcrumbs text-bodytext transition-all duration-500 ' +
+              tipClasses
+            }
+          >
+            <p>
+              Photo was taken: <Timestamp format="full" millis={exifMillis} />
+              <br />
+              <Button intent="link" onClick={useTheExif}>
+                Use this date instead
+              </Button>
+            </p>
+          </div>
         )}
       </label>
     </>
@@ -506,9 +533,8 @@ const PostForm = observer((props: Props) => {
           <ImageField postStore={postStore} />
         )}
         {postStore.mediaType === 'link' && <LinkField postStore={postStore} />}
-        <DescriptionField postStore={postStore} />
-
         <DateTimeField postStore={postStore} />
+        <DescriptionField postStore={postStore} />
 
         <div className="flex flex-col sm:flex-row gap-4 mt-8 flex-wrap">
           <Button

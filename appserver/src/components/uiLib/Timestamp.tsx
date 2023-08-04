@@ -12,22 +12,32 @@ const absDate = (date: Date) =>
 const handlePlural = (s: string, n: number) =>
   n === 1 ? s.replace('S', '') : s.replace('S', 's')
 
-const humanize = (millis: number) => {
+const humanize = (millis: number, format: 'relative' | 'full') => {
   const date = new Date(millis)
-  const diffSec = Math.floor((new Date().getTime() - millis) / 1000)
-  if (diffSec < 0) return absDate(date)
-  if (diffSec < 10) return 'just now'
-  if (diffSec < 60) return diffSec + handlePlural(' secondS ago', diffSec)
-  const diffMin = Math.floor(diffSec / 60)
-  if (diffMin < 60) return diffMin + handlePlural(' minuteS ago', diffMin)
-  const diffHr = Math.floor(diffMin / 60)
-  if (diffHr < 24) return diffHr + handlePlural(' hourS ago', diffHr)
-  const diffDay = Math.floor(diffHr / 24)
-  if (diffDay < 7) return diffDay + handlePlural(' dayS ago', diffDay)
-  return absDate(date)
+  if (format === 'relative') {
+    const diffSec = Math.floor((new Date().getTime() - millis) / 1000)
+    if (diffSec < 0) return absDate(date)
+    if (diffSec < 10) return 'just now'
+    if (diffSec < 60) return diffSec + handlePlural(' secondS ago', diffSec)
+    const diffMin = Math.floor(diffSec / 60)
+    if (diffMin < 60) return diffMin + handlePlural(' minuteS ago', diffMin)
+    const diffHr = Math.floor(diffMin / 60)
+    if (diffHr < 24) return diffHr + handlePlural(' hourS ago', diffHr)
+    const diffDay = Math.floor(diffHr / 24)
+    if (diffDay < 7) return diffDay + handlePlural(' dayS ago', diffDay)
+    return absDate(date)
+  } else {
+    return absDate(date)
+  }
 }
 
-const Timestamp = ({ millis }: { millis: number }) => {
+const Timestamp = ({
+  millis,
+  format,
+}: {
+  millis: number
+  format: undefined | 'relative' | 'full'
+}) => {
   // timestamps are client-side. render empty on SSR
   // TODO: do this better so that SSR fetches actually have the content. the
   // issue is that time zones can vary and the toLocaleString() isn't
@@ -38,7 +48,7 @@ const Timestamp = ({ millis }: { millis: number }) => {
     setRendered(true)
   }, [setRendered])
   if (rendered) {
-    return <span>{humanize(millis)}</span>
+    return <span>{humanize(millis, format || 'relative')}</span>
   } else {
     return <span>&nbsp;</span>
   }
