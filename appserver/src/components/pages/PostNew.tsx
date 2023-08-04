@@ -25,7 +25,6 @@ const NewPostPage = observer(() => {
   return (
     <>
       <PageTitle title="New post" />
-      <DiscordNag/>
       <Breadcrumbs
         crumbs={[
           project
@@ -40,6 +39,7 @@ const NewPostPage = observer(() => {
           { name: 'Add post' },
         ]}
       />
+      <DiscordNag/>
       <PagePad>
         <h3>Add post</h3>
         <PostForm mode="new" />
