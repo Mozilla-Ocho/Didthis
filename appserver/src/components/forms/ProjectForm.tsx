@@ -154,7 +154,7 @@ const ProjectForm = observer((props: Props) => {
   }
   const onImageUpload = useCallback(
     res => {
-      projectStore.setImageAssetId(res.cloudinaryAssetId, res.info)
+      projectStore.setImageAssetId(res.cloudinaryAssetId, res.imageMetaPrivate)
     },
     [projectStore]
   ) as UploadCallback

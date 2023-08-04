@@ -1,4 +1,4 @@
-import { action, makeAutoObservable, toJS } from 'mobx'
+import { makeAutoObservable, toJS } from 'mobx'
 import apiClient from '@/lib/apiClient'
 import { amplitudeProxyEndpoint } from '@/lib/apiCore'
 import log from '@/lib/log'

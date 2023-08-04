@@ -1,5 +1,6 @@
 import { Cloudinary } from '@cloudinary/url-gen'
 import { scale } from '@cloudinary/url-gen/actions/resize'
+import dayjs from 'dayjs'
 // import { autoGravity } from '@cloudinary/url-gen/qualifiers/gravity';
 
 const specialAssetIds = {
@@ -125,4 +126,47 @@ const cloudinaryUrlDirect = (
   return url
 }
 
-export { getCloudinaryConfig, getCloudinaryTransform, specialAssetIds, cloudinaryUrlDirect }
+const makeDashesInDatePart = (str: string): string => {
+  const [date,time] = str.split(' ')
+  return date.replaceAll(':','-')+' '+time
+}
+
+const getExifCreatedAtMillis = (imageMeta: CldImageMetaAny): number | null => {
+  if (imageMeta && imageMeta.metaOrigin === 'private') {
+    if (imageMeta.image_metadata) {
+      let timeStr = ''
+      let offsetStr = ''
+      const exif = imageMeta.image_metadata
+      if (exif) {
+        // looks like YYYY:MM:DD HH:MM:SS
+        timeStr =
+          exif.DateTime ||
+          exif.DateTimeOriginal ||
+          exif.DateTimeDigitized ||
+          exif.CreateDate ||
+          exif.ModifyDate || ""
+        // looks like [+/-]NN:NN eg "-07:00"
+        offsetStr =
+          exif.OffsetTime || exif.OffsetTimeOriginal || exif.OffsetTimeDigitized || ""
+      }
+      if (timeStr) {
+        try {
+          // try to make the exif strings into an iso date w/ offset
+          const d = dayjs(makeDashesInDatePart(timeStr) + offsetStr)
+          return d.valueOf()
+        } catch (e) {
+          return null
+        }
+      }
+    }
+  }
+  return null
+}
+
+export {
+  getCloudinaryConfig,
+  getCloudinaryTransform,
+  specialAssetIds,
+  cloudinaryUrlDirect,
+  getExifCreatedAtMillis,
+}

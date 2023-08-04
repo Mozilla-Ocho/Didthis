@@ -1,7 +1,14 @@
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@/lib/store'
-import { useCallback, useState } from 'react'
-import { Button, Input, Select, Textarea, CloudinaryImage } from '../uiLib'
+import { useCallback, useEffect, useState } from 'react'
+import {
+  Button,
+  Input,
+  Select,
+  Textarea,
+  CloudinaryImage,
+  Timestamp,
+} from '../uiLib'
 import { useRouter } from 'next/router'
 import { getParamString } from '@/lib/nextUtils'
 import pathBuilder from '@/lib/pathBuilder'
@@ -16,6 +23,9 @@ import type { UploadCallback } from '../ImageUpload'
 import profileUtils from '@/lib/profileUtils'
 import { twMerge } from 'tailwind-merge'
 import { trackingEvents } from '@/lib/trackingEvents'
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
+import dayjs, { Dayjs } from 'dayjs'
+import { getExifCreatedAtMillis } from '@/lib/cloudinaryConfig'
 
 class PostStore {
   id: string
@@ -36,6 +46,7 @@ class PostStore {
   urlMeta: ApiUrlMeta | false
   fetchUrlMetaAndUpdateDebounced: () => void
   spinning = false
+  didThisAtFormValue: Dayjs | null = null // for the controlled mui element
 
   constructor(
     mode: 'edit' | 'new',
@@ -64,6 +75,7 @@ class PostStore {
       this.imageMeta = post.imageMeta
       this.urlMeta = post.urlMeta || false
       if (this.imageAssetId) this.mediaType = 'image'
+      this.didThisAtFormValue = dayjs(post.didThisAt)
     } else {
       throw new Error(
         'post store must be initialized with "new", or "edit" and an api post obj'
@@ -87,6 +99,9 @@ class PostStore {
     return {
       id: this.id,
       createdAt: 0, // ignored / assigned at backend
+      didThisAt: this.didThisAtFormValue
+        ? this.didThisAtFormValue.valueOf()
+        : 0,
       updatedAt: 0, // ignored / assigned at backend
       projectId: this.projectId,
       scope: this.scope,
@@ -113,6 +128,15 @@ class PostStore {
     }
   }
 
+  dateTimeIsInvalid() {
+    const nowMillis = new Date().getTime()
+    if (!this.didThisAtFormValue) return false
+    if (this.didThisAtFormValue.valueOf() > nowMillis) {
+      return true
+    }
+    return false
+  }
+
   isPostable() {
     // XXX length validations
     const hasText = !!this.description.trim()
@@ -130,6 +154,7 @@ class PostStore {
     if (this.mediaType === 'image') {
       return hasImage
     }
+    if (this.dateTimeIsInvalid()) return false
     return hasText
   }
 
@@ -153,6 +178,9 @@ class PostStore {
   }
   setMediaType(x: PostMediaType) {
     this.mediaType = x
+  }
+  setDidThisAtDayjs(x: Dayjs | null) {
+    this.didThisAtFormValue = x
   }
   setSpinning(x: boolean) {
     this.spinning = x
@@ -304,7 +332,7 @@ const LinkField = observer(({ postStore }: { postStore: PostStore }) => {
 const ImageField = observer(({ postStore }: { postStore: PostStore }) => {
   const onResult = useCallback(
     res => {
-      postStore.setImageAssetId(res.cloudinaryAssetId, res.info)
+      postStore.setImageAssetId(res.cloudinaryAssetId, res.imageMetaPrivate)
     },
     [postStore]
   ) as UploadCallback
@@ -343,6 +371,72 @@ const ImageField = observer(({ postStore }: { postStore: PostStore }) => {
         )}
       </div>
     </div>
+  )
+})
+
+const DateTimeField = observer(({ postStore }: { postStore: PostStore }) => {
+  const handleChange = (x: Dayjs | null) => {
+    postStore.setDidThisAtDayjs(x)
+  }
+  const [flash,setFlash] = useState(false)
+  useEffect(() => {
+    if (flash) {
+      const timer = setTimeout(() => {
+        setFlash(false)
+      }, 400)
+      return () => {
+        clearTimeout(timer)
+      }
+    }
+  }, [flash])
+  const err = postStore.dateTimeIsInvalid()
+  const exifMillis = postStore.mediaType === 'image' && postStore.imageMeta
+    ? getExifCreatedAtMillis(postStore.imageMeta)
+    : null
+  const useTheExif = () => {
+    postStore.setDidThisAtDayjs(dayjs(exifMillis))
+    setFlash(true)
+  }
+  const canShowDateTip = !!exifMillis
+  const showDateTip =
+    canShowDateTip &&
+    (!postStore.didThisAtFormValue ||
+      postStore.didThisAtFormValue.valueOf() !== exifMillis)
+  const tipClasses = showDateTip
+    ? 'mt-2 p-4 h-[76px] opacity-100'
+    : 'mt-0 px-4 h-0 opacity-0'
+  const pickerBgClass = flash ? "bg-yellow-300" : ""
+  return (
+    <>
+      <label htmlFor="datetime-field" className="text-form-labels text-sm">
+        <p>Did this when?</p>
+        <div className={"grid grid-cols-1 transition-colors duration-300 "+pickerBgClass}>
+          <DateTimePicker
+            disableFuture
+            label={postStore.didThisAtFormValue === null ? 'now' : ''}
+            value={postStore.didThisAtFormValue}
+            onChange={handleChange}
+          />
+        </div>
+        {err && <p className="text-red-400 text-xs text-right">Post dates can’t be in the future</p>}
+        {canShowDateTip && (
+          <div
+            className={
+              'bg-breadcrumbs text-bodytext transition-all duration-500 ' +
+              tipClasses
+            }
+          >
+            <p>
+              Photo was taken: <Timestamp format="full" millis={exifMillis} />
+              <br />
+              <Button intent="link" onClick={useTheExif}>
+                Use this date instead
+              </Button>
+            </p>
+          </div>
+        )}
+      </label>
+    </>
   )
 })
 
@@ -439,6 +533,7 @@ const PostForm = observer((props: Props) => {
           <ImageField postStore={postStore} />
         )}
         {postStore.mediaType === 'link' && <LinkField postStore={postStore} />}
+        <DateTimeField postStore={postStore} />
         <DescriptionField postStore={postStore} />
 
         <div className="flex flex-col sm:flex-row gap-4 mt-8 flex-wrap">

@@ -9,6 +9,8 @@ import { useRouter } from 'next/router'
 import { appRootDivId } from './uiLib/Modal'
 import Head from 'next/head'
 import branding from '@/lib/branding'
+import { LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 // Inner is separate because it has to be a store observer for when
 // headerFooter=authed and the outer layer is the store provider itself.
@@ -37,7 +39,9 @@ const Inner = observer(
       <StoreLoadingWrapper>
         <LoginGlobalOverlay />
         <DeletionConfirmationModal />
-        <StaticLayout isThe404={isThe404} unauthHomepage={unauthHomepage}>{children}</StaticLayout>
+        <StaticLayout isThe404={isThe404} unauthHomepage={unauthHomepage}>
+          {children}
+        </StaticLayout>
       </StoreLoadingWrapper>
     )
   }
@@ -59,9 +63,19 @@ export default function DefaultLayout({
   const router = useRouter()
   return (
     <div id={appRootDivId}>
-      <Head><title>{branding.productName}</title></Head>
-      <StoreWrapper authUser={authUser} signupCodeInfo={signupCodeInfo || false} router={router}>
-        <Inner isThe404={isThe404} unauthHomepage={unauthHomepage}>{children}</Inner>
+      <Head>
+        <title>{branding.productName}</title>
+      </Head>
+      <StoreWrapper
+        authUser={authUser}
+        signupCodeInfo={signupCodeInfo || false}
+        router={router}
+      >
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <Inner isThe404={isThe404} unauthHomepage={unauthHomepage}>
+            {children}
+          </Inner>
+        </LocalizationProvider>
       </StoreWrapper>
     </div>
   )
