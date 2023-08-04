@@ -273,7 +273,7 @@ class FormStore {
 const ImageField = observer(({ formStore }: { formStore: FormStore }) => {
   const onResult = useCallback(
     res => {
-      formStore.setImageAssetId(res.cloudinaryAssetId, res.info)
+      formStore.setImageAssetId(res.cloudinaryAssetId, res.imageMetaPrivate)
     },
     [formStore]
   ) as UploadCallback

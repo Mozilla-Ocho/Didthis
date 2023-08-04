@@ -1,7 +1,14 @@
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@/lib/store'
 import { useCallback, useState } from 'react'
-import { Button, Input, Select, Textarea, CloudinaryImage } from '../uiLib'
+import {
+  Button,
+  Input,
+  Select,
+  Textarea,
+  CloudinaryImage,
+  Timestamp,
+} from '../uiLib'
 import { useRouter } from 'next/router'
 import { getParamString } from '@/lib/nextUtils'
 import pathBuilder from '@/lib/pathBuilder'
@@ -16,8 +23,9 @@ import type { UploadCallback } from '../ImageUpload'
 import profileUtils from '@/lib/profileUtils'
 import { twMerge } from 'tailwind-merge'
 import { trackingEvents } from '@/lib/trackingEvents'
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import dayjs, {Dayjs} from 'dayjs'
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
+import dayjs, { Dayjs } from 'dayjs'
+import { getExifCreatedAtMillis } from '@/lib/cloudinaryConfig'
 
 class PostStore {
   id: string
@@ -91,8 +99,10 @@ class PostStore {
     return {
       id: this.id,
       createdAt: 0, // ignored / assigned at backend
-      didThisAt: this.didThisAtFormValue ? this.didThisAtFormValue.valueOf() : 0,
-      updatedAt: 0, // ignored / assigned at backend 
+      didThisAt: this.didThisAtFormValue
+        ? this.didThisAtFormValue.valueOf()
+        : 0,
+      updatedAt: 0, // ignored / assigned at backend
       projectId: this.projectId,
       scope: this.scope,
       description: this.description.trim(),
@@ -322,7 +332,7 @@ const LinkField = observer(({ postStore }: { postStore: PostStore }) => {
 const ImageField = observer(({ postStore }: { postStore: PostStore }) => {
   const onResult = useCallback(
     res => {
-      postStore.setImageAssetId(res.cloudinaryAssetId, res.info)
+      postStore.setImageAssetId(res.cloudinaryAssetId, res.imageMetaPrivate)
     },
     [postStore]
   ) as UploadCallback
@@ -369,17 +379,35 @@ const DateTimeField = observer(({ postStore }: { postStore: PostStore }) => {
     postStore.setDidThisAtDayjs(x)
   }
   const err = postStore.dateTimeIsInvalid()
+  const exifMillis = postStore.imageMeta
+    ? getExifCreatedAtMillis(postStore.imageMeta)
+    : null
+  const useTheExif = () => {
+    postStore.setDidThisAtDayjs(dayjs(exifMillis))
+  }
+  const showDateTip =
+    !!exifMillis &&
+    (!postStore.didThisAtFormValue ||
+      postStore.didThisAtFormValue.valueOf() !== exifMillis)
   return (
     <>
       <label htmlFor="datetime-field">
         <span>Did this when:</span>
-            <DateTimePicker
-              disableFuture
-          label={postStore.didThisAtFormValue === null ? "now" : ""}
+        <DateTimePicker
+          disableFuture
+          label={postStore.didThisAtFormValue === null ? 'now' : ''}
           value={postStore.didThisAtFormValue}
           onChange={handleChange}
         />
         {err && <p>values in the future are not allowed</p>}
+        {showDateTip && (
+          <p>
+            This image was taken <Timestamp millis={exifMillis} /> -{' '}
+            <Button intent="link" onClick={useTheExif}>
+              use this datetime
+            </Button>
+          </p>
+        )}
       </label>
     </>
   )

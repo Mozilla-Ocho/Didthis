@@ -8,7 +8,7 @@ import {twMerge} from 'tailwind-merge'
 
 type UploadResult = {
   cloudinaryAssetId: string
-  info: CldImageMetaPrivate
+  imageMetaPrivate: CldImageMetaPrivate
 }
 
 type UploadCallback = (result: UploadResult) => void
@@ -160,7 +160,7 @@ const ImageUpload = ({
           store.trackEvent(trackingEvents.caUploadImage, { imgIntent:intent })
           onUploadWithUseCallback({
             cloudinaryAssetId: result.info.public_id,
-            info: result.info,
+            imageMetaPrivate: {...result.info, metaOrigin: 'private'} as CldImageMetaPrivate,
           })
         }
         if (result && result.info === 'hidden') {
