@@ -12115,7 +12115,7 @@ store2@^2.14.2:
 
 storybook@^7.2.1:
   version "7.2.1"
-  resolved "https://registry.npmjs.org/storybook/-/storybook-7.2.1.tgz"
+  resolved "https://registry.yarnpkg.com/storybook/-/storybook-7.2.1.tgz#042dc285e0402c23ceee508acd685105a5bf4cd5"
   integrity sha512-uNNqJrWUVaxdZdd3GpMTHt9h2EftoUKxtpAWeQlzx20DDvcliVC1yvLT54sLAzY8nlxxN+fBUuBbTSJ1Dx4TPg==
   dependencies:
     "@storybook/cli" "7.2.1"
