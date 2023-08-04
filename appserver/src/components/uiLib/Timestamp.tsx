@@ -36,7 +36,7 @@ const Timestamp = ({
   format,
 }: {
   millis: number
-  format: undefined | 'relative' | 'full'
+  format?: undefined | 'relative' | 'full'
 }) => {
   // timestamps are client-side. render empty on SSR
   // TODO: do this better so that SSR fetches actually have the content. the
