@@ -68,6 +68,7 @@ interface ButtonProps extends VariantProps<typeof buttonCVA> {
   spinning?: boolean
   trackEvent?: EventSpec
   trackEventOpts?: EventSpec['opts']
+  id?: string
 }
 
 const Button: FC<ButtonProps> = ({

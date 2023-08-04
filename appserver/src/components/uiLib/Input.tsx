@@ -20,13 +20,14 @@ const inputCVA = cva(
 type Props = React.InputHTMLAttributes<HTMLInputElement> &
   VariantProps<typeof inputCVA> & {
     customError?: false | string
-    greenText?: string,
-    checkingText?: string,
+    greenText?: string
+    checkingText?: string
     required?: boolean
     touched?: boolean
     maxLen?: number
     minLen?: number
     hideLengthUnlessViolated?: boolean
+    justTheInputOnly?: boolean
   }
 
 const Input: FC<Props> = ({
@@ -41,6 +42,7 @@ const Input: FC<Props> = ({
   maxLen,
   minLen,
   hideLengthUnlessViolated,
+  justTheInputOnly,
   ...props
 }) => {
   let error = ''
@@ -65,6 +67,12 @@ const Input: FC<Props> = ({
   const errorClass = error
     ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
     : ''
+  const theInput = (
+    <input className={twMerge(inputCVA({}), className, errorClass)} {...props}>
+      {children}
+    </input>
+  )
+  if (justTheInputOnly) return theInput
   return (
     <div>
       <input
@@ -81,7 +89,9 @@ const Input: FC<Props> = ({
       {!error && (info || greenText || checkingText) && (
         <div className="relative h-0 text-form-labels text-right text-xs right-0">
           {greenText && <span className="text-green-500">{greenText}</span>}
-          {checkingText && <span className="text-black-200">{checkingText}</span>}
+          {checkingText && (
+            <span className="text-black-200">{checkingText}</span>
+          )}
           {info}
         </div>
       )}

@@ -2,6 +2,7 @@
 import React, { useEffect, ReactNode, useState, useRef } from 'react'
 import ReactModal from 'react-modal'
 import { twMerge } from 'tailwind-merge'
+import Button from './Button'
 
 const appRootDivId = 'approot' // exported, used in default layout
 
@@ -13,21 +14,25 @@ const modalTransitionTime = 200
 interface ModalProps {
   isOpen: boolean
   handleClose: () => void
+  handleAfterClose?: () => void,
   srTitle: string
   renderTitleHeading?: boolean
   noPad?: boolean
   maxEdge?: boolean
   children: ReactNode
+  closeX?: boolean
 }
 
 const Modal: React.FC<ModalProps> = ({
   isOpen,
   handleClose,
+  handleAfterClose,
   srTitle,
   renderTitleHeading,
   noPad,
   maxEdge,
   children,
+  closeX,
 }) => {
   // see globals.css for ReactModal__Body--open (hides overflow to prevent document scroll)
 
@@ -63,6 +68,7 @@ const Modal: React.FC<ModalProps> = ({
       className="absolute flex justify-center items-center min-h-screen w-screen"
       shouldCloseOnOverlayClick={true}
       closeTimeoutMS={modalTransitionTime}
+      onAfterClose={handleAfterClose}
     >
       <div
         ref={contentRef}
@@ -72,6 +78,20 @@ const Modal: React.FC<ModalProps> = ({
           noPad || maxEdge ? '' : 'px-4 pt-5 pb-4 sm:p-6'
         )}
       >
+        {closeX && (
+          <p className="float-right">
+            <Button
+              intent="link"
+              id="modal-close"
+              data-testid="modalClose"
+              aria-label="close"
+              onClick={handleClose}
+              className="text-3xl leading-none no-underline ml-2"
+            >
+              &#x2715;
+            </Button>
+          </p>
+        )}
         {renderTitleHeading && <h4 className={`m-0 mb-4`}>{srTitle}</h4>}
         {children}
       </div>

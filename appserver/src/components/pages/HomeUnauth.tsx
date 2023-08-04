@@ -14,6 +14,7 @@ import Image from 'next/image'
 import { useStore } from '@/lib/store'
 import { trackingEvents } from '@/lib/trackingEvents'
 import { useEffect } from 'react'
+import {WaitlistButton} from '../WaitlistButton'
 
 // DRY_20334 outer page width styles
 const HomeUnauth = () => {
@@ -30,6 +31,7 @@ const HomeUnauth = () => {
     }
   })
 
+  const invited = store.signupCodeInfo && store.signupCodeInfo.active
   const contentColX = 'max-w-[1280px] mx-auto text-center'
   const chunks = 'mx-auto max-w-[580px] flex flex-col items-center'
 
@@ -43,7 +45,7 @@ const HomeUnauth = () => {
   const h2text = 'text-4xl md:text-5xl my-0'
   const h3text = 'text-3xl md:text-4xl mt-0 mb-4'
   const para = 'text-md leading-[24px] md:text-lg md:leading-[32px]'
-  const ctaButton = <LoginButton className="my-6 px-6 py-4 text-lg" />
+  const ctaButton = invited ? <LoginButton className="my-6 px-6 py-4 text-lg" /> : <WaitlistButton />
   return (
     <div className="grid grid-rows-[auto_1fr_auto] w-full min-h-screen">
       <AppHeader />
