@@ -28,6 +28,7 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
 
   // completed actions
   caJoinWaitlist: { eventName: 'joinWaitlist', opts: {} },
+  caJoinViralWaitlist: { eventName: 'joinViralWaitlist', opts: { /* fromPage, targetUserSlug */} },
   caSignup: {
     eventName: 'signup',
     opts: {
@@ -115,6 +116,10 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   bcWaitlist: {
     eventName: 'buttonClick',
     opts: { name: 'joinWaitlist' },
+  },
+  bcViralWaitlist: {
+    eventName: 'buttonClick',
+    opts: { name: 'joinViralWaitlist', /* fromPage, targetUserSlug */ },
   },
   bcSharePublicProject: {
     eventName: 'buttonClick',

@@ -161,6 +161,7 @@ type EventSpec = {
     direction?: 'asc' | 'desc'
     imgIntent?: CldImageIntent,
     asPartOfNewPost?: YorN
+    targetUserSlug?: string
   }
 }
 
