@@ -39,6 +39,12 @@ deployment has a chicken or egg problem in which the appserver depends on a
 custom image that can't be created because the private docker repository itself
 doesn't exist.
 
+`flag_use_firebase` is a boolean and if enabled, provisions a firebase web app
+in the gcp project which can be used for authentication for mvps/prototypes.
+enabling auth requires a manual step, once the firebase app is provisioned, be
+sure to log in via the console and enable auth for it (this cannot be done
+programmatically.)
+
 `gcp_project_id` is a string containing the gcp project id.
 
 note: this value is duplicated in the terraform vars and in the github

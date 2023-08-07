@@ -8,3 +8,7 @@ node_modules
 *.swp
 *.swo
 .env
+
+# credentials
+.*.json
+

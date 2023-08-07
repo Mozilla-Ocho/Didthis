@@ -4,6 +4,7 @@ variable "autoscaling_min" { type = number }
 variable "db_deletion_protection" { type = bool }
 variable "db_tier" { type = string }
 variable "env_name" { type = string }
+variable "flag_use_firebase" { type = bool }
 variable "flag_destroy" { type = bool }
 variable "flag_use_db" { type = bool }
 variable "flag_use_dummy_appserver" { type = bool }
@@ -97,11 +98,13 @@ module "docker_repo" {
   depends_on = [module.gcp_apis]
 }
 
-# module "firebase" {
-#   source = "./modules/firebase"
-#   gcp_project_id = var.gcp_project_id
-#   depends_on = [module.gcp_apis]
-# }
+module "firebase" {
+  count = var.flag_use_firebase ? 0 : 1
+  source = "./modules/firebase"
+  gcp_project_id = var.gcp_project_id
+  app_name = var.app_name
+  depends_on = [module.gcp_apis]
+}
 
 module "appserver_main" {
   count = var.flag_destroy ? 0 : 1
