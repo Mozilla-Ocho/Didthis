@@ -3,18 +3,21 @@ on: push
 jobs:
   test:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: appserver
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - uses: docker/setup-buildx-action@v2
+      - uses: docker/build-push-action@v4
         with:
-          node-version: "lts/*"
-          cache: "yarn"
-          cache-dependency-path: "appserver/yarn.lock"
-      - name: Install Dependencies
-        run: yarn install
-      - name: Run the tests
-        run: yarn test:ci
+          context: .
+          file: "dockerfiles/appserver"
+          tags: appserver_prod:latest
+          target: appserver_prod
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          push: false
+      - name: Run Jest
+        uses: addnab/docker-run-action@v3
+        with:
+          image: appserver_prod:latest
+          run: yarn test:ci
