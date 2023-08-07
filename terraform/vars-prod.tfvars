@@ -10,6 +10,7 @@ env_name="prod"
 flag_destroy=false
 flag_use_db=true
 flag_use_dummy_appserver=false
+flag_use_firebase=true
 gcp_project_id="moz-fx-future-products-prod"
 gcp_project_number="29393258446"
 region="us-central1"

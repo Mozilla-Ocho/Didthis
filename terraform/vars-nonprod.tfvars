@@ -10,6 +10,7 @@ env_name="nonprod"
 flag_destroy=false
 flag_use_db=true
 flag_use_dummy_appserver=false
+flag_use_firebase=true
 gcp_project_id="moz-fx-future-products-nonprod"
 gcp_project_number="984891837435"
 region="us-central1"
