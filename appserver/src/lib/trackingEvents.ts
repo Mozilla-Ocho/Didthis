@@ -10,6 +10,8 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   pvHomeUnauth: { eventName: 'pageview', opts: { name: 'homeUnauth' } },
   validCodeHomeUnauth: { eventName: 'validCodeHomeUnauth', opts: { name:
     'validCodeHomeUnauth', /* signupCodeName */ } },
+  waitlistHomeUnauth: { eventName: 'waitlistHomeUnauth', opts: { name:
+    'waitlistHomeUnauth' } },
   pvHomeAuth: { eventName: 'pageview', opts: { name: 'homeAuth' } },
   pvUser: { eventName: 'pageview', opts: { name: 'user' } },
   pvUnsolicited: { eventName: 'pageview', opts: { name: 'unsolicited' } },

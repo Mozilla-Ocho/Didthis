@@ -28,6 +28,9 @@ const HomeUnauth = () => {
       store.trackEvent(trackingEvents.validCodeHomeUnauth, {
         signupCodeName: store.signupCodeInfo.name,
       })
+    } else {
+      // otherwise, track special event for homepage waitlist funnel
+      store.trackEvent(trackingEvents.waitlistHomeUnauth)
     }
   })
 
