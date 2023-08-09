@@ -26,6 +26,7 @@ import { trackingEvents } from '@/lib/trackingEvents'
 import PageTitle from '../PageTitle'
 import OgMeta from '../OgMeta'
 import DiscordNag from '../DiscordNag'
+import ViralWaitlistBlurb from '../ViralWaitlistBlurb'
 
 const ProjectPage = observer(
   ({ targetUser }: { targetUser: ApiUser | false }) => {
@@ -133,6 +134,7 @@ const ProjectPage = observer(
           </Link>
         </ConfirmationModal>
         <Breadcrumbs crumbs={[{ name: project.title }]} />
+        <ViralWaitlistBlurb fromPage='project' targetUserSlug={targetUser.publicPageSlug} />
         <DiscordNag/>
         <PagePad>
           <UserPreview user={targetUser} compact={true} />
