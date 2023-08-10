@@ -1,4 +1,4 @@
-name: "Tests (Jest)"
+name: "Validate & Test"
 on: push
 jobs:
   test:
@@ -16,8 +16,10 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           push: false
-      - name: Run Jest
+      - name: Validate & Test
         uses: addnab/docker-run-action@v3
         with:
           image: appserver_prod:latest
-          run: yarn test:ci
+          run: |
+            yarn validate
+            yarn test:ci
