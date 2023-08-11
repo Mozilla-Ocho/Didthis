@@ -150,6 +150,8 @@ app
         console.log(e)
       }
       // DRY_51323 testBuckets contents
+      // for testing/viewing, ?bkt=[0-3] will force the lp bucket
+      if (req.query.bkt) untrustedBuckets.lp = parseInt(req.query.bkt,10)
       if (
         Number.isInteger(untrustedBuckets.lp) &&
         untrustedBuckets.lp >= 0 &&
