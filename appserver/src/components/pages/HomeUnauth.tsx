@@ -2,14 +2,19 @@ import { LoginButton } from '@/components/auth/LoginButton'
 import AppHeader from '@/components/AppHeader'
 import AppFooter from '@/components/AppFooter'
 import branding from '@/lib/branding'
-// import phoneHeroDk from '@/assets/img/dk-hero-img2x.png'
-// import phoneHeroMb from '@/assets/img/mb-hero-img2x.png'
-import captureProgressDk from '@/assets/img/dk-capture-your-progress-img2x.png'
-import captureProgressMb from '@/assets/img/mb-capture-your-progress-img2x.png'
-import worksWithAnyHobbyDk from '@/assets/img/works_with_any_hobby_2x.png'
-import shareCelebDesktop from '@/assets/img/share-and-celebrate-desktop-crop.png'
-import shareCelebMobile from '@/assets/img/share-and-celebrate-img-mobile-crop.png'
-import hiking from '@/assets/img/hiking_2x.png'
+import captureProgres2x from '@/assets/img/capture_your_progress2x.png'
+import worksWithAnyHobby1x from '@/assets/img/works_with_any_hobby_1x.png'
+import worksWithAnyHobby2x from '@/assets/img/works_with_any_hobby_2x.png'
+import shareAndCelebrate1x from '@/assets/img/share_and_celebrate1x.png'
+import shareAndCelebrate2x from '@/assets/img/share_and_celebrate2x.png'
+import hiking1x from '@/assets/img/hiking_1x.png'
+import hiking2x from '@/assets/img/hiking_2x.png'
+import knitting1x from '@/assets/img/knitting_1x.png'
+import knitting2x from '@/assets/img/knitting_2x.png'
+import woodworking1x from '@/assets/img/woodworking_1x.png'
+import woodworking2x from '@/assets/img/woodworking_2x.png'
+import baking1x from '@/assets/img/baking_1x.png'
+import baking2x from '@/assets/img/baking_2x.png'
 import Image from 'next/image'
 import { useStore } from '@/lib/store'
 import { trackingEvents } from '@/lib/trackingEvents'
@@ -20,8 +25,8 @@ import { PagePad } from '../uiLib'
 // DRY_20334 outer page width styles
 const HomeUnauth = () => {
   const store = useStore()
-  const bucketInt = (store.testBucket ? store.testBucket.value : 0) % 4
-  let topicBucket: 'combo' | 'authentic' | 'storytelling' | 'utility'
+  const bucketInt = (store.testBucket ? store.testBucket.value : 0) % 5
+  let topicBucket: 'combo' | 'authentic' | 'storytelling' | 'utility' | 'wip'
   // safe default to the combo bucket in case something's oddly wrong with
   // bucketInt inputs
   topicBucket = 'combo'
@@ -29,6 +34,7 @@ const HomeUnauth = () => {
   if (bucketInt === 1) topicBucket = 'authentic'
   if (bucketInt === 2) topicBucket = 'storytelling'
   if (bucketInt === 3) topicBucket = 'utility'
+  if (bucketInt === 4) topicBucket = 'wip'
   store.useTrackedPageEvent(trackingEvents.pvHomeUnauth, { topicBucket })
   useEffect(() => {
     // special tracking event for campaign conversion, if user viewed unauth
@@ -46,6 +52,34 @@ const HomeUnauth = () => {
   })
 
   const invited = store.signupCodeInfo && store.signupCodeInfo.active
+
+  let hobbyImg1x = woodworking1x
+  let hobbyImg2x = woodworking2x
+  let hobbyAlt = "An iPhone screenshot showing the DidThis application featuring a woodworking project in progress"
+  if (store.signupCodeInfo && store.signupCodeInfo.name === 'ads-knitting') {
+    hobbyImg1x = knitting1x
+    hobbyImg2x = knitting2x
+    hobbyAlt = "An iPhone screenshot showing the DidThis application featuring a knitting project in progress"
+  }
+  if (store.signupCodeInfo && store.signupCodeInfo.name === 'ads-textile') {
+    hobbyImg1x = knitting1x
+    hobbyImg2x = knitting2x
+    hobbyAlt = "An iPhone screenshot showing the DidThis application featuring a knitting project in progress"
+  }
+  if (store.signupCodeInfo && store.signupCodeInfo.name === 'ads-woodworking') {
+    // noop
+  }
+  if (store.signupCodeInfo && store.signupCodeInfo.name === 'ads-cooking') {
+    hobbyImg1x = baking1x
+    hobbyImg2x = baking2x
+    hobbyAlt = "An iPhone screenshot showing the DidThis application featuring a bakingproject in progress"
+  }
+  if (store.signupCodeInfo && store.signupCodeInfo.name === 'ads-hiking') {
+    hobbyImg1x = hiking1x
+    hobbyImg2x = hiking2x
+    hobbyAlt = "An iPhone screenshot showing the DidThis application featuring a hike in progress"
+  }
+
   const contentColX = 'max-w-[1280px] mx-auto text-center'
   // const chunks = 'mx-auto max-w-[580px] flex flex-col items-center'
 
@@ -86,6 +120,11 @@ const HomeUnauth = () => {
                       Capture the authentic story of your passion projects
                     </span>
                   )}
+                  {topicBucket === 'wip' && (
+                    <span>
+                      A work in progress is worth celebrating
+                    </span>
+                  )}
                 </strong>
               </h4>
               <p className="text-base">
@@ -100,9 +139,9 @@ const HomeUnauth = () => {
                 {topicBucket === 'utility' && (
                   <span>
                     Track and journal your progress through your hobby journeys.
-                    Reflect and record the joys and challenges, and
-                    celebrate your growth. Keep your projects private or share
-                    them with the people who will delight in your process.
+                    Reflect and record the joys and challenges, and celebrate
+                    your growth. Keep your projects private or share them with
+                    the people who will delight in your process.
                   </span>
                 )}
                 {topicBucket === 'storytelling' && (
@@ -114,9 +153,16 @@ const HomeUnauth = () => {
                 )}
                 {topicBucket === 'combo' && (
                   <span>
-                    Track each victory, stumble, or simple snapshot for
-                    yourself &mdash; or to share with the people who will delight in
-                    your process.
+                    Track each victory, stumble, or simple snapshot for yourself
+                    &mdash; or to share with the people who will delight in your
+                    process.
+                  </span>
+                )}
+                {topicBucket === 'wip' && (
+                  <span>
+                    Didthis helps you keep track of your hobby projects,
+                    remember what you’ve learned and accomplished, and share
+                    your achievements with friends and fellow hobbyists.
                   </span>
                 )}
               </p>
@@ -124,23 +170,21 @@ const HomeUnauth = () => {
             </div>
             <picture>
               <source
-                media="(min-width: 640px)"
-                srcSet={hiking.src + ' 2x'}
-                height={hiking.height / 2}
-                width={hiking.width / 2}
+                srcSet={hobbyImg2x.src + ' 2x'}
+                height={hobbyImg2x.height / 2}
+                width={hobbyImg2x.width / 2}
               />
               <source
-                media="(max-width: 639px)"
-                srcSet={hiking.src + ' 2x'}
-                height={hiking.height / 2}
-                width={hiking.width / 2}
+                srcSet={hobbyImg1x.src + ' 1x'}
+                height={hobbyImg1x.height }
+                width={hobbyImg1x.width }
               />
               <img
-                src={hiking.src}
-                height={hiking.height / 2}
-                width={hiking.width / 2}
+                src={hobbyImg2x.src}
+                height={hobbyImg2x.height / 2}
+                width={hobbyImg2x.width / 2}
                 className="mb-[-15%]"
-                alt="an iPhone screen of a user’s project page with snapshots of their woodworking project to build a step stool"
+                alt={hobbyAlt}
               />
             </picture>
           </div>
@@ -152,26 +196,12 @@ const HomeUnauth = () => {
 
               <div className={flexPairRev}>
                 <div className={howWorksImgCont}>
-                  <picture>
-                    <source
-                      media="(min-width: 640px)"
-                      srcSet={captureProgressDk.src + ' 2x'}
-                      height={captureProgressDk.height / 2}
-                      width={captureProgressDk.width / 2}
+                    <Image
+                      src={captureProgres2x}
+                      height={captureProgres2x.height / 2}
+                      width={captureProgres2x.width / 2}
+                      alt="a series of illustrations showing the evolution of a baking project from mixing dough, to cooking in the oven, to a finished loaf of bread"
                     />
-                    <source
-                      media="(max-width: 639px)"
-                      srcSet={captureProgressMb.src + ' 2x'}
-                      height={captureProgressMb.height / 2}
-                      width={captureProgressMb.width / 2}
-                    />
-                    <img
-                      src={captureProgressMb.src}
-                      height={captureProgressMb.height / 2}
-                      width={captureProgressMb.width / 2}
-                      alt="a series of screenshots showing the evolution of a party stickers project from design concept to printing, with text, links, and images"
-                    />
-                  </picture>
                 </div>
                 <div className={howWorksTextCont}>
                   <h3 className={h4text}>Capture your progress</h3>
@@ -185,26 +215,12 @@ const HomeUnauth = () => {
 
               <div className={flexPair}>
                 <div className={howWorksImgCont}>
-                  <picture>
-                    <source
-                      media="(min-width: 640px)"
-                      srcSet={worksWithAnyHobbyDk.src + ' 2x'}
-                      height={worksWithAnyHobbyDk.height / 2}
-                      width={worksWithAnyHobbyDk.width / 2}
-                    />
-                    <source
-                      media="(max-width: 639px)"
-                      srcSet={worksWithAnyHobbyDk.src + ' 2x'}
-                      height={worksWithAnyHobbyDk.height / 2}
-                      width={worksWithAnyHobbyDk.width / 2}
-                    />
-                    <img
-                      src={worksWithAnyHobbyDk.src}
-                      height={worksWithAnyHobbyDk.height / 2}
-                      width={worksWithAnyHobbyDk.width / 2}
-                      alt="a group of project cards showing titles and photographs including: “My quest for low-sugar cookies”, “Climbing Maple Mountain”, “Living room side table”, and “A beige hand-knit sweater”"
-                    />
-                  </picture>
+                  <Image
+                    src={worksWithAnyHobby2x}
+                    height={worksWithAnyHobby2x.height / 2}
+                    width={worksWithAnyHobby2x.width / 2}
+                    alt="a group of project cards showing titles and photographs including: “My quest for low-sugar cookies”, “Climbing Maple Mountain”, “Living room side table”, and “A beige hand-knit sweater”"
+                  />
                 </div>
                 <div className={howWorksTextCont}>
                   <h3 className={h4text}>Works with any hobby</h3>
@@ -217,17 +233,14 @@ const HomeUnauth = () => {
                 </div>
               </div>
 
-              <div className={flexPairRev + ' !mb-0'}>
+              <div className={flexPairRev }>
                 <div className={howWorksImgCont}>
                   <Image
-                    src={shareCelebMobile}
-                    className={howWorksImg + ' md:hidden'}
-                    alt="a group of social media app icons including Reddit, Facebook, Instagram, Twitter, TikTok, Discord, and Slack"
-                  />
-                  <Image
-                    src={shareCelebDesktop}
-                    className={howWorksImg + ' hidden md:inline my-24 ml-8'}
-                    alt="a group of social media app icons including Reddit, Facebook, Instagram, Twitter, TikTok, Discord, and Slack"
+                    src={shareAndCelebrate2x}
+                    width={shareAndCelebrate2x.width / 2}
+                    height={shareAndCelebrate2x.height / 2}
+                    className={howWorksImg}
+                    alt="an illustration of a phone in a hand with outward arrows connecting to other people, indicating sharing and distribution of content from your phone"
                   />
                 </div>
                 <div className={howWorksTextCont}>
