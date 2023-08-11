@@ -43,24 +43,24 @@ class Store {
   showConfirmDeleteModal = false
   router: NextRouter
   debugObjId = (Math.random() + '').replace('0.', '')
-  testBuckets: TestBuckets | undefined
+  testBucket: TestBucket | undefined
 
   constructor({
     authUser,
     signupCodeInfo,
     router,
-    testBuckets,
+    testBucket,
   }: {
     authUser?: ApiUser | false
     signupCodeInfo?: false | ApiSignupCodeInfo
     router: NextRouter
     // bucketed tests are not in use everywhere so this is undefined in a bunch
     // of pages.
-    testBuckets?: TestBuckets
+    testBucket?: TestBucket
   }) {
     this.router = router
-    this.testBuckets= testBuckets
-    log.readiness("testBuckets", testBuckets)
+    this.testBucket= testBucket
+    log.readiness("testBucket", testBucket)
     // nextjs SSR computes and provides the authUser and signup code via input
     // props to the wrapper/provider
     makeAutoObservable(

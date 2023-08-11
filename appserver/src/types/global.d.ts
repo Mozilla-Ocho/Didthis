@@ -192,7 +192,9 @@ type SlugCheck = {
 }
 
 // DRY_51323 testBuckets contents
-type TestBuckets = {
-  lp: number,
+type TestBucket = {
+  version: number,
+  value: number,
 }
+
 

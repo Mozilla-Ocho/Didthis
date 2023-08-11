@@ -19,7 +19,7 @@ import { WaitlistButton } from '../WaitlistButton'
 // DRY_20334 outer page width styles
 const HomeUnauth = () => {
   const store = useStore()
-  const bucketInt = store.testBuckets ? store.testBuckets.lp : 0
+  const bucketInt = (store.testBucket ? store.testBucket.value : 0) % 4
   let topicBucket: 'combo' | 'authentic' | 'storytelling' | 'utility'
   // safe default to the combo bucket in case something's oddly wrong with
   // bucketInt inputs

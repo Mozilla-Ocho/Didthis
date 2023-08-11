@@ -135,33 +135,25 @@ app
         secure: process.env.NEXT_PUBLIC_ENV_NAME !== 'dev',
       })
       const bucketsCookieStr = cookies.get(bucketsCookieName) || ''
-      const testBuckets = {}
-      let untrustedBuckets = {}
-      try {
-        untrustedBuckets = Object.fromEntries(
-          new URLSearchParams(bucketsCookieStr).entries()
-        )
-        untrustedBuckets.lp = parseInt(untrustedBuckets.lp, 10) // NaN for new users
-      } catch (e) {
-        console.log(
-          'failed to parse bucket cookie. content:',
-          JSON.stringify(bucketsCookieStr)
-        )
-        console.log(e)
-      }
-      // DRY_51323 testBuckets contents
-      // for testing/viewing, ?bkt=[0-3] will force the lp bucket
-      if (req.query.bkt) untrustedBuckets.lp = parseInt(req.query.bkt,10)
-      if (
-        Number.isInteger(untrustedBuckets.lp) &&
-        untrustedBuckets.lp >= 0 &&
-        untrustedBuckets.lp <= 4
-      ) {
-        // cookie has a valid int from 0-4, keep it
-        testBuckets.lp = untrustedBuckets.lp
+      const currentVersion = 1
+      const testBucket = {version: currentVersion, value: 0}
+      let [version,value] = bucketsCookieStr.split('-')
+      version = parseInt(version, 10)
+      value = parseInt(value, 10)
+      if (Number.isInteger(version) &&
+        version > 0 &&
+        version <= currentVersion &&
+        Number.isInteger(value)) {
+        testBucket.version = version
+        testBucket.value = value
       } else {
-        // assign new random bucket
-        testBuckets.lp = Math.floor(Math.random() * 4)
+        const intArray = new Uint32Array(1)
+        crypto.getRandomValues(intArray)
+        testBucket.value = intArray[0]
+      }
+      if (req.query.bkt) {
+        testBucket.version = currentVersion
+        testBucket.value = parseInt(req.query.bkt, 10) || 0
       }
       const options = {
         maxAge: 365 * 24 * 60 * 60 * 1000,
@@ -170,12 +162,12 @@ app
         sameSite: 'Lax',
         secure: process.env.NEXT_PUBLIC_ENV_NAME !== 'dev',
       }
-      const newContentStr = new URLSearchParams(testBuckets).toString()
+      const newContentStr = testBucket.version+'-'+testBucket.value
       if (newContentStr !== bucketsCookieStr) {
         // console.log('set bucket cookie', newContentStr)
         cookies.set(bucketsCookieName, newContentStr, options)
       }
-      req._testBuckets = testBuckets
+      req._testBucket = testBucket
       next()
     })
 
