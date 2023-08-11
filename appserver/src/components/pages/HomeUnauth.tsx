@@ -168,25 +168,13 @@ const HomeUnauth = () => {
               </p>
               {ctaButton}
             </div>
-            <picture>
-              <source
-                srcSet={hobbyImg2x.src + ' 2x'}
-                height={hobbyImg2x.height / 2}
-                width={hobbyImg2x.width / 2}
-              />
-              <source
-                srcSet={hobbyImg1x.src + ' 1x'}
-                height={hobbyImg1x.height }
-                width={hobbyImg1x.width }
-              />
-              <img
-                src={hobbyImg2x.src}
-                height={hobbyImg2x.height / 2}
-                width={hobbyImg2x.width / 2}
-                className="mb-[-15%]"
-                alt={hobbyAlt}
-              />
-            </picture>
+            <Image
+              src={hobbyImg2x}
+              height={hobbyImg2x.height / 2}
+              width={hobbyImg2x.width / 2}
+              className="mb-[-15%]"
+              alt={hobbyAlt}
+            />
           </div>
         </PagePad>
         <div className="bg-yellow-home pt-[10%] sm:pt-[20px] md:pt-[6%] lg:pt-[8%]">
