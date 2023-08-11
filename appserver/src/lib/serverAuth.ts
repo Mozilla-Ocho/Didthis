@@ -30,6 +30,12 @@ export const signupCodes: {
     name: 'ads-knitting',
     envNames: ['prod'],
   },
+  '53e1fa36': {
+    active: true,
+    value: '53e1fa36',
+    name: 'ads-textile',
+    envNames: ['prod'],
+  },
   d887cd80: {
     active: true,
     value: 'd887cd80',
@@ -58,6 +64,12 @@ export const signupCodes: {
     active: true,
     value: '37deb374',
     name: 'ads-travel',
+    envNames: ['prod'],
+  },
+  e22b4dac5: {
+    active: true,
+    value: 'e22b4dac5',
+    name: 'ads-experiences',
     envNames: ['prod'],
   },
   '6fda0933': {
