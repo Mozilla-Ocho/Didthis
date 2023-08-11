@@ -53,12 +53,16 @@ export default function DefaultLayout({
   children,
   unauthHomepage,
   isThe404,
+  testBuckets,
 }: {
   authUser: ApiUser | false
   signupCodeInfo?: false | ApiSignupCodeInfo
   children: ReactNode // ReactNode not ReactElement
   unauthHomepage?: boolean
   isThe404?: boolean
+  // bucketed tests are not in use everywhere so this is undefined in a bunch
+  // of pages.
+  testBuckets?: TestBuckets
 }) {
   const router = useRouter()
   return (
@@ -70,6 +74,7 @@ export default function DefaultLayout({
         authUser={authUser}
         signupCodeInfo={signupCodeInfo || false}
         router={router}
+        testBuckets={testBuckets}
       >
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <Inner isThe404={isThe404} unauthHomepage={unauthHomepage}>

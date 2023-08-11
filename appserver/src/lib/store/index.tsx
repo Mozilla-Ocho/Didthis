@@ -17,15 +17,17 @@ const StoreWrapper = ({
   signupCodeInfo,
   children,
   router,
+  testBuckets,
 }: {
   authUser: ApiUser | false
   signupCodeInfo: false | ApiSignupCodeInfo
   children: ReactNode
   router: NextRouter
+  testBuckets?: TestBuckets
 }) => {
   // this wrapper should only be present once, towards the top of the
   // application component component tree.
-  const [store] = useState(() => new Store({ authUser, signupCodeInfo, router }))
+  const [store] = useState(() => new Store({ authUser, signupCodeInfo, router, testBuckets }))
   useEffect(() => {
     store.loadSignupInfoFromSessionStorage()
   },[store])

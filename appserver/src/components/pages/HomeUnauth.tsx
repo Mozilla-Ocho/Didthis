@@ -14,12 +14,25 @@ import Image from 'next/image'
 import { useStore } from '@/lib/store'
 import { trackingEvents } from '@/lib/trackingEvents'
 import { useEffect } from 'react'
-import {WaitlistButton} from '../WaitlistButton'
+import { WaitlistButton } from '../WaitlistButton'
 
 // DRY_20334 outer page width styles
 const HomeUnauth = () => {
   const store = useStore()
-  store.useTrackedPageEvent(trackingEvents.pvHomeUnauth)
+  const bucketInt = store.testBuckets ? store.testBuckets.lp : 0
+  let topicBucket: 'combo' | 'authentic' | 'storytelling' | 'utility'
+  // safe default to the combo bucket in case something's oddly wrong with
+  // bucketInt inputs
+  topicBucket = 'combo'
+  if (bucketInt === 0) topicBucket = 'combo'
+  if (bucketInt === 1) topicBucket = 'authentic'
+  if (bucketInt === 2) topicBucket = 'storytelling'
+  if (bucketInt === 3) topicBucket = 'utility'
+  // topicBucket = 'combo'
+  // topicBucket = 'authentic'
+  // topicBucket = 'storytelling'
+  // topicBucket = 'utility'
+  store.useTrackedPageEvent(trackingEvents.pvHomeUnauth, { topicBucket })
   useEffect(() => {
     // special tracking event for campaign conversion, if user viewed unauth
     // landing page unauth with a valid sign up code, mark that, and we'll
@@ -27,10 +40,11 @@ const HomeUnauth = () => {
     if (store.signupCodeInfo && store.signupCodeInfo.active) {
       store.trackEvent(trackingEvents.validCodeHomeUnauth, {
         signupCodeName: store.signupCodeInfo.name,
+        topicBucket,
       })
     } else {
       // otherwise, track special event for homepage waitlist funnel
-      store.trackEvent(trackingEvents.waitlistHomeUnauth)
+      store.trackEvent(trackingEvents.waitlistHomeUnauth, { topicBucket })
     }
   })
 
@@ -42,13 +56,17 @@ const HomeUnauth = () => {
     'flex flex-col mb-16 md:mb-8 gap-8 md:gap-10 items-center'
   const flexPair = flexPairCommon + ' md:flex-row'
   const flexPairRev = flexPairCommon + ' md:flex-row-reverse'
-  const howWorksImgCont = ''//'basis-3/5'
+  const howWorksImgCont = '' //'basis-3/5'
   const howWorksTextCont = 'text-center md:text-left basis-2/5'
   const howWorksImg = 'inline'
   const h2text = 'text-4xl md:text-5xl my-0'
   const h3text = 'text-3xl md:text-4xl mt-0 mb-4'
   const para = 'text-md leading-[24px] md:text-lg md:leading-[32px]'
-  const ctaButton = invited ? <LoginButton className="my-6 px-6 py-4 text-lg" /> : <WaitlistButton />
+  const ctaButton = invited ? (
+    <LoginButton className="my-6 px-6 py-4 text-lg" />
+  ) : (
+    <WaitlistButton />
+  )
   return (
     <div className="grid grid-rows-[auto_1fr_auto] w-full min-h-screen">
       <AppHeader />
@@ -56,7 +74,24 @@ const HomeUnauth = () => {
         <div className={contentColX + ' py-8 md:py-10 px-4'}>
           <div className={chunks}>
             <p className="text-4xl md:text-5xl">
-              <strong>A work in progress is worth celebrating.</strong>
+              <strong>
+                {topicBucket === 'combo' && (
+                  <span>
+                    Tell the authentic story of your passion projects
+                  </span>
+                )}
+                {topicBucket === 'storytelling' && (
+                  <span>Every step is a story</span>
+                )}
+                {topicBucket === 'authentic' && (
+                  <span>An authentic record of your passion projects</span>
+                )}
+                {topicBucket === 'utility' && (
+                  <span>
+                    Never forget a step in your passion projects
+                  </span>
+                )}
+              </strong>
             </p>
             {ctaButton}
             <picture>
@@ -84,7 +119,9 @@ const HomeUnauth = () => {
         <div className="bg-white">
           <div className={contentColX + ' py-8 md:py-6 px-8'}>
             <div className={chunks}>
-              <h2 className={h2text + 'mb-4 md:mb-6'}>What is {branding.productName}?</h2>
+              <h2 className={h2text + 'mb-4 md:mb-6'}>
+                What is {branding.productName}?
+              </h2>
               <p className={para}>
                 {branding.productName} helps you keep track of your hobby
                 projects, remember what you’ve learned and accomplished, and
@@ -165,7 +202,7 @@ const HomeUnauth = () => {
                 </div>
               </div>
 
-              <div className={flexPairRev + " !mb-0"}>
+              <div className={flexPairRev + ' !mb-0'}>
                 <div className={howWorksImgCont}>
                   <Image
                     src={shareCelebMobile}

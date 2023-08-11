@@ -162,6 +162,7 @@ type EventSpec = {
     imgIntent?: CldImageIntent,
     asPartOfNewPost?: YorN
     targetUserSlug?: string
+    topicBucket?: string,
   }
 }
 
@@ -188,5 +189,10 @@ type SlugCheck = {
   available: boolean,
   valid: boolean,
   errorConst?: SlugError,
+}
+
+// DRY_51323 testBuckets contents
+type TestBuckets = {
+  lp: number,
 }
 

@@ -9,15 +9,18 @@ import { getAuthUser, getValidCodeInfo } from '@/lib/serverAuth';
 const Wrapper = ({
   authUser,
   signupCodeInfo,
+  testBuckets,
 }: {
   authUser: ApiUser | false
   signupCodeInfo: ApiSignupCodeInfo | false
+  testBuckets: TestBuckets,
 }) => {
   return (
     <DefaultLayout
       authUser={authUser}
       signupCodeInfo={signupCodeInfo}
       unauthHomepage={!authUser}
+      testBuckets={testBuckets}
     >
       <Home />
     </DefaultLayout>
@@ -35,6 +38,8 @@ export const getServerSideProps = async (
   const signupCodeInfo = signupCode ? getValidCodeInfo(signupCode) : false
   let authUser: ApiUser | false = false
   const sessionCookie = context.req.cookies[sessionCookieName]
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  const testBuckets = (context.req as any)._testBuckets as TestBuckets
   if (sessionCookie) {
     // in SSR, we call getAuthUser directly, forcibly coercing the
     // NextApiRequest-ish context.req object and NextApiResponse-ish
@@ -49,6 +54,7 @@ export const getServerSideProps = async (
     props: {
       signupCodeInfo,
       authUser,
+      testBuckets,
     },
   }
 }

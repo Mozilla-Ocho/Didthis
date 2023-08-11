@@ -3,12 +3,14 @@ import morgan from 'morgan'
 import next from 'next'
 import Cookies from 'cookies'
 import crypto from 'crypto'
-import proxy from 'express-http-proxy';
+import proxy from 'express-http-proxy'
 
 const app = next({ dev: process.env.NODE_ENV !== 'production' })
 const handle = app.getRequestHandler()
 
 const csrfCookieName = '_h3y_csrf' // DRY_86325 crsf cookie name. TODO: put this in a non-typescript shared const file?
+
+const bucketsCookieName = '_bkt' // DRY_19565 bucket cookie name
 
 app
   .prepare()
@@ -30,7 +32,7 @@ app
       })
     )
 
-    server.use((req,res,next) => {
+    server.use((req, res, next) => {
       if (req.hostname.match(/didthat\.app/)) {
         res.status(404).send('404 Page Not Found')
       } else {
@@ -38,15 +40,18 @@ app
       }
     })
 
-    const amplitudeProxy = express.Router();
+    const amplitudeProxy = express.Router()
     amplitudeProxy.use(
-      '/amplitude', // DRY_61169 
+      '/amplitude', // DRY_61169
       proxy('https://api2.amplitude.com/', {
         proxyReqPathResolver: function () {
           return '/2/httpapi'
         },
         proxyReqBodyDecorator: function (bodyContent) {
-          const json = (bodyContent instanceof Buffer) ? bodyContent.toString('utf-8') : bodyContent
+          const json =
+            bodyContent instanceof Buffer
+              ? bodyContent.toString('utf-8')
+              : bodyContent
           console.log('amplitudeProxy body content:', json)
           // let parsed
           // try {
@@ -55,10 +60,10 @@ app
           //   parsed = json
           // }
           // console.log('amplitudeProxy body content:', JSON.stringify(parsed,null,2));
-          return bodyContent;
+          return bodyContent
         },
       })
-    );
+    )
     server.use(amplitudeProxy)
 
     // ensure client has a crsf cookie. any client who doesn't have one gets
@@ -118,6 +123,58 @@ app
       } else {
         next()
       }
+    })
+
+    // ensure client has a bucket cookie. we use this to bucket the user into
+    // tests (e.g. landing page copy variants). it's a key/value bag stored in
+    // querystring format in the cookie. also because we need it on the first
+    // request (homepage), we stash the parsed object into the request so that
+    // getServerSideProps can send it to the store.
+    server.use((req, res, next) => {
+      const cookies = new Cookies(req, res, {
+        secure: process.env.NEXT_PUBLIC_ENV_NAME !== 'dev',
+      })
+      const bucketsCookieStr = cookies.get(bucketsCookieName) || ''
+      const testBuckets = {}
+      let untrustedBuckets = {}
+      try {
+        untrustedBuckets = Object.fromEntries(
+          new URLSearchParams(bucketsCookieStr).entries()
+        )
+        untrustedBuckets.lp = parseInt(untrustedBuckets.lp, 10) // NaN for new users
+      } catch (e) {
+        console.log(
+          'failed to parse bucket cookie. content:',
+          JSON.stringify(bucketsCookieStr)
+        )
+        console.log(e)
+      }
+      // DRY_51323 testBuckets contents
+      if (
+        Number.isInteger(untrustedBuckets.lp) &&
+        untrustedBuckets.lp >= 0 &&
+        untrustedBuckets.lp <= 4
+      ) {
+        // cookie has a valid int from 0-4, keep it
+        testBuckets.lp = untrustedBuckets.lp
+      } else {
+        // assign new random bucket
+        testBuckets.lp = Math.floor(Math.random() * 4)
+      }
+      const options = {
+        maxAge: 365 * 24 * 60 * 60 * 1000,
+        // not httpOnly because the client needs to be able to read it.
+        httpOnly: false,
+        sameSite: 'Lax',
+        secure: process.env.NEXT_PUBLIC_ENV_NAME !== 'dev',
+      }
+      const newContentStr = new URLSearchParams(testBuckets).toString()
+      if (newContentStr !== bucketsCookieStr) {
+        // console.log('set bucket cookie', newContentStr)
+        cookies.set(bucketsCookieName, newContentStr, options)
+      }
+      req._testBuckets = testBuckets
+      next()
     })
 
     server.all('*', (req, res) => {
