@@ -85,6 +85,7 @@ module.exports = {
         // for headers, likewise we stick to names that twMerge knows about.
         '2xl': ['20px','24px'], // H5 in mocks
         '3xl': ['24px','28px'], // H4 in mocks
+        '3xl2': ['30px','36px'], // midway btw the big jump from 3xl and 4xl...
         '4xl': ['36px','46px'], // H3 in mocks
         '5xl': ['48px','62px'], // H2 in mocks
         '6xl': ['64px','82px'], // H1 in mocks
