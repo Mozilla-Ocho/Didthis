@@ -30,10 +30,12 @@ const WaitlistButton = observer(
     mode,
     fromPage,
     targetUserSlug,
+    className,
   }: {
     mode?: 'viral' | 'homepage'
     fromPage?: string
-    targetUserSlug?: string
+    targetUserSlug?: string,
+    className?: string
   }) => {
     if (!mode) mode = 'homepage'
     const store = useStore()
@@ -205,7 +207,7 @@ const WaitlistButton = observer(
           <Button
             onClick={handleClick}
             data-testid="waitlistbutton"
-            className="my-6 px-6 py-4 text-lg"
+            className={`my-6 px-6 py-4 text-lg ${className}`}
           >
             Join the wait list
           </Button>

@@ -24,6 +24,8 @@ const modalTransitionTime = 200
 
 // XXX_PORTING review for non-singleton changes
 
+const KEY_SIGNUP_CODE_INFO = 'signupCodeInfo'
+
 class Store {
   user: false | ApiUser = false
   // we don't have a type for the firebase ref
@@ -59,8 +61,8 @@ class Store {
     testBucket?: TestBucket
   }) {
     this.router = router
-    this.testBucket= testBucket
-    log.readiness("testBucket", testBucket)
+    this.testBucket = testBucket
+    log.readiness('testBucket', testBucket)
     // nextjs SSR computes and provides the authUser and signup code via input
     // props to the wrapper/provider
     makeAutoObservable(
@@ -113,20 +115,27 @@ class Store {
   setSignupCodeInfo(info: ApiSignupCodeInfo | false) {
     this.signupCodeInfo = info
     if (info && typeof window !== 'undefined') {
-      window.sessionStorage.setItem('signupCodeInfo', JSON.stringify(toJS(this.signupCodeInfo)))
+      window.sessionStorage.setItem(
+        KEY_SIGNUP_CODE_INFO,
+        JSON.stringify(toJS(this.signupCodeInfo))
+      )
     }
+  }
+
+  removeSignupCodeInfoFromSessionStorage() {
+    window.sessionStorage.removeItem(KEY_SIGNUP_CODE_INFO)
   }
 
   loadSignupInfoFromSessionStorage() {
     // called on useeffect so as not to break SSR
     if (typeof window !== 'undefined') {
       try {
-        const json = window.sessionStorage.getItem('signupCodeInfo')
+        const json = window.sessionStorage.getItem(KEY_SIGNUP_CODE_INFO)
         if (json) {
           const info = JSON.parse(json) as ApiSignupCodeInfo
           this.signupCodeInfo = info
         }
-      } catch(e) { }
+      } catch (e) {}
     }
   }
 
@@ -225,14 +234,18 @@ class Store {
           amplitude.flush()
           firebaseUser
             .getIdToken()
-            .then(idToken => apiClient.getMe({
-              // auth on server detects idToken and uses it instead of session
-              // cookie if present, note this turns it into a POST request
-              idToken,
-              // send the signup code because it will also assign that to the
-              // user in the backend if they don't have one set yet.
-              signupCode: this.signupCodeInfo ? this.signupCodeInfo.value : false
-            }))
+            .then(idToken =>
+              apiClient.getMe({
+                // auth on server detects idToken and uses it instead of session
+                // cookie if present, note this turns it into a POST request
+                idToken,
+                // send the signup code because it will also assign that to the
+                // user in the backend if they don't have one set yet.
+                signupCode: this.signupCodeInfo
+                  ? this.signupCodeInfo.value
+                  : false,
+              })
+            )
             .then(wrapper => {
               log.readiness('acquired getMe user after firebase auth')
               this.setUser(wrapper.payload)
@@ -280,7 +293,7 @@ class Store {
   launchGlobalLoginOverlay(overrideCodeCheck: boolean) {
     this.trackEvent(trackingEvents.bcLoginSignup)
     this.loginErrorMode = false
-    console.log("signupCodeInfo",this.signupCodeInfo)
+    console.log('signupCodeInfo', this.signupCodeInfo)
     // DRY_47693 signup code logic
     if (this.signupCodeInfo === false) {
       // with no code present, we don't show any special case ui, we just let
@@ -335,6 +348,11 @@ class Store {
       log.auth('store acquired user', x)
       this.user = x
       amplitude.setUserId(x.id)
+      // If we have signup code info, remove it from storage.
+      if (this.signupCodeInfo) {
+        this.signupCodeInfo = false
+        this.removeSignupCodeInfoFromSessionStorage()
+      }
       // DRY_47693 signup code logic
       // if we have a signup code on the url, clear it
       if (this.signupCodeInfo && typeof window !== 'undefined') {
@@ -342,7 +360,6 @@ class Store {
         const url = new URL(window.location.toString())
         url.searchParams.delete('signupCode')
         window.history.replaceState({}, '', url.toString())
-        this.signupCodeInfo = false
       }
     } else {
       log.auth('store clearing user')

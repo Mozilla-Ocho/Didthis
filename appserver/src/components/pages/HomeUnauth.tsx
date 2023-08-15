@@ -82,10 +82,13 @@ const HomeUnauth = () => {
   const howWorksImg = 'inline'
   const h4text = 'text-2xl md:text-3xl mt-0 mb-4'
   const para = 'text-base leading-[24px] md:text-base md:leading-[32px]'
-  const ctaButton = invited ? (
+  const ctaButtons = invited ? (
     <LoginButton className="my-6 px-6 py-4 text-lg" />
   ) : (
-    <WaitlistButton />
+    <>
+      <WaitlistButton className="mr-4" />
+      <LoginButton className="my-6 px-6 py-4 text-lg" />
+    </>
   )
   return (
     <div className="grid grid-rows-[auto_1fr_auto] w-full min-h-screen">
@@ -161,7 +164,7 @@ const HomeUnauth = () => {
                   </span>
                 )}
               </p>
-              {ctaButton}
+              {ctaButtons}
             </div>
             <Image
               src={hobbyImg2x}
@@ -236,7 +239,7 @@ const HomeUnauth = () => {
                   </p>
                 </div>
               </div>
-              {ctaButton}
+              {ctaButtons}
             </div>
           </div>
         </div>
