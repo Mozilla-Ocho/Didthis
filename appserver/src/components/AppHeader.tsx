@@ -30,17 +30,23 @@ const AppHeader = observer(({ isThe404 }: { isThe404?: boolean }) => {
           </div>
         ) : (
           <div className="flex items-center py-2 justify-center md:justify-full">
+            {!isThe404 && (
+              <div className="sm:hidden basis-2/6">
+                {/* this div here to make the logo centered on mobile */}
+              </div>
+            )}
             <Link
               intent="internalNav"
               href="/"
               trackEvent={trackingEvents.bcHeaderLogo}
+              className="sm:flex-grow"
             >
               <h1 className="text-3xl leading-none p-0 m-0">
                 <Image src={LogoWordmarkSvg} alt={branding.productName} />
               </h1>
             </Link>
             {!isThe404 && (
-              <div className="hidden md:block text-right text-sm flex-grow">
+              <div className="basis-2/6 text-right text-sm">
                 <LoginButton intent="link" />
               </div>
             )}
