@@ -49,7 +49,9 @@ class FormStore {
     makeAutoObservable(this, {
       doSlugCheckDebounced: false,
     })
-    this._doSlugCheck()
+    // for SSR reasons, we have to defer the slug check a bit. because in SSR
+    // mode, the slug check is skipped.
+    this.doSlugCheckDebounced()
   }
 
   setName(x: string) {
@@ -124,6 +126,11 @@ class FormStore {
   }
 
   _doSlugCheck() {
+    if (typeof window === 'undefined') {
+      // don't run the slug check in SSR. this sort of thing is incredibly
+      // non-obvious until things break...
+      return
+    }
     this.checkingSlug = true
     apiClient
       .getSlugCheck({ userSlug: this.userSlug, provisionalName: this.name })
