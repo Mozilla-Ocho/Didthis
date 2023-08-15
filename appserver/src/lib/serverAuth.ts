@@ -244,6 +244,14 @@ const getOrCreateUser = async ({
   ]
 }
 
+export const createTrialUser = async ({
+  signupCode,
+}: {
+  signupCode: string | false
+}): Promise<[ApiUser, UserDbRow] | [false, false]> => {
+  return [false, false];
+}
+
 // we want very long-lived sessions so we are not using firebase admin sdk's
 // built in session cookie featuer which cap at 14 days
 const sessionCookieMaxAgeMillis = 1000 * 60 * 60 * 24 * 180

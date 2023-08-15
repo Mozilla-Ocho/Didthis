@@ -65,7 +65,7 @@ interface UserDbRowForWrite { // for writes (numbers are numbers)
   // overflows/corruption for large numbers that the db could potentially
   // represent but javscript can't?
   id: ApiUserid
-  email: string
+  email: string | null
   system_slug: string
   user_slug: string | null
   user_slug_lc: string | null

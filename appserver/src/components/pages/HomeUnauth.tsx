@@ -1,4 +1,5 @@
 import { LoginButton } from '@/components/auth/LoginButton'
+import { DeferredSignupButton } from '@/components/auth/DeferredSignupButton'
 import AppHeader from '@/components/AppHeader'
 import AppFooter from '@/components/AppFooter'
 import branding from '@/lib/branding'
@@ -83,7 +84,7 @@ const HomeUnauth = () => {
   const h4text = 'text-2xl md:text-3xl mt-0 mb-4'
   const para = 'text-base leading-[24px] md:text-base md:leading-[32px]'
   const ctaButtons = invited ? (
-    <LoginButton className="my-6 px-6 py-4 text-lg" />
+    <DeferredSignupButton className="my-6 px-6 py-4 text-lg" />
   ) : (
     <>
       <WaitlistButton className="mr-4" />
