@@ -13,17 +13,27 @@ export const signupCodes: {
   [key: string]: ApiSignupCodeInfo
 } = {
   '1234': {
+    // just here for ease of use in dev only
     active: true,
     value: '1234',
     name: 'dev',
     envNames: ['dev'],
   },
   a6fd47b9: {
+    // for links given to mozillians
     active: true,
     value: 'a6fd47b9',
     name: 'intshare1',
     envNames: ['dev', 'nonprod', 'prod'],
   },
+  c3a4b20b: {
+    // used on links sent by email to the waitlist
+    active: true,
+    value: 'c3a4b20b',
+    name: 'waitlist',
+    envNames: ['dev', 'nonprod', 'prod'],
+  },
+  // {{{ reddit ad campaign codes
   '011bda94': {
     active: true,
     value: '011bda94',
@@ -78,6 +88,7 @@ export const signupCodes: {
     name: 'ads-pottery',
     envNames: ['dev', 'nonprod', 'prod'],
   },
+  // }}}
 }
 
 const toSeconds = (date: Date) => Math.floor(date.getTime() / 1000)
@@ -124,7 +135,7 @@ const userFromDbRow = (
     systemSlug: dbRow.system_slug,
     publicPageSlug: dbRow.user_slug || dbRow.system_slug,
     profile,
-    createdAt: parseInt(dbRow.created_at_millis as string,10),
+    createdAt: parseInt(dbRow.created_at_millis as string, 10),
   }
   if (opts.publicFilter) {
     delete user.email
@@ -136,7 +147,7 @@ const userFromDbRow = (
     user.signupCodeName = dbRow.signup_code_name || ''
     if (!dbRow.signup_code_name) user.unsolicited = true
   }
-  if (dbRow.admin_status  === 'admin') user.isAdmin = true
+  if (dbRow.admin_status === 'admin') user.isAdmin = true
   if (dbRow.ban_status === 'flagged') user.isFlagged = true
   if (opts.justCreated) user.justCreated = true
   return user
