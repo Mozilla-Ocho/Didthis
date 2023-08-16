@@ -134,6 +134,7 @@ const userFromDbRow = (
     // userSlug: dbRow.user_slug || undefined,
     systemSlug: dbRow.system_slug,
     publicPageSlug: dbRow.user_slug || dbRow.system_slug,
+    isTrial: dbRow.trial_status,
     profile,
     createdAt: parseInt(dbRow.created_at_millis as string, 10),
   }
@@ -249,7 +250,31 @@ export const createTrialUser = async ({
 }: {
   signupCode: string | false
 }): Promise<[ApiUser, UserDbRow] | [false, false]> => {
-  return [false, false];
+  const millis = new Date().getTime()
+  const codeInfo = getValidCodeInfo(signupCode)
+  const systemSlug = await generateRandomAvailableSystemSlug()
+  const id = `trial-${systemSlug}`
+  const columns: UserDbRowForWrite = {
+    id,
+    email: null,
+    system_slug: systemSlug,
+    user_slug: null,
+    user_slug_lc: null,
+    profile: profileUtils.mkDefaultProfile(),
+    signup_code_name: codeInfo && codeInfo.active ? codeInfo.name : null,
+    created_at_millis: millis,
+    updated_at_millis: millis,
+    last_write_from_user: millis,
+    last_read_from_user: millis,
+    admin_status: null,
+    ban_status: null,
+  }
+  const dbRow = (await knex('users').insert(columns).returning('*'))[0] as UserDbRow
+  log.serverApi('created user', dbRow.id)
+  return [
+    userFromDbRow(dbRow, { publicFilter: false, justCreated: true }),
+    dbRow,
+  ]
 }
 
 // we want very long-lived sessions so we are not using firebase admin sdk's

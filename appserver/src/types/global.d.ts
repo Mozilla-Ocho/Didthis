@@ -36,6 +36,7 @@ type ApiUser = {
   unsolicited?: true
   isAdmin?: true
   isFlagged?: true
+  isTrial?: boolean
   lastFullPageLoad?: number
   lastWrite?: number
   updatedAt?: number
@@ -55,6 +56,7 @@ interface UserDbRow { // for reads (numbers are strings)
   signup_code_name: string | null
   admin_status: 'admin' | null
   ban_status: 'flagged' | null
+  trial_status?: boolean
   last_write_from_user: string | null
   last_read_from_user: string | null
 }

@@ -1,64 +1,15 @@
-jest.mock('../../knex', () => {
-  return (tableName: string) => {
-    console.log('TABLE', tableName)
-  }
-})
-
-const mockGetAuthUser = jest.fn()
-const mockCreateTrialUser = jest.fn()
-jest.mock('../../lib/serverAuth', () => {
-  return {
-    get getAuthUser() {
-      return mockGetAuthUser
-    },
-    get createTrialUser() {
-      return mockCreateTrialUser
-    },
-    get signupCodes() {
-      return {
-        '1234': {
-          active: true,
-          value: '1234',
-          name: 'dev',
-          envNames: ['dev'],
-        },
-        '8675309': {
-          active: false,
-          value: '1234',
-          name: 'dev',
-          envNames: ['dev'],
-        },
-      }
-    },
-  }
-})
-
+/**
+ * @jest-environment node
+ */
 import { NextApiRequest, NextApiResponse } from 'next'
 import handler from './createProfile'
 
 describe('createProfile', () => {
-  const mockRequest = { body: {} }
-  const mockResponse = { status: jest.fn() }
-  const mockResponseStatus = { json: jest.fn() }
-
   beforeEach(() => {
     jest.resetAllMocks()
     mockRequest.body = {}
     mockResponse.status.mockReturnValue(mockResponseStatus)
   })
-
-  const callHandler = async () =>
-    await handler(
-      mockRequest as unknown as NextApiRequest,
-      mockResponse as unknown as NextApiResponse
-    )
-
-  function expectUnauthorized() {
-    expect(mockResponse.status).toBeCalledWith(401)
-    expect(mockResponseStatus.json).toBeCalled()
-    const resultJson = mockResponseStatus.json.mock.calls[0][0]
-    expect(resultJson.success).toBeFalsy()
-  }
 
   it('is unauthorized for a signed-in user', async () => {
     mockGetAuthUser.mockReturnValue([{}, {}])
@@ -106,4 +57,53 @@ describe('createProfile', () => {
     expect(resultJson.success).toBeTruthy()
     expect(resultJson.payload).toEqual(newUser)
   })
+})
+
+const mockRequest = { body: {} }
+const mockResponse = { status: jest.fn() }
+const mockResponseStatus = { json: jest.fn() }
+
+const callHandler = async () =>
+  await handler(
+    // HACK: there's probably a better way to handle these types
+    mockRequest as unknown as NextApiRequest,
+    mockResponse as unknown as NextApiResponse
+  )
+
+function expectUnauthorized() {
+  expect(mockResponse.status).toBeCalledWith(401)
+  expect(mockResponseStatus.json).toBeCalled()
+  const resultJson = mockResponseStatus.json.mock.calls[0][0]
+  expect(resultJson.success).toBeFalsy()
+}
+
+const mockGetAuthUser = jest.fn()
+const mockCreateTrialUser = jest.fn()
+const mockSignupCodes = {
+  '1234': {
+    active: true,
+    value: '1234',
+    name: 'dev',
+    envNames: ['dev'],
+  },
+  '8675309': {
+    active: false,
+    value: '1234',
+    name: 'dev',
+    envNames: ['dev'],
+  },
+}
+
+jest.mock('../../lib/serverAuth', () => {
+  return {
+    get getAuthUser() {
+      return mockGetAuthUser
+    },
+    get createTrialUser() {
+      return mockCreateTrialUser
+    },
+    get signupCodes() {
+      return mockSignupCodes
+    },
+  }
 })
