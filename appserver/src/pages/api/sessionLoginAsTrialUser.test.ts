@@ -2,9 +2,9 @@
  * @jest-environment node
  */
 import { NextApiRequest, NextApiResponse } from 'next'
-import handler from './createProfile'
+import handler from './sessionLoginAsTrialUser'
 
-describe('createProfile', () => {
+describe('sessionLoginAsTrialUser', () => {
   beforeEach(() => {
     jest.resetAllMocks()
     mockRequest.body = {}
@@ -39,7 +39,7 @@ describe('createProfile', () => {
 
   it('is authorized for anonymous user with valid signup code', async () => {
     const signupCode = '1234'
-    const newUser = {}
+    const newUser = { id: 'trial-8675309' }
 
     mockGetAuthUser.mockReturnValue([false, false])
     mockRequest.body = { signupCode }
@@ -53,15 +53,18 @@ describe('createProfile', () => {
 
     expect(mockResponse.status).toBeCalledWith(201)
     expect(mockResponseStatus.json).toBeCalled()
-    const resultJson = mockResponseStatus.json.mock.calls[0][0]
+
+    const [[resultJson]] = mockResponseStatus.json.mock.calls
     expect(resultJson.success).toBeTruthy()
     expect(resultJson.payload).toEqual(newUser)
+
+    expect(mockLoginSessionForUser).toBeCalledWith(
+      mockRequest,
+      mockResponse,
+      newUser
+    )
   })
 })
-
-const mockRequest = { body: {} }
-const mockResponse = { status: jest.fn() }
-const mockResponseStatus = { json: jest.fn() }
 
 const callHandler = async () =>
   await handler(
@@ -77,8 +80,13 @@ function expectUnauthorized() {
   expect(resultJson.success).toBeFalsy()
 }
 
+const mockRequest = { body: {} }
+const mockResponse = { status: jest.fn() }
+const mockResponseStatus = { json: jest.fn() }
+
 const mockGetAuthUser = jest.fn()
 const mockCreateTrialUser = jest.fn()
+const mockLoginSessionForUser = jest.fn()
 const mockSignupCodes = {
   '1234': {
     active: true,
@@ -101,6 +109,9 @@ jest.mock('../../lib/serverAuth', () => {
     },
     get createTrialUser() {
       return mockCreateTrialUser
+    },
+    get loginSessionForUser() {
+      return mockLoginSessionForUser
     },
     get signupCodes() {
       return mockSignupCodes

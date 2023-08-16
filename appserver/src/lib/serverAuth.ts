@@ -91,7 +91,7 @@ export const signupCodes: {
   // }}}
 }
 
-const toSeconds = (date: Date) => Math.floor(date.getTime() / 1000)
+export const toSeconds = (date: Date) => Math.floor(date.getTime() / 1000)
 
 export const getValidCodeInfo = (userCode: string | undefined | false) => {
   const badCode = { active: false, value: userCode, name: '', envNames: [] }
@@ -248,7 +248,7 @@ const getOrCreateUser = async ({
 export const createTrialUser = async ({
   signupCode,
 }: {
-  signupCode: string | false
+  signupCode: string
 }): Promise<[ApiUser, UserDbRow] | [false, false]> => {
   const millis = new Date().getTime()
   const codeInfo = getValidCodeInfo(signupCode)
@@ -268,18 +268,41 @@ export const createTrialUser = async ({
     last_read_from_user: millis,
     admin_status: null,
     ban_status: null,
+    trial_status: true,
   }
   const dbRow = (await knex('users').insert(columns).returning('*'))[0] as UserDbRow
-  log.serverApi('created user', dbRow.id)
+  log.serverApi('created trial user', dbRow.id)
   return [
     userFromDbRow(dbRow, { publicFilter: false, justCreated: true }),
     dbRow,
   ]
 }
 
+export const loginSessionForUser = async (
+  req: NextApiRequest,
+  res: NextApiResponse,
+  user: ApiUser
+) => {
+  const cookies = new Cookies(req, res, {
+    secure: process.env.NEXT_PUBLIC_ENV_NAME !== 'dev',
+  })
+  const cookieOptions = {
+    maxAge: sessionCookieMaxAgeMillis,
+    httpOnly: process.env.NEXT_PUBLIC_ENV_NAME !== 'dev',
+    sameSite: 'lax' as const,
+    secure: process.env.NEXT_PUBLIC_ENV_NAME !== 'dev',
+  }
+  const sessionCookie = mkSessionCookie(
+    user.id,
+    toSeconds(new Date()),
+    toSeconds(new Date())
+  )
+  cookies.set(sessionCookieName, sessionCookie, cookieOptions)
+}
+
 // we want very long-lived sessions so we are not using firebase admin sdk's
 // built in session cookie featuer which cap at 14 days
-const sessionCookieMaxAgeMillis = 1000 * 60 * 60 * 24 * 180
+export const sessionCookieMaxAgeMillis = 1000 * 60 * 60 * 24 * 180
 // this is the period of time for which existing session cookies can still work
 // after a user resets their password. smaller is more secure, but at the cost
 // of latency to the user for roundtripping to firebase to check the validity.

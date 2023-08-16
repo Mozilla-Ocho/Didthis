@@ -77,6 +77,7 @@ interface UserDbRowForWrite { // for writes (numbers are numbers)
   signup_code_name: string | null
   admin_status: 'admin' | null
   ban_status: 'flagged' | null
+  trial_status?: boolean
   last_write_from_user: number | null
   last_read_from_user: number | null
 }

@@ -342,6 +342,20 @@ class Store {
     this.loginErrorMode = false
   }
 
+  async loginAsNewTrialUser() {
+    if (this.signupCodeInfo === false) {
+      // TODO: this shouldn't happen - need to log an error?
+      return
+    }
+    if (this.user) throw new Error('must be unauthed')
+    const wrapper = await apiClient.sessionLoginAsTrialUser({
+      signupCode: this.signupCodeInfo.value,
+    })
+    this.removeSignupCodeInfoFromSessionStorage()
+    const slug = wrapper.payload.systemSlug;
+    window.location.assign(`/user/${slug}/post`)
+  }
+
   setUser(x: ApiUser | false) {
     log.auth('setuser', x)
     if (x) {

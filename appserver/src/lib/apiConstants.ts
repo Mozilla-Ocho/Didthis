@@ -9,6 +9,7 @@ type GenericErrorId =
   | 'ERR_BAD_INPUT'
   | 'ERR_REMOTE_FETCH_FAILED'
   | 'ERR_CSRF_TOKEN'
+  | 'ERR_CREATION_FAILED'
 
 type ErrorId = GenericErrorId
 
@@ -103,7 +104,13 @@ interface SlugCheckWrapper extends SuccessWrapper {
 
 type WaitlistWrapper = EmptySuccessWrapper
 
+interface SessionLoginAsTrialUserWrapper extends SuccessWrapper {
+  action: "sessionLoginAsTrialUser",
+  payload: ApiUser
+}
+
 export type {
+  SessionLoginAsTrialUserWrapper,
   DeletePostWrapper,
   DeleteProjectWrapper,
   EmptySuccessWrapper,

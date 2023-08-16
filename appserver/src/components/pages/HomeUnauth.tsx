@@ -83,8 +83,17 @@ const HomeUnauth = () => {
   const howWorksImg = 'inline'
   const h4text = 'text-2xl md:text-3xl mt-0 mb-4'
   const para = 'text-base leading-[24px] md:text-base md:leading-[32px]'
+
+  const handleDeferredLogin = async () => {
+    store.trackEvent(trackingEvents.bcLoginTrialSignup)
+    await store.loginAsNewTrialUser()
+  }
+
   const ctaButtons = invited ? (
-    <DeferredSignupButton className="my-6 px-6 py-4 text-lg" />
+    <DeferredSignupButton
+      onClick={handleDeferredLogin}
+      className="my-6 px-6 py-4 text-lg"
+    />
   ) : (
     <>
       <WaitlistButton className="mr-4" />

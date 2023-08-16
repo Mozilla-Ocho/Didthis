@@ -1,31 +1,25 @@
 import { Button } from '@/components/uiLib'
 import { observer } from 'mobx-react-lite'
-import { useStore } from '@/lib/store'
-import { trackingEvents } from '@/lib/trackingEvents'
 import branding from '@/lib/branding'
+import { MouseEventHandler } from 'react'
 
 const DeferredSignupButton = observer(
   ({
+    onClick,
     intent,
     text,
     'data-testid': dataTestid,
     className,
   }: {
-    overrideCodeCheck?: boolean
-    overrideCodeCheckIfNoSignupCode?: boolean
+    onClick?: MouseEventHandler<Element>,
     intent?: React.ComponentProps<typeof Button>['intent']
     text?: string
     'data-testid'?: string
     className?: string
   }) => {
-    const store = useStore()
-    const handleClick = () => {
-      store.trackEvent(trackingEvents.bcLoginSignup)
-      store.launchGlobalLoginOverlay(false)
-    }
     return (
       <Button
-        onClick={handleClick}
+        onClick={onClick}
         intent={intent}
         data-testid={dataTestid || 'DeferredSignupButton'}
         className={className}
