@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
-import { MockStoreWrapper } from "../../lib/store/mocks"
+import { MockStoreWrapper } from '../../mocks/store/storybook'
+import mockApiClient from '../../mocks/apiClient/storybook'
 import HomeUnauth from './Home'
+
+import { action } from '@storybook/addon-actions'
 
 import '@/styles/globals.css'
 
@@ -19,10 +22,25 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
-  args: {
-  },
+  args: {},
   render: args => (
     <MockStoreWrapper>
+      <HomeUnauth {...args} />
+    </MockStoreWrapper>
+  ),
+}
+
+export const WithSignupCode: Story = {
+  args: {},
+  render: args => (
+    <MockStoreWrapper
+      signupCodeInfo={{
+        active: true,
+        value: '1234',
+        name: 'dev',
+        envNames: ['dev'],
+      }}
+    >
       <HomeUnauth {...args} />
     </MockStoreWrapper>
   ),

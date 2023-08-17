@@ -1,11 +1,11 @@
 import { makeAutoObservable, toJS } from 'mobx'
-import apiClient from '@/lib/apiClient'
+import apiClientBase from '@/lib/apiClient'
 import { amplitudeProxyEndpoint } from '@/lib/apiCore'
 import log from '@/lib/log'
 import { isEqual } from 'lodash-es'
 import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth'
-import * as amplitude from '@amplitude/analytics-browser'
+import * as amplitudeBase from '@amplitude/analytics-browser'
 import { trackingEvents } from '@/lib/trackingEvents'
 import { useEffect } from 'react'
 import { NextRouter } from 'next/router'
@@ -25,6 +25,9 @@ const modalTransitionTime = 200
 // XXX_PORTING review for non-singleton changes
 
 const KEY_SIGNUP_CODE_INFO = 'signupCodeInfo'
+
+export type ApiClient = typeof apiClientBase
+export type AmplitudeClient = typeof amplitudeBase
 
 class Store {
   user: false | ApiUser = false
@@ -46,12 +49,16 @@ class Store {
   router: NextRouter
   debugObjId = (Math.random() + '').replace('0.', '')
   testBucket: TestBucket | undefined
+  apiClient: ApiClient
+  amplitude: AmplitudeClient
 
   constructor({
     authUser,
     signupCodeInfo,
     router,
     testBucket,
+    apiClient = apiClientBase,
+    amplitude = amplitudeBase,
   }: {
     authUser?: ApiUser | false
     signupCodeInfo?: false | ApiSignupCodeInfo
@@ -59,9 +66,13 @@ class Store {
     // bucketed tests are not in use everywhere so this is undefined in a bunch
     // of pages.
     testBucket?: TestBucket
+    apiClient?: ApiClient
+    amplitude?: AmplitudeClient
   }) {
     this.router = router
     this.testBucket = testBucket
+    this.apiClient = apiClient;
+    this.amplitude = amplitude;
     log.readiness('testBucket', testBucket)
     // nextjs SSR computes and provides the authUser and signup code via input
     // props to the wrapper/provider
@@ -77,7 +88,7 @@ class Store {
     if (signupCodeInfo) this.setSignupCodeInfo(signupCodeInfo)
     if (authUser) this.setUser(authUser)
     if (typeof window !== 'undefined') {
-      amplitude.init(process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY as string, '', {
+      this.amplitude.init(process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY as string, '', {
         serverUrl: amplitudeProxyEndpoint,
         defaultTracking: {
           pageViews: false,
@@ -231,11 +242,11 @@ class Store {
           this.cancelGlobalLoginOverlay()
           // and switch to our own loading state
           this.setFullPageLoading(true)
-          amplitude.flush()
+          this.amplitude.flush()
           firebaseUser
             .getIdToken()
             .then(idToken =>
-              apiClient.getMe({
+              this.apiClient.getMe({
                 // auth on server detects idToken and uses it instead of session
                 // cookie if present, note this turns it into a POST request
                 idToken,
@@ -348,7 +359,7 @@ class Store {
       return
     }
     if (this.user) throw new Error('must be unauthed')
-    const wrapper = await apiClient.sessionLoginAsTrialUser({
+    const wrapper = await this.apiClient.sessionLoginAsTrialUser({
       signupCode: this.signupCodeInfo.value,
     })
     this.removeSignupCodeInfoFromSessionStorage()
@@ -361,7 +372,7 @@ class Store {
     if (x) {
       log.auth('store acquired user', x)
       this.user = x
-      amplitude.setUserId(x.id)
+      this.amplitude.setUserId(x.id)
       // If we have signup code info, remove it from storage.
       if (this.signupCodeInfo) {
         this.signupCodeInfo = false
@@ -382,7 +393,7 @@ class Store {
 
   setAmplitudeUserAttrs() {
     if (!this.user) return false
-    const identifyOps = new amplitude.Identify()
+    const identifyOps = new this.amplitude.Identify()
     if (this.user.signupCodeName) {
       // if the user has a signup code, make sure it's set in the amplitude user properties
       log.tracking('identify() signupCode')
@@ -392,16 +403,16 @@ class Store {
     log.tracking('identify() slugs')
     identifyOps.setOnce('systemSlug', this.user.systemSlug)
     if (this.user.userSlug) identifyOps.set('userSlug', this.user.userSlug)
-    amplitude.identify(identifyOps)
+    this.amplitude.identify(identifyOps)
   }
 
   async logOut() {
     // we have to call the api to delete the cookie because it's httpOnly
     log.auth('store logOut')
     this.trackEvent(trackingEvents.bcLogout)
-    amplitude.setUserId(undefined)
-    amplitude.flush()
-    return apiClient
+    this.amplitude.setUserId(undefined)
+    this.amplitude.flush()
+    return this.apiClient
       .sessionLogout()
       .then(() => {
         window.location.assign('/')
@@ -430,7 +441,7 @@ class Store {
       fullEvent.opts.name,
       JSON.stringify(fullEvent)
     )
-    amplitude.track(fullEvent.eventName, fullEvent.opts)
+    this.amplitude.track(fullEvent.eventName, fullEvent.opts)
   }
 
   setTrackedPageEvent(evt: EventSpec, opts?: EventSpec['opts']) {
@@ -482,7 +493,7 @@ class Store {
     mediaType: PostMediaType
   ): Promise<ApiPost> {
     if (!this.user) throw new Error('must be authed')
-    return apiClient.savePost({ post }).then(wrapper => {
+    return this.apiClient.savePost({ post }).then(wrapper => {
       this.setUser(wrapper.payload.user)
       if (mode === 'new') {
         if (post.projectId === 'new') {
@@ -520,7 +531,7 @@ class Store {
         this.trackEvent(trackingEvents.caSetProjectPrivate)
       }
     }
-    return apiClient.saveProject({ project }).then(wrapper => {
+    return this.apiClient.saveProject({ project }).then(wrapper => {
       this.setUser(wrapper.payload.user)
       if (mode === 'new') {
         this.trackEvent(trackingEvents.caNewProject, { asPartOfNewPost: 'n' })
@@ -557,7 +568,7 @@ class Store {
     if (this.confirmingDelete && res === 'yes') {
       this.confirmingDelete.deleting = true
       if (this.confirmingDelete.kind === 'post') {
-        apiClient
+        this.apiClient
           .deletePost({
             postId: this.confirmingDelete.thing.id,
             projectId: this.confirmingDelete.thing.projectId,
@@ -580,7 +591,7 @@ class Store {
           })
       }
       if (this.confirmingDelete.kind === 'project') {
-        apiClient
+        this.apiClient
           .deleteProject({ projectId: this.confirmingDelete.thing.id })
           .then(wrapper => {
             this.showConfirmDeleteModal = false
@@ -617,7 +628,7 @@ class Store {
     ) {
       this.trackEvent(trackingEvents.caProfileAll)
     }
-    return apiClient.saveProfile({ profile, userSlug }).then(wrapper => {
+    return this.apiClient.saveProfile({ profile, userSlug }).then(wrapper => {
       this.setUser(wrapper.payload)
       this.trackEvent(trackingEvents.edProfile)
       this.router.push(pathBuilder.user(wrapper.payload.systemSlug))

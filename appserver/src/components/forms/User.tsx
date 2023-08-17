@@ -1,4 +1,4 @@
-import apiClient from '@/lib/apiClient'
+import { ApiClient } from '@/lib/apiClient'
 import { SlugCheckWrapper } from '@/lib/apiConstants'
 import branding from '@/lib/branding'
 import { specialAssetIds } from '@/lib/cloudinaryConfig'
@@ -29,8 +29,10 @@ class FormStore {
   reddit: string
   instagram: string
   spinning = false
+  apiClient: ApiClient
 
-  constructor(user: ApiUser) {
+  constructor(user: ApiUser, apiClient: ApiClient) {
+    this.apiClient = apiClient
     this.name = user.profile.name || ''
     if (this.name) this.nameTouched = true
     this.bio = user.profile.bio || ''
@@ -132,7 +134,7 @@ class FormStore {
       return
     }
     this.checkingSlug = true
-    apiClient
+    this.apiClient
       .getSlugCheck({ userSlug: this.userSlug, provisionalName: this.name })
       .then(
         action(wrapper => {
@@ -331,7 +333,7 @@ const UserForm = observer(() => {
   if (!user) {
     return <></>
   }
-  const [formStore] = useState(() => new FormStore(user))
+  const [formStore] = useState(() => new FormStore(user, store.apiClient))
   const handleSubmit = (e: React.FormEvent) => {
     e.stopPropagation()
     e.preventDefault()
@@ -377,6 +379,11 @@ const UserForm = observer(() => {
             visits your page.
           </p>
         </div>
+        {user.isTrial && (
+          <div>
+            OH HI THERE TRIAL USER
+          </div>
+        )}
         <div>
           <label htmlFor="nameField">
             <h5>Real name</h5>

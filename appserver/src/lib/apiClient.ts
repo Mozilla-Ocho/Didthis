@@ -246,4 +246,6 @@ const apiClient = {
   flagUser,
 }
 
+export type ApiClient = typeof apiClient;
+
 export default apiClient
