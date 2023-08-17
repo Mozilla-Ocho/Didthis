@@ -33,6 +33,13 @@ export const signupCodes: {
     name: 'waitlist',
     envNames: ['dev', 'nonprod', 'prod'],
   },
+  '3f3de1a1': {
+    // for usertesting unsupervised tests
+    active: true,
+    value: '3f3de1a1',
+    name: 'usertesting',
+    envNames: ['dev', 'nonprod', 'prod'],
+  },
   // {{{ reddit ad campaign codes
   '011bda94': {
     active: true,
