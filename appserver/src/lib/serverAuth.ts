@@ -270,12 +270,48 @@ export const createTrialUser = async ({
     ban_status: null,
     trial_status: true,
   }
-  const dbRow = (await knex('users').insert(columns).returning('*'))[0] as UserDbRow
+  const dbRow = (
+    await knex('users').insert(columns).returning('*')
+  )[0] as UserDbRow
   log.serverApi('created trial user', dbRow.id)
   return [
     userFromDbRow(dbRow, { publicFilter: false, justCreated: true }),
     dbRow,
   ]
+}
+
+export const claimTrialUser = async ({
+  user,
+  claimIdToken,
+}: {
+  user: ApiUser
+  claimIdToken: string
+}): Promise<ApiUser | false> => {
+  try {
+    const decodedIdToken = await getAuth(firebaseApp).verifyIdToken(
+      claimIdToken,
+      true
+    )
+    const { uid, email } = decodedIdToken
+    const millis = new Date().getTime()
+    const dbRow = (
+      await knex('users')
+        .update({
+          id: uid,
+          email: email,
+          trial_status: false,
+          updated_at_millis: millis,
+          last_write_from_user: millis,
+          last_read_from_user: millis,
+        })
+        .where('id', user.id)
+        .returning('*')
+    )[0] as UserDbRow
+    return userFromDbRow(dbRow, { publicFilter: false, justCreated: false })
+  } catch (e) {
+    log.serverApi('idToken validation failed', e)
+    return false
+  }
 }
 
 export const loginSessionForUser = async (

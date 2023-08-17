@@ -118,6 +118,10 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
     eventName: 'buttonClick',
     opts: { name: 'loginTrialSignup' },
   },
+  bcClaimTrialAccount: {
+    eventName: 'buttonClick',
+    opts: { name: 'claimTrialAccount' },
+  },
   bcLogout: { eventName: 'buttonClick', opts: { name: 'logout' } },
   bcWaitlist: {
     eventName: 'buttonClick',

@@ -4,13 +4,14 @@ import branding from '@/lib/branding'
 import { specialAssetIds } from '@/lib/cloudinaryConfig'
 import profileUtils from '@/lib/profileUtils'
 import { useStore } from '@/lib/store'
-import {trackingEvents} from '@/lib/trackingEvents'
+import { trackingEvents } from '@/lib/trackingEvents'
 import { debounce } from 'lodash-es'
 import { action, makeAutoObservable } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useState } from 'react'
 import ImageUpload, { UploadCallback } from '../ImageUpload'
 import { Button, CloudinaryImage, Input, Textarea } from '../uiLib'
+import { ClaimTrialAccountButton } from '../auth/ClaimTrialAccountButton'
 
 class FormStore {
   name: string
@@ -316,7 +317,7 @@ const ImageField = observer(({ formStore }: { formStore: FormStore }) => {
               onClick={deleteImage}
               className="grow sm:grow-0"
               trackEvent={trackingEvents.bcRemoveImage}
-              trackEventOpts={{imgIntent:'avatar'}}
+              trackEventOpts={{ imgIntent: 'avatar' }}
             >
               Remove
             </Button>
@@ -343,6 +344,10 @@ const UserForm = observer(() => {
       formStore.getApiProfile(),
       formStore.hasUserSlug() ? formStore.userSlug.trim() : undefined
     )
+  }
+  const handleClaimTrialAccount = async () => {
+    store.trackEvent(trackingEvents.bcClaimTrialAccount)
+    await store.beginClaimTrialAccount()
   }
   const setName = (e: React.ChangeEvent<HTMLInputElement>) => {
     formStore.setName(e.target.value)
@@ -372,6 +377,19 @@ const UserForm = observer(() => {
         method="POST"
         className="flex flex-col gap-8"
       >
+        {user.isTrial && (
+          <div>
+            <p>
+              You are logged in with a trial account. You can claim this account
+              by setting an email address and a password. This enables you to
+              share content in public and to log into this account later.
+            </p>
+            <ClaimTrialAccountButton
+              className="my-6 px-6 py-4 text-lg"
+              onClick={handleClaimTrialAccount}
+            />
+          </div>
+        )}
         <div>
           <h3>Account Details</h3>
           <p>
@@ -379,11 +397,6 @@ const UserForm = observer(() => {
             visits your page.
           </p>
         </div>
-        {user.isTrial && (
-          <div>
-            OH HI THERE TRIAL USER
-          </div>
-        )}
         <div>
           <label htmlFor="nameField">
             <h5>Real name</h5>
@@ -542,7 +555,7 @@ const UserForm = observer(() => {
             onClick={() => store.goBack()}
             className="w-full sm:w-[150px]"
             trackEvent={trackingEvents.bcDiscardChanges}
-            trackEventOpts={{fromPage:'userEdit'}}
+            trackEventOpts={{ fromPage: 'userEdit' }}
           >
             Discard changes
           </Button>

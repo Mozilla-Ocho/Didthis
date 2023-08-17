@@ -71,8 +71,8 @@ class Store {
   }) {
     this.router = router
     this.testBucket = testBucket
-    this.apiClient = apiClient;
-    this.amplitude = amplitude;
+    this.apiClient = apiClient
+    this.amplitude = amplitude
     log.readiness('testBucket', testBucket)
     // nextjs SSR computes and provides the authUser and signup code via input
     // props to the wrapper/provider
@@ -88,14 +88,18 @@ class Store {
     if (signupCodeInfo) this.setSignupCodeInfo(signupCodeInfo)
     if (authUser) this.setUser(authUser)
     if (typeof window !== 'undefined') {
-      this.amplitude.init(process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY as string, '', {
-        serverUrl: amplitudeProxyEndpoint,
-        defaultTracking: {
-          pageViews: false,
-          sessions: true,
-          formInteractions: false,
-        },
-      })
+      this.amplitude.init(
+        process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY as string,
+        '',
+        {
+          serverUrl: amplitudeProxyEndpoint,
+          defaultTracking: {
+            pageViews: false,
+            sessions: true,
+            formInteractions: false,
+          },
+        }
+      )
       const pt = window.localStorage.getItem('pendingTrack')
       // in addition to specific login or signup events, its useful in
       // ampltidue to have a meta event that flags this session as
@@ -231,74 +235,83 @@ class Store {
     // auth instead.
     firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE)
 
-    firebase.auth().onAuthStateChanged(
-      // called after a sign in / sign up action from the user in the firebase
-      // ui, and we want to generate a session cookie from it (and potentially
-      // autovivify the user in the backend)
-      firebaseUser => {
-        if (firebaseUser) {
-          log.auth('firebase user', firebaseUser)
-          // and we can close the firebase ui container modal
-          this.cancelGlobalLoginOverlay()
-          // and switch to our own loading state
-          this.setFullPageLoading(true)
-          this.amplitude.flush()
-          firebaseUser
-            .getIdToken()
-            .then(idToken =>
-              this.apiClient.getMe({
-                // auth on server detects idToken and uses it instead of session
-                // cookie if present, note this turns it into a POST request
-                idToken,
-                // send the signup code because it will also assign that to the
-                // user in the backend if they don't have one set yet.
-                signupCode: this.signupCodeInfo
-                  ? this.signupCodeInfo.value
-                  : false,
-              })
-            )
-            .then(wrapper => {
-              log.readiness('acquired getMe user after firebase auth')
-              this.setUser(wrapper.payload)
-              this.setAmplitudeUserAttrs()
-              // because we're about to reload and can't trust the amplitude
-              // stuff to finish, we stash the tracking intent in localstorage
-              // and do it on the next page render. (does amplitude sdk do that
-              // internally?)
-              if (wrapper.payload.justCreated) {
-                log.auth('user is justCreated=true')
-                window.localStorage.setItem('pendingTrack', 'signup')
-                window.localStorage.removeItem('skipBlankSlate') // DRY_26502
-              } else {
-                localStorage.setItem('pendingTrack', 'login')
-              }
-              // TODO: HBY-70 need to full page reload here otherwise layout
-              // doesn't update because layout component props that are driven
-              // by ssr auth are not refreshed.
-              // this.setFullPageLoading(false)
-              window.location.reload()
-            })
-            .catch(e => {
-              log.error('error acquiring user onAuthStateChanged', e)
-              // this is what happens if the user is banned, or if there's a
-              // network error on any of the critical api sequences.  better
-              // error handling is important but for now, we will just force a
-              // page reload.
-              // TODO: better handling here.
-              window.location.reload()
-            })
-        } else {
+    firebase
+      .auth()
+      .onAuthStateChanged(
+        this.handleFirebaseAuthStateChanged.bind(this),
+        error => {
+          log.error(error)
+          log.readiness('firebase auth error')
           this.cancelGlobalLoginOverlay()
           this.setFullPageLoading(false)
         }
-      },
-      error => {
-        log.error(error)
-        log.readiness('firebase auth error')
-        this.cancelGlobalLoginOverlay()
-        this.setFullPageLoading(false)
+      )
+  }
+
+  async handleFirebaseAuthStateChanged(firebaseUser: firebase.User | null) {
+    // called after a sign in / sign up action from the user in the firebase
+    // ui, and we want to generate a session cookie from it (and potentially
+    // autovivify the user in the backend)
+    if (firebaseUser == null) {
+      this.cancelGlobalLoginOverlay()
+      this.setFullPageLoading(false)
+      return
+    }
+
+    log.auth('firebase user', firebaseUser)
+    // and we can close the firebase ui container modal
+    this.cancelGlobalLoginOverlay()
+    // and switch to our own loading state
+    this.setFullPageLoading(true)
+    this.amplitude.flush()
+
+    try {
+      const idToken = await firebaseUser.getIdToken()
+
+      if (this.user && this.user.isTrial) {
+        // Attempt to sign in with firebase while logged in as a trial user
+        // is an attempt to claim the trial account
+        return await this.convertTrialAccountToClaimed(idToken)
       }
-    )
+
+      const wrapper = await this.apiClient.getMe({
+        // auth on server detects idToken and uses it instead of session
+        // cookie if present, note this turns it into a POST request
+        idToken,
+        // send the signup code because it will also assign that to the
+        // user in the backend if they don't have one set yet.
+        signupCode: this.signupCodeInfo ? this.signupCodeInfo.value : false,
+      })
+      log.readiness('acquired getMe user after firebase auth')
+      this.setUser(wrapper.payload)
+      this.setAmplitudeUserAttrs()
+
+      // because we're about to reload and can't trust the amplitude
+      // stuff to finish, we stash the tracking intent in localstorage
+      // and do it on the next page render. (does amplitude sdk do that
+      // internally?)
+      if (wrapper.payload.justCreated) {
+        log.auth('user is justCreated=true')
+        window.localStorage.setItem('pendingTrack', 'signup')
+        window.localStorage.removeItem('skipBlankSlate') // DRY_26502
+      } else {
+        localStorage.setItem('pendingTrack', 'login')
+      }
+
+      // TODO: HBY-70 need to full page reload here otherwise layout
+      // doesn't update because layout component props that are driven
+      // by ssr auth are not refreshed.
+      // this.setFullPageLoading(false)
+      window.location.reload()
+    } catch (e) {
+      log.error('error acquiring user onAuthStateChanged', e)
+      // this is what happens if the user is banned, or if there's a
+      // network error on any of the critical api sequences.  better
+      // error handling is important but for now, we will just force a
+      // page reload.
+      // TODO: better handling here.
+      window.location.reload()
+    }
   }
 
   launchGlobalLoginOverlay(overrideCodeCheck: boolean) {
@@ -363,8 +376,20 @@ class Store {
       signupCode: this.signupCodeInfo.value,
     })
     this.removeSignupCodeInfoFromSessionStorage()
-    const slug = wrapper.payload.systemSlug;
+    const slug = wrapper.payload.systemSlug
+    // TODO: move this to a mockable library?
     window.location.assign(`/user/${slug}/post`)
+  }
+
+  async beginClaimTrialAccount() {
+    this.launchGlobalLoginOverlay(false)
+  }
+
+  async convertTrialAccountToClaimed(claimIdToken: string) {
+    if (!this.user) throw new Error('must be authed')
+    const wrapper = await this.apiClient.claimTrialUser({ claimIdToken })
+    // TODO: move this to a mockable library?
+    window.location.assign(`/user/${wrapper.payload.systemSlug}/edit`)
   }
 
   setUser(x: ApiUser | false) {

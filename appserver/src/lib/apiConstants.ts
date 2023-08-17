@@ -109,8 +109,13 @@ interface SessionLoginAsTrialUserWrapper extends SuccessWrapper {
   payload: ApiUser
 }
 
+interface ClaimTrialUserWrapper extends SuccessWrapper {
+  action: "claimTrialUser",
+  payload: ApiUser
+}
+
 export type {
-  SessionLoginAsTrialUserWrapper,
+  ClaimTrialUserWrapper,
   DeletePostWrapper,
   DeleteProjectWrapper,
   EmptySuccessWrapper,
@@ -121,6 +126,7 @@ export type {
   SaveProfileWrapper,
   SavedPostWrapper,
   SavedProjectWrapper,
+  SessionLoginAsTrialUserWrapper,
   SlugCheckWrapper,
   SuccessWrapper,
   UrlMetaWrapper,

@@ -12,6 +12,7 @@ import type {
   WaitlistWrapper,
   SuccessWrapper,
   SessionLoginAsTrialUserWrapper,
+  ClaimTrialUserWrapper,
 } from './apiConstants'
 
 // const getHealthCheck = async () => {
@@ -228,8 +229,22 @@ const sessionLoginAsTrialUser = async ({
   return wrapper
 }
 
+const claimTrialUser = async ({
+  claimIdToken,
+}: {
+  claimIdToken: string
+}) => {
+  const wrapper = await wrapFetch({
+    action: 'claimTrialUser',
+    method: 'POST',
+    body: { claimIdToken },
+  }) as ClaimTrialUserWrapper
+  return wrapper
+}
+
 const apiClient = {
   sessionLoginAsTrialUser,
+  claimTrialUser,
   deletePost,
   deleteProject,
   // getHealthCheck,

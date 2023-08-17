@@ -5,10 +5,12 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import {
   createTrialUser,
   loginSessionForUser,
+  claimTrialUser,
   sessionCookieMaxAgeMillis,
   signupCodes,
 } from './serverAuth'
 import { sessionCookieName } from './/apiConstants'
+import { UseDropdownParameters } from '@mui/base'
 
 describe('createTrialUser', () => {
   let oldEnvName: string | undefined
@@ -60,6 +62,60 @@ describe('createTrialUser', () => {
   })
 })
 
+describe('claimTrialUser', () => {
+  it('updates the trial user with a real UID and sets trial_status to false', async () => {
+    const claimIdToken = 'abcdef12345678'
+    const user: ApiUser = {
+      id: 'trial-8675309',
+      systemSlug: '',
+      publicPageSlug: '',
+      profile: {
+        updatedAt: 0,
+        projects: {},
+      },
+      createdAt: 0,
+    }
+    const claimedDbRow: UserDbRow = {
+      id: '10293847',
+      email: 'me@example.com',
+      system_slug: '',
+      user_slug: null,
+      user_slug_lc: null,
+      profile: {
+        updatedAt: 0,
+        projects: {},
+      },
+      created_at_millis: '',
+      updated_at_millis: '',
+      signup_code_name: null,
+      admin_status: null,
+      ban_status: null,
+      last_write_from_user: null,
+      last_read_from_user: null,
+    }
+
+    mockFirebaseVerifyIdToken.mockReturnValue({
+      uid: claimedDbRow.id,
+      email: claimedDbRow.email,
+    })
+    mockKnexUpdateReturning.mockImplementation(() => [claimedDbRow])
+
+    let resultClaimedUser = await claimTrialUser({ user, claimIdToken })
+    expect(resultClaimedUser).not.toBeFalsy()
+    resultClaimedUser = resultClaimedUser as ApiUser
+
+    expect(mockKnexUpdate).toBeCalled()
+    const [[{ id, email, trial_status }]] = mockKnexUpdate.mock.calls
+    expect(id).toEqual(claimedDbRow.id)
+    expect(email).toEqual(claimedDbRow.email)
+    expect(trial_status).toEqual(false)
+
+    expect(resultClaimedUser.id).toEqual(claimedDbRow.id)
+    expect(resultClaimedUser.email).toEqual(claimedDbRow.email)
+    expect(resultClaimedUser.isTrial).toBeFalsy()
+  })
+})
+
 describe('loginSessionForUser', () => {
   let oldSecret: string | undefined
   beforeEach(() => {
@@ -98,6 +154,7 @@ describe('loginSessionForUser', () => {
 
 const mockKnexQueryBuilder = jest.fn((tableName: string) => ({
   insert: mockKnexInsert,
+  update: mockKnexUpdate,
   where: mockKnexWhere,
 }))
 const mockKnexInsert = jest.fn((columns: UserDbRowForWrite) => ({
@@ -107,6 +164,13 @@ const mockKnexInsertReturning = jest.fn(() => [] as UserDbRow[])
 const mockKnexWhere = jest.fn(() => ({ orWhere: mockKnexOrWhere }))
 const mockKnexOrWhere = jest.fn(() => ({ first: mockKnexFirst }))
 const mockKnexFirst = jest.fn(() => Promise.resolve(undefined))
+const mockKnexUpdate = jest.fn((columns: UserDbRowForWrite) => ({
+  where: mockKnexUpdateWhere,
+}))
+const mockKnexUpdateWhere = jest.fn(() => ({
+  returning: mockKnexUpdateReturning,
+}))
+const mockKnexUpdateReturning = jest.fn(() => [] as UserDbRow[])
 
 jest.mock('../knex', () => {
   return (tableName: string) => mockKnexQueryBuilder(tableName)
@@ -130,3 +194,25 @@ jest.mock('cookies', () => {
   }
   return MockCookies
 })
+
+const mockFirebaseInitializeApp = jest.fn()
+
+jest.mock('firebase-admin/app', () => ({
+  get initializeApp() {
+    return mockFirebaseInitializeApp
+  },
+}))
+
+const mockFirebaseGetAuth = jest.fn(() => ({
+  verifyIdToken: mockFirebaseVerifyIdToken,
+}))
+const mockFirebaseVerifyIdToken = jest.fn(() => ({
+  uid: '8675309',
+  email: 'noone@somewhere.com',
+}))
+
+jest.mock('firebase-admin/auth', () => ({
+  get getAuth() {
+    return mockFirebaseGetAuth
+  },
+}))

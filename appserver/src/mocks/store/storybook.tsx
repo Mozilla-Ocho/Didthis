@@ -20,6 +20,7 @@ export const buildStore: typeof buildMockStore = (
     initFirebase: action('initFirebase'),
     trackEvent: action('trackEvent'),
     launchGlobalLoginOverlay: action('launchGlobalLoginOverlay'),
+    beginClaimTrialAccount: action('claimTrialAccount'),
     ...storeOverrides,
   })
 
