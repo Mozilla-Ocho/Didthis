@@ -21,6 +21,7 @@ export const buildStore: typeof buildMockStore = (
     trackEvent: action('trackEvent'),
     launchGlobalLoginOverlay: action('launchGlobalLoginOverlay'),
     beginClaimTrialAccount: action('beginClaimTrialAccount'),
+    logOut: action('logOut'),
     ...storeOverrides,
   })
 
