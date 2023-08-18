@@ -89,16 +89,13 @@ const HomeUnauth = () => {
     await store.loginAsNewTrialUser()
   }
 
-  const ctaButtons = invited ? (
+  const ctaButton = invited ? (
     <DeferredSignupButton
       onClick={handleDeferredLogin}
       className="my-6 px-6 py-4 text-lg"
     />
   ) : (
-    <>
-      <WaitlistButton className="mr-4" />
-      <LoginButton className="my-6 px-6 py-4 text-lg" />
-    </>
+    <WaitlistButton className="mr-4" />
   )
   return (
     <div className="grid grid-rows-[auto_1fr_auto] w-full min-h-screen">
@@ -174,7 +171,7 @@ const HomeUnauth = () => {
                   </span>
                 )}
               </p>
-              {ctaButtons}
+              {ctaButton}
             </div>
             <Image
               src={hobbyImg2x}
@@ -249,7 +246,7 @@ const HomeUnauth = () => {
                   </p>
                 </div>
               </div>
-              {ctaButtons}
+              {ctaButton}
             </div>
           </div>
         </div>
