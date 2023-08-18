@@ -25,7 +25,7 @@ import { specialAssetIds } from '@/lib/cloudinaryConfig'
 import { trackingEvents } from '@/lib/trackingEvents'
 import PageTitle from '../PageTitle'
 import OgMeta from '../OgMeta'
-import DiscordNag from '../DiscordNag'
+import RemindersAndAlerts from '../RemindersAndAlerts'
 import ViralWaitlistBlurb from '../ViralWaitlistBlurb'
 
 const ProjectPage = observer(
@@ -135,7 +135,7 @@ const ProjectPage = observer(
         </ConfirmationModal>
         <Breadcrumbs crumbs={[{ name: project.title }]} />
         <ViralWaitlistBlurb fromPage='project' targetUserSlug={targetUser.publicPageSlug} />
-        <DiscordNag/>
+        <RemindersAndAlerts/>
         <PagePad>
           <UserPreview user={targetUser} compact={true} />
 

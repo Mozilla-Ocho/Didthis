@@ -379,11 +379,6 @@ const UserForm = observer(() => {
       >
         {user.isTrial && (
           <div>
-            <p>
-              You are logged in with a trial account. You can claim this account
-              by setting an email address and a password. This enables you to
-              share content in public and to log into this account later.
-            </p>
             <ClaimTrialAccountButton
               className="my-6 px-6 py-4 text-lg"
               onClick={handleClaimTrialAccount}

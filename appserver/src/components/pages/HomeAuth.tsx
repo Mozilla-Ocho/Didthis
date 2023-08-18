@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react'
 import { trackingEvents } from '@/lib/trackingEvents'
 import PageTitle from '../PageTitle'
 import OgMeta from '../OgMeta'
-import DiscordNag from '../DiscordNag'
+import RemindersAndAlerts from '../RemindersAndAlerts'
 
 const HomeAuth = observer(() => {
   const store = useStore()
@@ -91,7 +91,7 @@ const HomeAuth = observer(() => {
     <>
       <PageTitle title={title} />
       <OgMeta user={store.user} />
-      <DiscordNag/>
+      <RemindersAndAlerts/>
       <PagePad yControlOnly>
         <PagePad noPadY>
           <UserPreview user={store.user} compact={false} />

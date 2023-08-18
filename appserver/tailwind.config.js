@@ -69,6 +69,7 @@ module.exports = {
         'breadcrumbs': '#FFFCE3',
 
         'discordnag': '#EFFBFF',
+        'trialaccountnag': '#FFC107',
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',

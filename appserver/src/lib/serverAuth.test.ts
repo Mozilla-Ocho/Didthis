@@ -10,7 +10,6 @@ import {
   signupCodes,
 } from './serverAuth'
 import { sessionCookieName } from './/apiConstants'
-import { UseDropdownParameters } from '@mui/base'
 
 describe('createTrialUser', () => {
   let oldEnvName: string | undefined

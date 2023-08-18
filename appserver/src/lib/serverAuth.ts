@@ -294,6 +294,9 @@ export const claimTrialUser = async ({
     )
     const { uid, email } = decodedIdToken
     const millis = new Date().getTime()
+
+    // TODO: detect whether ID is already taken? this update fails thanks
+    // to the unique index, so this won't clobber an existing user
     const dbRow = (
       await knex('users')
         .update({

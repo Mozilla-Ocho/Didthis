@@ -271,7 +271,8 @@ class Store {
       if (this.user && this.user.isTrial) {
         // Attempt to sign in with firebase while logged in as a trial user
         // is an attempt to claim the trial account
-        return await this.convertTrialAccountToClaimed(idToken)
+        await this.convertTrialAccountToClaimed(idToken)
+        return
       }
 
       const wrapper = await this.apiClient.getMe({
@@ -387,9 +388,18 @@ class Store {
 
   async convertTrialAccountToClaimed(claimIdToken: string) {
     if (!this.user) throw new Error('must be authed')
-    const wrapper = await this.apiClient.claimTrialUser({ claimIdToken })
-    // TODO: move this to a mockable library?
-    window.location.assign(`/user/${wrapper.payload.systemSlug}/edit`)
+    try {
+      const wrapper = await this.apiClient.claimTrialUser({ claimIdToken })
+      if (wrapper.success) {
+        // TODO: move this to a mockable library?
+        window.location.assign(`/user/${wrapper.payload.systemSlug}/edit`)
+      }
+    } catch (e) {
+      // TODO: need a better error reporting dialogue
+      window.alert("Attempt to claim trial account failed, please try a different email address.")
+      log.error('Account claim attempt failed')
+      window.location.reload()
+    }
   }
 
   setUser(x: ApiUser | false) {
