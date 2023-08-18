@@ -419,6 +419,18 @@ const verifySessionCookie = async (
       newCookie: cookie,
       roundtrip: false,
     }
+  } else if (roundtrip && uid.startsWith('trial-')) {
+    log.serverApi('skipping roundtrip revalidation for trial account')
+    return {
+      valid: true,
+      uid,
+      newCookie: mkSessionCookie(
+        uid,
+        toSeconds(issuedDate),
+        toSeconds(new Date())
+      ),
+      roundtrip: false,
+    }
   } else {
     const auth = getAuth(firebaseApp)
     try {
