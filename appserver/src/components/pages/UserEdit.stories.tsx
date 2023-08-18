@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 
 import { MockStoreWrapper } from '../../mocks/store/storybook'
 import apiClientDefault from '../../mocks/apiClient/storybook'
+import authUser from "../../mocks/apiUser"
 import { ApiClient } from '../../lib/apiClient'
 
 import UserEdit from './UserEdit'
@@ -43,24 +44,6 @@ export const TrialAccount: Story = {
       <UserEdit {...args} />
     </MockStoreWrapper>
   ),
-}
-
-const authUser: ApiUser = {
-  id: 'trial-8675309',
-  systemSlug: '8675309',
-  publicPageSlug: 'jrandom',
-  userSlug: 'jrandom',
-  isTrial: false,
-  profile: {
-    name: 'J Random Hacker',
-    bio: undefined,
-    socialUrls: undefined,
-    imageAssetId: undefined,
-    imageMeta: undefined,
-    updatedAt: 0,
-    projects: {},
-  },
-  createdAt: 0,
 }
 
 const apiClient: ApiClient = {
