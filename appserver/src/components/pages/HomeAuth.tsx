@@ -74,8 +74,22 @@ const HomeAuth = observer(() => {
     return (
       <>
         <PagePad>
-          <h3 className="mt-10 mb-4">Account created!</h3>
-          <p className="mb-6">
+          <h3 className="mt-10 mb-4">Trial account created!</h3>
+          <p className="mt-6 mb-6">
+            You've just created a temporary account to try things out.
+          </p>
+          <p className="mt-6 mb-6">
+            Later, when you're ready, you can{' '}
+            <Link
+              href={`/user/${store.user.systemSlug}/edit`}
+              trackEvent={trackingEvents.bcTrialAccountNag}
+            >
+              <strong>claim this account</strong>
+            </Link>{' '}
+            by setting an email address and a password. This enables you to
+            share content in public and to sign into this account later.
+          </p>
+          <p className="mt-6 mb-6">
             Let’s get started. Are you working on a hobby project right now?
             Click “Add post”, pick a photo from your camera roll, and start
             tracking your journey!
@@ -86,12 +100,12 @@ const HomeAuth = observer(() => {
     )
   }
   const ugcUsername = store.user.userSlug || store.user.profile.name
-  const title = (ugcUsername ? ugcUsername+'’s projects' : 'My projects')
+  const title = ugcUsername ? ugcUsername + '’s projects' : 'My projects'
   return (
     <>
       <PageTitle title={title} />
       <OgMeta user={store.user} />
-      <RemindersAndAlerts/>
+      <RemindersAndAlerts />
       <PagePad yControlOnly>
         <PagePad noPadY>
           <UserPreview user={store.user} compact={false} />

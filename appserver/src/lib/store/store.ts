@@ -378,8 +378,9 @@ class Store {
     })
     this.removeSignupCodeInfoFromSessionStorage()
     const slug = wrapper.payload.systemSlug
+
     // TODO: move this to a mockable library?
-    window.location.assign(`/user/${slug}/post`)
+    window.location.assign(`/`)
   }
 
   async beginClaimTrialAccount() {
