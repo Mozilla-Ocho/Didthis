@@ -62,14 +62,17 @@ const LogoutButton = observer(
           onNo={handleLogoutCancel}
           onClose={handleLogoutCancel}
         >
-          You cannot access this trial account again without having{' '}
-          <Link
-            href={`/user/${user.systemSlug}/edit`}
-            trackEvent={trackingEvents.bcTrialAccountNag}
-          >
-            <strong>claimed it</strong>
-          </Link>{' '}
-          with an email address and password. Are you sure you want to sign out?
+          <p>
+            You cannot access this trial account again without having{' '}
+            <Link
+              href={`/user/${user.systemSlug}/edit`}
+              trackEvent={trackingEvents.bcTrialAccountNag}
+            >
+              <strong>claimed it</strong>
+            </Link>{' '}
+            with an email address and password.
+          </p>
+          <p className="mt-6 mb-6">Are you sure you want to sign out?</p>
         </ConfirmationModal>
       </>
     )
