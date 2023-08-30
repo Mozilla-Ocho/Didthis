@@ -282,11 +282,11 @@ const DescriptionField = observer(({ postStore }: { postStore: PostStore }) => {
   }
   const hint =
     postStore.mediaType === 'text'
-      ? 'Your post here...'
+      ? 'Write something...'
       : postStore.mediaType === 'image'
-      ? 'Optional image caption or notes...'
+      ? 'Write about this image...'
       : postStore.mediaType === 'link'
-      ? 'Optional link caption or notes...'
+      ? 'Write about this link...'
       : ''
   return (
     <>
