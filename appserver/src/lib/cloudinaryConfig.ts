@@ -31,7 +31,6 @@ const getCloudinaryConfig = (intent: CldImageIntent) => {
     // transformation or gravity on it when rendering.
     showSkipCropButton: false,
     clientAllowedFormats: ['png', 'jpg', 'jpeg', 'gif', 'webp'],
-    maxImageFileSize: 5500000, //5.5MB
     maxImageWidth: 3000,
     maxImageHeight: 3000,
     theme: 'minimal',
