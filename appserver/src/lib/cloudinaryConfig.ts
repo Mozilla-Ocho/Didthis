@@ -19,6 +19,8 @@ const getCloudinaryConfig = (intent: CldImageIntent) => {
     cloudName: 'dbpulyvbq',
     sources: ['local'],
     multiple: false,
+    maxFileSize: 15000000,
+    maxImageFileSize: 15000000,
     cropping: true,
     croppingAspectRatio: 1,
     croppingCoordinatesMode: 'custom',
@@ -29,7 +31,6 @@ const getCloudinaryConfig = (intent: CldImageIntent) => {
     // transformation or gravity on it when rendering.
     showSkipCropButton: false,
     clientAllowedFormats: ['png', 'jpg', 'jpeg', 'gif', 'webp'],
-    maxImageFileSize: 5500000, //5.5MB
     maxImageWidth: 3000,
     maxImageHeight: 3000,
     theme: 'minimal',

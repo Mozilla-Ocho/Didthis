@@ -8,6 +8,8 @@ import branding from '@/lib/branding'
 const DiscordNag = () => {
   const store = useStore()
   if (!store.user) return <></>
+  // hide discord nag for usertesting users
+  if (store.user.signupCodeName === 'usertesting') return <></>
   return (
     <PagePad wide noPadY>
       <div className={`py-4 px-6 mt-4 bg-discordnag`}>
