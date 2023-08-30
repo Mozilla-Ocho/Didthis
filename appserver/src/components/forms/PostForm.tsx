@@ -280,13 +280,21 @@ const DescriptionField = observer(({ postStore }: { postStore: PostStore }) => {
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     postStore.setDescription(e.target.value)
   }
+  const hint =
+    postStore.mediaType === 'text'
+      ? 'Your post here...'
+      : postStore.mediaType === 'image'
+      ? 'Optional image caption or notes...'
+      : postStore.mediaType === 'link'
+      ? 'Optional link caption or notes...'
+      : ''
   return (
     <>
       <label htmlFor="description-field">
         <span className="sr-only">description:</span>
         <Textarea
           id="description-field"
-          placeholder=""
+          placeholder={hint}
           name="description"
           value={postStore.description}
           onChange={handleChange}
@@ -378,7 +386,7 @@ const DateTimeField = observer(({ postStore }: { postStore: PostStore }) => {
   const handleChange = (x: Dayjs | null) => {
     postStore.setDidThisAtDayjs(x)
   }
-  const [flash,setFlash] = useState(false)
+  const [flash, setFlash] = useState(false)
   useEffect(() => {
     if (flash) {
       const timer = setTimeout(() => {
@@ -390,9 +398,10 @@ const DateTimeField = observer(({ postStore }: { postStore: PostStore }) => {
     }
   }, [flash])
   const err = postStore.dateTimeIsInvalid()
-  const exifMillis = postStore.mediaType === 'image' && postStore.imageMeta
-    ? getExifCreatedAtMillis(postStore.imageMeta)
-    : null
+  const exifMillis =
+    postStore.mediaType === 'image' && postStore.imageMeta
+      ? getExifCreatedAtMillis(postStore.imageMeta)
+      : null
   const useTheExif = () => {
     postStore.setDidThisAtDayjs(dayjs(exifMillis))
     setFlash(true)
@@ -405,12 +414,16 @@ const DateTimeField = observer(({ postStore }: { postStore: PostStore }) => {
   const tipClasses = showDateTip
     ? 'mt-2 p-4 h-[76px] opacity-100'
     : 'mt-0 px-4 h-0 opacity-0'
-  const pickerBgClass = flash ? "bg-yellow-300" : ""
+  const pickerBgClass = flash ? 'bg-yellow-300' : ''
   return (
     <>
       <label htmlFor="datetime-field" className="text-form-labels text-sm">
         <p>Did this when?</p>
-        <div className={"grid grid-cols-1 transition-colors duration-300 "+pickerBgClass}>
+        <div
+          className={
+            'grid grid-cols-1 transition-colors duration-300 ' + pickerBgClass
+          }
+        >
           <DateTimePicker
             disableFuture
             label={postStore.didThisAtFormValue === null ? 'now' : ''}
@@ -418,7 +431,11 @@ const DateTimeField = observer(({ postStore }: { postStore: PostStore }) => {
             onChange={handleChange}
           />
         </div>
-        {err && <p className="text-red-400 text-xs text-right">Post dates can’t be in the future</p>}
+        {err && (
+          <p className="text-red-400 text-xs text-right">
+            Post dates can’t be in the future
+          </p>
+        )}
         {canShowDateTip && (
           <div
             className={
