@@ -19,6 +19,8 @@ const getCloudinaryConfig = (intent: CldImageIntent) => {
     cloudName: 'dbpulyvbq',
     sources: ['local'],
     multiple: false,
+    maxFileSize: 15000000,
+    maxImageFileSize: 15000000,
     cropping: true,
     croppingAspectRatio: 1,
     croppingCoordinatesMode: 'custom',
