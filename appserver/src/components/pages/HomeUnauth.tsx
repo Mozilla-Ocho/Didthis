@@ -29,6 +29,10 @@ const HomeUnauth = () => {
   if (bucketInt === 2) topicBucket = 'storytelling'
   if (bucketInt === 3) topicBucket = 'utility'
   if (bucketInt === 4) topicBucket = 'wip'
+  if (store.signupCodeInfo && store.signupCodeInfo.name === 'usertesting') {
+    // all usertesting tests see the personal utility text
+    topicBucket = 'utility'
+  }
   store.useTrackedPageEvent(trackingEvents.pvHomeUnauth, { topicBucket })
   useEffect(() => {
     // special tracking event for campaign conversion, if user viewed unauth
