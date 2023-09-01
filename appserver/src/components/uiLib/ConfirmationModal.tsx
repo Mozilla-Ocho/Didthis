@@ -28,8 +28,8 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   spinning,
 }) => {
   return (
-    <Modal srTitle={title} renderTitleHeading isOpen={isOpen} handleClose={onClose}>
-      <div className="max-w-[320px]">
+    <Modal srTitle={title} fixedSmall renderTitleHeading isOpen={isOpen} handleClose={onClose}>
+      <div>
         {body && <p id="confirm-modal-body" className="mb-4">{body}</p>}
         {!body && (
           <div id="confirm-modal-body" style={{ marginBottom: '16px' }}>

@@ -368,24 +368,25 @@ const UserForm = observer(() => {
   }
   return (
     <>
+      <div className="mb-10">
+        <h3>Account Details</h3>
+        <p>
+          The information you add here will be publicly visible to anyone who
+          visits your page.
+        </p>
+        {user.isTrial && (
+          <p className="my-4 p-4 text-sm bg-yellow-100">
+            Heads up: account details are not editable or publicly visible until
+            you{' '}
+            <ClaimTrialAccountButton intent="link" text="sign up" />.
+          </p>
+        )}
+      </div>
       <form
         onSubmit={handleSubmit}
         method="POST"
-        className="flex flex-col gap-8"
+        className={'flex flex-col gap-8 ' + (user.isTrial ? 'opacity-60' : '')}
       >
-        <div>
-          <h3>Account Details</h3>
-          <p>
-            The information you add here will be publicly visible to anyone who
-            visits your page.
-          </p>
-          {user.isTrial && (
-            <p className="my-4 p-4 text-sm bg-yellow-100">
-              Temporary trial accounts aren't publicly visible.{" "}
-              <ClaimTrialAccountButton intent="link" /> to start sharing now.
-            </p>
-          )}
-        </div>
         <div>
           <label htmlFor="nameField">
             <h5>Real name</h5>

@@ -19,6 +19,7 @@ interface ModalProps {
   renderTitleHeading?: boolean
   noPad?: boolean
   maxEdge?: boolean
+  fixedSmall?: boolean
   children: ReactNode
   closeX?: boolean
 }
@@ -31,6 +32,7 @@ const Modal: React.FC<ModalProps> = ({
   renderTitleHeading,
   noPad,
   maxEdge,
+  fixedSmall,
   children,
   closeX,
 }) => {
@@ -75,6 +77,7 @@ const Modal: React.FC<ModalProps> = ({
         className={twMerge(
           'modal_content_container overflow-hidden shadow-xl min-w-[320px]',
           maxEdge ? 'w-full' : 'm-4 bg-white rounded-lg',
+          fixedSmall ? 'max-w-[320px]' : '',
           noPad || maxEdge ? '' : 'px-4 pt-5 pb-4 sm:p-6'
         )}
       >

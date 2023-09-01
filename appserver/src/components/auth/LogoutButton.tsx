@@ -4,6 +4,7 @@ import { useStore } from '@/lib/store'
 import { trackingEvents } from '@/lib/trackingEvents'
 import { useState } from 'react'
 import { ClaimTrialAccountButton } from '../auth/ClaimTrialAccountButton'
+import branding from '@/lib/branding'
 
 const LogoutButton = observer(
   ({
@@ -63,7 +64,7 @@ const LogoutButton = observer(
         </Button>
         <ConfirmationModal
           isOpen={modalOpen}
-          title={'Abandon your trial account?'}
+          title={'Lose unsaved posts and projects?'}
           yesText="Yes"
           noText="No"
           onYes={completeLogout}
@@ -71,11 +72,9 @@ const LogoutButton = observer(
           onClose={handleLogoutCancel}
         >
           <p>
-            You cannot access this trial account again without having{' '}
-            <ClaimTrialAccountButton text="claimed it" intent="link" className="text-base" />{' '}
-            with an email address and password.
+            Because you haven’t <ClaimTrialAccountButton text="signed up" intent="link" className="text-base" /> for {branding.productName}, any projects and posts you’ve created are not saved and will be lost.
           </p>
-          <p className="mt-6 mb-6">Are you sure you want to sign out?</p>
+          <p className="mt-6 mb-6">Are you sure you want to sign out and lose your work?</p>
         </ConfirmationModal>
       </>
     )

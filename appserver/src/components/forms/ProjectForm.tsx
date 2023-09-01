@@ -283,8 +283,8 @@ const ProjectForm = observer((props: Props) => {
           </p>
           {user.isTrial && (
             <p className="my-4 p-4 text-sm bg-yellow-100">
-              Temporary trial accounts can’t make projects public for sharing.
-              <ClaimTrialAccountButton intent="link" /> to start sharing now.
+              Heads up: To make a project public (and to manage it from other devices),
+              you’ll need to <ClaimTrialAccountButton intent="link" text="sign up" /> first.
             </p>
           )}
         </div>
