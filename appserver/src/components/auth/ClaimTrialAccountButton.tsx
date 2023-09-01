@@ -11,26 +11,32 @@ const ClaimTrialAccountButton = observer(
     text,
     'data-testid': dataTestid,
     className,
+    skipConfirmation = false,
   }: {
     intent?: React.ComponentProps<typeof Button>['intent']
     text?: string
     'data-testid'?: string
     className?: string
+    skipConfirmation?: boolean
   }) => {
     const store = useStore()
     const [modalOpen, setModalOpen] = useState(false)
 
     const handleClick = () => {
-      setModalOpen(true)
+      if (skipConfirmation) {
+        store.beginClaimTrialAccount()
+      } else {
+        setModalOpen(true)
+      }
       store.trackEvent(trackingEvents.bcClaimTrialAccount)
     }
     const handleClaimCancel = () => {
       setModalOpen(false)
       store.trackEvent(trackingEvents.bcCancelClaimTrialAccount)
     }
-    const completeClaim = async () => {
+    const completeClaim = () => {
       setModalOpen(false)
-      return store.beginClaimTrialAccount()
+      store.beginClaimTrialAccount()
     }
 
     return (

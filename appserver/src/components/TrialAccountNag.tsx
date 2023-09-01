@@ -15,7 +15,7 @@ const TrialAccountNag = ({ user }: { user: ApiUser }) => {
         </div>
         <div>
           <div className="text-sm text-end">
-            <ClaimTrialAccountButton intent="link" />
+            <ClaimTrialAccountButton intent="link" skipConfirmation={true} />
           </div>
         </div>
       </div>
