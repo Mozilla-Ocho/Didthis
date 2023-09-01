@@ -138,7 +138,8 @@ class Store {
   }
 
   removeSignupCodeInfoFromSessionStorage() {
-    window.sessionStorage.removeItem(KEY_SIGNUP_CODE_INFO)
+    if (typeof window !== 'undefined')
+      window.sessionStorage.removeItem(KEY_SIGNUP_CODE_INFO)
   }
 
   loadSignupInfoFromSessionStorage() {
@@ -406,7 +407,7 @@ class Store {
       }
     } catch (e) {
       // TODO: need a better error reporting dialogue
-      window.alert("Attempt to claim trial account failed, please try a different email address.")
+      window.alert("Sign up failed, please try a different email address.")
       log.error('Account claim attempt failed')
       window.location.reload()
     }

@@ -13,15 +13,20 @@ const DiscordNag = () => {
       <div className={`py-4 px-6 mt-4 bg-discordnag`}>
         <div className="grid grid-cols-[auto_1fr] gap-2 items-start">
           <Image
-            className="inline w-8 h-8"
+            className="inline w-12 h-12"
             src={giftcardIcon}
             alt="gift card icon"
           />
-          <div className="text-sm">
-            Hi there, {branding.productName} alpha tester! We want to hear what
-            you think. Zoom with us for just 30 minutes and we’ll send you a{' '}
-            <strong>$75 Amazon gift card!</strong><span className="sm:hidden"><br/><br/></span> Interested? Drop a note on
-            our{' '}
+          <div className="text-md">
+            We want to hear what you think about {branding.productName}. Zoom
+            with us for 30 minutes and get a{' '}
+            <strong>$75 Amazon gift card!</strong> (Even if you don’t like{' '}
+            {branding.productName} &mdash; we promise.)
+            <span className="sm:hidden">
+              <br />
+              <br />
+            </span>{' '}
+            Interested? Drop a note on our{' '}
             <span className="whitespace-nowrap">
               <Link
                 external

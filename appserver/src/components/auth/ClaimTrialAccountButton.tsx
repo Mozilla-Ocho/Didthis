@@ -51,19 +51,19 @@ const ClaimTrialAccountButton = observer(
         </Button>
         <ConfirmationModal
           isOpen={modalOpen}
-          title={'Claim account'}
-          yesText="Claim account"
+          title={'Sign up'}
+          yesText="Sign up"
           noText="Not now"
           onYes={completeClaim}
           onNo={handleClaimCancel}
           onClose={handleClaimCancel}
         >
           <p>
-            In order to be able to share your project out to others, you will
-            need to claim your {branding.productName} account with an email
-            address and password.
+            In order to share your projects publicly, and to access your
+            account from other devices, you will need to sign up for a{' '}
+            {branding.productName} account.
           </p>
-          <p className="mt-6 mb-6">Do you want to claim your account now?</p>
+          <p className="mt-6 mb-6">Do you want to sign up now?</p>
         </ConfirmationModal>
       </>
     )

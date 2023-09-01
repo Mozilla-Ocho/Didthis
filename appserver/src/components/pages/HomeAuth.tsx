@@ -10,6 +10,7 @@ import { trackingEvents } from '@/lib/trackingEvents'
 import PageTitle from '../PageTitle'
 import OgMeta from '../OgMeta'
 import RemindersAndAlerts from '../RemindersAndAlerts'
+import branding from '@/lib/branding'
 
 const HomeAuth = observer(() => {
   const store = useStore()
@@ -74,7 +75,7 @@ const HomeAuth = observer(() => {
     return (
       <>
         <PagePad>
-          <h3 className="mt-10 mb-4">Get Started</h3>
+          <h3 className="mt-10 mb-4">Welcome to {branding.productName}!</h3>
           <p className="mt-6 mb-6">
             Let’s get started. Are you working on a hobby project right now?
             Click “Add post”, pick a photo from your camera roll, and start
