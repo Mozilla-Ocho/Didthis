@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { useStore } from '@/lib/store'
 import { trackingEvents } from '@/lib/trackingEvents'
 import { useState } from 'react'
+import { ClaimTrialAccountButton } from '../auth/ClaimTrialAccountButton'
 
 const LogoutButton = observer(
   ({
@@ -71,12 +72,7 @@ const LogoutButton = observer(
         >
           <p>
             You cannot access this trial account again without having{' '}
-            <Link
-              href={`/user/${user.systemSlug}/edit`}
-              trackEvent={trackingEvents.bcTrialAccountNag}
-            >
-              <strong>claimed it</strong>
-            </Link>{' '}
+            <ClaimTrialAccountButton text="claimed it" intent="link" className="text-base" />{' '}
             with an email address and password.
           </p>
           <p className="mt-6 mb-6">Are you sure you want to sign out?</p>

@@ -70,6 +70,7 @@ module.exports = {
 
         'discordnag': '#EFFBFF',
         'trialaccountnag': colors['yellow-300'],
+        'warning': colors['yellow-100'],
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',

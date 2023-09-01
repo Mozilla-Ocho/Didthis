@@ -377,7 +377,12 @@ class Store {
       signupCode: this.signupCodeInfo.value,
     })
     this.removeSignupCodeInfoFromSessionStorage()
-    const slug = wrapper.payload.systemSlug
+
+    // Clear skipBlankSlate so that it appears again in case this user had
+    // a trial account in the past (e.g. mainly us testing?)
+    window.localStorage.removeItem(
+      'skipBlankSlate' // DRY_26502
+    )
 
     // TODO: move this to a mockable library?
     window.location.assign(`/`)

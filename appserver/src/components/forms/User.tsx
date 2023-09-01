@@ -5,13 +5,13 @@ import { specialAssetIds } from '@/lib/cloudinaryConfig'
 import profileUtils from '@/lib/profileUtils'
 import { useStore } from '@/lib/store'
 import { trackingEvents } from '@/lib/trackingEvents'
+import { ClaimTrialAccountButton } from '../auth/ClaimTrialAccountButton'
 import { debounce } from 'lodash-es'
 import { action, makeAutoObservable } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useState } from 'react'
 import ImageUpload, { UploadCallback } from '../ImageUpload'
 import { Button, CloudinaryImage, Input, Textarea } from '../uiLib'
-import { ClaimTrialAccountButton } from '../auth/ClaimTrialAccountButton'
 
 class FormStore {
   name: string
@@ -345,10 +345,6 @@ const UserForm = observer(() => {
       formStore.hasUserSlug() ? formStore.userSlug.trim() : undefined
     )
   }
-  const handleClaimTrialAccount = async () => {
-    store.trackEvent(trackingEvents.bcClaimTrialAccount)
-    await store.beginClaimTrialAccount()
-  }
   const setName = (e: React.ChangeEvent<HTMLInputElement>) => {
     formStore.setName(e.target.value)
   }
@@ -377,20 +373,18 @@ const UserForm = observer(() => {
         method="POST"
         className="flex flex-col gap-8"
       >
-        {user.isTrial && (
-          <div>
-            <ClaimTrialAccountButton
-              className="my-6 px-6 py-4 text-lg"
-              onClick={handleClaimTrialAccount}
-            />
-          </div>
-        )}
         <div>
           <h3>Account Details</h3>
           <p>
             The information you add here will be publicly visible to anyone who
             visits your page.
           </p>
+          {user.isTrial && (
+            <p className="my-4 p-4 text-sm bg-yellow-100">
+              Temporary trial accounts aren't publicly visible.{" "}
+              <ClaimTrialAccountButton intent="link" /> to start sharing now.
+            </p>
+          )}
         </div>
         <div>
           <label htmlFor="nameField">
@@ -406,6 +400,7 @@ const UserForm = observer(() => {
               className="mt-2 text-bodytext"
               touched={formStore.nameTouched}
               maxLen={profileUtils.maxChars.name}
+              disabled={user.isTrial}
             />
           </label>
         </div>
@@ -434,10 +429,11 @@ const UserForm = observer(() => {
               checkingText={
                 formStore.checkingSlug ? 'Checking availability...' : ''
               }
+              disabled={user.isTrial}
             />
           </label>
         </div>
-        <ImageField formStore={formStore} />
+        {!user.isTrial && <ImageField formStore={formStore} />}
         <div>
           <h5>Social links</h5>
           <label
@@ -458,6 +454,7 @@ const UserForm = observer(() => {
               customError={
                 formStore.validOrEmptySocialUrl('twitter') ? '' : 'invalid URL'
               }
+              disabled={user.isTrial}
             />
           </label>
           <label
@@ -478,6 +475,7 @@ const UserForm = observer(() => {
               customError={
                 formStore.validOrEmptySocialUrl('facebook') ? '' : 'invalid URL'
               }
+              disabled={user.isTrial}
             />
           </label>
           <label
@@ -498,6 +496,7 @@ const UserForm = observer(() => {
               customError={
                 formStore.validOrEmptySocialUrl('reddit') ? '' : 'invalid URL'
               }
+              disabled={user.isTrial}
             />
           </label>
           <label
@@ -520,6 +519,7 @@ const UserForm = observer(() => {
                   ? ''
                   : 'invalid URL'
               }
+              disabled={user.isTrial}
             />
           </label>
         </div>
@@ -533,6 +533,7 @@ const UserForm = observer(() => {
               className="mt-2 text-bodytext"
               touched={formStore.bioTouched}
               maxLen={profileUtils.maxChars.blurb}
+              disabled={user.isTrial}
             />
           </label>
         </div>
@@ -540,7 +541,7 @@ const UserForm = observer(() => {
           <Button
             spinning={formStore.spinning}
             type="submit"
-            disabled={!formStore.isPostable()}
+            disabled={!formStore.isPostable() || user.isTrial}
             className="w-full sm:w-[150px]"
           >
             Save

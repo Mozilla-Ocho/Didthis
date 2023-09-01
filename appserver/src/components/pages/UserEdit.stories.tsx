@@ -5,7 +5,7 @@ import {
   MockStoreWrapperProps,
 } from '../../mocks/store/storybook'
 import apiClientDefault from '../../mocks/apiClient/storybook'
-import authUser from '../../mocks/apiUser'
+import authUser, { apiUserWithProject, apiUserBlankSlate } from '../../mocks/apiUser'
 import apiProject from '../../mocks/apiProject'
 import { ApiClient } from '../../lib/apiClient'
 
@@ -41,10 +41,10 @@ export const Default: Story = {
 }
 
 export const TrialAccountNoProjects: Story = {
-  name: "Trial (no projects)",
+  name: 'Trial (no projects)',
   render: args => (
     <MockStoreWrapper
-      authUser={{ ...authUser, isTrial: true }}
+      authUser={{ ...apiUserBlankSlate, isTrial: true }}
       apiClient={apiClient}
     >
       <StaticLayout>
@@ -55,18 +55,12 @@ export const TrialAccountNoProjects: Story = {
 }
 
 export const TrialAccountWithProjects: Story = {
-  name: "Trial (with projects)",
+  name: 'Trial (with projects)',
   render: args => (
     <MockStoreWrapper
       authUser={{
-        ...authUser,
+        ...apiUserWithProject,
         isTrial: true,
-        profile: {
-          ...authUser.profile,
-          projects: {
-            [apiProject.id]: apiProject,
-          },
-        },
       }}
       apiClient={apiClient}
     >

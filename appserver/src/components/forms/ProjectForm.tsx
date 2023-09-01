@@ -15,6 +15,7 @@ import ImageUpload from '../ImageUpload'
 import type { UploadCallback } from '../ImageUpload'
 import { makeAutoObservable } from 'mobx'
 import { trackingEvents } from '@/lib/trackingEvents'
+import { ClaimTrialAccountButton } from '../auth/ClaimTrialAccountButton'
 
 class ProjectStore {
   title: string
@@ -254,31 +255,39 @@ const ProjectForm = observer((props: Props) => {
             )}
           </div>
         </div>
-        {!user.isTrial && (
-          <div>
-            <label
-              htmlFor="visibility"
-              className="inline-flex flex-row items-center cursor-pointer"
-            >
-              <span className="mr-3 text-sm text-form-labels inline-block cursor-pointer">
-                Public project:
-              </span>
-              <span className="relative inline-flex items-center inline-block">
-                <input
-                  type="checkbox"
-                  id="visibility"
-                  value="private"
-                  className="sr-only peer"
-                  disabled={user.isTrial}
-                  checked={projectStore.scope !== 'private'}
-                  onChange={setVisibility}
-                />
-                {/* https://flowbite.com/docs/forms/toggle/ */}
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-form-toggle-bg"></div>
-              </span>
-            </label>
-          </div>
-        )}
+        <div>
+          <label
+            htmlFor="visibility"
+            className="inline-flex flex-row items-center cursor-pointer"
+          >
+            <span className="mr-3 text-sm text-form-labels inline-block cursor-pointer">
+              Public project:
+            </span>
+            <span className="relative inline-flex items-center inline-block">
+              <input
+                type="checkbox"
+                id="visibility"
+                value="private"
+                className="sr-only peer"
+                disabled={user.isTrial}
+                checked={projectStore.scope !== 'private'}
+                onChange={setVisibility}
+              />
+              {/* https://flowbite.com/docs/forms/toggle/ */}
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-form-toggle-bg peer-disabled:opacity-75"></div>
+            </span>
+          </label>
+          <p className="text-sm my-4">
+            You can share your project out to others when you make your project
+            public.
+          </p>
+          {user.isTrial && (
+            <p className="my-4 p-4 text-sm bg-yellow-100">
+              Temporary trial accounts can’t make projects public for sharing.
+              <ClaimTrialAccountButton intent="link" /> to start sharing now.
+            </p>
+          )}
+        </div>
         <div className="flex flex-col sm:flex-row gap-4 flex-wrap">
           <Button
             spinning={projectStore.spinning}

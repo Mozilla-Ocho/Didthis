@@ -1,3 +1,5 @@
+import apiProject from './apiProject'
+
 export const apiUserBlankSlate: ApiUser = {
   id: '8675309',
   systemSlug: '8675309',
@@ -15,6 +17,7 @@ export const apiUserBlankSlate: ApiUser = {
   },
   createdAt: 0,
 }
+
 export const apiUser: ApiUser = {
   id: '8675309',
   systemSlug: '8675309',
@@ -32,4 +35,15 @@ export const apiUser: ApiUser = {
   },
   createdAt: 0,
 }
+
+export const apiUserWithProject: ApiUser = {
+  ...apiUser,
+  profile: {
+    ...apiUser.profile,
+    projects: {
+      [apiProject.id]: apiProject,
+    },
+  }
+}
+
 export default apiUser
