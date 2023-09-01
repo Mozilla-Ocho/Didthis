@@ -376,6 +376,10 @@ class Store {
     const wrapper = await this.apiClient.sessionLoginAsTrialUser({
       signupCode: this.signupCodeInfo.value,
     })
+    this.trackEvent(trackingEvents.caNewTrial, {
+      signupCodeName: this.signupCodeInfo ? this.signupCodeInfo.name : undefined,
+    })
+
     this.removeSignupCodeInfoFromSessionStorage()
 
     // Clear skipBlankSlate so that it appears again in case this user had

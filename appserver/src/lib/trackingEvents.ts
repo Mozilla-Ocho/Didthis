@@ -31,6 +31,12 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   // completed actions
   caJoinWaitlist: { eventName: 'joinWaitlist', opts: {} },
   caJoinViralWaitlist: { eventName: 'joinViralWaitlist', opts: { /* fromPage, targetUserSlug */} },
+  caNewTrial: {
+    eventName: 'newTrial',
+    opts: {
+      /* signupCodeName */
+    }
+  },
   caSignup: {
     eventName: 'signup',
     opts: {
@@ -121,6 +127,10 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   bcClaimTrialAccount: {
     eventName: 'buttonClick',
     opts: { name: 'claimTrialAccount' },
+  },
+  bcCancelClaimTrialAccount: {
+    eventName: 'buttonClick',
+    opts: { name: 'cancelClaimTrialAccount' },
   },
   bcLogout: { eventName: 'buttonClick', opts: { name: 'logout' } },
   bcWaitlist: {
