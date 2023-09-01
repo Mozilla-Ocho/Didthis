@@ -4,6 +4,8 @@ import DiscordNag from './DiscordNag'
 import TrialAccountNag from './TrialAccountNag'
 import TrialAccountSignedUpAlert from './TrialAccountSignedUpAlert'
 
+const CLEAR_SIGNED_UP_ALERT_DELAY = 5000;
+
 export const RemindersAndAlerts = () => {
   const store = useStore()
   const [showTrialAccountSignedUpAlert, setShowTrialAccountSignedUpAlert] =
@@ -11,10 +13,11 @@ export const RemindersAndAlerts = () => {
 
   useEffect(() => {
     const val = store.wasTrialAccountClaimed()
-    console.log("WAS CLAIMED", val)
     setShowTrialAccountSignedUpAlert(val)
-    store.clearTrialAccountClaimed()
-  }, [])
+    setTimeout(() => {
+      store.clearTrialAccountClaimed()
+    }, CLEAR_SIGNED_UP_ALERT_DELAY)
+  }, [store])
 
   return (
     <>
