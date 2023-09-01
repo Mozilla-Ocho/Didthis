@@ -29,7 +29,8 @@ const ClaimTrialAccountButton = observer(
       store.trackEvent(trackingEvents.bcCancelClaimTrialAccount)
     }
     const completeClaim = async () => {
-      await store.beginClaimTrialAccount()
+      setModalOpen(false)
+      return store.beginClaimTrialAccount()
     }
 
     return (

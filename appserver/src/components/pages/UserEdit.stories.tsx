@@ -6,7 +6,6 @@ import {
 } from '../../mocks/store/storybook'
 import apiClientDefault from '../../mocks/apiClient/storybook'
 import authUser, { apiUserWithProject, apiUserBlankSlate } from '../../mocks/apiUser'
-import apiProject from '../../mocks/apiProject'
 import { ApiClient } from '../../lib/apiClient'
 
 import StaticLayout from '../StaticLayout'
