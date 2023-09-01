@@ -19,8 +19,15 @@ const LogoutButton = observer(
     const [modalOpen, setModalOpen] = useState(false)
 
     const store = useStore()
+
     const user = store.user
     if (!user) return <></>
+
+    const hasProjects = Object.keys(user.profile.projects).length > 0
+    const hasProfileEdits =
+      user.profile.name || user.userSlug || user.profile.imageAssetId
+    const inBlankSlate = !hasProjects && !hasProfileEdits
+    if (inBlankSlate && user.isTrial) return <></>
 
     const handleClick = () => {
       if (!user.isTrial) {

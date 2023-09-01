@@ -1,10 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
-import { MockStoreWrapper } from '../../mocks/store/storybook'
+import {
+  MockStoreWrapper,
+  MockStoreWrapperProps,
+} from '../../mocks/store/storybook'
 import apiClientDefault from '../../mocks/apiClient/storybook'
-import authUser from "../../mocks/apiUser"
+import authUser from '../../mocks/apiUser'
+import apiProject from '../../mocks/apiProject'
 import { ApiClient } from '../../lib/apiClient'
 
+import StaticLayout from '../StaticLayout'
 import UserEdit from './UserEdit'
 
 import { action } from '@storybook/addon-actions'
@@ -26,22 +31,48 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
-  args: {},
   render: args => (
     <MockStoreWrapper authUser={authUser} apiClient={apiClient}>
-      <UserEdit {...args} />
+      <StaticLayout>
+        <UserEdit {...args} />
+      </StaticLayout>
     </MockStoreWrapper>
   ),
 }
 
-export const TrialAccount: Story = {
-  args: {},
+export const TrialAccountNoProjects: Story = {
+  name: "Trial (no projects)",
   render: args => (
     <MockStoreWrapper
       authUser={{ ...authUser, isTrial: true }}
       apiClient={apiClient}
     >
-      <UserEdit {...args} />
+      <StaticLayout>
+        <UserEdit {...args} />
+      </StaticLayout>
+    </MockStoreWrapper>
+  ),
+}
+
+export const TrialAccountWithProjects: Story = {
+  name: "Trial (with projects)",
+  render: args => (
+    <MockStoreWrapper
+      authUser={{
+        ...authUser,
+        isTrial: true,
+        profile: {
+          ...authUser.profile,
+          projects: {
+            [apiProject.id]: apiProject,
+          },
+        },
+      }}
+      apiClient={apiClient}
+    >
+      <StaticLayout>
+        <UserEdit {...args} />
+      </StaticLayout>
     </MockStoreWrapper>
   ),
 }

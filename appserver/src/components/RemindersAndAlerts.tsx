@@ -6,8 +6,8 @@ export const RemindersAndAlerts = () => {
   const store = useStore()
   return (
     <>
-      <DiscordNag />
       {store.user && store.user.isTrial && <TrialAccountNag user={store.user} />}
+      <DiscordNag />
     </>
   )
 }

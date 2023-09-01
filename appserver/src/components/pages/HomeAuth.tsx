@@ -74,21 +74,7 @@ const HomeAuth = observer(() => {
     return (
       <>
         <PagePad>
-          <h3 className="mt-10 mb-4">Trial account created!</h3>
-          <p className="mt-6 mb-6">
-            You've just created a temporary account to try things out.
-          </p>
-          <p className="mt-6 mb-6">
-            Later, when you're ready, you can{' '}
-            <Link
-              href={`/user/${store.user.systemSlug}/edit`}
-              trackEvent={trackingEvents.bcTrialAccountNag}
-            >
-              <strong>claim this account</strong>
-            </Link>{' '}
-            by setting an email address and a password. This enables you to
-            share content in public and to sign into this account later.
-          </p>
+          <h3 className="mt-10 mb-4">Get Started</h3>
           <p className="mt-6 mb-6">
             Let’s get started. Are you working on a hobby project right now?
             Click “Add post”, pick a photo from your camera roll, and start

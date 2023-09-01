@@ -25,11 +25,13 @@ export const buildStore: typeof buildMockStore = (
     ...storeOverrides,
   })
 
+export type MockStoreWrapperProps = Omit<BaseMockStoreWrapperProps, 'buildStore'>;
+
 export const MockStoreWrapper = ({
   children,
   apiClient = apiClientDefault,
   ...args
-}: Omit<BaseMockStoreWrapperProps, 'buildStore'>) => {
+}: MockStoreWrapperProps) => {
   return (
     <BaseMockStoreWrapper {...{ ...args, buildStore, apiClient, amplitude }}>
       {children}
