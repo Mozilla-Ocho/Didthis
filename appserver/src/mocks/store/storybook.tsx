@@ -9,14 +9,14 @@ import amplitude from '../../mocks/amplitude/storybook'
 import {
   BaseMockStoreWrapper,
   BaseMockStoreWrapperProps,
-  buildMockStore,
+  buildMockStore as baseBuildMockStore,
 } from './index'
 
-export const buildStore: typeof buildMockStore = (
+export const buildMockStore: typeof baseBuildMockStore = (
   storeParams,
   storeOverrides
 ) =>
-  buildMockStore(storeParams, {
+  baseBuildMockStore(storeParams, {
     initFirebase: action('initFirebase'),
     trackEvent: action('trackEvent'),
     launchGlobalLoginOverlay: action('launchGlobalLoginOverlay'),
@@ -25,11 +25,12 @@ export const buildStore: typeof buildMockStore = (
     ...storeOverrides,
   })
 
-export type MockStoreWrapperProps = Omit<BaseMockStoreWrapperProps, 'buildStore'>;
+export type MockStoreWrapperProps = Omit<BaseMockStoreWrapperProps>;
 
 export const MockStoreWrapper = ({
   children,
   apiClient = apiClientDefault,
+  buildStore = buildMockStore,
   ...args
 }: MockStoreWrapperProps) => {
   return (

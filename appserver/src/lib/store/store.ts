@@ -24,7 +24,8 @@ const modalTransitionTime = 200
 
 // XXX_PORTING review for non-singleton changes
 
-const KEY_SIGNUP_CODE_INFO = 'signupCodeInfo'
+export const KEY_SIGNUP_CODE_INFO = 'signupCodeInfo'
+export const KEY_TRIAL_ACCOUNT_CLAIMED = 'trialAccountClaimed'
 
 export type ApiClient = typeof apiClientBase
 export type AmplitudeClient = typeof amplitudeBase
@@ -51,6 +52,7 @@ class Store {
   testBucket: TestBucket | undefined
   apiClient: ApiClient
   amplitude: AmplitudeClient
+  trialAccountClaimed?: boolean
 
   constructor({
     authUser,
@@ -377,7 +379,9 @@ class Store {
       signupCode: this.signupCodeInfo.value,
     })
     this.trackEvent(trackingEvents.caNewTrial, {
-      signupCodeName: this.signupCodeInfo ? this.signupCodeInfo.name : undefined,
+      signupCodeName: this.signupCodeInfo
+        ? this.signupCodeInfo.name
+        : undefined,
     })
 
     this.removeSignupCodeInfoFromSessionStorage()
@@ -396,17 +400,35 @@ class Store {
     this.launchGlobalLoginOverlay(false)
   }
 
+  setTrialAccountClaimed() {
+    window.localStorage.setItem(KEY_TRIAL_ACCOUNT_CLAIMED, 'true')
+  }
+
+  wasTrialAccountClaimed() {
+    if (typeof window === 'undefined') {
+      return false
+    }
+    return window.localStorage.getItem(KEY_TRIAL_ACCOUNT_CLAIMED) === 'true'
+  }
+
+  clearTrialAccountClaimed() {
+    window.localStorage.removeItem(KEY_TRIAL_ACCOUNT_CLAIMED)
+  }
+
   async convertTrialAccountToClaimed(claimIdToken: string) {
     if (!this.user) throw new Error('must be authed')
     try {
       const wrapper = await this.apiClient.claimTrialUser({ claimIdToken })
       if (wrapper.success) {
         // TODO: move this to a mockable library?
+        this.setTrialAccountClaimed()
         window.location.assign(`/user/${wrapper.payload.systemSlug}/edit`)
       }
     } catch (e) {
       // TODO: need a better error reporting dialogue
-      window.alert("Attempt to claim trial account failed, please try a different email address.")
+      window.alert(
+        'Attempt to claim trial account failed, please try a different email address.'
+      )
       log.error('Account claim attempt failed')
       window.location.reload()
     }

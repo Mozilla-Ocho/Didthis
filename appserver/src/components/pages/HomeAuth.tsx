@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react'
 import { trackingEvents } from '@/lib/trackingEvents'
 import PageTitle from '../PageTitle'
 import OgMeta from '../OgMeta'
+import TrialAccountSignedUpAlert from '../TrialAccountSignedUpAlert'
 import RemindersAndAlerts from '../RemindersAndAlerts'
 
 const HomeAuth = observer(() => {

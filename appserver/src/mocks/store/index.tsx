@@ -7,10 +7,11 @@ import { StoreContext } from '../../lib/store'
 import Store from '../../lib/store/store'
 
 export type StoreParams = ConstructorParameters<typeof Store>[0]
+export type StoreOverrides = Partial<Store> | undefined
 
 export const buildMockStore = (
   storeParams: StoreParams,
-  storeOverrides: Partial<Store> = {}
+  storeOverrides: StoreOverrides = {}
 ) => {
   // note: can't use subclass - makeAutoObservable disallows it
   const store = new Store(storeParams)
