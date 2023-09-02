@@ -166,6 +166,10 @@ type EventSpec = {
     asPartOfNewPost?: YorN
     targetUserSlug?: string
     topicBucket?: string,
+    inTrial?: YorN,
+    loseTrialWork?: YorN,
+    numProjects?: number,
+    numPosts?: number,
   }
 }
 
