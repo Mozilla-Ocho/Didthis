@@ -47,7 +47,9 @@ const LogoutButton = observer(
       setModalOpen(false)
       // TODO: does this logout event get reliably tracked? because we will
       // reload the page after this.
-      store.trackEvent(trackingEvents.bcLogout)
+      store.trackEvent(trackingEvents.bcLogout, {
+        loseTrialWork: (user.isTrial && !inBlankSlate) ? 'y' : 'n',
+      })
       store.logOut()
       onLogout && onLogout()
     }
@@ -72,9 +74,18 @@ const LogoutButton = observer(
           onClose={handleLogoutCancel}
         >
           <p>
-            Because you haven’t <ClaimTrialAccountButton text="signed up" intent="link" className="text-base" /> for {branding.productName}, any projects and posts you’ve created are not saved and will be lost.
+            Because you haven’t{' '}
+            <ClaimTrialAccountButton
+              text="signed up"
+              intent="link"
+              className="text-base"
+            />{' '}
+            for {branding.productName}, any projects and posts you’ve created
+            are not saved and will be lost.
           </p>
-          <p className="mt-6 mb-6">Are you sure you want to sign out and lose your work?</p>
+          <p className="mt-6 mb-6">
+            Are you sure you want to sign out and lose your work?
+          </p>
         </ConfirmationModal>
       </>
     )

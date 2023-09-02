@@ -108,6 +108,7 @@ class Store {
       // authenticated so we can easily report on auth vs unauth session
       // activity.
       if (pt === 'signup') {
+        // DRY_25748 signup tracking
         this.trackEvent(trackingEvents.caSignup, {
           signupCodeName: authUser ? authUser.signupCodeName : undefined,
         })
@@ -296,6 +297,7 @@ class Store {
       // internally?)
       if (wrapper.payload.justCreated) {
         log.auth('user is justCreated=true')
+        // DRY_25748 signup tracking
         window.localStorage.setItem('pendingTrack', 'signup')
         window.localStorage.removeItem('skipBlankSlate') // DRY_26502
       } else {
@@ -423,6 +425,8 @@ class Store {
       if (wrapper.success) {
         // TODO: move this to a mockable library?
         this.setTrialAccountClaimed()
+        // DRY_25748 signup tracking
+        window.localStorage.setItem('pendingTrack', 'signup')
         window.location.assign(`/user/${wrapper.payload.systemSlug}/edit`)
       }
     } catch (e) {
@@ -502,6 +506,7 @@ class Store {
     if (!fullEvent.opts.slug && this.user) {
       fullEvent.opts.slug = this.user.publicPageSlug
     }
+    fullEvent.opts.isTrial = (this.user && this.user.isTrial) ? 'y' : 'n'
     log.tracking(
       fullEvent.eventName,
       fullEvent.opts.name,
@@ -559,6 +564,8 @@ class Store {
     mediaType: PostMediaType
   ): Promise<ApiPost> {
     if (!this.user) throw new Error('must be authed')
+    const numProjects = Object.keys(this.user.profile.projects).length
+    const numPosts = Object.values(this.user.profile.projects).map(p => Object.keys(p.posts).length).reduce((a,b)=>a+b,0)
     return this.apiClient.savePost({ post }).then(wrapper => {
       this.setUser(wrapper.payload.user)
       if (mode === 'new') {
@@ -566,15 +573,21 @@ class Store {
           this.trackEvent(trackingEvents.caNewPost, {
             newProject: 'y',
             mediaType,
+            numProjects,
+            numPosts,
           })
           this.trackEvent(trackingEvents.caNewProject, {
             asPartOfNewPost: 'y',
             mediaType,
+            numProjects,
+            numPosts,
           })
         } else {
           this.trackEvent(trackingEvents.caNewPost, {
             newProject: 'n',
             mediaType,
+            numProjects,
+            numPosts,
           })
         }
       } else {

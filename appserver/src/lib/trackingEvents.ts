@@ -132,7 +132,7 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
     eventName: 'buttonClick',
     opts: { name: 'cancelClaimTrialAccount' },
   },
-  bcLogout: { eventName: 'buttonClick', opts: { name: 'logout' } },
+  bcLogout: { eventName: 'buttonClick', opts: { name: 'logout' /* loseTrialWork */ } },
   bcWaitlist: {
     eventName: 'buttonClick',
     opts: { name: 'joinWaitlist' },
