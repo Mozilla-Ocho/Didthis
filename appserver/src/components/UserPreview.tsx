@@ -45,7 +45,7 @@ const UserPreview = observer(
     }
     return (
       <div className="grid grid-rows-[auto_auto_auto] gap-4">
-        {isSelf && (
+        {isSelf && !user.isTrial && (
           <p>
             <Link href={pathBuilder.userEdit(user.systemSlug)}>
               Edit account details

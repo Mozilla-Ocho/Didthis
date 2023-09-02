@@ -98,7 +98,7 @@ export const signupCodes: {
   // }}}
 }
 
-const toSeconds = (date: Date) => Math.floor(date.getTime() / 1000)
+export const toSeconds = (date: Date) => Math.floor(date.getTime() / 1000)
 
 export const getValidCodeInfo = (userCode: string | undefined | false) => {
   const badCode = { active: false, value: userCode, name: '', envNames: [] }
@@ -141,6 +141,7 @@ const userFromDbRow = (
     // userSlug: dbRow.user_slug || undefined,
     systemSlug: dbRow.system_slug,
     publicPageSlug: dbRow.user_slug || dbRow.system_slug,
+    isTrial: dbRow.trial_status,
     profile,
     createdAt: parseInt(dbRow.created_at_millis as string, 10),
   }
@@ -251,9 +252,103 @@ const getOrCreateUser = async ({
   ]
 }
 
+export const createTrialUser = async ({
+  signupCode,
+}: {
+  signupCode: string
+}): Promise<[ApiUser, UserDbRow] | [false, false]> => {
+  const millis = new Date().getTime()
+  const codeInfo = getValidCodeInfo(signupCode)
+  const systemSlug = await generateRandomAvailableSystemSlug()
+  const id = `trial-${systemSlug}`
+  const columns: UserDbRowForWrite = {
+    id,
+    email: null,
+    system_slug: systemSlug,
+    user_slug: null,
+    user_slug_lc: null,
+    profile: profileUtils.mkDefaultProfile(),
+    signup_code_name: codeInfo && codeInfo.active ? codeInfo.name : null,
+    created_at_millis: millis,
+    updated_at_millis: millis,
+    last_write_from_user: millis,
+    last_read_from_user: millis,
+    admin_status: null,
+    ban_status: null,
+    trial_status: true,
+  }
+  const dbRow = (
+    await knex('users').insert(columns).returning('*')
+  )[0] as UserDbRow
+  log.serverApi('created trial user', dbRow.id)
+  return [
+    userFromDbRow(dbRow, { publicFilter: false, justCreated: true }),
+    dbRow,
+  ]
+}
+
+export const claimTrialUser = async ({
+  user,
+  claimIdToken,
+}: {
+  user: ApiUser
+  claimIdToken: string
+}): Promise<ApiUser | false> => {
+  try {
+    const decodedIdToken = await getAuth(firebaseApp).verifyIdToken(
+      claimIdToken,
+      true
+    )
+    const { uid, email } = decodedIdToken
+    const millis = new Date().getTime()
+
+    // TODO: detect whether ID is already taken? this update fails thanks
+    // to the unique index, so this won't clobber an existing user
+    const dbRow = (
+      await knex('users')
+        .update({
+          id: uid,
+          email: email,
+          trial_status: false,
+          updated_at_millis: millis,
+          last_write_from_user: millis,
+          last_read_from_user: millis,
+        })
+        .where('id', user.id)
+        .returning('*')
+    )[0] as UserDbRow
+    return userFromDbRow(dbRow, { publicFilter: false, justCreated: false })
+  } catch (e) {
+    log.serverApi('idToken validation failed', e)
+    return false
+  }
+}
+
+export const loginSessionForUser = async (
+  req: NextApiRequest,
+  res: NextApiResponse,
+  user: ApiUser
+) => {
+  const cookies = new Cookies(req, res, {
+    secure: process.env.NEXT_PUBLIC_ENV_NAME !== 'dev',
+  })
+  const cookieOptions = {
+    maxAge: sessionCookieMaxAgeMillis,
+    httpOnly: process.env.NEXT_PUBLIC_ENV_NAME !== 'dev',
+    sameSite: 'lax' as const,
+    secure: process.env.NEXT_PUBLIC_ENV_NAME !== 'dev',
+  }
+  const sessionCookie = mkSessionCookie(
+    user.id,
+    toSeconds(new Date()),
+    toSeconds(new Date())
+  )
+  cookies.set(sessionCookieName, sessionCookie, cookieOptions)
+}
+
 // we want very long-lived sessions so we are not using firebase admin sdk's
 // built in session cookie featuer which cap at 14 days
-const sessionCookieMaxAgeMillis = 1000 * 60 * 60 * 24 * 180
+export const sessionCookieMaxAgeMillis = 1000 * 60 * 60 * 24 * 180
 // this is the period of time for which existing session cookies can still work
 // after a user resets their password. smaller is more secure, but at the cost
 // of latency to the user for roundtripping to firebase to check the validity.
@@ -329,6 +424,18 @@ const verifySessionCookie = async (
       valid: true,
       uid,
       newCookie: cookie,
+      roundtrip: false,
+    }
+  } else if (roundtrip && uid.startsWith('trial-')) {
+    log.serverApi('skipping roundtrip revalidation for trial account')
+    return {
+      valid: true,
+      uid,
+      newCookie: mkSessionCookie(
+        uid,
+        toSeconds(issuedDate),
+        toSeconds(new Date())
+      ),
       roundtrip: false,
     }
   } else {

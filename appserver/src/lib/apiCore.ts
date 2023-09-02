@@ -138,7 +138,7 @@ const wrapFetch = async (fetchArgs: FetchArgs): Promise<SuccessWrapper> => {
     }
     log.api('fetching', action, queryParams, config)
     const res = await fetch(url, config)
-    if (res.status !== 200) {
+    if (res.status !== 200 && res.status !== 201) {
       let errorId, errorMsg
       let wrapper: ErrorWrapper | undefined
       try {

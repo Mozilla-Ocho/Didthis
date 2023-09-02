@@ -31,6 +31,12 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   // completed actions
   caJoinWaitlist: { eventName: 'joinWaitlist', opts: {} },
   caJoinViralWaitlist: { eventName: 'joinViralWaitlist', opts: { /* fromPage, targetUserSlug */} },
+  caNewTrial: {
+    eventName: 'newTrial',
+    opts: {
+      /* signupCodeName */
+    }
+  },
   caSignup: {
     eventName: 'signup',
     opts: {
@@ -114,7 +120,19 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
     eventName: 'buttonClick',
     opts: { name: 'loginSignup' },
   },
-  bcLogout: { eventName: 'buttonClick', opts: { name: 'logout' } },
+  bcLoginTrialSignup: {
+    eventName: 'buttonClick',
+    opts: { name: 'loginTrialSignup' },
+  },
+  bcClaimTrialAccount: {
+    eventName: 'buttonClick',
+    opts: { name: 'claimTrialAccount' },
+  },
+  bcCancelClaimTrialAccount: {
+    eventName: 'buttonClick',
+    opts: { name: 'cancelClaimTrialAccount' },
+  },
+  bcLogout: { eventName: 'buttonClick', opts: { name: 'logout' /* loseTrialWork */ } },
   bcWaitlist: {
     eventName: 'buttonClick',
     opts: { name: 'joinWaitlist' },
@@ -158,6 +176,10 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   bcDiscordNag: {
     eventName: 'buttonClick',
     opts: { name: 'bcDiscordNag' },
+  },
+  bcTrialAccountNag: {
+    eventName: 'buttonClick',
+    opts: { name: 'bcTrialAccountNag' },
   },
   bcOchoIdea: {
     eventName: 'buttonClick',

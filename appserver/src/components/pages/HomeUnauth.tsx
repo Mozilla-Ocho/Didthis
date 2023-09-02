@@ -1,4 +1,5 @@
 import { LoginButton } from '@/components/auth/LoginButton'
+import { DeferredSignupButton } from '@/components/auth/DeferredSignupButton'
 import AppHeader from '@/components/AppHeader'
 import AppFooter from '@/components/AppFooter'
 import branding from '@/lib/branding'
@@ -86,10 +87,19 @@ const HomeUnauth = () => {
   const howWorksImg = 'inline'
   const h4text = 'text-2xl md:text-3xl mt-0 mb-4'
   const para = 'text-base leading-[24px] md:text-base md:leading-[32px]'
+
+  const handleDeferredLogin = async () => {
+    store.trackEvent(trackingEvents.bcLoginTrialSignup)
+    await store.loginAsNewTrialUser()
+  }
+
   const ctaButton = invited ? (
-    <LoginButton className="my-6 px-6 py-4 text-lg" />
+    <DeferredSignupButton
+      onClick={handleDeferredLogin}
+      className="my-6 px-6 py-4 text-lg"
+    />
   ) : (
-    <WaitlistButton />
+    <WaitlistButton className="mr-4" />
   )
   return (
     <div className="grid grid-rows-[auto_1fr_auto] w-full min-h-screen">

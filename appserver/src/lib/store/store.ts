@@ -1,11 +1,11 @@
 import { makeAutoObservable, toJS } from 'mobx'
-import apiClient from '@/lib/apiClient'
+import apiClientBase from '@/lib/apiClient'
 import { amplitudeProxyEndpoint } from '@/lib/apiCore'
 import log from '@/lib/log'
 import { isEqual } from 'lodash-es'
 import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth'
-import * as amplitude from '@amplitude/analytics-browser'
+import * as amplitudeBase from '@amplitude/analytics-browser'
 import { trackingEvents } from '@/lib/trackingEvents'
 import { useEffect } from 'react'
 import { NextRouter } from 'next/router'
@@ -23,6 +23,12 @@ let moduleGlobalFirebaseRef: any | false = false
 const modalTransitionTime = 200
 
 // XXX_PORTING review for non-singleton changes
+
+export const KEY_SIGNUP_CODE_INFO = 'signupCodeInfo'
+export const KEY_TRIAL_ACCOUNT_CLAIMED = 'trialAccountClaimed'
+
+export type ApiClient = typeof apiClientBase
+export type AmplitudeClient = typeof amplitudeBase
 
 class Store {
   user: false | ApiUser = false
@@ -44,12 +50,17 @@ class Store {
   router: NextRouter
   debugObjId = (Math.random() + '').replace('0.', '')
   testBucket: TestBucket | undefined
+  apiClient: ApiClient
+  amplitude: AmplitudeClient
+  trialAccountClaimed?: boolean
 
   constructor({
     authUser,
     signupCodeInfo,
     router,
     testBucket,
+    apiClient = apiClientBase,
+    amplitude = amplitudeBase,
   }: {
     authUser?: ApiUser | false
     signupCodeInfo?: false | ApiSignupCodeInfo
@@ -57,10 +68,14 @@ class Store {
     // bucketed tests are not in use everywhere so this is undefined in a bunch
     // of pages.
     testBucket?: TestBucket
+    apiClient?: ApiClient
+    amplitude?: AmplitudeClient
   }) {
     this.router = router
-    this.testBucket= testBucket
-    log.readiness("testBucket", testBucket)
+    this.testBucket = testBucket
+    this.apiClient = apiClient
+    this.amplitude = amplitude
+    log.readiness('testBucket', testBucket)
     // nextjs SSR computes and provides the authUser and signup code via input
     // props to the wrapper/provider
     makeAutoObservable(
@@ -75,20 +90,25 @@ class Store {
     if (signupCodeInfo) this.setSignupCodeInfo(signupCodeInfo)
     if (authUser) this.setUser(authUser)
     if (typeof window !== 'undefined') {
-      amplitude.init(process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY as string, '', {
-        serverUrl: amplitudeProxyEndpoint,
-        defaultTracking: {
-          pageViews: false,
-          sessions: true,
-          formInteractions: false,
-        },
-      })
+      this.amplitude.init(
+        process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY as string,
+        '',
+        {
+          serverUrl: amplitudeProxyEndpoint,
+          defaultTracking: {
+            pageViews: false,
+            sessions: true,
+            formInteractions: false,
+          },
+        }
+      )
       const pt = window.localStorage.getItem('pendingTrack')
       // in addition to specific login or signup events, its useful in
       // ampltidue to have a meta event that flags this session as
       // authenticated so we can easily report on auth vs unauth session
       // activity.
       if (pt === 'signup') {
+        // DRY_25748 signup tracking
         this.trackEvent(trackingEvents.caSignup, {
           signupCodeName: authUser ? authUser.signupCodeName : undefined,
         })
@@ -113,20 +133,28 @@ class Store {
   setSignupCodeInfo(info: ApiSignupCodeInfo | false) {
     this.signupCodeInfo = info
     if (info && typeof window !== 'undefined') {
-      window.sessionStorage.setItem('signupCodeInfo', JSON.stringify(toJS(this.signupCodeInfo)))
+      window.sessionStorage.setItem(
+        KEY_SIGNUP_CODE_INFO,
+        JSON.stringify(toJS(this.signupCodeInfo))
+      )
     }
+  }
+
+  removeSignupCodeInfoFromSessionStorage() {
+    if (typeof window !== 'undefined')
+      window.sessionStorage.removeItem(KEY_SIGNUP_CODE_INFO)
   }
 
   loadSignupInfoFromSessionStorage() {
     // called on useeffect so as not to break SSR
     if (typeof window !== 'undefined') {
       try {
-        const json = window.sessionStorage.getItem('signupCodeInfo')
+        const json = window.sessionStorage.getItem(KEY_SIGNUP_CODE_INFO)
         if (json) {
           const info = JSON.parse(json) as ApiSignupCodeInfo
           this.signupCodeInfo = info
         }
-      } catch(e) { }
+      } catch (e) {}
     }
   }
 
@@ -211,76 +239,91 @@ class Store {
     // auth instead.
     firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE)
 
-    firebase.auth().onAuthStateChanged(
-      // called after a sign in / sign up action from the user in the firebase
-      // ui, and we want to generate a session cookie from it (and potentially
-      // autovivify the user in the backend)
-      firebaseUser => {
-        if (firebaseUser) {
-          log.auth('firebase user', firebaseUser)
-          // and we can close the firebase ui container modal
-          this.cancelGlobalLoginOverlay()
-          // and switch to our own loading state
-          this.setFullPageLoading(true)
-          amplitude.flush()
-          firebaseUser
-            .getIdToken()
-            .then(idToken => apiClient.getMe({
-              // auth on server detects idToken and uses it instead of session
-              // cookie if present, note this turns it into a POST request
-              idToken,
-              // send the signup code because it will also assign that to the
-              // user in the backend if they don't have one set yet.
-              signupCode: this.signupCodeInfo ? this.signupCodeInfo.value : false
-            }))
-            .then(wrapper => {
-              log.readiness('acquired getMe user after firebase auth')
-              this.setUser(wrapper.payload)
-              this.setAmplitudeUserAttrs()
-              // because we're about to reload and can't trust the amplitude
-              // stuff to finish, we stash the tracking intent in localstorage
-              // and do it on the next page render. (does amplitude sdk do that
-              // internally?)
-              if (wrapper.payload.justCreated) {
-                log.auth('user is justCreated=true')
-                window.localStorage.setItem('pendingTrack', 'signup')
-                window.localStorage.removeItem('skipBlankSlate') // DRY_26502
-              } else {
-                localStorage.setItem('pendingTrack', 'login')
-              }
-              // TODO: HBY-70 need to full page reload here otherwise layout
-              // doesn't update because layout component props that are driven
-              // by ssr auth are not refreshed.
-              // this.setFullPageLoading(false)
-              window.location.reload()
-            })
-            .catch(e => {
-              log.error('error acquiring user onAuthStateChanged', e)
-              // this is what happens if the user is banned, or if there's a
-              // network error on any of the critical api sequences.  better
-              // error handling is important but for now, we will just force a
-              // page reload.
-              // TODO: better handling here.
-              window.location.reload()
-            })
-        } else {
+    firebase
+      .auth()
+      .onAuthStateChanged(
+        this.handleFirebaseAuthStateChanged.bind(this),
+        error => {
+          log.error(error)
+          log.readiness('firebase auth error')
           this.cancelGlobalLoginOverlay()
           this.setFullPageLoading(false)
         }
-      },
-      error => {
-        log.error(error)
-        log.readiness('firebase auth error')
-        this.cancelGlobalLoginOverlay()
-        this.setFullPageLoading(false)
+      )
+  }
+
+  async handleFirebaseAuthStateChanged(firebaseUser: firebase.User | null) {
+    // called after a sign in / sign up action from the user in the firebase
+    // ui, and we want to generate a session cookie from it (and potentially
+    // autovivify the user in the backend)
+    if (firebaseUser == null) {
+      this.cancelGlobalLoginOverlay()
+      this.setFullPageLoading(false)
+      return
+    }
+
+    log.auth('firebase user', firebaseUser)
+    // and we can close the firebase ui container modal
+    this.cancelGlobalLoginOverlay()
+    // and switch to our own loading state
+    this.setFullPageLoading(true)
+    this.amplitude.flush()
+
+    try {
+      const idToken = await firebaseUser.getIdToken()
+
+      if (this.user && this.user.isTrial) {
+        // Attempt to sign in with firebase while logged in as a trial user
+        // is an attempt to claim the trial account
+        await this.convertTrialAccountToClaimed(idToken)
+        return
       }
-    )
+
+      const wrapper = await this.apiClient.getMe({
+        // auth on server detects idToken and uses it instead of session
+        // cookie if present, note this turns it into a POST request
+        idToken,
+        // send the signup code because it will also assign that to the
+        // user in the backend if they don't have one set yet.
+        signupCode: this.signupCodeInfo ? this.signupCodeInfo.value : false,
+      })
+      log.readiness('acquired getMe user after firebase auth')
+      this.setUser(wrapper.payload)
+      this.setAmplitudeUserAttrs()
+
+      // because we're about to reload and can't trust the amplitude
+      // stuff to finish, we stash the tracking intent in localstorage
+      // and do it on the next page render. (does amplitude sdk do that
+      // internally?)
+      if (wrapper.payload.justCreated) {
+        log.auth('user is justCreated=true')
+        // DRY_25748 signup tracking
+        window.localStorage.setItem('pendingTrack', 'signup')
+        window.localStorage.removeItem('skipBlankSlate') // DRY_26502
+      } else {
+        localStorage.setItem('pendingTrack', 'login')
+      }
+
+      // TODO: HBY-70 need to full page reload here otherwise layout
+      // doesn't update because layout component props that are driven
+      // by ssr auth are not refreshed.
+      // this.setFullPageLoading(false)
+      window.location.reload()
+    } catch (e) {
+      log.error('error acquiring user onAuthStateChanged', e)
+      // this is what happens if the user is banned, or if there's a
+      // network error on any of the critical api sequences.  better
+      // error handling is important but for now, we will just force a
+      // page reload.
+      // TODO: better handling here.
+      window.location.reload()
+    }
   }
 
   launchGlobalLoginOverlay(overrideCodeCheck: boolean) {
     this.trackEvent(trackingEvents.bcLoginSignup)
     this.loginErrorMode = false
-    console.log("signupCodeInfo",this.signupCodeInfo)
+    console.log('signupCodeInfo', this.signupCodeInfo)
     // DRY_47693 signup code logic
     if (this.signupCodeInfo === false) {
       // with no code present, we don't show any special case ui, we just let
@@ -329,12 +372,82 @@ class Store {
     this.loginErrorMode = false
   }
 
+  async loginAsNewTrialUser() {
+    if (this.signupCodeInfo === false) {
+      // TODO: this shouldn't happen - need to log an error?
+      return
+    }
+    if (this.user) throw new Error('must be unauthed')
+    const wrapper = await this.apiClient.sessionLoginAsTrialUser({
+      signupCode: this.signupCodeInfo.value,
+    })
+    this.trackEvent(trackingEvents.caNewTrial, {
+      signupCodeName: this.signupCodeInfo
+        ? this.signupCodeInfo.name
+        : undefined,
+    })
+
+    this.removeSignupCodeInfoFromSessionStorage()
+
+    // Clear skipBlankSlate so that it appears again in case this user had
+    // a trial account in the past (e.g. mainly us testing?)
+    window.localStorage.removeItem(
+      'skipBlankSlate' // DRY_26502
+    )
+
+    // TODO: move this to a mockable library?
+    window.location.assign(`/`)
+  }
+
+  async beginClaimTrialAccount() {
+    this.launchGlobalLoginOverlay(false)
+  }
+
+  setTrialAccountClaimed() {
+    window.localStorage.setItem(KEY_TRIAL_ACCOUNT_CLAIMED, 'true')
+  }
+
+  wasTrialAccountClaimed() {
+    if (typeof window === 'undefined') {
+      return false
+    }
+    return window.localStorage.getItem(KEY_TRIAL_ACCOUNT_CLAIMED) === 'true'
+  }
+
+  clearTrialAccountClaimed() {
+    window.localStorage.removeItem(KEY_TRIAL_ACCOUNT_CLAIMED)
+  }
+
+  async convertTrialAccountToClaimed(claimIdToken: string) {
+    if (!this.user) throw new Error('must be authed')
+    try {
+      const wrapper = await this.apiClient.claimTrialUser({ claimIdToken })
+      if (wrapper.success) {
+        // TODO: move this to a mockable library?
+        this.setTrialAccountClaimed()
+        // DRY_25748 signup tracking
+        window.localStorage.setItem('pendingTrack', 'signup')
+        window.location.assign(`/user/${wrapper.payload.systemSlug}/edit`)
+      }
+    } catch (e) {
+      // TODO: need a better error reporting dialogue
+      window.alert("Sign up failed, please try a different email address.")
+      log.error('Account claim attempt failed')
+      window.location.reload()
+    }
+  }
+
   setUser(x: ApiUser | false) {
     log.auth('setuser', x)
     if (x) {
       log.auth('store acquired user', x)
       this.user = x
-      amplitude.setUserId(x.id)
+      this.amplitude.setUserId(x.id)
+      // If we have signup code info, remove it from storage.
+      if (this.signupCodeInfo) {
+        this.signupCodeInfo = false
+        this.removeSignupCodeInfoFromSessionStorage()
+      }
       // DRY_47693 signup code logic
       // if we have a signup code on the url, clear it
       if (this.signupCodeInfo && typeof window !== 'undefined') {
@@ -342,7 +455,6 @@ class Store {
         const url = new URL(window.location.toString())
         url.searchParams.delete('signupCode')
         window.history.replaceState({}, '', url.toString())
-        this.signupCodeInfo = false
       }
     } else {
       log.auth('store clearing user')
@@ -351,7 +463,7 @@ class Store {
 
   setAmplitudeUserAttrs() {
     if (!this.user) return false
-    const identifyOps = new amplitude.Identify()
+    const identifyOps = new this.amplitude.Identify()
     if (this.user.signupCodeName) {
       // if the user has a signup code, make sure it's set in the amplitude user properties
       log.tracking('identify() signupCode')
@@ -361,16 +473,16 @@ class Store {
     log.tracking('identify() slugs')
     identifyOps.setOnce('systemSlug', this.user.systemSlug)
     if (this.user.userSlug) identifyOps.set('userSlug', this.user.userSlug)
-    amplitude.identify(identifyOps)
+    this.amplitude.identify(identifyOps)
   }
 
   async logOut() {
     // we have to call the api to delete the cookie because it's httpOnly
     log.auth('store logOut')
     this.trackEvent(trackingEvents.bcLogout)
-    amplitude.setUserId(undefined)
-    amplitude.flush()
-    return apiClient
+    this.amplitude.setUserId(undefined)
+    this.amplitude.flush()
+    return this.apiClient
       .sessionLogout()
       .then(() => {
         window.location.assign('/')
@@ -394,12 +506,13 @@ class Store {
     if (!fullEvent.opts.slug && this.user) {
       fullEvent.opts.slug = this.user.publicPageSlug
     }
+    fullEvent.opts.isTrial = (this.user && this.user.isTrial) ? 'y' : 'n'
     log.tracking(
       fullEvent.eventName,
       fullEvent.opts.name,
       JSON.stringify(fullEvent)
     )
-    amplitude.track(fullEvent.eventName, fullEvent.opts)
+    this.amplitude.track(fullEvent.eventName, fullEvent.opts)
   }
 
   setTrackedPageEvent(evt: EventSpec, opts?: EventSpec['opts']) {
@@ -451,22 +564,30 @@ class Store {
     mediaType: PostMediaType
   ): Promise<ApiPost> {
     if (!this.user) throw new Error('must be authed')
-    return apiClient.savePost({ post }).then(wrapper => {
+    const numProjects = Object.keys(this.user.profile.projects).length
+    const numPosts = Object.values(this.user.profile.projects).map(p => Object.keys(p.posts).length).reduce((a,b)=>a+b,0)
+    return this.apiClient.savePost({ post }).then(wrapper => {
       this.setUser(wrapper.payload.user)
       if (mode === 'new') {
         if (post.projectId === 'new') {
           this.trackEvent(trackingEvents.caNewPost, {
             newProject: 'y',
             mediaType,
+            numProjects,
+            numPosts,
           })
           this.trackEvent(trackingEvents.caNewProject, {
             asPartOfNewPost: 'y',
             mediaType,
+            numProjects,
+            numPosts,
           })
         } else {
           this.trackEvent(trackingEvents.caNewPost, {
             newProject: 'n',
             mediaType,
+            numProjects,
+            numPosts,
           })
         }
       } else {
@@ -489,7 +610,7 @@ class Store {
         this.trackEvent(trackingEvents.caSetProjectPrivate)
       }
     }
-    return apiClient.saveProject({ project }).then(wrapper => {
+    return this.apiClient.saveProject({ project }).then(wrapper => {
       this.setUser(wrapper.payload.user)
       if (mode === 'new') {
         this.trackEvent(trackingEvents.caNewProject, { asPartOfNewPost: 'n' })
@@ -526,7 +647,7 @@ class Store {
     if (this.confirmingDelete && res === 'yes') {
       this.confirmingDelete.deleting = true
       if (this.confirmingDelete.kind === 'post') {
-        apiClient
+        this.apiClient
           .deletePost({
             postId: this.confirmingDelete.thing.id,
             projectId: this.confirmingDelete.thing.projectId,
@@ -549,7 +670,7 @@ class Store {
           })
       }
       if (this.confirmingDelete.kind === 'project') {
-        apiClient
+        this.apiClient
           .deleteProject({ projectId: this.confirmingDelete.thing.id })
           .then(wrapper => {
             this.showConfirmDeleteModal = false
@@ -586,7 +707,7 @@ class Store {
     ) {
       this.trackEvent(trackingEvents.caProfileAll)
     }
-    return apiClient.saveProfile({ profile, userSlug }).then(wrapper => {
+    return this.apiClient.saveProfile({ profile, userSlug }).then(wrapper => {
       this.setUser(wrapper.payload)
       this.trackEvent(trackingEvents.edProfile)
       this.router.push(pathBuilder.user(wrapper.payload.systemSlug))

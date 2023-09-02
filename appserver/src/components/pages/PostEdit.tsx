@@ -13,7 +13,7 @@ import pathBuilder from '@/lib/pathBuilder'
 import { PagePad } from '../uiLib'
 import {trackingEvents} from '@/lib/trackingEvents'
 import PageTitle from '../PageTitle'
-import DiscordNag from '../DiscordNag'
+import RemindersAndAlerts from '../RemindersAndAlerts'
 
 const PostEditPage = observer(() => {
   const store = useStore()
@@ -39,7 +39,7 @@ const PostEditPage = observer(() => {
           { name: post ? 'Edit post' : 'New post' },
         ]}
       />
-      <DiscordNag />
+      <RemindersAndAlerts />
       <PagePad>
         <h3>Edit post</h3>
         <PostForm mode="edit" post={post} />

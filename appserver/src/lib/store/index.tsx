@@ -10,7 +10,7 @@ import Store from './store'
 import { NextRouter } from 'next/router'
 import Loading from '@/components/pages/Loading'
 
-const StoreContext = createContext<Store | null>(null)
+export const StoreContext = createContext<Store | null>(null)
 
 const StoreWrapper = ({
   authUser,
