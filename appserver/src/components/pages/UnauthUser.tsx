@@ -7,7 +7,7 @@ import { useStore } from '@/lib/store'
 import { trackingEvents } from '@/lib/trackingEvents'
 import PageTitle from '../PageTitle'
 import OgMeta from '../OgMeta'
-import DiscordNag from '../DiscordNag'
+import RemindersAndAlerts from '../RemindersAndAlerts'
 import ViralWaitlistBlurb from '../ViralWaitlistBlurb'
 
 // TODO: rename this to NonAuthUser or something, it's shown even in auth but
@@ -22,7 +22,7 @@ const UnauthUser = observer(
     return (
       <>
         <ViralWaitlistBlurb fromPage='user' targetUserSlug={targetUser.publicPageSlug} />
-        <DiscordNag />
+        <RemindersAndAlerts />
         <PagePad>
           <OgMeta user={targetUser} />
           <PageTitle title={targetUser.userSlug || targetUser.profile.name} />

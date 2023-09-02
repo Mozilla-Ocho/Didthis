@@ -9,7 +9,9 @@ import { useEffect, useState } from 'react'
 import { trackingEvents } from '@/lib/trackingEvents'
 import PageTitle from '../PageTitle'
 import OgMeta from '../OgMeta'
-import DiscordNag from '../DiscordNag'
+import TrialAccountSignedUpAlert from '../TrialAccountSignedUpAlert'
+import RemindersAndAlerts from '../RemindersAndAlerts'
+import branding from '@/lib/branding'
 
 const HomeAuth = observer(() => {
   const store = useStore()
@@ -74,8 +76,8 @@ const HomeAuth = observer(() => {
     return (
       <>
         <PagePad>
-          <h3 className="mt-10 mb-4">Account created!</h3>
-          <p className="mb-6">
+          <h3 className="mt-10 mb-4">Welcome to {branding.productName}!</h3>
+          <p className="mt-6 mb-6">
             Let’s get started. Are you working on a hobby project right now?
             Click “Add post”, pick a photo from your camera roll, and start
             tracking your journey!
@@ -86,12 +88,12 @@ const HomeAuth = observer(() => {
     )
   }
   const ugcUsername = store.user.userSlug || store.user.profile.name
-  const title = (ugcUsername ? ugcUsername+'’s projects' : 'My projects')
+  const title = ugcUsername ? ugcUsername + '’s projects' : 'My projects'
   return (
     <>
       <PageTitle title={title} />
       <OgMeta user={store.user} />
-      <DiscordNag/>
+      <RemindersAndAlerts />
       <PagePad yControlOnly>
         <PagePad noPadY>
           <UserPreview user={store.user} compact={false} />

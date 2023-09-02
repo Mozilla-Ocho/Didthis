@@ -33,6 +33,12 @@ export default async function handler(
     ...inputProject,
     updatedAt: millis,
   } as ApiProject
+
+  if (user.isTrial) {
+    // Force projects into private scope for trial users
+    project.scope = 'private'
+  }
+
   // this api ignores the value of "posts" as a property on the project and
   // preserves whats there or sets to [] for new projects.
   const existingProject = profile.projects[project.id]

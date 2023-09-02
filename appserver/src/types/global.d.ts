@@ -36,6 +36,7 @@ type ApiUser = {
   unsolicited?: true
   isAdmin?: true
   isFlagged?: true
+  isTrial?: boolean
   lastFullPageLoad?: number
   lastWrite?: number
   updatedAt?: number
@@ -55,6 +56,7 @@ interface UserDbRow { // for reads (numbers are strings)
   signup_code_name: string | null
   admin_status: 'admin' | null
   ban_status: 'flagged' | null
+  trial_status?: boolean
   last_write_from_user: string | null
   last_read_from_user: string | null
 }
@@ -65,7 +67,7 @@ interface UserDbRowForWrite { // for writes (numbers are numbers)
   // overflows/corruption for large numbers that the db could potentially
   // represent but javscript can't?
   id: ApiUserid
-  email: string
+  email: string | null
   system_slug: string
   user_slug: string | null
   user_slug_lc: string | null
@@ -75,6 +77,7 @@ interface UserDbRowForWrite { // for writes (numbers are numbers)
   signup_code_name: string | null
   admin_status: 'admin' | null
   ban_status: 'flagged' | null
+  trial_status?: boolean
   last_write_from_user: number | null
   last_read_from_user: number | null
 }
@@ -163,6 +166,10 @@ type EventSpec = {
     asPartOfNewPost?: YorN
     targetUserSlug?: string
     topicBucket?: string,
+    inTrial?: YorN,
+    loseTrialWork?: YorN,
+    numProjects?: number,
+    numPosts?: number,
   }
 }
 

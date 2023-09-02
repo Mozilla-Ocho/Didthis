@@ -1,10 +1,11 @@
-import apiClient from '@/lib/apiClient'
+import { ApiClient } from '@/lib/apiClient'
 import { SlugCheckWrapper } from '@/lib/apiConstants'
 import branding from '@/lib/branding'
 import { specialAssetIds } from '@/lib/cloudinaryConfig'
 import profileUtils from '@/lib/profileUtils'
 import { useStore } from '@/lib/store'
-import {trackingEvents} from '@/lib/trackingEvents'
+import { trackingEvents } from '@/lib/trackingEvents'
+import { ClaimTrialAccountButton } from '../auth/ClaimTrialAccountButton'
 import { debounce } from 'lodash-es'
 import { action, makeAutoObservable } from 'mobx'
 import { observer } from 'mobx-react-lite'
@@ -29,8 +30,10 @@ class FormStore {
   reddit: string
   instagram: string
   spinning = false
+  apiClient: ApiClient
 
-  constructor(user: ApiUser) {
+  constructor(user: ApiUser, apiClient: ApiClient) {
+    this.apiClient = apiClient
     this.name = user.profile.name || ''
     if (this.name) this.nameTouched = true
     this.bio = user.profile.bio || ''
@@ -132,7 +135,7 @@ class FormStore {
       return
     }
     this.checkingSlug = true
-    apiClient
+    this.apiClient
       .getSlugCheck({ userSlug: this.userSlug, provisionalName: this.name })
       .then(
         action(wrapper => {
@@ -314,7 +317,7 @@ const ImageField = observer(({ formStore }: { formStore: FormStore }) => {
               onClick={deleteImage}
               className="grow sm:grow-0"
               trackEvent={trackingEvents.bcRemoveImage}
-              trackEventOpts={{imgIntent:'avatar'}}
+              trackEventOpts={{ imgIntent: 'avatar' }}
             >
               Remove
             </Button>
@@ -331,7 +334,7 @@ const UserForm = observer(() => {
   if (!user) {
     return <></>
   }
-  const [formStore] = useState(() => new FormStore(user))
+  const [formStore] = useState(() => new FormStore(user, store.apiClient))
   const handleSubmit = (e: React.FormEvent) => {
     e.stopPropagation()
     e.preventDefault()
@@ -365,18 +368,25 @@ const UserForm = observer(() => {
   }
   return (
     <>
+      <div className="mb-10">
+        <h3>Account Details</h3>
+        <p>
+          The information you add here will be publicly visible to anyone who
+          visits your page.
+        </p>
+        {user.isTrial && (
+          <p className="my-4 p-4 text-sm bg-yellow-100">
+            Heads up: account details are not editable or publicly visible until
+            you{' '}
+            <ClaimTrialAccountButton intent="link" text="sign up" />.
+          </p>
+        )}
+      </div>
       <form
         onSubmit={handleSubmit}
         method="POST"
-        className="flex flex-col gap-8"
+        className={'flex flex-col gap-8 ' + (user.isTrial ? 'opacity-60' : '')}
       >
-        <div>
-          <h3>Account Details</h3>
-          <p>
-            The information you add here will be publicly visible to anyone who
-            visits your page.
-          </p>
-        </div>
         <div>
           <label htmlFor="nameField">
             <h5>Real name</h5>
@@ -391,6 +401,7 @@ const UserForm = observer(() => {
               className="mt-2 text-bodytext"
               touched={formStore.nameTouched}
               maxLen={profileUtils.maxChars.name}
+              disabled={user.isTrial}
             />
           </label>
         </div>
@@ -419,10 +430,11 @@ const UserForm = observer(() => {
               checkingText={
                 formStore.checkingSlug ? 'Checking availability...' : ''
               }
+              disabled={user.isTrial}
             />
           </label>
         </div>
-        <ImageField formStore={formStore} />
+        {!user.isTrial && <ImageField formStore={formStore} />}
         <div>
           <h5>Social links</h5>
           <label
@@ -443,6 +455,7 @@ const UserForm = observer(() => {
               customError={
                 formStore.validOrEmptySocialUrl('twitter') ? '' : 'invalid URL'
               }
+              disabled={user.isTrial}
             />
           </label>
           <label
@@ -463,6 +476,7 @@ const UserForm = observer(() => {
               customError={
                 formStore.validOrEmptySocialUrl('facebook') ? '' : 'invalid URL'
               }
+              disabled={user.isTrial}
             />
           </label>
           <label
@@ -483,6 +497,7 @@ const UserForm = observer(() => {
               customError={
                 formStore.validOrEmptySocialUrl('reddit') ? '' : 'invalid URL'
               }
+              disabled={user.isTrial}
             />
           </label>
           <label
@@ -505,6 +520,7 @@ const UserForm = observer(() => {
                   ? ''
                   : 'invalid URL'
               }
+              disabled={user.isTrial}
             />
           </label>
         </div>
@@ -518,6 +534,7 @@ const UserForm = observer(() => {
               className="mt-2 text-bodytext"
               touched={formStore.bioTouched}
               maxLen={profileUtils.maxChars.blurb}
+              disabled={user.isTrial}
             />
           </label>
         </div>
@@ -525,7 +542,7 @@ const UserForm = observer(() => {
           <Button
             spinning={formStore.spinning}
             type="submit"
-            disabled={!formStore.isPostable()}
+            disabled={!formStore.isPostable() || user.isTrial}
             className="w-full sm:w-[150px]"
           >
             Save
@@ -535,7 +552,7 @@ const UserForm = observer(() => {
             onClick={() => store.goBack()}
             className="w-full sm:w-[150px]"
             trackEvent={trackingEvents.bcDiscardChanges}
-            trackEventOpts={{fromPage:'userEdit'}}
+            trackEventOpts={{ fromPage: 'userEdit' }}
           >
             Discard changes
           </Button>
