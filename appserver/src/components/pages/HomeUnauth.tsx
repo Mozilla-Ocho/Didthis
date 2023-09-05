@@ -111,11 +111,14 @@ const HomeUnauth = () => {
             <div className="sm:max-w-[40%] text-center sm:text-left lg:self-center">
               <h4 className="text-3xl sm:text-3xl2 lg:text-4xl leading-tight md:leading-tight mb-6">
                 <strong>
+                  {/*
                   {topicBucket === 'authentic' && (
                     <span>An authentic record of your passion projects</span>
                   )}
                   {topicBucket === 'utility' && (
+                  */}
                     <span>Never forget a step in your passion projects</span>
+                  {/*
                   )}
                   {topicBucket === 'storytelling' && (
                     <span>Every step is a story</span>
@@ -130,9 +133,11 @@ const HomeUnauth = () => {
                       A work in progress is worth celebrating
                     </span>
                   )}
+                  */}
                 </strong>
               </h4>
               <p className="text-base">
+                  {/*
                 {topicBucket === 'authentic' && (
                   <span>
                     DidThis is a positive space of your own to celebrate each
@@ -143,6 +148,7 @@ const HomeUnauth = () => {
                   </span>
                 )}
                 {topicBucket === 'utility' && (
+                  */}
                   <span>
                     Journal your progress through your hobby journeys with
                     images, text, or links that are a snap to capture in
@@ -150,6 +156,7 @@ const HomeUnauth = () => {
                     and celebrate your growth. Keep your projects private, or
                     share them with the people who appreciate your process.
                   </span>
+                  {/*
                 )}
                 {topicBucket === 'storytelling' && (
                   <span>
@@ -175,6 +182,7 @@ const HomeUnauth = () => {
                     your achievements with friends and fellow hobbyists.
                   </span>
                 )}
+                  */}
               </p>
               {ctaButton}
             </div>
