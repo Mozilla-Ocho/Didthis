@@ -1,4 +1,4 @@
-import { LoginButton } from '@/components/auth/LoginButton'
+// import { LoginButton } from '@/components/auth/LoginButton'
 import { DeferredSignupButton } from '@/components/auth/DeferredSignupButton'
 import AppHeader from '@/components/AppHeader'
 import AppFooter from '@/components/AppFooter'
@@ -34,6 +34,7 @@ const HomeUnauth = () => {
     // all usertesting tests see the personal utility text
     topicBucket = 'utility'
   }
+  topicBucket = 'utility' // as of 09/05/23 all users see utility messaging
   store.useTrackedPageEvent(trackingEvents.pvHomeUnauth, { topicBucket })
   useEffect(() => {
     // special tracking event for campaign conversion, if user viewed unauth
