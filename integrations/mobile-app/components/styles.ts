@@ -4,6 +4,7 @@ export const styles = StyleSheet.create({
   listItems: {
     backgroundColor: "white",
     minHeight: 288,
+    flex: 1,
   },
   wrapperMessage: {
     alignItems: "center",

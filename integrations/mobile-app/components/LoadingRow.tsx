@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Animated, Text, View, Easing, StyleSheet } from "react-native";
 import { styles } from "./styles";
 
-const GlowView = ({ style, children }) => {
+const GlowView = ({ style = {}, children }) => {
   const [glowAnim] = useState(new Animated.Value(0.3));
 
   useEffect(() => {
