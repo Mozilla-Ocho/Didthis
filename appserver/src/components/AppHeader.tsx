@@ -7,15 +7,9 @@ import LogoWordmarkSvg from '@/assets/img/didthis_wordmark_light.svg'
 import Image from 'next/image'
 import { LoginButton } from './auth/LoginButton'
 import { trackingEvents } from '@/lib/trackingEvents'
-import { DeferredSignupButton } from './auth/DeferredSignupButton'
 
 const AppHeader = observer(({ isThe404 }: { isThe404?: boolean }) => {
   const store = useStore()
-  const invited = store.signupCodeInfo && store.signupCodeInfo.active
-  const handleDeferredLogin = async () => {
-    store.trackEvent(trackingEvents.bcLoginTrialSignup)
-    await store.loginAsNewTrialUser()
-  }
   return (
     <div>
       <PagePad wide noPadY>
@@ -31,7 +25,10 @@ const AppHeader = observer(({ isThe404 }: { isThe404?: boolean }) => {
               </h1>
             </Link>
             <div className="text-right text-sm flex-grow">
-              <LogoutButton intent="headerNav" />
+              {store.inTrialBlankSlate ?
+              <LoginButton intent="headerNav" />
+              :
+              <LogoutButton intent="headerNav" />}
             </div>
           </div>
         ) : (
@@ -53,14 +50,7 @@ const AppHeader = observer(({ isThe404 }: { isThe404?: boolean }) => {
             </Link>
             {!isThe404 && (
               <div className="basis-2/6 text-right text-sm">
-                {invited ? (
-                  <DeferredSignupButton
-                    intent="link"
-                    onClick={handleDeferredLogin}
-                  />
-                ) : (
-                  <LoginButton intent="link" />
-                )}
+                <LoginButton intent="link" />
               </div>
             )}
           </div>

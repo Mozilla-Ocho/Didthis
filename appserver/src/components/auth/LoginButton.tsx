@@ -23,9 +23,7 @@ const LoginButton = observer(
       store.trackEvent(trackingEvents.bcLoginSignup)
       store.launchGlobalLoginOverlay(false)
     }
-    const defaultText = store.signupCodeInfo
-      ? branding.signupButtonTxt
-      : branding.loginButtonTxt
+    const defaultText = branding.loginButtonTxt
     return (
       <Button
         onClick={handleClick}

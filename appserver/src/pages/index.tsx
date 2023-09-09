@@ -35,7 +35,9 @@ export const getServerSideProps = async (
   // DRY_47693 signup code logic
   const url = new URL('http://anyhost.com' + context.resolvedUrl)
   const signupCode = url.searchParams.get('signupCode') || false
-  const signupCodeInfo = signupCode ? getValidCodeInfo(signupCode) : false
+  // getValidCodeInfo will return the default open door code if none is present
+  // on the URL.
+  const signupCodeInfo = getValidCodeInfo(signupCode)
   let authUser: ApiUser | false = false
   const sessionCookie = context.req.cookies[sessionCookieName]
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
