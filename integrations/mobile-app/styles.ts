@@ -1,6 +1,24 @@
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
+  project: {},
+  post: {
+    backgroundColor: "white",
+    fontSize: 16,
+    lineHeight: 24,
+    fontWeight: "800",
+    padding: 10,
+    margin: 10,
+    flex: 1,
+    alignItems: "flex-start",
+    alignContent: "flex-start",
+    justifyContent: "flex-start",
+  },
+  postImage: {
+    flex: 1,
+    width: "100%",
+    height: 100,
+  },
   listItems: {
     backgroundColor: "white",
     minHeight: 288,

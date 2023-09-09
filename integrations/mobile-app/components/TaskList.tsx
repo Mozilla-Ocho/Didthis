@@ -2,7 +2,7 @@ import { Task } from "./Task";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { LoadingRow } from "./LoadingRow";
 import { MaterialIcons } from "@expo/vector-icons";
-import { styles } from "./styles";
+import { styles } from "../styles";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, updateTaskState } from "../store";
 import { useMemo } from "react";
