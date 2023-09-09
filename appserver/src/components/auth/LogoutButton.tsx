@@ -25,12 +25,6 @@ const LogoutButton = observer(
     const user = store.user
     if (!user) return <></>
 
-    const hasProjects = Object.keys(user.profile.projects).length > 0
-    const hasProfileEdits =
-      user.profile.name || user.userSlug || user.profile.imageAssetId
-    const inBlankSlate = !hasProjects && !hasProfileEdits
-    if (inBlankSlate && user.isTrial) return <></>
-
     const handleClick = () => {
       if (!user.isTrial) {
         completeLogout()
@@ -48,7 +42,7 @@ const LogoutButton = observer(
       // TODO: does this logout event get reliably tracked? because we will
       // reload the page after this.
       store.trackEvent(trackingEvents.bcLogout, {
-        loseTrialWork: (user.isTrial && !inBlankSlate) ? 'y' : 'n',
+        loseTrialWork: store.inTrialWithContent ? 'y' : 'n',
       })
       store.logOut()
       onLogout && onLogout()

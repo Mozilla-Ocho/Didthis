@@ -95,19 +95,35 @@ export const signupCodes: {
     name: 'ads-pottery',
     envNames: ['dev', 'nonprod', 'prod'],
   },
+  '83ad9fa2': {
+    // a special code we fall back to when no code is present for a temporary
+    // period of opening up registrations to any inbound visitor. this is a
+    // bit of a hack, the better solution would be to update the user creation
+    // logic to accept no code according to a configuration variable that
+    // allows open signups, but for now this is the fastest way to open things
+    // up temporarily.
+    active: true,
+    value: '83ad9fa2',
+    name: 'opendoor',
+    envNames: ['dev', 'nonprod', 'prod'],
+  },
   // }}}
 }
 
 export const toSeconds = (date: Date) => Math.floor(date.getTime() / 1000)
 
 export const getValidCodeInfo = (userCode: string | undefined | false) => {
-  const badCode = { active: false, value: userCode, name: '', envNames: [] }
-  if (!userCode) return badCode
+  // for a little while we are going to allow everyone in w/o a signup code,
+  // defaulting to a baseline code if they don't have one specifically on the
+  // inbound landing page url.
+  const unmatchedCode = signupCodes['83ad9fa2']
+  // const unmatchedCode = { active: false, value: userCode, name: '', envNames: [] }
+  if (!userCode) return unmatchedCode
   const check = signupCodes[userCode]
-  if (!check) return badCode
-  if (!check.active) return badCode
+  if (!check) return unmatchedCode
+  if (!check.active) return unmatchedCode
   if (check.envNames.indexOf(process.env.NEXT_PUBLIC_ENV_NAME as string) < 0)
-    return badCode
+    return unmatchedCode
   return check
 }
 

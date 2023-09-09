@@ -133,16 +133,26 @@ class Store {
   setSignupCodeInfo(info: ApiSignupCodeInfo | false) {
     this.signupCodeInfo = info
     if (info && typeof window !== 'undefined') {
-      window.sessionStorage.setItem(
-        KEY_SIGNUP_CODE_INFO,
-        JSON.stringify(toJS(this.signupCodeInfo))
-      )
+      let replace = true
+      try {
+        const json = window.sessionStorage.getItem(KEY_SIGNUP_CODE_INFO)
+        if (json) {
+          const existing = JSON.parse(json) as ApiSignupCodeInfo
+          if (existing && info.name === 'opendoor') {
+            // in the event there is an existing code in localstorage, and the
+            // current code is the default 'opendoor', don't replace the
+            // existing value.
+            replace = false
+          }
+        }
+      } catch (e) {}
+      if (replace) {
+        window.sessionStorage.setItem(
+          KEY_SIGNUP_CODE_INFO,
+          JSON.stringify(toJS(this.signupCodeInfo))
+        )
+      }
     }
-  }
-
-  removeSignupCodeInfoFromSessionStorage() {
-    if (typeof window !== 'undefined')
-      window.sessionStorage.removeItem(KEY_SIGNUP_CODE_INFO)
   }
 
   loadSignupInfoFromSessionStorage() {
@@ -152,7 +162,9 @@ class Store {
         const json = window.sessionStorage.getItem(KEY_SIGNUP_CODE_INFO)
         if (json) {
           const info = JSON.parse(json) as ApiSignupCodeInfo
-          this.signupCodeInfo = info
+          if (!this.signupCodeInfo || this.signupCodeInfo.name === 'opendoor') {
+            this.signupCodeInfo = info
+          }
         }
       } catch (e) {}
     }
@@ -272,9 +284,9 @@ class Store {
     try {
       const idToken = await firebaseUser.getIdToken()
 
-      if (this.user && this.user.isTrial) {
+      if (this.inTrialWithContent) {
         // Attempt to sign in with firebase while logged in as a trial user
-        // is an attempt to claim the trial account
+        // with content is an attempt to claim the trial account
         await this.convertTrialAccountToClaimed(idToken)
         return
       }
@@ -387,8 +399,6 @@ class Store {
         : undefined,
     })
 
-    this.removeSignupCodeInfoFromSessionStorage()
-
     // Clear skipBlankSlate so that it appears again in case this user had
     // a trial account in the past (e.g. mainly us testing?)
     window.localStorage.removeItem(
@@ -401,6 +411,24 @@ class Store {
 
   async beginClaimTrialAccount() {
     this.launchGlobalLoginOverlay(false)
+  }
+
+  get inTrialBlankSlate() {
+    const user = this.user
+    if (!user) return false
+    if (!user.isTrial) return false
+    const hasProjects = Object.keys(user.profile.projects).length > 0
+    if (hasProjects) return false
+    const hasProfileEdits =
+      user.profile.name || user.userSlug || user.profile.imageAssetId
+    return !hasProfileEdits
+  }
+
+  get inTrialWithContent() {
+    const user = this.user
+    if (!user) return false
+    if (!user.isTrial) return false
+    return !this.inTrialBlankSlate
   }
 
   setTrialAccountClaimed() {
@@ -446,7 +474,6 @@ class Store {
       // If we have signup code info, remove it from storage.
       if (this.signupCodeInfo) {
         this.signupCodeInfo = false
-        this.removeSignupCodeInfoFromSessionStorage()
       }
       // DRY_47693 signup code logic
       // if we have a signup code on the url, clear it
