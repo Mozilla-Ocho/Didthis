@@ -12,40 +12,13 @@ export type PostEditorProps = {
   post: ApiPost;
 };
 
-type PostEditorReducerAction =
-  | {
-      type: "didThisAt";
-      value: ApiPost["didThisAt"];
-    }
-  | {
-      type: "description";
-      value: ApiPost["description"];
-    }
-  | {
-      type: "image";
-      value: ApiPost["image"];
-    };
-
-export function postEditorReducer(
-  state: ApiPost,
-  action: PostEditorReducerAction
-) {
-  switch (action.type) {
-    case "didThisAt":
-      return { ...state, didThisAt: action.value };
-    case "description":
-      return { ...state, description: action.value };
-    case "image":
-      return { ...state, image: action.value };
-    default: {
-      return state;
-    }
-  }
-}
+// TODO: "save" button to commit current state of reducer
 
 export const PostEditor = ({ post: initialPost }: PostEditorProps) => {
-  const [post, dispatch] = useReducer(postEditorReducer, initialPost);
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [{ showDatePicker, post }, dispatch] = useReducer(reducer, {
+    showDatePicker: false,
+    post: initialPost,
+  });
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -59,21 +32,38 @@ export const PostEditor = ({ post: initialPost }: PostEditorProps) => {
       allowsMultipleSelection: false,
     });
     if (!result.canceled) {
-      dispatch({ type: "image", value: result.assets[0] });
+      dispatch({
+        type: "updatePost",
+        key: "image",
+        value: result.assets[0],
+      });
     }
   };
 
+  // TODO: always show on iOS, use imperative on android
+  const showDatepicker = () => {
+    dispatch({
+      type: "showDatePicker",
+      value: true,
+    });
+  };
+
   const onChangeDidThisAt = (_event, selectedDate: Date) => {
-    setShowDatePicker(false);
-    dispatch({ type: "didThisAt", value: new Date(selectedDate).getTime() });
+    dispatch([
+      {
+        type: "showDatePicker",
+        value: false,
+      },
+      {
+        type: "updatePost",
+        key: "didThisAt",
+        value: new Date(selectedDate).getTime(),
+      },
+    ]);
   };
 
   const onChangeDescription = (value: string) =>
-    dispatch({ type: "description", value });
-
-  const showDatepicker = () => {
-    setShowDatePicker(true);
-  };
+    dispatch({ type: "updatePost", key: "description", value });
 
   return (
     <>
@@ -101,3 +91,43 @@ export const PostEditor = ({ post: initialPost }: PostEditorProps) => {
     </>
   );
 };
+
+type State = {
+  showDatePicker: boolean;
+  post: ApiPost;
+};
+
+type ObjectUpdateAction<T extends string, C extends Object> = {
+  [K in keyof C]: { type: T; key: K; value: C[K] };
+}[keyof C];
+
+type ApiPostUpdateAction = ObjectUpdateAction<"updatePost", ApiPost>;
+
+type ShowDatePickerAction = { type: "showDatePicker"; value: boolean };
+
+type Action = ApiPostUpdateAction | ShowDatePickerAction;
+
+function actionReducer(state: State, action: Action) {
+  switch (action.type) {
+    case "showDatePicker": {
+      const { value } = action;
+      return { ...state, showDatePicker: value };
+    }
+    case "updatePost": {
+      const { post } = state;
+      const { key, value } = action;
+      return { ...state, post: { ...post, [key]: value } };
+    }
+    default:
+      return state;
+  }
+}
+
+export function reducer(stateIn: State, actionsIn: Action | Action[]) {
+  let state = stateIn;
+  let actions = Array.isArray(actionsIn) ? actionsIn : [actionsIn];
+  for (let action of actions) {
+    state = actionReducer(state, action);
+  }
+  return state;
+}
