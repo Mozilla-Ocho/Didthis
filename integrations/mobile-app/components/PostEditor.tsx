@@ -12,13 +12,24 @@ export type PostEditorProps = {
   post: ApiPost;
 };
 
+type State = {
+  showDatePicker: boolean;
+  post: ApiPost;
+};
+
+const createInitialState = (initialPost: ApiPost): State => ({
+  showDatePicker: false,
+  post: initialPost,
+});
+
 // TODO: "save" button to commit current state of reducer
 
 export const PostEditor = ({ post: initialPost }: PostEditorProps) => {
-  const [{ showDatePicker, post }, dispatch] = useReducer(reducer, {
-    showDatePicker: false,
-    post: initialPost,
-  });
+  const [{ showDatePicker, post }, dispatch] = useReducer(
+    reducer,
+    initialPost,
+    createInitialState
+  );
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -51,13 +62,13 @@ export const PostEditor = ({ post: initialPost }: PostEditorProps) => {
   const onChangeDidThisAt = (_event, selectedDate: Date) => {
     dispatch([
       {
-        type: "showDatePicker",
-        value: false,
-      },
-      {
         type: "updatePost",
         key: "didThisAt",
         value: new Date(selectedDate).getTime(),
+      },
+      {
+        type: "showDatePicker",
+        value: false,
       },
     ]);
   };
@@ -92,27 +103,27 @@ export const PostEditor = ({ post: initialPost }: PostEditorProps) => {
   );
 };
 
-type State = {
-  showDatePicker: boolean;
-  post: ApiPost;
-};
-
 type ObjectUpdateAction<T extends string, C extends Object> = {
-  [K in keyof C]: { type: T; key: K; value: C[K] };
+  [K in keyof C]: {
+    type: T;
+    key: K;
+    value: C[K];
+  };
 }[keyof C];
 
-type ApiPostUpdateAction = ObjectUpdateAction<"updatePost", ApiPost>;
+type PropertyUpdateAction<T extends string, V> = {
+  type: T;
+  value: V;
+};
 
-type ShowDatePickerAction = { type: "showDatePicker"; value: boolean };
-
-type Action = ApiPostUpdateAction | ShowDatePickerAction;
+type Action =
+  | ObjectUpdateAction<"updatePost", ApiPost>
+  | PropertyUpdateAction<"showDatePicker", boolean>;
 
 function actionReducer(state: State, action: Action) {
   switch (action.type) {
-    case "showDatePicker": {
-      const { value } = action;
-      return { ...state, showDatePicker: value };
-    }
+    case "showDatePicker":
+      return { ...state, showDatePicker: action.value };
     case "updatePost": {
       const { post } = state;
       const { key, value } = action;
