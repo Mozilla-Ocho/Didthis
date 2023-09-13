@@ -6,10 +6,11 @@ import {
   ActivityIndicator,
   StyleSheet,
   StatusBar,
+  Text,
 } from "react-native";
 import type { RootStackParamList } from "../App";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import WebView, { WebViewNavigation } from "react-native-webview";
+import WebView, { WebViewNavigation, WebViewMessageEvent } from "react-native-webview";
 
 import WebViewNavToolbar from "../components/WebViewNavToolbar";
 
@@ -38,11 +39,33 @@ export default function HomeScreen(props: HomeScreenProps) {
     WebViewNavigation | undefined
   >();
 
-  const handleWebViewNavigationStateChange = (navState: WebViewNavigation) =>
+  // HACK: there's no postMessage on WebView, so we inject a script to dispatch event
+  function postMessage(message: any) {
+    webviewRef.current?.injectJavaScript(
+      buildInjectableJSMessage(message)
+    );
+  }
+
+  const [lastMessage, setLastMessage] = useState("");
+
+  const handleNavigationStateChange = (navState: WebViewNavigation) =>
     setWebviewNavigation(navState);
+
+  const handleMessage = (event: WebViewMessageEvent) => {
+    const {
+      nativeEvent: { data },
+    } = event;
+
+    setLastMessage(`${Date.now()}: ${JSON.stringify(data)}`);
+
+    if (data === "ping") {
+      postMessage("pong");
+    }
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      <Text>In app last message: {lastMessage}</Text>
       <StatusBar barStyle="dark-content" />
       <WebView
         source={{ uri: siteBaseUrl }}
@@ -56,7 +79,8 @@ export default function HomeScreen(props: HomeScreenProps) {
           />
         )}
         ref={webviewRef}
-        onNavigationStateChange={handleWebViewNavigationStateChange}
+        onNavigationStateChange={handleNavigationStateChange}
+        onMessage={handleMessage}
       />
       <WebViewNavToolbar
         webview={webviewRef.current}
@@ -64,4 +88,15 @@ export default function HomeScreen(props: HomeScreenProps) {
       />
     </SafeAreaView>
   );
+}
+
+// HACK: there's no postMessage to webview, so we inject a lil script
+function buildInjectableJSMessage(message: any) {
+  return `
+    (function() {
+      document.dispatchEvent(new MessageEvent('message', {
+        data: ${JSON.stringify(message)}
+      }));
+    })();
+  `;
 }
