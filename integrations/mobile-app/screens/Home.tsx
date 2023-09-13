@@ -10,7 +10,11 @@ import {
 } from "react-native";
 import type { RootStackParamList } from "../App";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import WebView, { WebViewNavigation, WebViewMessageEvent } from "react-native-webview";
+import WebView, {
+  WebViewNavigation,
+  WebViewMessageEvent,
+} from "react-native-webview";
+import * as ImagePicker from "expo-image-picker";
 
 import WebViewNavToolbar from "../components/WebViewNavToolbar";
 
@@ -31,6 +35,22 @@ const styles = StyleSheet.create({
 
 const { siteBaseUrl, originWhitelist } = Constants.expoConfig.extra;
 
+const pickImage = async () => {
+  // No permissions request is necessary for launching the image library
+  let result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ImagePicker.MediaTypeOptions.All,
+    allowsEditing: true,
+    aspect: [4, 3],
+    quality: 1,
+    exif: true,
+    base64: true,
+    allowsMultipleSelection: false,
+  });
+  if (!result.canceled) {
+    return result.assets[0]
+  }
+};
+
 export default function HomeScreen(props: HomeScreenProps) {
   const { navigation } = props;
 
@@ -39,11 +59,18 @@ export default function HomeScreen(props: HomeScreenProps) {
     WebViewNavigation | undefined
   >();
 
-  // HACK: there's no postMessage on WebView, so we inject a script to dispatch event
   function postMessage(message: any) {
-    webviewRef.current?.injectJavaScript(
-      buildInjectableJSMessage(message)
-    );
+    // HACK: there's no postMessage on WebView, so we inject a script to dispatch event
+    const data = JSON.stringify(message);
+    // Escaping is hard business
+    const toInject = `
+      (function() {
+        document.dispatchEvent(new MessageEvent('message', {
+          data: \`${data.replace(/`/g, "\\`")}\`
+        }));
+      })();
+    `;
+    webviewRef.current?.injectJavaScript(toInject);
   }
 
   const [lastMessage, setLastMessage] = useState("");
@@ -56,12 +83,28 @@ export default function HomeScreen(props: HomeScreenProps) {
       nativeEvent: { data },
     } = event;
 
-    setLastMessage(`${Date.now()}: ${JSON.stringify(data)}`);
+    setLastMessage(`${Date.now()}: ${data}`);
 
-    if (data === "ping") {
-      postMessage("pong");
+    try {
+      const { type, payload } = JSON.parse(data);
+      switch (type) {
+        case "ping": {
+          postMessage({ type: "pong" });
+          break;
+        }
+        case "pickImage": {
+          pickImage().then(result => {
+            postMessage({
+              type: "pickImage",
+              payload: result
+            });
+          })
+        }
+      }
+    } catch (e) {
+      // failed to parse data
     }
-  }
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -88,15 +131,4 @@ export default function HomeScreen(props: HomeScreenProps) {
       />
     </SafeAreaView>
   );
-}
-
-// HACK: there's no postMessage to webview, so we inject a lil script
-function buildInjectableJSMessage(message: any) {
-  return `
-    (function() {
-      document.dispatchEvent(new MessageEvent('message', {
-        data: ${JSON.stringify(message)}
-      }));
-    })();
-  `;
 }
