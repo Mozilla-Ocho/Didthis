@@ -14,6 +14,8 @@ import WebView, {
   WebViewNavigation,
   WebViewMessageEvent,
 } from "react-native-webview";
+import { btoa } from 'react-native-quick-base64';
+
 import * as ImagePicker from "expo-image-picker";
 
 import WebViewNavToolbar from "../components/WebViewNavToolbar";
@@ -47,7 +49,7 @@ const pickImage = async () => {
     allowsMultipleSelection: false,
   });
   if (!result.canceled) {
-    return result.assets[0]
+    return result.assets[0];
   }
 };
 
@@ -60,17 +62,17 @@ export default function HomeScreen(props: HomeScreenProps) {
   >();
 
   function postMessage(message: any) {
-    // HACK: there's no postMessage on WebView, so we inject a script to dispatch event
-    const data = JSON.stringify(message);
-    // Escaping is hard business
-    const toInject = `
+    // HACK: no postMessage on WebView, so here's a hack to simulate
+    // using base64 here because character escaping is a rough business
+    webviewRef.current?.injectJavaScript(`
       (function() {
-        document.dispatchEvent(new MessageEvent('message', {
-          data: \`${data.replace(/`/g, "\\`")}\`
-        }));
+        document.dispatchEvent(
+          new MessageEvent('message', {
+            data: window.atob("${btoa(JSON.stringify(message))}")
+          }
+        ));
       })();
-    `;
-    webviewRef.current?.injectJavaScript(toInject);
+    `);
   }
 
   const [lastMessage, setLastMessage] = useState("");
@@ -85,24 +87,21 @@ export default function HomeScreen(props: HomeScreenProps) {
 
     setLastMessage(`${Date.now()}: ${data}`);
 
-    try {
-      const { type, payload } = JSON.parse(data);
-      switch (type) {
-        case "ping": {
-          postMessage({ type: "pong" });
-          break;
-        }
-        case "pickImage": {
-          pickImage().then(result => {
-            postMessage({
-              type: "pickImage",
-              payload: result
-            });
-          })
-        }
+    const { type, payload } = JSON.parse(data);
+    setLastMessage(`${Date.now()}: ${type}`);
+    switch (type) {
+      case "ping": {
+        postMessage({ type: "pong" });
+        break;
       }
-    } catch (e) {
-      // failed to parse data
+      case "pickImage": {
+        pickImage().then((result) => {
+          postMessage({
+            type: "pickImage",
+            payload: result,
+          });
+        });
+      }
     }
   };
 
