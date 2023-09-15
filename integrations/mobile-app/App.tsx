@@ -1,22 +1,24 @@
+import "react-native-gesture-handler";
 import * as React from "react";
-import { StyleSheet, Text, View, Image, Button } from "react-native";
+import { Image } from "react-native";
 import Constants from "expo-constants";
 import { NavigationContainer } from "@react-navigation/native";
-import HomeScreen, { HomeScreenRouteParams } from "./screens/Home";
-import ProjectsScreen, { ProjectsScreenRouteParams } from "./screens/Projects";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import type { NativeStackNavigationOptions } from "@react-navigation/native-stack";
-import DidthisWebScreen, { DidthisWebScreenRouteParams } from "./screens/DidThisWeb";
+import AppShellHostContextProvider from "./lib/appShellHost/context";
+import WebAppScreen, { WebAppScreenRouteParams } from "./screens/WebApp";
+import DoTheThingScreen, { DoTheThingScreenRouteParams } from "./screens/DoTheThing";
+import {
+  createStackNavigator,
+  StackNavigationOptions,
+} from "@react-navigation/stack";
 
 export type RootStackParamList = {
-  Home: HomeScreenRouteParams;
-  Projects: ProjectsScreenRouteParams;
-  DidthisWeb: DidthisWebScreenRouteParams;
+  WebApp: WebAppScreenRouteParams;
+  DoTheThing: DoTheThingScreenRouteParams;
 };
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
+const Stack = createStackNavigator<RootStackParamList>();
 
-function LogoTitle(props: any) {
+function LogoTitle() {
   return (
     <Image
       style={{ width: 48, height: 48 }}
@@ -26,18 +28,8 @@ function LogoTitle(props: any) {
 }
 
 function App() {
-  const headerTitle = (props) => <LogoTitle {...props} />;
-
-  const headerRight = () => (
-    <Button
-      onPress={() => alert("This is a button!")}
-      title="Info"
-      color="#fff"
-    />
-  );
-
-  const screenOptions: NativeStackNavigationOptions = {
-    headerTitle,
+  const screenOptions: StackNavigationOptions = {
+    headerTitle: () => <LogoTitle />,
     headerStyle: {
       backgroundColor: "#fff1a6",
     },
@@ -47,21 +39,17 @@ function App() {
     },
   };
 
-
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={screenOptions}>
-        <Stack.Screen
-          name="Home"
-          options={{
-            //headerRight,
-          }}
+      <AppShellHostContextProvider>
+        <Stack.Navigator
+          detachInactiveScreens={false}
+          screenOptions={screenOptions}
         >
-          {(props) => <HomeScreen {...props} foo="bar" />}
-        </Stack.Screen>
-        <Stack.Screen name="DidthisWeb" component={DidthisWebScreen} />
-        <Stack.Screen name="Projects" component={ProjectsScreen} />
-      </Stack.Navigator>
+          <Stack.Screen name="WebApp" component={WebAppScreen} />
+          <Stack.Screen name="DoTheThing" component={DoTheThingScreen} />
+        </Stack.Navigator>
+      </AppShellHostContextProvider>
     </NavigationContainer>
   );
 }
@@ -71,14 +59,5 @@ let AppEntryPoint = App;
 if (Constants.expoConfig.extra.storybookEnabled === "true") {
   AppEntryPoint = require("./.storybook").default;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
 
 export default AppEntryPoint;
