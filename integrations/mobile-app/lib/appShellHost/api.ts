@@ -1,42 +1,42 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Dispatch } from "react";
-import { Action, State, createInitialState } from "./state";
-import WebView, { WebViewMessageEvent } from "react-native-webview";
-import { NavigationProp, useNavigation, useNavigationState } from "@react-navigation/native";
+import { Action, State } from "./state";
+import { NavigationProp } from "@react-navigation/native";
+import { RootStackParamList } from "../../App";
+import { Payload } from "./messaging";
 
 export default class AppShellHostAPI {
   state?: State;
   dispatch?: Dispatch<Action> | undefined;
-  navigation?: ReturnType<typeof useNavigation>;
+  navigation?: NavigationProp<RootStackParamList>;
 
   constructor(
-    state?: State,
-    dispatch?: Dispatch<Action>,
-    navigation?: ReturnType<typeof useNavigation>,
+    state?: AppShellHostAPI["state"],
+    dispatch?: AppShellHostAPI["dispatch"],
+    navigation?: AppShellHostAPI["navigation"]
   ) {
     Object.assign(this, {
-      state, dispatch, navigation
-    })
+      state,
+      dispatch,
+      navigation,
+    });
+
+    if (this.messaging) {
+      this.messaging.registerMethod(
+        "useScreen",
+        this.handleUseScreen.bind(this)
+      );
+    }
   }
 
   get messaging() {
-    return this.state.messaging;
+    return this.state?.messaging;
   }
 
-  /*
-  showAppFeatureOverlay() {
-    this.dispatch({
-      type: "update",
-      key: "appFeatureOverlayIsVisible",
-      value: true,
-    });
+  async handleUseScreen(payload: Payload, id: string) {
+    const response = this.messaging.deferResponse(id);
+    // @ts-ignore throw a runtime error if web content asks for an unknown route
+    this.navigation.navigate(payload.screen, { requestId: id, payload });
+    return response;
   }
-
-  hideAppFeatureOverlay() {
-    this.dispatch({
-      type: "update",
-      key: "appFeatureOverlayIsVisible",
-      value: false,
-    });
-  }
-  */
 }

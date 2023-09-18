@@ -32,15 +32,11 @@ export default function AppShellHostContextProvider({
     [state, dispatch, navigation]
   );
 
+  // HACK: Find a cleaner place to register these methods!
   const { messaging } = state;
   messaging.registerMethod("pickImage", async () => {
     const result = await pickImage();
     return JSON.parse(JSON.stringify(result));
-  });
-  messaging.registerMethod("doThing", async (payload, id) => {
-    const response = appShellHostAPI.messaging.deferResponse(id);
-    navigation.navigate("DoTheThing", { requestId: id, payload });
-    return response;
   });
 
   return (
