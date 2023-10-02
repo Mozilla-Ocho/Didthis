@@ -99,7 +99,7 @@ module "docker_repo" {
 }
 
 module "firebase" {
-  count = var.flag_use_firebase ? 0 : 1
+  count = var.flag_use_firebase ? 1 : 0
   source = "./modules/firebase"
   gcp_project_id = var.gcp_project_id
   app_name = var.app_name
