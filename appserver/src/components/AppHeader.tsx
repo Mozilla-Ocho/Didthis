@@ -25,7 +25,7 @@ const AppHeader = observer(({ isThe404 }: { isThe404?: boolean }) => {
               </h1>
             </Link>
             <div className="text-right text-sm flex-grow">
-              {store.inTrialBlankSlate ?
+              {store.inTrialBlankSlate() ?
               <LoginButton intent="headerNav" />
               :
               <LogoutButton intent="headerNav" />}

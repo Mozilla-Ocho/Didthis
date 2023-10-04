@@ -284,7 +284,7 @@ class Store {
     try {
       const idToken = await firebaseUser.getIdToken()
 
-      if (this.inTrialWithContent) {
+      if (this.inTrialWithContent()) {
         // Attempt to sign in with firebase while logged in as a trial user
         // with content is an attempt to claim the trial account
         await this.convertTrialAccountToClaimed(idToken)
@@ -413,7 +413,7 @@ class Store {
     this.launchGlobalLoginOverlay(false)
   }
 
-  get inTrialBlankSlate() {
+  inTrialBlankSlate() {
     const user = this.user
     if (!user) return false
     if (!user.isTrial) return false
@@ -424,11 +424,11 @@ class Store {
     return !hasProfileEdits
   }
 
-  get inTrialWithContent() {
+  inTrialWithContent() {
     const user = this.user
     if (!user) return false
     if (!user.isTrial) return false
-    return !this.inTrialBlankSlate
+    return !this.inTrialBlankSlate()
   }
 
   setTrialAccountClaimed() {
