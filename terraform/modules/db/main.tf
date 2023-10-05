@@ -13,7 +13,15 @@
 # terraform state rm module.db.google_sql_user.dbuser
 # terraform state rm module.db.google_sql_database.db
 
+variable "name" {
+  type = string
+}
 variable "db_name" {
+  # name is the name of gcp cloud sql instance in the gcp resource
+  # definition, whereas db_name is the name of the logical database
+  # created inside postgres that psql clients would use to connect.
+  # there was a bug in which this wasn't an input var, and was just always
+  # being set to "graceland".
   type = string
 }
 variable "db_tier" {
@@ -45,8 +53,8 @@ resource "random_password" "maindbpass" {
 # {{{ actual db
 
 resource "google_sql_database_instance" "main" {
-  name             = var.db_name
-  database_version = "POSTGRES_14" # XXX i changed from 12 to 14 here - update appserver cli version
+  name             = var.name
+  database_version = "POSTGRES_14"
   region           = var.region
 
   settings {
@@ -83,7 +91,7 @@ output "private_ip_address" {
 # }
 
 resource "google_sql_database" "db" {
-  name      = "graceland"
+  name      = var.db_name
   instance  = google_sql_database_instance.main.name
 }
 
@@ -105,11 +113,6 @@ output "db_pass" {
 }
 output "db_name" {
   value = google_sql_database.db.name
-}
-output "connection_name" {
-  # e.g. my-project:us-central1:my-db
-  # used for the sql proxy on the jump host
-  value = google_sql_database_instance.main.connection_name
 }
 
 # }}}
