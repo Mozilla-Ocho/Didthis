@@ -1,12 +1,12 @@
-import * as Updates from 'expo-updates';
+import * as Updates from "expo-updates";
 
 // see also: https://docs.expo.dev/guides/environment-variables/
-const storybookEnabled = process.env.EXPO_PUBLIC_STORYBOOK_ENABLED === "true";
-const siteBaseUrl =
+let storybookEnabled = process.env.EXPO_PUBLIC_STORYBOOK_ENABLED === "true";
+
+let siteBaseUrl =
   process.env.EXPO_PUBLIC_SITE_BASE_URL || "https://test.didthis.app";
 
-const originWhitelist = [
-  siteBaseUrl,
+let baseOriginWhitelist = [
   "https://moz-fx-future-products-prod.firebaseapp.com",
   "https://moz-fx-future-products-nonprod.firebaseapp.com",
   "https://upload-widget.cloudinary.com",
@@ -14,21 +14,21 @@ const originWhitelist = [
   "https://res-s.cloudinary.com",
 ];
 
-const Config = {
-  storybookEnabled,
-  siteBaseUrl,
-  originWhitelist,
-};
-
 // see eas.json for channel definitions
 if (Updates.channel === "production") {
-  Config.siteBaseUrl = "https://didthis.app";
+  siteBaseUrl = "https://didthis.app";
 } else if (Updates.channel === "preview") {
-  Config.siteBaseUrl = "https://test.didthis.app";
+  siteBaseUrl = "https://test.didthis.app";
 } else if (Updates.channel === "storybook") {
-  Config.storybookEnabled = true;
+  storybookEnabled = true;
 } else if (Updates.channel === "development") {
   // e.g. EXPO_PUBLIC_SITE_BASE_URL='http://192.168.0.104:3000' yarn start
 }
+
+const Config = {
+  storybookEnabled,
+  siteBaseUrl,
+  originWhitelist: [siteBaseUrl, ...baseOriginWhitelist],
+};
 
 export default Config;
