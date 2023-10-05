@@ -1,4 +1,4 @@
-import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TouchableOpacity, StyleSheet, Text } from "react-native";
 import Constants from "expo-constants";
 
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
 export default function WebViewNavToolbar({
   siteBaseUrl = siteBaseUrlDefault,
   webview,
-  webviewNavigation: { canGoBack = false, canGoForward = false } = {},
+  webviewNavigation: { canGoBack = false, canGoForward = false, url } = {},
   showReload = false,
 }: WebViewNavToolbarProps) {
   return (
@@ -64,6 +64,7 @@ export default function WebViewNavToolbar({
       >
         <FontAwesomeIcon icon={faHome} />
       </TouchableOpacity>
+      <Text>{url}</Text>
       {showReload && (
         <TouchableOpacity
           style={styles.toolbarButton}

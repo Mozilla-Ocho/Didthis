@@ -15,16 +15,10 @@
     },
     "preview": {
       "distribution": "internal",
-      "channel": "preview",
-      "env": {
-        "EXPO_PUBLIC_SITE_BASE_URL": "https://test.didthis.app"
-      }
+      "channel": "preview"
     },
     "production": {
-      "channel": "production",
-      "env": {
-        "EXPO_PUBLIC_SITE_BASE_URL": "https://didthis.app"
-      }
+      "channel": "production"
     }
   },
   "submit": {
