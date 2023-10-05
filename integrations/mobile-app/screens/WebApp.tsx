@@ -12,8 +12,9 @@ import {
 import WebViewNavToolbar from "../components/WebViewNavToolbar";
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../App";
+import Config from "../lib/config";
 
-const { siteBaseUrl, originWhitelist } = Constants.expoConfig.extra;
+const { siteBaseUrl, originWhitelist } = Config;
 
 export type WebAppScreenRouteParams = {
   now: number;

@@ -25,6 +25,7 @@ import { faPlus as addIcon } from "@fortawesome/free-solid-svg-icons/faPlus";
 import AppShellHostContextProvider from "./lib/appShellHost/context";
 import { useAppShellHost } from "./lib/appShellHost/index";
 import { colors, styles } from "./styles";
+import Config from "./lib/config";
 
 export type RootStackParamList = {
   WebApp: WebAppScreenRouteParams;
@@ -162,7 +163,7 @@ function AppMainStack({ drawerOpen, setDrawerOpen }: AppMainStackProps) {
 
 let AppEntryPoint = App;
 
-if (Constants.expoConfig.extra.storybookEnabled === "true") {
+if (Config.storybookEnabled) {
   AppEntryPoint = require("./.storybook").default;
 }
 
