@@ -42,7 +42,7 @@ const LogoutButton = observer(
       // TODO: does this logout event get reliably tracked? because we will
       // reload the page after this.
       store.trackEvent(trackingEvents.bcLogout, {
-        loseTrialWork: store.inTrialWithContent ? 'y' : 'n',
+        loseTrialWork: store.inTrialWithContent() ? 'y' : 'n',
       })
       store.logOut()
       onLogout && onLogout()
