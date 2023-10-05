@@ -68,7 +68,8 @@ module "gcp_apis" {
 module "db" {
   count = var.flag_destroy ? 0 : var.flag_use_db ? 1 : 0
   source = "./modules/db"
-  db_name = "${var.app_name}-pgmain"
+  name = "${var.app_name}-pgmain"
+  db_name = "graceland" # TODO: this needs to be based on app-name
   db_tier = var.db_tier
   region = var.region
   vpc_id = local.vpc_id
@@ -76,16 +77,16 @@ module "db" {
   depends_on = [module.gcp_apis]
 }
 
-module "db_proxy" {
-  count = var.flag_destroy ? 0 : var.flag_use_db ? 1 : 0
-  source = "./modules/db_proxy"
+module "bastion" {
+  count = var.flag_destroy ? 0 : 1
+  source = "./modules/bastion"
   app_name  = var.app_name
   gcp_project_id = var.gcp_project_id
   vpc_id = local.vpc_id
-  db_connection_name = module.db[0].connection_name
-  db_user = module.db[0].db_user
-  db_name = module.db[0].db_name
-  db_pass = module.db[0].db_pass
+  db_host = var.flag_use_db ? module.db[0].private_ip_address : ""
+  db_name = var.flag_use_db ? module.db[0].db_name : ""
+  db_user = var.flag_use_db ? module.db[0].db_user : ""
+  db_pass = var.flag_use_db ? module.db[0].db_pass : ""
   depends_on = [module.gcp_apis]
 }
 
@@ -159,8 +160,4 @@ output "gcr_image_deployed" {
 # output "dns_records_lb" {
 #   value = module.lb_main.dns_records
 # }
-
-output "db_proxy_public_ip" {
-  value = var.flag_use_db ? module.db_proxy[0].public_ip : "none"
-}
 
