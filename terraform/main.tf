@@ -141,12 +141,13 @@ module "appserver_main" {
 }
 
 module "lb_main" {
+  # count = var.flag_destroy ? 0 : var.flag_enable_lb ? 1 : 0
   source = "./modules/lb"
   app_name = var.app_name
   name = "main"
   region = var.region
   gcr_service_name = module.appserver_main[0].service_name
-  domains = var.lb_ssl_domain_names
+  lb_ssl_domain_names = var.lb_ssl_domain_names
   lb_cert_domain_change_increment_outage = var.lb_cert_domain_change_increment_outage
   depends_on = [module.gcp_apis, module.appserver_main[0]]
 }
@@ -159,9 +160,10 @@ output "gcr_image_deployed" {
   value = var.flag_destroy ? "" : module.appserver_main[0].image_deployed
 }
 
-output "dns_records_lb" {
-  # this is a list of domains->IP address that should be managed in the dns
-  # config in the shared vpc project.
-  value = module.lb_main.dns_records
+output "public_lb_ip_address" {
+  value = var.flag_destroy ? "" : var.flag_enable_lb ? module.lb_main.public_lb_ip_address : "(lb not enabled)"
 }
 
+# output "dns_records_lb" {
+#   value = module.lb_main.dns_records
+# }

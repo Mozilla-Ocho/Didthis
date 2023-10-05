@@ -16,9 +16,7 @@ gcp_project_number="29393258446"
 region="us-central1"
 vpc_remote_bucket="tfstate-vpcs-07b5b6988f2f"
 vpc_remote_name="common"
-# when changing domains on the load balancer cert, the
-# lb_cert_domain_change_increment_outage must be incremented which will cause a
-# temporary outage while the load balancer cert is being provisioned.
-# TODO: zero-downtime changes to domain names / certs...
+# change these when setting up a domain name per docs in the vpc repo:
+flag_enable_lb=false
 lb_ssl_domain_names=["didthis.app","www.didthis.app"]
 lb_cert_domain_change_increment_outage=5

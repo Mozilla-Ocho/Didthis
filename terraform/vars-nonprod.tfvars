@@ -16,5 +16,7 @@ gcp_project_number="984891837435"
 region="us-central1"
 vpc_remote_bucket="tfstate-vpcs-5ec7945d96f"
 vpc_remote_name="common"
+# change these when setting up a domain name per docs in the vpc repo:
+flag_enable_lb=true
 lb_ssl_domain_names=["test.didthis.app","www.test.didthis.app"]
 lb_cert_domain_change_increment_outage=5
