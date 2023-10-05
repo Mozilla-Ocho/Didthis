@@ -4,6 +4,10 @@ export default ({ config }) => {
     name: "Didthis Prototype",
     slug: "didthis-prototype",
     owner: "lmorchard",
+    ios: {
+      // bundleIdentifier: "org.mozilla.Didthis"
+      bundleIdentifier: "com.lmorchard.Didthis"
+    },
     extra: {
       eas: {
         projectId: "bb2e6caf-a447-43b6-86cb-4ee477e6abc3",

@@ -24,7 +24,7 @@ const Config = {
 if (Updates.channel === "production") {
   Config.siteBaseUrl = "https://didthis.app";
 } else if (Updates.channel === "preview") {
-  Config.siteBaseUrl = "https://this.didthis.app";
+  Config.siteBaseUrl = "https://test.didthis.app";
 } else if (Updates.channel === "storybook") {
   Config.storybookEnabled = true;
 } else if (Updates.channel === "development") {
