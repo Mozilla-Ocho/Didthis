@@ -16,5 +16,5 @@ gcp_project_number="984891837435"
 region="us-central1"
 vpc_remote_bucket="tfstate-vpcs-5ec7945d96f"
 vpc_remote_name="common"
-lb_ssl_domain_names=["test.didthat.app","www.test.didthat.app","test.didthis.app","www.test.didthis.app"]
-lb_cert_domain_change_increment_outage=4
+lb_ssl_domain_names=["test.didthis.app","www.test.didthis.app"]
+lb_cert_domain_change_increment_outage=5
