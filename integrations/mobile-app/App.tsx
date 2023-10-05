@@ -26,6 +26,7 @@ import AppShellHostContextProvider from "./lib/appShellHost/context";
 import { useAppShellHost } from "./lib/appShellHost/index";
 import { colors, styles } from "./styles";
 import Config from "./lib/config";
+import * as Updates from 'expo-updates';
 
 export type RootStackParamList = {
   WebApp: WebAppScreenRouteParams;
@@ -140,7 +141,7 @@ function AppMainStack({ drawerOpen, setDrawerOpen }: AppMainStackProps) {
         <FontAwesomeIcon icon={menuIcon} />
       </TouchableOpacity>
     ),
-    headerTitle: () => <Text>Didthis</Text>,
+    headerTitle: () => <Text>Didthis ({Updates.channel})</Text>,
     headerStyle: {
       backgroundColor: colors["yellow-300"],
     },
