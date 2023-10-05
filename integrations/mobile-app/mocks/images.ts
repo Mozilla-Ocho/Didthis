@@ -1,4 +1,4 @@
-import { CapturedImage } from "../store/types";
+import { CapturedImage } from "../lib/types";
 
 // TODO: find a way to load this up dynamically?
 export function makeDidThisImage(): CapturedImage {

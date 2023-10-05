@@ -3,9 +3,13 @@ export default ({ config }) => {
 
   return {
     ...config,
-    name: "Storybook Tutorial Template",
-    slug: "storybook-tutorial-template",
+    name: "Didthis Prototype",
+    slug: "didthis-prototype",
+    owner: "lmorchard",
     extra: {
+      eas: {
+        projectId: "bb2e6caf-a447-43b6-86cb-4ee477e6abc3",
+      },
       storybookEnabled: process.env.STORYBOOK_ENABLED,
       siteBaseUrl,
       originWhitelist: [
@@ -16,6 +20,12 @@ export default ({ config }) => {
         "https://widget.cloudinary.com",
         "https://res-s.cloudinary.com",
       ],
+    },
+    updates: {
+      url: "https://u.expo.dev/bb2e6caf-a447-43b6-86cb-4ee477e6abc3",
+    },
+    runtimeVersion: {
+      policy: "sdkVersion",
     },
   };
 };

@@ -3,9 +3,6 @@
  */
 import { configureStore, createSlice } from '@reduxjs/toolkit';
 
-
-
-
 /*
  * The initial state of our store when the app loads.
  * Usually, you would fetch this from a server. Let's not worry about that now

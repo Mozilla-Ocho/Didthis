@@ -10,7 +10,7 @@ import { faRotateRight } from "@fortawesome/free-solid-svg-icons/faRotateRight";
 const { siteBaseUrl: siteBaseUrlDefault } = Constants.expoConfig.extra;
 
 export type WebViewNavToolbarProps = {
-  siteBaseUrl?: string,
+  siteBaseUrl?: string;
   webview?: {
     reload: () => void;
     goBack: () => void;
@@ -22,6 +22,7 @@ export type WebViewNavToolbarProps = {
     canGoForward?: boolean;
     url?: string;
   };
+  showReload?: boolean;
 };
 
 const styles = StyleSheet.create({
@@ -30,10 +31,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   tabBarContainer: {
-    padding: 20,
+    padding: 12,
     flexDirection: "row",
     justifyContent: "space-around",
     backgroundColor: "#fff1a6",
+  },
+  toolbarButton: {
+    padding: 4,
   },
 });
 
@@ -41,16 +45,18 @@ export default function WebViewNavToolbar({
   siteBaseUrl = siteBaseUrlDefault,
   webview,
   webviewNavigation: { canGoBack = false, canGoForward = false } = {},
+  showReload = false,
 }: WebViewNavToolbarProps) {
   return (
     <View style={styles.tabBarContainer}>
       <TouchableOpacity
         onPress={() => webview && webview.goBack()}
-        style={{ opacity: canGoBack ? 1.0 : 0.1 }}
+        style={{ ...styles.toolbarButton, opacity: canGoBack ? 1.0 : 0.1 }}
       >
         <FontAwesomeIcon icon={faArrowLeft} />
       </TouchableOpacity>
       <TouchableOpacity
+        style={styles.toolbarButton}
         onPress={() =>
           webview &&
           webview.injectJavaScript(`window.location = "${siteBaseUrl}"`)
@@ -58,12 +64,17 @@ export default function WebViewNavToolbar({
       >
         <FontAwesomeIcon icon={faHome} />
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => webview && webview.reload()}>
-        <FontAwesomeIcon icon={faRotateRight} />
-      </TouchableOpacity>
+      {showReload && (
+        <TouchableOpacity
+          style={styles.toolbarButton}
+          onPress={() => webview && webview.reload()}
+        >
+          <FontAwesomeIcon icon={faRotateRight} />
+        </TouchableOpacity>
+      )}
       <TouchableOpacity
         onPress={() => webview && webview.goForward()}
-        style={{ opacity: canGoForward ? 1.0 : 0.1 }}
+        style={{ ...styles.toolbarButton, opacity: canGoForward ? 1.0 : 0.1 }}
       >
         <FontAwesomeIcon icon={faArrowRight} />
       </TouchableOpacity>

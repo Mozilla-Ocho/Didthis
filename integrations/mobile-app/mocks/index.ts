@@ -1,4 +1,4 @@
-import { CapturedImage, ApiPost, ApiProject } from "../store/types";
+import { CapturedImage, ApiPost, ApiProject } from "../lib/types";
 import { makeDidThisImage } from "./images";
 
 export const mockImage: CapturedImage = makeDidThisImage();

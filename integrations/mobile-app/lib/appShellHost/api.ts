@@ -4,6 +4,10 @@ import { Action, State } from "./state";
 import { NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../App";
 import { Payload } from "./messaging";
+import { ApiUser } from "../types";
+import Constants from "expo-constants";
+
+const { siteBaseUrl } = Constants.expoConfig.extra;
 
 export default class AppShellHostAPI {
   state?: State;
@@ -21,16 +25,45 @@ export default class AppShellHostAPI {
       navigation,
     });
 
-    if (this.messaging) {
-      this.messaging.registerMethod(
-        "useScreen",
-        this.handleUseScreen.bind(this)
-      );
-    }
+    if (!this.messaging) return;
+
+    this.messaging.registerMethod("useScreen", this.handleUseScreen.bind(this));
+    this.messaging.registerMethod(
+      "updateAppConfig",
+      this.handleUpdateAppConfig.bind(this)
+    );
+  }
+
+  navigateToPath(path: string) {
+    const webview = this.messaging.webview;
+    if (!webview) return;
+    webview.injectJavaScript(`window.location = "${siteBaseUrl}${path}"`);
   }
 
   get messaging() {
     return this.state?.messaging;
+  }
+
+  async handleUpdateAppConfig(payload: Payload) {
+    // HACK: should probably do some validation here?
+    const { user, links } = payload;
+
+    this.dispatch({
+      type: "update",
+      key: "user",
+      value: user as unknown as ApiUser,
+    });
+
+    this.dispatch({
+      type: "update",
+      key: "links",
+      value: {
+        ...this.state.links,
+        ...(links as State["links"]),
+      },
+    });
+
+    return { success: true };
   }
 
   async handleUseScreen(payload: Payload, id: string) {

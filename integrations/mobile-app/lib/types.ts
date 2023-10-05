@@ -5,6 +5,46 @@ export type ApiTimestamp = number; // epoch milliseconds integer
 export type ApiProjectStatus = "active" | "complete" | "paused";
 export type ApiScope = "public" | "private";
 
+type ApiSocialUrls = {
+  twitter?: string,
+  reddit?: string,
+  facebook?: string,
+  instagram?: string,
+}
+
+type ApiProfile = {
+  name?: string
+  bio?: string
+  socialUrls?: ApiSocialUrls
+  imageAssetId?: string
+  imageMeta?: CldImageMetaPrivate | CldImageMetaPublic
+  updatedAt: number // updated when user account details are modified (not projects)
+  projects: { [key: string]: ApiProject }
+}
+
+export type ApiUser = {
+  id: ApiUserId
+  email?: string // not present on public records
+  // use systemSlug for editing/writes/forms because it's stable
+  systemSlug: string
+  // use userSlug when linking to the page in a way that could be shared/public
+  userSlug?: string
+  // publicPageSlug is a shortcut for (userSlug || systemSlug)
+  publicPageSlug: string
+  profile: ApiProfile
+  createdAt: number
+  signupCodeName?: string
+  unsolicited?: true
+  isAdmin?: true
+  isFlagged?: true
+  isTrial?: boolean
+  lastFullPageLoad?: number
+  lastWrite?: number
+  updatedAt?: number
+  // true if the user being returned was created/added to the db in the request
+  justCreated?: boolean
+}
+
 export type CapturedImage = {
   width: number;
   height: number;
@@ -53,6 +93,7 @@ type CldImageMetaPublic = {
   width: number;
   height: number;
   format: string;
+  url: string;
 };
 /* we're going to capture whatever object metadata cloudinary returns with
  * images, which includes things like the original dimensions, format, exif

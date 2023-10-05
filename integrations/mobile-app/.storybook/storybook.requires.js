@@ -47,11 +47,7 @@ try {
 
 const getStories = () => {
   return {
-    "./components/Post.stories.tsx": require("../components/Post.stories.tsx"),
-    "./components/PostEditor.stories.tsx": require("../components/PostEditor.stories.tsx"),
-    "./components/Project.stories.tsx": require("../components/Project.stories.tsx"),
-    "./components/Task.stories.tsx": require("../components/Task.stories.tsx"),
-    "./components/TaskList.stories.tsx": require("../components/TaskList.stories.tsx"),
+    "./components/WebViewNavToolbar.stories.tsx": require("../components/WebViewNavToolbar.stories.tsx"),
   };
 };
 

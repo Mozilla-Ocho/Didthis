@@ -1,14 +1,20 @@
 import { useReducer, Dispatch } from 'react'
 import AppShellHostAPI from './api'
 import MessageHandler from './messaging'
+import { ApiUser } from "../types"
 
-export function createInitialState() {
-  return {
-    messaging: new MessageHandler(),
-  }
+export type State = {
+  messaging: MessageHandler,
+  user?: ApiUser,
+  links: Record<string, string>
 }
 
-export type State = ReturnType<typeof createInitialState>
+export function createInitialState(): State {
+  return {
+    messaging: new MessageHandler(),
+    links: {}
+  }
+}
 
 type ObjectUpdateAction<T extends string, C extends object> = {
   [K in keyof C]: {

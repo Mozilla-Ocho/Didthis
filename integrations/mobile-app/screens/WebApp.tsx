@@ -2,7 +2,13 @@ import Constants from "expo-constants";
 import useAppShellHost from "../lib/appShellHost";
 import { useEffect, useRef, useState } from "react";
 import WebView, { WebViewNavigation } from "react-native-webview";
-import { ActivityIndicator, Button, SafeAreaView, StatusBar, StyleSheet } from "react-native";
+import {
+  ActivityIndicator,
+  Button,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+} from "react-native";
 import WebViewNavToolbar from "../components/WebViewNavToolbar";
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../App";
