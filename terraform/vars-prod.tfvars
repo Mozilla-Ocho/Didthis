@@ -16,3 +16,7 @@ gcp_project_number="REPLACEME"
 region="us-central1"
 vpc_remote_bucket="REPLACEME"
 vpc_remote_name="common"
+# change these when setting up a domain name per docs in the vpc repo:
+flag_enable_lb=false
+lb_ssl_domain_names=["example.com","www.example.com"]
+lb_cert_domain_change_increment_outage=1

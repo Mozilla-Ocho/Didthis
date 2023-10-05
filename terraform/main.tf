@@ -134,16 +134,17 @@ module "appserver_main" {
   ]
 }
 
-# module "lb_main" {
-#   source = "./modules/lb"
-#   prefix = var.app_name
-#   name = "main"
-#   region = var.region
-#   gcr_service_name = module.appserver_main[0].service_name
-#   domains = ["..."]
-#   lb_cert_domain_change_increment_outage = var.lb_cert_domain_change_increment_outage
-#   depends_on = [module.gcp_apis, module.appserver_main[0]]
-# }
+module "lb_main" {
+  count = var.flag_destroy ? 0 : var.flag_enable_lb ? 1 : 0
+  source = "./modules/lb"
+  app_name = var.app_name
+  name = "main"
+  region = var.region
+  gcr_service_name = module.appserver_main[0].service_name
+  lb_ssl_domain_names = var.lb_ssl_domain_names
+  lb_cert_domain_change_increment_outage = var.lb_cert_domain_change_increment_outage
+  depends_on = [module.gcp_apis, module.appserver_main[0]]
+}
 
 output "gcr_service_url" {
   value = var.flag_destroy ? "" : module.appserver_main[0].service_url
@@ -153,9 +154,9 @@ output "gcr_image_deployed" {
   value = var.flag_destroy ? "" : module.appserver_main[0].image_deployed
 }
 
-# output "public_ip_address" {
-#   value = module.lb_main.public_ip_address
-# }
+output "public_lb_ip_address" {
+  value = var.flag_destroy ? "" : var.flag_enable_lb ? module.lb_main.public_lb_ip_address : "(lb not enabled)"
+}
 
 # output "dns_records_lb" {
 #   value = module.lb_main.dns_records

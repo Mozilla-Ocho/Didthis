@@ -14,7 +14,7 @@ variable "region" {
 variable "gcr_service_name" {
   type = string
 }
-variable "domains" {
+variable "lb_ssl_domain_names" {
   # special steps are needed when changing these, see the lifecycle directive
   # in the cert.
   type = list(string)
@@ -77,7 +77,7 @@ resource "google_compute_managed_ssl_certificate" "default" {
   # gcloud compute ssl-certificates describe main-lb-cert
   name = "${var.app_name}-${var.name}-lb-cert-${var.lb_cert_domain_change_increment_outage}"
   managed {
-    domains = var.domains
+    domains = var.lb_ssl_domain_names
   }
   lifecycle {
     # when changing domains on the cert, we have to
@@ -125,11 +125,11 @@ resource "google_compute_global_forwarding_rule" "https_proxy" {
 
 # {{{ dns
 
-output "public_ip_address" {
+output "public_lb_ip_address" {
   value = google_compute_global_address.lb.address
 }
 output "dns_records" {
-  value = [for d in var.domains : "${d} : ${google_compute_global_address.lb.address}"]
+  value = [for d in var.lb_ssl_domain_names : "${d} : ${google_compute_global_address.lb.address}"]
 }
 
 # }}}
