@@ -9,13 +9,6 @@
       "distribution": "internal",
       "channel": "development"
     },
-    "preview-simulator": {
-      "distribution": "internal",
-      "channel": "preview",
-      "ios": {
-        "simulator": true
-      }
-    },
     "storybook": {
       "developmentClient": true,
       "distribution": "internal",
@@ -28,6 +21,13 @@
     "preview-production": {
       "distribution": "internal",
       "channel": "production"
+    },
+    "preview-simulator": {
+      "distribution": "internal",
+      "channel": "preview",
+      "ios": {
+        "simulator": true
+      }
     },
     "production": {
       "channel": "production"

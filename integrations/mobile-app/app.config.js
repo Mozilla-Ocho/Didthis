@@ -1,16 +1,20 @@
 export default ({ config }) => {
   return {
     ...config,
-    name: "Didthis Prototype",
-    slug: "didthis-prototype",
-    owner: "lmorchard",
+    name: "Didthis",
+    slug: "didthis",
+    owner: "mozilla-ocho-h3y",
+    // owner: "lmorchard",
     ios: {
       // bundleIdentifier: "org.mozilla.Didthis"
       bundleIdentifier: "com.lmorchard.Didthis"
     },
     extra: {
       eas: {
-        projectId: "bb2e6caf-a447-43b6-86cb-4ee477e6abc3",
+        // mozilla-ocho-h3y org project
+        projectId: "d1216396-7cf9-4a41-9543-ce7e31e0529b"
+        // lmorchard's old sandbox expo project
+        // projectId: "bb2e6caf-a447-43b6-86cb-4ee477e6abc3",
       },
     },
     updates: {
