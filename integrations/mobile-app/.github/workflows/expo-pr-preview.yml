@@ -1,12 +1,16 @@
+# https://github.com/expo/expo-github-action/tree/main/preview-comment#publish-and-preview-on-pull-request
 name: "Build Expo Preview for PR"
 on:
   pull_request:
+    types: [opened, synchronize]
 jobs:
   tests:
     uses: ./.github/workflows/tests.yml
   preview:
     needs: tests
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write # Allow comments on PRs
     steps:
       - name: 🏗 Setup repo
         uses: actions/checkout@v3
@@ -17,16 +21,19 @@ jobs:
           node-version: 18.x
           cache: yarn
 
-      - name: 🏗 Setup EAS
+      - name: 🏗 Setup Expo
         uses: expo/expo-github-action@v8
         with:
-          eas-version: latest
+          expo-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: 📦 Install dependencies
         run: yarn install
 
-      - name: 🚀 Create preview
-        uses: expo/expo-github-action/preview@v8
+      - name: 🚀 Publish to Expo
+        run: expo publish --release-channel=pr-${{ github.event.number }} --non-interactive
+
+      - name: 💬 Comment in preview
+        uses: expo/expo-github-action/preview-comment@v8
         with:
-          command: eas update --auto
+          channel: pr-${{ github.event.number }}
