@@ -5,6 +5,7 @@ jobs:
   tests:
     uses: ./.github/workflows/tests.yml
   preview:
+    needs: tests
     runs-on: ubuntu-latest
     steps:
       - name: 🏗 Setup repo
