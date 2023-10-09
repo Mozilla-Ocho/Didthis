@@ -1,6 +1,6 @@
 name: "Build Expo Preview for PR"
 on:
-  pull_request_target:
+  pull_request:
 jobs:
   tests:
     uses: ./.github/workflows/tests.yml
