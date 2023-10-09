@@ -64,7 +64,6 @@ export default function WebViewNavToolbar({
       >
         <FontAwesomeIcon icon={faHome} />
       </TouchableOpacity>
-      <Text>{url}</Text>
       {showReload && (
         <TouchableOpacity
           style={styles.toolbarButton}
