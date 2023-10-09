@@ -1,6 +1,9 @@
 name: "Build Expo Preview for PR"
-on: [pull_request]
+on:
+  pull_request:
 jobs:
+  tests:
+    uses: ./.github/workflows/tests.yml
   preview:
     runs-on: ubuntu-latest
     steps:

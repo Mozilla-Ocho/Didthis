@@ -4,6 +4,8 @@ on:
     branches:
       - main
 jobs:
+  tests:
+    uses: ./.github/workflows/tests.yml
   update:
     runs-on: ubuntu-latest
     steps:
