@@ -6,7 +6,8 @@ export default ({ config }) => {
     owner: "mozilla-ocho-h3y",
     // owner: "lmorchard",
     ios: {
-      // bundleIdentifier: "org.mozilla.Didthis"
+      //bundleIdentifier: "org.mozilla.Didthis"
+      // lmorchard's old sandbox expo project
       bundleIdentifier: "com.lmorchard.Didthis",
     },
     extra: {
