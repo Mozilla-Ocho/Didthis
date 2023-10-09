@@ -1,3 +1,4 @@
+name: "Build Expo Update for main branch"
 on:
   push:
     branches:
