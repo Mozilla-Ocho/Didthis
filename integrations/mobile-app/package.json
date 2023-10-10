@@ -63,7 +63,8 @@
     "storybook:ios": "sb-rn-get-stories && cross-env EXPO_PUBLIC_STORYBOOK_ENABLED='true' expo start --ios",
     "storybook:android": "sb-rn-get-stories && cross-env EXPO_PUBLIC_STORYBOOK_ENABLED='true' expo start --android",
     "ts:check": "tsc",
-    "validate": "npm-run-all ts:check",
+    "expo:doctor": "npx expo-doctor",
+    "validate": "npm-run-all expo:doctor ts:check",
     "test": "jest"
   },
   "jest": {
@@ -72,7 +73,7 @@
       "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)"
     ]
   },
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "name": "didthis-mobile-app"
 }

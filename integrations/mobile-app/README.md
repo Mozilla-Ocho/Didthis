@@ -17,7 +17,6 @@ To use these previews, install the [Expo Go](https://expo.dev/expo-go) app on on
 ### Quick start
 
 - Follow the [installation docs for Expo](https://docs.expo.dev/get-started/installation/)
-- Install mobile dev tools (i.e. Xcode and Android SDK) - TODO: elaborate on this
 - Ensure you have an instance of [the Didthis server stack](github.com/mozilla-Ocho/h3y) running locally.
 - Find the IP address and port of the web server (e.g. `192.168.0.104:3000`)
 - Start the Expo bundler and substitute your server's address as `EXPO_PUBLIC_SITE_BASE_URL`
@@ -32,3 +31,11 @@ To use these previews, install the [Expo Go](https://expo.dev/expo-go) app on on
   ```
 - See [`package.json`](./package.json) for further available scripts.
 
+### Advanced development
+
+#### Local builds (iOS on macOS)
+```
+xcode-select --install
+brew install fastlane
+ eas build --platform ios --local
+```

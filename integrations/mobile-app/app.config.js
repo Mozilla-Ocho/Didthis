@@ -3,12 +3,14 @@ export default ({ config }) => {
     ...config,
     name: "Didthis",
     slug: "didthis",
+    icon: "./assets/didthis-snap-logo.png",
     owner: "mozilla-ocho-h3y",
     // owner: "lmorchard",
     ios: {
       //bundleIdentifier: "org.mozilla.Didthis"
       // lmorchard's old sandbox expo project
       bundleIdentifier: "com.lmorchard.Didthis",
+      buildNumber: "2",
     },
     extra: {
       eas: {
