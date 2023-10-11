@@ -6,6 +6,9 @@ export default ({ config }) => {
     icon: "./assets/didthis-snap-logo.png",
     owner: "mozilla-ocho-h3y",
     // owner: "lmorchard",
+    android: {
+      package: "com.lmorchard.Didthis",
+    },
     ios: {
       //bundleIdentifier: "org.mozilla.Didthis"
       // lmorchard's old sandbox expo project

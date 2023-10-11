@@ -86,3 +86,7 @@ web-build/
 dist/
 .env*
 
+# Ignore Expo prebuild generated source, for now
+/ios
+/android
+
