@@ -34,7 +34,9 @@
     "react-native-web": "~0.19.6",
     "react-native-webview": "13.2.2",
     "react-navigation-stack": "^2.10.4",
-    "react-redux": "^8.1.2"
+    "react-redux": "^8.1.2",
+    "expo-splash-screen": "~0.20.5",
+    "expo-status-bar": "~1.6.0"
   },
   "devDependencies": {
     "@babel/core": "^7.19.3",
@@ -54,8 +56,8 @@
   },
   "scripts": {
     "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "storybook-generate": "sb-rn-get-stories",
     "storybook-watch": "sb-rn-watcher",
