@@ -13,7 +13,10 @@ export default ({ config }) => {
       //bundleIdentifier: "org.mozilla.Didthis"
       // lmorchard's old sandbox expo project
       bundleIdentifier: "com.lmorchard.Didthis",
-      buildNumber: "3",
+      buildNumber: "4",
+      config: {
+        usesNonExemptEncryption: false,
+      },
     },
     extra: {
       eas: {
