@@ -33,9 +33,11 @@ To use these previews, install the [Expo Go](https://expo.dev/expo-go) app on on
 
 ### Advanced development
 
-#### Local builds (iOS on macOS)
+#### Full local app build (iOS on macOS)
+These commands will generate native code from the Expo project, build the app with Xcode, and then launch it in a simulator.
+
 ```
 xcode-select --install
-brew install fastlane
- eas build --platform ios --local
+npx expo prebuild
+yarn ios
 ```
