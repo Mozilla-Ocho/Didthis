@@ -2,6 +2,13 @@
 format_version: '13'
 default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 project_type: react-native
+
+trigger_map:
+- push_branch: main
+  workflow: apple-appstore-deploy
+- pull_request_source_branch: "*"
+  workflow: development-build
+
 app:
   envs:
   - opts:
@@ -22,16 +29,14 @@ app:
   - opts:
       is_expand: false
     APPLE_IOS_INFO_PLIST_PATH: ios/Didthis/Info.plist
-trigger_map:
-- push_branch: main
-  workflow: apple-appstore-deploy
-- pull_request_source_branch: "*"
-  workflow: development-build
+
 meta:
   bitrise.io:
     stack: osx-xcode-14.3.x-ventura
     machine_type_id: g2-m1.8core
+
 workflows:
+
   development-build:
     description: Perform development app build
     before_run:
@@ -42,10 +47,9 @@ workflows:
         - automatic_code_signing: apple-id
     after_run:
     - common-cleanup
-  apple-appstore-deploy:
-    description: 'Build and upload to App Store
 
-      '
+  apple-appstore-deploy:
+    description: 'Build and upload to App Store'
     before_run:
     - common-setup
     steps:
@@ -60,6 +64,7 @@ workflows:
         - itunescon_user: "$APPLE_DEV_ACCOUNT_ID"
     after_run:
     - common-cleanup
+
   common-setup:
     description: Common setup steps before workflow
     steps:
@@ -88,6 +93,7 @@ workflows:
     - set-xcode-build-number@1:
         inputs:
         - plist_path: "$APPLE_IOS_INFO_PLIST_PATH"
+
   common-cleanup:
     description: Common cleanup steps after main workflow
     steps:
