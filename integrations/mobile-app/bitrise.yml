@@ -1,12 +1,12 @@
 ---
-format_version: '13'
+format_version: "13"
 default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 project_type: react-native
 
 trigger_map:
 - push_branch: main
   workflow: apple-appstore-deploy
-- pull_request_source_branch: "*"
+- pull_request_source_branch: '*'
   workflow: development-build
 
 app:
@@ -22,7 +22,7 @@ app:
     BITRISE_SCHEME: Didthis
   - opts:
       is_expand: false
-    APPLE_APP_STORE_APP_ID: '6468972692'
+    APPLE_APP_STORE_APP_ID: "6468972692"
   - opts:
       is_expand: false
     APPLE_APP_STORE_BUNDLE_ID: com.lmorchard.Didthis
@@ -49,7 +49,7 @@ workflows:
     - common-cleanup
 
   apple-appstore-deploy:
-    description: 'Build and upload to App Store'
+    description: Build and upload to App Store
     before_run:
     - common-setup
     steps:
@@ -59,11 +59,18 @@ workflows:
         - automatic_code_signing: apple-id
     - deploy-to-itunesconnect-application-loader@1:
         inputs:
-        - password: "$APPLE_DEV_ACCOUNT_PASSWORD"
-        - app_password: "$APPLE_DEV_ACCOUNT_APP_SPECIFIC_PASSWORD"
-        - itunescon_user: "$APPLE_DEV_ACCOUNT_ID"
+        - password: $APPLE_DEV_ACCOUNT_PASSWORD
+        - app_password: $APPLE_DEV_ACCOUNT_APP_SPECIFIC_PASSWORD
+        - itunescon_user: $APPLE_DEV_ACCOUNT_ID
     after_run:
     - common-cleanup
+
+  common-cleanup:
+    description: Common cleanup steps after main workflow
+    steps:
+    - save-cocoapods-cache@1: {}
+    - save-npm-cache@1: {}
+    - deploy-to-bitrise-io@2: {}
 
   common-setup:
     description: Common setup steps before workflow
@@ -92,11 +99,5 @@ workflows:
         title: Hack to address Xcode 7.3 error https://github.com/bitrise-steplib/steps-xcode-archive/issues/287
     - set-xcode-build-number@1:
         inputs:
-        - plist_path: "$APPLE_IOS_INFO_PLIST_PATH"
-
-  common-cleanup:
-    description: Common cleanup steps after main workflow
-    steps:
-    - save-cocoapods-cache@1: {}
-    - save-npm-cache@1: {}
-    - deploy-to-bitrise-io@2: {}
+        - plist_path: $APPLE_IOS_INFO_PLIST_PATH
+    - certificate-and-profile-installer@1: {}
