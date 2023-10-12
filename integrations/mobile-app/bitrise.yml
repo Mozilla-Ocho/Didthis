@@ -22,10 +22,10 @@ app:
     BITRISE_SCHEME: Didthis
   - opts:
       is_expand: false
-    APPLE_APP_STORE_APP_ID: "6468972692"
+    APPLE_APP_STORE_APP_ID: "6468680088"
   - opts:
       is_expand: false
-    APPLE_APP_STORE_BUNDLE_ID: com.lmorchard.Didthis
+    APPLE_APP_STORE_BUNDLE_ID: org.mozilla.Didthis
   - opts:
       is_expand: false
     APPLE_IOS_INFO_PLIST_PATH: ios/Didthis/Info.plist
