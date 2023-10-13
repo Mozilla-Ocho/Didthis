@@ -1,3 +1,5 @@
+import withRemoveiOSNotificationEntitlement from "./config-plugins/withRemoveiOSNotificationEntitlement";
+
 export default ({ config }) => {
   return {
     ...config,
@@ -26,5 +28,9 @@ export default ({ config }) => {
     runtimeVersion: {
       policy: "sdkVersion",
     },
+    plugins: [
+      ...(config.plugins ?? []),
+      [withRemoveiOSNotificationEntitlement],
+    ],
   };
 };
