@@ -34,3 +34,14 @@ jobs:
         uses: expo/expo-github-action/preview@v8
         with:
           command: eas update --auto --branch=pr-${{ github.event.number }}
+          comment: false
+
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          comment_tag: storybook-build
+          message: |
+            🚀 **App** preview update is ready for use with [Expo Go](https://expo.dev/expo-go):
+            - Branch: ${{ steps.preview.outputs.branchName }}
+            - [More info](${{ steps.preview.outputs.link }})
+            - <img src="${{ steps.preview.outputs.qr }}" width="250px" height="250px" />
