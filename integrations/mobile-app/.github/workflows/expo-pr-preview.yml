@@ -31,6 +31,7 @@ jobs:
         run: yarn install
 
       - name: 🚀 Create preview
+        id: preview
         uses: expo/expo-github-action/preview@v8
         with:
           command: eas update --auto --branch=pr-${{ github.event.number }}
@@ -41,8 +42,6 @@ jobs:
         with:
           comment_tag: preview-app-build
           message: |
-            🚀 **App** preview update is ready for use with [Expo Go](https://expo.dev/expo-go):
-            - Branch: ${{ steps.preview.outputs.branchName }}
-            - [More info](${{ steps.preview.outputs.link }})
+            🚀 **App** [preview update](${{ steps.preview.outputs.link }}) is ready for use with [Expo Go](https://expo.dev/expo-go):
 
             <img src="${{ steps.preview.outputs.qr }}" width="250px" height="250px" />

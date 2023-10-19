@@ -37,7 +37,6 @@ jobs:
         uses: expo/expo-github-action/preview@v8
         with:
           command: eas update --auto --branch=pr-${{ github.event.number }}-storybook
-          comment-id: projectId:storybook:{projectId}
           comment: false
 
       - name: Comment PR
@@ -45,8 +44,6 @@ jobs:
         with:
           comment_tag: preview-storybook-build
           message: |
-            📓 **Storybook** preview update is ready for use with [Expo Go](https://expo.dev/expo-go):
-            - Branch: ${{ steps.preview.outputs.branchName }}
-            - [More info](${{ steps.preview.outputs.link }})
+            📓 **Storybook** [preview update](${{ steps.preview.outputs.link }}) is ready for use with [Expo Go](https://expo.dev/expo-go):
 
             <img src="${{ steps.preview.outputs.qr }}" width="250px" height="250px" />
