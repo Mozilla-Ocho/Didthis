@@ -45,3 +45,4 @@ jobs:
             🚀 **App** [preview update](${{ steps.preview.outputs.link }}) is ready for use with [Expo Go](https://expo.dev/expo-go):
 
             <img src="${{ steps.preview.outputs.qr }}" width="250px" height="250px" />
+            <a href="${{ steps.preview.outputs.link }}"><img src="${{ steps.preview.outputs.qr }}" width="250px" height="250px" /></a>
