@@ -1,4 +1,6 @@
-import { View } from "react-native";
+import { View, SafeAreaView } from "react-native";
+import { StyleSheet } from "react-native";
+import { colors } from "../styles";
 
 export const parameters = {
   controls: {
@@ -9,16 +11,12 @@ export const parameters = {
   },
 };
 
-export const decorators = [
-  (Story) => (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: "#26c6da",
-        padding: 8,
-      }}
-    >
-      <Story />
-    </View>
-  ),
-];
+const styles = StyleSheet.create({
+  previewWrapper: {
+    ...StyleSheet.absoluteFillObject,
+    margin: 0,
+    padding: 0,
+  },
+});
+
+export const decorators = [(Story) => <Story />];

@@ -64,6 +64,7 @@ export default function WebViewNavToolbar({
       >
         <FontAwesomeIcon icon={faHome} />
       </TouchableOpacity>
+
       {showReload && (
         <TouchableOpacity
           style={styles.toolbarButton}
@@ -72,6 +73,7 @@ export default function WebViewNavToolbar({
           <FontAwesomeIcon icon={faRotateRight} />
         </TouchableOpacity>
       )}
+      
       <TouchableOpacity
         onPress={() => webview && webview.goForward()}
         style={{ ...styles.toolbarButton, opacity: canGoForward ? 1.0 : 0.1 }}
