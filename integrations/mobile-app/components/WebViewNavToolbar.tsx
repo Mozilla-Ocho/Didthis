@@ -1,4 +1,4 @@
-import { View, TouchableOpacity, StyleSheet, Text } from "react-native";
+import { View, TouchableOpacity, StyleSheet } from "react-native";
 import Constants from "expo-constants";
 
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";

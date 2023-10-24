@@ -48,6 +48,7 @@ try {
 const getStories = () => {
   return {
     "./components/DateTimePicker.stories.tsx": require("../components/DateTimePicker.stories.tsx"),
+    "./components/Loader.stories.tsx": require("../components/Loader.stories.tsx"),
     "./components/TopNav.stories.tsx": require("../components/TopNav.stories.tsx"),
     "./components/WebViewNavToolbar.stories.tsx": require("../components/WebViewNavToolbar.stories.tsx"),
   };
