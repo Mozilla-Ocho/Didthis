@@ -9,6 +9,7 @@
     "@react-native-masked-view/masked-view": "0.2.9",
     "@react-navigation/bottom-tabs": "^6.5.8",
     "@react-navigation/drawer": "^6.6.4",
+    "@react-navigation/elements": "^1.3.20",
     "@react-navigation/native": "^6.1.7",
     "@react-navigation/native-stack": "^6.9.13",
     "@react-navigation/stack": "^6.3.17",
@@ -55,13 +56,13 @@
     "typescript": "^5.1.3"
   },
   "scripts": {
-    "start": "expo start",
+    "start": "expo start --port=8088",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
     "storybook-generate": "sb-rn-get-stories",
     "storybook-watch": "sb-rn-watcher",
-    "storybook": "sb-rn-get-stories && cross-env EXPO_PUBLIC_STORYBOOK_ENABLED='true' expo start",
+    "storybook": "sb-rn-get-stories && cross-env EXPO_PUBLIC_STORYBOOK_ENABLED='true' expo start --port=8088",
     "storybook:ios": "sb-rn-get-stories && cross-env EXPO_PUBLIC_STORYBOOK_ENABLED='true' expo start --ios",
     "storybook:android": "sb-rn-get-stories && cross-env EXPO_PUBLIC_STORYBOOK_ENABLED='true' expo start --android",
     "ts:check": "tsc",

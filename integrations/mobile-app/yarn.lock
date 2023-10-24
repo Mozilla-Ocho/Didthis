@@ -2236,9 +2236,14 @@
     color "^4.2.3"
     warn-once "^0.1.0"
 
-"@react-navigation/elements@^1.3.19", "@react-navigation/elements@^1.3.20":
+"@react-navigation/elements@^1.3.19":
   version "1.3.20"
   resolved "https://registry.npmjs.org/@react-navigation/elements/-/elements-1.3.20.tgz"
+  integrity sha512-/9YT9tp1R4ejXt+5cqcQnShTIv790sAAxeqizF1zLnSldmbHmb2kxxbCW6UhyhqRnTLF3UFpZwwgy4A8AP/MzA==
+
+"@react-navigation/elements@^1.3.20":
+  version "1.3.20"
+  resolved "https://registry.yarnpkg.com/@react-navigation/elements/-/elements-1.3.20.tgz#8fc7829035129354eef115229c5537dbe2d004c8"
   integrity sha512-/9YT9tp1R4ejXt+5cqcQnShTIv790sAAxeqizF1zLnSldmbHmb2kxxbCW6UhyhqRnTLF3UFpZwwgy4A8AP/MzA==
 
 "@react-navigation/native-stack@^6.9.13":

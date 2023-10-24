@@ -1,7 +1,9 @@
 # https://github.com/expo/expo-github-action/tree/main/preview-comment#publish-and-preview-on-pull-request
-name: "Build Expo Preview for PR"
+name: "Build Expo Storybook for PR"
 on:
   pull_request:
+env:
+  EXPO_PUBLIC_STORYBOOK_ENABLED: true
 jobs:
   tests:
     uses: ./.github/workflows/tests.yml
@@ -34,14 +36,14 @@ jobs:
         id: preview
         uses: expo/expo-github-action/preview@v8
         with:
-          command: eas update --auto --branch=pr-${{ github.event.number }}
+          command: eas update --auto --branch=pr-${{ github.event.number }}-storybook
           comment: false
 
       - name: Comment PR
         uses: thollander/actions-comment-pull-request@v2
         with:
-          comment_tag: preview-app-build
+          comment_tag: preview-storybook-build
           message: |
-            🚀 **App** [preview update](${{ steps.preview.outputs.link }}) is ready for use with [Expo Go](https://expo.dev/expo-go):
+            📓 **Storybook** [preview update](${{ steps.preview.outputs.link }}) is ready for use with [Expo Go](https://expo.dev/expo-go):
 
             <a href="${{ steps.preview.outputs.link }}"><img src="${{ steps.preview.outputs.qr }}" width="250px" height="250px" /></a>
