@@ -20,6 +20,7 @@ export function ThemedSafeViewDecorator<TArgs>(
         style={{
           ...StyleSheet.absoluteFillObject,
           flexDirection: "column",
+          backgroundColor: colors.background
         }}
       >
         <Story />

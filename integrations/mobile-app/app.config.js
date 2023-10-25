@@ -14,6 +14,7 @@ export default ({ config }) => {
       bundleIdentifier: "org.mozilla.Didthis",
       buildNumber: "4",
       config: {
+        usesAppleSignIn: true,
         usesNonExemptEncryption: false,
       },
     },
@@ -31,6 +32,7 @@ export default ({ config }) => {
     plugins: [
       ...(config.plugins ?? []),
       [withRemoveiOSNotificationEntitlement],
+      "expo-apple-authentication",
     ],
   };
 };

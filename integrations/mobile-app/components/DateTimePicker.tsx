@@ -12,42 +12,23 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export type DateTimePickerProps = {};
 
 export default function DateTimePicker({}: DateTimePickerProps) {
-  const colorScheme = useColorScheme();
+  const { colors } = useTheme();
+  const scheme = useColorScheme();
 
-  return (
+  const styles = StyleSheet.create({
+    datePicker: {
+      marginVertical: 12,
+      marginHorizontal: 24,
+    },
+  });
+
+  return <>
     <RNDateTimePicker
       mode="datetime"
       display="inline"
       value={new Date()}
       style={styles.datePicker}
+      themeVariant={scheme}
     />
-  );
+  </>;
 }
-
-const styles = StyleSheet.create({
-  screen: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "#f00",
-    flexDirection: "column",
-    alignContent: "flex-start",
-    justifyContent: "flex-start",
-  },
-  datePicker: {
-    marginVertical: 12,
-    marginHorizontal: 24,
-  },
-  header: {
-    backgroundColor: "#ccc",
-    flex: 1,
-    flexGrow: 0,
-    flexBasis: 48,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-  },
-  border: {
-    borderBottomWidth: 1,
-  },
-});

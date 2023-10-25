@@ -32,7 +32,9 @@ function MockAppDecorator(
         marginTop: -47, // HACK: account for nav header asserting its own margin in storybook
       }}
     >
-      <Story />
+      <View>
+        <Story />
+      </View>
       <View style={{ flexGrow: 1, padding: 16, justifyContent: "center" }}>
         <Text style={{ color: colors.text, padding: 48 }}>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do

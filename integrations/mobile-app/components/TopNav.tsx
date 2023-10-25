@@ -5,6 +5,7 @@ import {
 } from "@react-navigation/elements";
 import * as React from "react";
 import { useTheme } from "@react-navigation/native";
+import { Text, View } from "react-native";
 
 export type TopNavProps = {
   title?: string;
@@ -29,6 +30,10 @@ export default function TopNav({
 
   return (
     <Header
+      headerStyle={{
+        backgroundColor: colors.background,
+        borderBottomColor: colors.text,
+      }}
       title={title}
       headerShadowVisible={true}
       headerLeft={() => (

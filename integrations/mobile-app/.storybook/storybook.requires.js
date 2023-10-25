@@ -47,6 +47,7 @@ try {
 
 const getStories = () => {
   return {
+    "./components/AppleSigninButton.stories.tsx": require("../components/AppleSigninButton.stories.tsx"),
     "./components/DateTimePicker.stories.tsx": require("../components/DateTimePicker.stories.tsx"),
     "./components/Loader.stories.tsx": require("../components/Loader.stories.tsx"),
     "./components/TopNav.stories.tsx": require("../components/TopNav.stories.tsx"),
