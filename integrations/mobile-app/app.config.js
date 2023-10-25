@@ -14,7 +14,6 @@ export default ({ config }) => {
       bundleIdentifier: "org.mozilla.Didthis",
       buildNumber: "4",
       config: {
-        usesAppleSignIn: true,
         usesNonExemptEncryption: false,
       },
     },
