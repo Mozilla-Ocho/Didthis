@@ -13,6 +13,7 @@ import WebAppScreen, { WebAppScreenRouteParams } from "./screens/WebApp";
 import DoTheThingScreen, {
   DoTheThingScreenRouteParams,
 } from "./screens/DoTheThing";
+import SigninScreen, { SigninScreenRouteParams } from "./screens/Signin";
 import {
   createStackNavigator,
   StackNavigationOptions,
@@ -26,9 +27,13 @@ import AppShellHostContextProvider from "./lib/appShellHost/context";
 import { useAppShellHost } from "./lib/appShellHost/index";
 import { colors, styles } from "./styles";
 import Config from "./lib/config";
-import * as Updates from 'expo-updates';
+import { useFonts } from 'expo-font';
+import * as Updates from "expo-updates";
+import useAppFonts from "./lib/fonts";
+import Loader from "./components/Loader";
 
 export type RootStackParamList = {
+  Signin: SigninScreenRouteParams;
   WebApp: WebAppScreenRouteParams;
   DoTheThing: DoTheThingScreenRouteParams;
 };
@@ -36,6 +41,14 @@ export type RootStackParamList = {
 const Stack = createStackNavigator<RootStackParamList>();
 
 function App() {
+  const [fontsLoaded, fontError] = useAppFonts();
+  if (!fontsLoaded) {
+    return <Loader />;
+  }
+  if (fontError) {
+    console.error(fontError);
+  }
+
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   return (
     <NavigationContainer>
@@ -156,6 +169,7 @@ function AppMainStack({ drawerOpen, setDrawerOpen }: AppMainStackProps) {
       detachInactiveScreens={false}
       screenOptions={screenOptions}
     >
+      <Stack.Screen name="Signin" component={SigninScreen} />
       <Stack.Screen name="WebApp" component={WebAppScreen} />
       <Stack.Screen name="DoTheThing" component={DoTheThingScreen} />
     </Stack.Navigator>

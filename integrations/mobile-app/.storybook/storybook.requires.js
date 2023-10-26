@@ -11,6 +11,13 @@ import {
 global.STORIES = [
   {
     titlePrefix: "",
+    directory: "./screens",
+    files: "**/*.stories.?(ts|tsx|js|jsx)",
+    importPathMatcher:
+      "^\\.[\\\\/](?:screens(?:\\/(?!\\.)(?:(?:(?!(?:^|\\/)\\.).)*?)\\/|\\/|$)(?!\\.)(?=.)[^/]*?\\.stories\\.(?:ts|tsx|js|jsx)?)$",
+  },
+  {
+    titlePrefix: "",
     directory: "./components",
     files: "**/*.stories.?(ts|tsx|js|jsx)",
     importPathMatcher:
@@ -47,6 +54,7 @@ try {
 
 const getStories = () => {
   return {
+    "./screens/Signin.stories.tsx": require("../screens/Signin.stories.tsx"),
     "./components/AppleSigninButton.stories.tsx": require("../components/AppleSigninButton.stories.tsx"),
     "./components/DateTimePicker.stories.tsx": require("../components/DateTimePicker.stories.tsx"),
     "./components/Loader.stories.tsx": require("../components/Loader.stories.tsx"),

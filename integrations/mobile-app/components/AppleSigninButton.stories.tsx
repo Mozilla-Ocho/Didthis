@@ -27,8 +27,13 @@ export default {
 
 type Story = StoryObj<SubjectType>;
 
+const actionSignin = action("signinNew");
+
 const baseArgs: Partial<SubjectArgs> = {
-  onSignin: action("signin"),
+  onSignin: (result) => {
+    console.error(result);
+    actionSignin(result);
+  },
   onCancel: action("cancel"),
   onError: action("error"),
 };
