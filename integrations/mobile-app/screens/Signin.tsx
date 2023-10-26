@@ -3,10 +3,12 @@ import AppleSigninButton from "../components/AppleSigninButton";
 import Config from "../lib/config";
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../App";
-import { styles as globalStyles, colors, fonts } from "../styles";
-import useAppFonts from "../lib/fonts";
+import { styles as globalStyles, colors } from "../styles";
+import { useState } from "react";
+import * as AppleAuthentication from "expo-apple-authentication";
 
 const { siteBaseUrl, originWhitelist } = Config;
+const loginURL = `${siteBaseUrl}/api/sessionLoginWithAppleId`;
 
 export type SigninScreenRouteParams = {};
 
@@ -16,6 +18,31 @@ export type SigninScreenProps = {} & StackScreenProps<
 >;
 
 export default function SigninScreen(props: SigninScreenProps) {
+  const onSignin = async (
+    credential: AppleAuthentication.AppleAuthenticationCredential
+  ) => {
+    console.log(`POST`, loginURL, credential);
+
+    const resp = await fetch(loginURL, {
+      method: "POST",
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ credential }),
+    });
+
+    try {
+      const result = await resp.json();
+      const headers = resp.headers;
+      const setCookie = headers.get('set-cookie');
+
+      console.log({ setCookie, result, headers });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.screen}>
       <View style={styles.logoContainer}>
@@ -33,7 +60,7 @@ export default function SigninScreen(props: SigninScreenProps) {
         updates.
       </Text>
       <View style={styles.signinContainer}>
-        <AppleSigninButton />
+        <AppleSigninButton {...{ onSignin }} />
       </View>
       <Text style={[styles.text]}>or</Text>
       <Text style={[styles.text, styles.textNoAccountLink]}>
