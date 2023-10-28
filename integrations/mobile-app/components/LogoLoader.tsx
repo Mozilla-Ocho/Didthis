@@ -5,9 +5,9 @@ import {
 } from "react-native";
 import LottieView from "lottie-react-native";
 
-export type LoaderProps = {};
+export type LogoLoaderProps = {};
 
-export default function Loader({}: LoaderProps) {
+export default function LogoLoader({}: LogoLoaderProps) {
   return (
     <SafeAreaView
       style={{
@@ -17,7 +17,7 @@ export default function Loader({}: LoaderProps) {
     >
       <LottieView
         style={{ flexGrow: 1 }}
-        source={require("../assets/SparkleLoader.json")}
+        source={require("../assets/DidThis-LoaderAnim.json")}
         autoPlay={true}
         loop={true}
       />

@@ -1,12 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-native";
 import SigninScreen, { SigninScreenProps } from "./Signin";
 import { action } from "@storybook/addon-actions";
-import { useColorScheme } from "react-native";
-import {
-  DarkTheme,
-  DefaultTheme,
-  NavigationContainer,
-} from "@react-navigation/native";
+import { ThemedNavigationContainer } from "../lib/storybook/decorators";
 
 const Subject = SigninScreen;
 type SubjectProps = SigninScreenProps;
@@ -17,23 +12,24 @@ export default {
   title: "screens/SigninScreen",
   component: Subject,
   decorators: [
-    (Story) => {
-      const colorScheme = useColorScheme();
-      const theme = colorScheme === "dark" ? DarkTheme : DefaultTheme;
-      return (
-        <NavigationContainer theme={theme}>
-          <Story />
-        </NavigationContainer>
-      );
-    },
+    ThemedNavigationContainer<SubjectArgs>,
   ],
 } satisfies Meta<SubjectType>;
 
 type Story = StoryObj<SubjectType>;
 
-const actionSignin = action("signinNew");
+const actionNavigate = action("navigate");
 
-const baseArgs: Partial<SubjectArgs> = {};
+const baseArgs: Partial<SubjectArgs> = {
+  // @ts-ignore mocking navigate() only
+  navigation: {
+    // @ts-ignore
+    navigate: (screen: string, params: object) => {
+      console.log("navigate", screen, JSON.stringify(params, null, "  "));
+      actionNavigate(screen, params);
+    }
+  }
+};
 
 export const Default: Story = {
   args: baseArgs,

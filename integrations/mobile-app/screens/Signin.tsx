@@ -1,14 +1,10 @@
 import { View, Text, Image, SafeAreaView, StyleSheet } from "react-native";
 import AppleSigninButton from "../components/AppleSigninButton";
-import Config from "../lib/config";
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../App";
 import { styles as globalStyles, colors } from "../styles";
-import { useState } from "react";
 import * as AppleAuthentication from "expo-apple-authentication";
-
-const { siteBaseUrl, originWhitelist } = Config;
-const loginURL = `${siteBaseUrl}/api/sessionLoginWithAppleId`;
+import * as Storage from "../lib/storage";
 
 export type SigninScreenRouteParams = {};
 
@@ -17,30 +13,12 @@ export type SigninScreenProps = {} & StackScreenProps<
   "WebApp"
 >;
 
-export default function SigninScreen(props: SigninScreenProps) {
+export default function SigninScreen({ navigation }: SigninScreenProps) {
   const onSignin = async (
     credential: AppleAuthentication.AppleAuthenticationCredential
   ) => {
-    console.log(`POST`, loginURL, credential);
-
-    const resp = await fetch(loginURL, {
-      method: "POST",
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ credential }),
-    });
-
-    try {
-      const result = await resp.json();
-      const headers = resp.headers;
-      const setCookie = headers.get('set-cookie');
-
-      console.log({ setCookie, result, headers });
-    } catch (e) {
-      console.error(e);
-    }
+    await Storage.setObject("APPLE_ID_CREDENTIAL", credential);
+    navigation.navigate("WebApp", { credential });
   };
 
   return (

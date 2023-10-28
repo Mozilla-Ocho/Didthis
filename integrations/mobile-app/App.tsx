@@ -13,7 +13,7 @@ import {
 import AppShellHostContextProvider from "./lib/appShellHost/context";
 import Config from "./lib/config";
 import useAppFonts from "./lib/fonts";
-import Loader from "./components/Loader";
+import LogoLoader from "./components/LogoLoader";
 
 export type RootStackParamList = {
   Signin: SigninScreenRouteParams;
@@ -27,7 +27,7 @@ function App() {
   const [fontsLoaded, fontError] = useAppFonts();
 
   if (!fontsLoaded) {
-    return <Loader />;
+    return <LogoLoader />;
   }
   if (fontError) {
     console.error(fontError);

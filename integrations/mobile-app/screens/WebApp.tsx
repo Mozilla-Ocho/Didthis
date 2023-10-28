@@ -1,24 +1,20 @@
-import Constants from "expo-constants";
 import useAppShellHost from "../lib/appShellHost";
 import { useEffect, useRef, useState } from "react";
 import WebView, { WebViewNavigation } from "react-native-webview";
-import {
-  ActivityIndicator,
-  Button,
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-} from "react-native";
+import { SafeAreaView, StatusBar, StyleSheet } from "react-native";
 import WebViewNavToolbar from "../components/WebViewNavToolbar";
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../App";
 import Config from "../lib/config";
+import Loader from "../components/Loader";
+import * as AppleAuthentication from "expo-apple-authentication";
+import { useRoute } from "@react-navigation/native";
+import { Payload } from "../lib/appShellHost/messaging";
 
 const { siteBaseUrl, originWhitelist } = Config;
 
 export type WebAppScreenRouteParams = {
-  now: number;
-  thingy: string;
+  credential?: AppleAuthentication.AppleAuthenticationCredential;
 };
 
 export type WebAppScreenProps = {} & StackScreenProps<
@@ -26,29 +22,36 @@ export type WebAppScreenProps = {} & StackScreenProps<
   "WebApp"
 >;
 
-export default function WebAppScreen(props: WebAppScreenProps) {
+export default function WebAppScreen({ route }: WebAppScreenProps) {
+  const { credential } = route.params;
   const appShellHost = useAppShellHost();
   const { messaging } = appShellHost;
+  const { webContentReady } = appShellHost.state;
 
   const webviewRef = useRef<WebView>(null);
-  useEffect(
-    () => messaging.setWebView(webviewRef.current),
-    [webviewRef.current]
-  );
 
   const [webviewNavigation, setWebviewNavigation] = useState<
     WebViewNavigation | undefined
   >();
 
+  useEffect(
+    () => messaging?.setWebView(webviewRef.current),
+    [messaging, webviewRef.current]
+  );
+
+  useEffect(() => {
+    if (messaging && credential && webContentReady) {
+      messaging.postMessage("appleCredential", {
+        // HACK: credential is compatible with Payload, might be a better way to handle this.
+        timeSent: Date.now(),
+        credential: credential as unknown as Payload,
+      });
+      console.log("SENT CREDENTIAL", Date.now());
+    }
+  }, [webContentReady, messaging, credential]);
+
   const handleNavigationStateChange = (navState: WebViewNavigation) =>
     setWebviewNavigation(navState);
-
-  const styles = StyleSheet.create({
-    flexContainer: {
-      flex: 1,
-      justifyContent: "center",
-    },
-  });
 
   return (
     <SafeAreaView style={{ ...StyleSheet.absoluteFillObject }}>
@@ -57,13 +60,7 @@ export default function WebAppScreen(props: WebAppScreenProps) {
         source={{ uri: siteBaseUrl }}
         originWhitelist={originWhitelist}
         startInLoadingState={true}
-        renderLoading={() => (
-          <ActivityIndicator
-            color="black"
-            size="large"
-            style={styles.flexContainer}
-          />
-        )}
+        renderLoading={() => <Loader />}
         ref={webviewRef}
         onNavigationStateChange={handleNavigationStateChange}
         onMessage={messaging.onMessage}

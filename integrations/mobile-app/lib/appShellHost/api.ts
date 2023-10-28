@@ -27,6 +27,7 @@ export default class AppShellHostAPI {
 
     if (!this.messaging) return;
 
+    this.messaging.registerMethod("ping", this.handlePing.bind(this));
     this.messaging.registerMethod("useScreen", this.handleUseScreen.bind(this));
     this.messaging.registerMethod(
       "updateAppConfig",
@@ -42,6 +43,15 @@ export default class AppShellHostAPI {
 
   get messaging() {
     return this.state?.messaging;
+  }
+
+  async handlePing(payload: Payload) {
+    this.dispatch({
+      type: "update",
+      key: "webContentReady",
+      value: true,
+    });
+    return { message: "pong" };
   }
 
   async handleUpdateAppConfig(payload: Payload) {

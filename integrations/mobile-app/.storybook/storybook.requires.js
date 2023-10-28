@@ -55,9 +55,11 @@ try {
 const getStories = () => {
   return {
     "./screens/Signin.stories.tsx": require("../screens/Signin.stories.tsx"),
+    "./screens/WebApp.stories.tsx": require("../screens/WebApp.stories.tsx"),
     "./components/AppleSigninButton.stories.tsx": require("../components/AppleSigninButton.stories.tsx"),
     "./components/DateTimePicker.stories.tsx": require("../components/DateTimePicker.stories.tsx"),
     "./components/Loader.stories.tsx": require("../components/Loader.stories.tsx"),
+    "./components/LogoLoader.stories.tsx": require("../components/LogoLoader.stories.tsx"),
     "./components/TopNav.stories.tsx": require("../components/TopNav.stories.tsx"),
     "./components/WebViewNavToolbar.stories.tsx": require("../components/WebViewNavToolbar.stories.tsx"),
   };

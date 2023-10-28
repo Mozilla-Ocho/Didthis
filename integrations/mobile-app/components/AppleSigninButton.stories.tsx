@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from "@storybook/react-native";
-import { PartialStoryFn } from "@storybook/csf";
 import AppleSigninButton, { AppleSigninButtonProps } from "./AppleSigninButton";
 import { ThemedSafeViewDecorator } from "../lib/storybook/decorators";
 import { action } from "@storybook/addon-actions";
