@@ -8,6 +8,7 @@ variable "flag_use_firebase" { type = bool }
 variable "flag_destroy" { type = bool }
 variable "flag_use_db" { type = bool }
 variable "flag_use_dummy_appserver" { type = bool }
+variable "flag_enable_lb" { type = bool }
 variable "gcp_project_id" { type = string }
 variable "gcp_project_number" { type = string }
 variable "region" { type = string }
