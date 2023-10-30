@@ -14,6 +14,8 @@ variable "gcp_project_number" { type = string }
 variable "region" { type = string }
 variable "vpc_remote_bucket" { type = string }
 variable "vpc_remote_name" { type = string }
+variable "lb_ssl_domain_names" { type = list(string) }
+variable "lb_cert_domain_change_increment_outage" { type = number }
 
 variable "image_tag" {
   # this var is not defined in the vars file, it's passed in at runtime via the
