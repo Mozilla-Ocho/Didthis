@@ -1,4 +1,4 @@
-name: "Build Expo Update for main branch"
+name: "Build Expo Preview for main"
 on:
   push:
     branches:
