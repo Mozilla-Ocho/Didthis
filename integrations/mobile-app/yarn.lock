@@ -2236,14 +2236,9 @@
     color "^4.2.3"
     warn-once "^0.1.0"
 
-"@react-navigation/elements@^1.3.19":
+"@react-navigation/elements@^1.3.19", "@react-navigation/elements@^1.3.20":
   version "1.3.20"
   resolved "https://registry.npmjs.org/@react-navigation/elements/-/elements-1.3.20.tgz"
-  integrity sha512-/9YT9tp1R4ejXt+5cqcQnShTIv790sAAxeqizF1zLnSldmbHmb2kxxbCW6UhyhqRnTLF3UFpZwwgy4A8AP/MzA==
-
-"@react-navigation/elements@^1.3.20":
-  version "1.3.20"
-  resolved "https://registry.yarnpkg.com/@react-navigation/elements/-/elements-1.3.20.tgz#8fc7829035129354eef115229c5537dbe2d004c8"
   integrity sha512-/9YT9tp1R4ejXt+5cqcQnShTIv790sAAxeqizF1zLnSldmbHmb2kxxbCW6UhyhqRnTLF3UFpZwwgy4A8AP/MzA==
 
 "@react-navigation/native-stack@^6.9.13":
@@ -6274,10 +6269,10 @@ expo-updates-interface@~0.10.0:
   resolved "https://registry.npmjs.org/expo-updates-interface/-/expo-updates-interface-0.10.1.tgz"
   integrity sha512-I6JMR7EgjXwckrydDmrkBEX/iw750dcqpzQVsjznYWfi0HTEOxajLHB90fBFqQkUV5i5s4Fd3hYQ1Cn0oMzUbA==
 
-expo-updates@~0.18.16:
-  version "0.18.16"
-  resolved "https://registry.npmjs.org/expo-updates/-/expo-updates-0.18.16.tgz"
-  integrity sha512-5/3Yh6FHG8oRDz1pqpn7NEO6GQBH5GV/sygnkkn3JxsiXzlOsuOY7+x+gFr4CdKVyreaoJV863ZxKvxplVE4fA==
+expo-updates@~0.18.17:
+  version "0.18.17"
+  resolved "https://registry.yarnpkg.com/expo-updates/-/expo-updates-0.18.17.tgz#11ce03ee95ee19e1a1e253b2a98dd9b3dc019c71"
+  integrity sha512-oyBDR94nYEtVw+iBod3N9LFqTfpLHofmUjh0lP12YZINUI89hvoAyqRe56eSnlpWkzziG6g1y4NGva0D0ViK6w==
   dependencies:
     "@expo/code-signing-certificates" "0.0.5"
     "@expo/config" "~8.1.0"
