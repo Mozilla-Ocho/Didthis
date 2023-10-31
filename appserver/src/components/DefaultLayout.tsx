@@ -11,6 +11,7 @@ import Head from 'next/head'
 import branding from '@/lib/branding'
 import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import AppShellContextProvider from '@/lib/appShellContent/context'
 
 // Inner is separate because it has to be a store observer for when
 // headerFooter=authed and the outer layer is the store provider itself.
@@ -76,11 +77,13 @@ export default function DefaultLayout({
         router={router}
         testBucket={testBucket}
       >
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <Inner isThe404={isThe404} unauthHomepage={unauthHomepage}>
-            {children}
-          </Inner>
-        </LocalizationProvider>
+        <AppShellContextProvider>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <Inner isThe404={isThe404} unauthHomepage={unauthHomepage}>
+              {children}
+            </Inner>
+          </LocalizationProvider>
+        </AppShellContextProvider>
       </StoreWrapper>
     </div>
   )

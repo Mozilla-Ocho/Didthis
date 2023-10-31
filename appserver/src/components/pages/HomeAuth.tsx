@@ -12,6 +12,7 @@ import OgMeta from '../OgMeta'
 import TrialAccountSignedUpAlert from '../TrialAccountSignedUpAlert'
 import RemindersAndAlerts from '../RemindersAndAlerts'
 import branding from '@/lib/branding'
+import useAppShell from '@/lib/appShellContent'
 
 const HomeAuth = observer(() => {
   const store = useStore()
@@ -21,6 +22,21 @@ const HomeAuth = observer(() => {
   )
   const [rendered, setRendered] = useState(false)
   store.useTrackedPageEvent(trackingEvents.pvHomeAuth)
+
+  const appShell = useAppShell()
+  useEffect(() => {
+    // Update the app shell with user & nav related details
+    if (!appShell.inAppWebView || !store.user) return
+    appShell.api.request("updateAppConfig", {
+      user: store.user,
+      links: {
+        user: pathBuilder.user(store.user.systemSlug),
+        userEdit: pathBuilder.userEdit(store.user.systemSlug),
+        newPost: pathBuilder.newPost(store.user.systemSlug),
+      },
+    })
+  }, [store.user, appShell.inAppWebView, appShell.api])
+
   useEffect(() => {
     // this is a hack to prevent a failure of client vs server rendering state,
     // by just rendering blank initially, and then using useState (which is

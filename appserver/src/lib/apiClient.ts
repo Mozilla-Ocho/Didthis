@@ -13,7 +13,9 @@ import type {
   SuccessWrapper,
   SessionLoginAsTrialUserWrapper,
   ClaimTrialUserWrapper,
+  SessionLoginWithAppleIdWrapper,
 } from './apiConstants'
+import { AppleAuthenticationCredential } from "./appleAuth";
 
 // const getHealthCheck = async () => {
 //   const payload = await wrapFetch({ action: 'health_check' })
@@ -216,6 +218,19 @@ const flagUser = async({
   return wrapper
 }
 
+const sessionLoginWithAppleId = async({
+  credential,
+}: {
+  credential: AppleAuthenticationCredential
+}) => {
+  const wrapper = await wrapFetch({
+    action: 'sessionLoginWithAppleId',
+    method: 'POST',
+    body: { credential: credential as JSONABLE },
+  }) as SessionLoginWithAppleIdWrapper
+  return wrapper
+}
+
 const sessionLoginAsTrialUser = async ({
   signupCode,
 }: {
@@ -243,6 +258,7 @@ const claimTrialUser = async ({
 }
 
 const apiClient = {
+  sessionLoginWithAppleId,
   sessionLoginAsTrialUser,
   claimTrialUser,
   deletePost,

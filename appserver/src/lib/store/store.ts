@@ -11,6 +11,7 @@ import { useEffect } from 'react'
 import { NextRouter } from 'next/router'
 import pathBuilder from '../pathBuilder'
 import profileUtils from '../profileUtils'
+import { AppleAuthenticationCredential } from '../appleAuth'
 // import { UrlMetaWrapper } from '../apiConstants'
 
 type GeneralError = false | '_get_me_first_fail_' | '_api_fail_'
@@ -382,6 +383,13 @@ class Store {
   cancelGlobalLoginOverlay() {
     this.firebaseModalOpen = false
     this.loginErrorMode = false
+  }
+
+  async loginWithAppleId(credential: AppleAuthenticationCredential) {
+    if (this.user) throw new Error('must be unauthed')
+    const wrapper = await this.apiClient.sessionLoginWithAppleId({ credential })
+    this.trackEvent(trackingEvents.caAppleIDLogin, {})
+    window.location.assign(`/`)
   }
 
   async loginAsNewTrialUser() {

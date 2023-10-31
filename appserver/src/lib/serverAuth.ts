@@ -9,6 +9,8 @@ import { sessionCookieName } from './apiConstants'
 import { getParamString } from './nextUtils'
 import crypto from 'crypto'
 
+export const SIGNUP_CODE_FOR_APPLEID = "0a99131d";
+
 export const signupCodes: {
   [key: string]: ApiSignupCodeInfo
 } = {
@@ -93,6 +95,12 @@ export const signupCodes: {
     active: true,
     value: '6fda0933',
     name: 'ads-pottery',
+    envNames: ['dev', 'nonprod', 'prod'],
+  },
+  '0a99131d': {
+    active: true,
+    value: '0a99131d',
+    name: 'apple-id',
     envNames: ['dev', 'nonprod', 'prod'],
   },
   '83ad9fa2': {
@@ -202,7 +210,7 @@ const generateRandomAvailableSystemSlug = async () => {
   return slug
 }
 
-const getOrCreateUser = async ({
+export const getOrCreateUser = async ({
   id,
   autoVivifyWithEmail, // optional. if not provided, will not autovivity
   signupCode,
@@ -442,8 +450,8 @@ const verifySessionCookie = async (
       newCookie: cookie,
       roundtrip: false,
     }
-  } else if (roundtrip && uid.startsWith('trial-')) {
-    log.serverApi('skipping roundtrip revalidation for trial account')
+  } else if (roundtrip && (uid.startsWith('trial-') || uid.startsWith('apple-'))) {
+    log.serverApi('skipping roundtrip revalidation for non-firebase account')
     return {
       valid: true,
       uid,
