@@ -7,7 +7,14 @@ export type State = {
   messaging: MessageHandler,
   webContentReady: boolean,
   user?: ApiUser,
-  links: Record<string, string>
+  links: Record<string, string>,
+  topNav?: {
+    show: boolean,
+    title: string,
+    leftLabel?: string,
+    rightLabel?: string,
+    leftIsBack?: boolean,
+  }
 }
 
 export function createInitialState(): State {

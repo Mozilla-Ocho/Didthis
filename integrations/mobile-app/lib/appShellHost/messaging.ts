@@ -1,4 +1,5 @@
 import WebView, { WebViewMessageEvent } from "react-native-webview";
+import { AppMessages } from "./types";
 
 export type JSONValue =
   | string
@@ -6,11 +7,11 @@ export type JSONValue =
   | boolean
   | null
   | JSONValue[]
-  | { [key: string]: JSONValue }
+  | { [key: string]: JSONValue };
 export interface JSONObject {
-  [k: string]: JSONValue
+  [k: string]: JSONValue;
 }
-export type Payload = JSONObject
+export type Payload = JSONObject;
 
 export type MessageRequest = {
   type: "request";
@@ -72,7 +73,11 @@ export default class MessageHandler {
     return this.deferredResponses[id];
   }
 
-  postMessage(type: string, payload: Payload, id?: string) {
+  postMessage<T extends keyof AppMessages>(
+    type: T,
+    payload: AppMessages[T],
+    id?: string
+  ) {
     this.webview?.postMessage(JSON.stringify({ type, payload, id }));
   }
 

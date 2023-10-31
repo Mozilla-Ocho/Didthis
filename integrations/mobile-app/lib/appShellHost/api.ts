@@ -7,6 +7,7 @@ import { Payload } from "./messaging";
 import { ApiUser } from "../types";
 import * as SiteAPI from "../siteApi";
 import Constants from "expo-constants";
+import { AppRequestMethods } from "./types";
 
 const { siteBaseUrl } = Constants.expoConfig.extra;
 
@@ -42,11 +43,14 @@ export default class AppShellHostAPI {
     if (!this.messaging) return;
 
     // TODO: declare these in a type shared with the server side
-    const methods = {
+    // FIXME: this type isn't quite right, but it at least checks the keys
+    const methods: Record<keyof AppRequestMethods, Function> = {
       ping: this.handlePing,
       useScreen: this.handleUseScreen,
       updateAppConfig: this.handleUpdateAppConfig,
       signin: this.handleSignin,
+      updateTopNav: this.handleUpdateTopNav,
+      pickImage: this.handlePickImage,
     };
 
     for (const [name, method] of Object.entries(methods)) {
@@ -96,4 +100,19 @@ export default class AppShellHostAPI {
     await SiteAPI.resetSignin();
     this.navigation.navigate("Signin");
   }
+
+  async handleUpdateTopNav(
+    payload: AppRequestMethods["updateTopNav"]["request"],
+    id: string
+  ): Promise<AppRequestMethods["updateTopNav"]["response"]> {
+    const { show, title, leftIsBack, leftLabel, rightLabel } = payload;
+    this.dispatch({
+      type: "update",
+      key: "topNav",
+      value: { show, title, leftIsBack, leftLabel, rightLabel }
+    });
+    return { success: true };
+  }
+
+  async handlePickImage(payload: Payload, id: string) {}
 }

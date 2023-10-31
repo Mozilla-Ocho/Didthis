@@ -29,7 +29,6 @@ function MockAppDecorator(
       style={{
         ...StyleSheet.absoluteFillObject,
         flexDirection: "column",
-        marginTop: -47, // HACK: account for nav header asserting its own margin in storybook
       }}
     >
       <View>

@@ -9,6 +9,7 @@ import Config from "../lib/config";
 import Loader from "../components/Loader";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { Payload } from "../lib/appShellHost/messaging";
+import TopNav from "../components/TopNav";
 
 const { siteBaseUrl, originWhitelist } = Config;
 
@@ -40,11 +41,7 @@ export default function WebAppScreen({ route }: WebAppScreenProps) {
 
   useEffect(() => {
     if (messaging && credential && webContentReady) {
-      messaging.postMessage("appleCredential", {
-        // HACK: credential is compatible with Payload, might be a better way to handle this.
-        timeSent: Date.now(),
-        credential: credential as unknown as Payload,
-      });
+      messaging.postMessage("appleCredential", { credential });
     }
   }, [webContentReady, messaging, credential]);
 
@@ -54,6 +51,7 @@ export default function WebAppScreen({ route }: WebAppScreenProps) {
   return (
     <SafeAreaView style={{ ...StyleSheet.absoluteFillObject }}>
       <StatusBar barStyle="dark-content" />
+      <ConditionalTopNav />
       <WebView
         source={{ uri: siteBaseUrl }}
         originWhitelist={originWhitelist}
@@ -63,10 +61,41 @@ export default function WebAppScreen({ route }: WebAppScreenProps) {
         onNavigationStateChange={handleNavigationStateChange}
         onMessage={messaging.onMessage}
       />
-      <WebViewNavToolbar
-        webview={webviewRef.current}
-        webviewNavigation={webviewNavigation}
-      />
     </SafeAreaView>
+  );
+}
+
+function ConditionalTopNav() {
+  const appShellHost = useAppShellHost();
+  const { messaging } = appShellHost;
+
+  const { topNav } = appShellHost.state;
+  if (!topNav?.show) return;
+
+  const { title, leftLabel, rightLabel, leftIsBack } = topNav;
+
+  let onLeftPress = undefined;
+  if (leftLabel) {
+    onLeftPress = () =>
+      messaging.postMessage("topNavLeftPress", { label: leftLabel });
+  }
+
+  let onRightPress = undefined;
+  if (rightLabel) {
+    onRightPress = () =>
+      messaging.postMessage("topNavRightPress", { label: rightLabel });
+  }
+
+  return (
+    <TopNav
+      {...{
+        title,
+        leftLabel,
+        leftIsBack,
+        onLeftPress,
+        rightLabel,
+        onRightPress,
+      }}
+    />
   );
 }
