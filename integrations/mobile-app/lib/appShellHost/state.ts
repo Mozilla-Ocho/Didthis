@@ -5,6 +5,7 @@ import { ApiUser } from "../types"
 
 export type State = {
   messaging: MessageHandler,
+  webContentReady: boolean,
   user?: ApiUser,
   links: Record<string, string>
 }
@@ -12,6 +13,7 @@ export type State = {
 export function createInitialState(): State {
   return {
     messaging: new MessageHandler(),
+    webContentReady: false,
     links: {}
   }
 }

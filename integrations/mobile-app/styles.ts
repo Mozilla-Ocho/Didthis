@@ -18,7 +18,29 @@ export const colors = {
   "gl-black": "#1f1f1f",
 };
 
+export const fonts = {
+  logo: "Solway-Medium",
+  heading: "Rubik-Bold",
+  text: "Rubik-Regular",
+};
+
 export const styles = StyleSheet.create({
+  textHeading: {
+    fontFamily: fonts.heading,
+    fontSize: 24,
+    fontWeight: "700",
+  },
+  text: {
+    fontFamily: fonts.text,
+  },
+  logoText: {
+    color: colors["yellow-700"],
+    fontFamily: fonts.logo,
+    fontWeight: "500",
+    fontSize: 49.396,
+    letterSpacing: 0.988,
+  },
+
   drawer: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: colors["yellow-300"],

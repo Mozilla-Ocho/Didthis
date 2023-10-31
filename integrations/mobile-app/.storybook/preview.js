@@ -1,6 +1,6 @@
-import { View, SafeAreaView } from "react-native";
 import { StyleSheet } from "react-native";
-import { colors } from "../styles";
+import useAppFonts from "../lib/fonts";
+import Loader from "../components/Loader";
 
 export const parameters = {
   controls: {
@@ -19,4 +19,15 @@ const styles = StyleSheet.create({
   },
 });
 
-export const decorators = [(Story) => <Story />];
+export const decorators = [
+  (Story) => {
+    const [fontsLoaded, fontError] = useAppFonts();
+    if (!fontsLoaded) {
+      return <Loader />;
+    }
+    if (fontError) {
+      console.error(fontError);
+    }
+    return <Story />;
+  },
+];

@@ -31,6 +31,7 @@ export default ({ config }) => {
     plugins: [
       ...(config.plugins ?? []),
       [withRemoveiOSNotificationEntitlement],
+      "expo-apple-authentication",
     ],
   };
 };

@@ -2,6 +2,20 @@ import type { Meta, StoryObj } from "@storybook/react-native";
 import { action } from "@storybook/addon-actions";
 
 import WebViewNavToolbar, { WebViewNavToolbarProps } from "./WebViewNavToolbar";
+import { ThemedSafeViewDecorator } from "../lib/storybook/decorators";
+
+const Subject = WebViewNavToolbar;
+type SubjectProps = WebViewNavToolbarProps;
+type SubjectType = typeof WebViewNavToolbar;
+type SubjectArgs = Partial<SubjectProps>;
+
+export default {
+  title: "components/WebViewNavToolbar",
+  component: Subject,
+  decorators: [ThemedSafeViewDecorator<SubjectArgs>],
+} satisfies Meta<SubjectType>;
+
+type Story = StoryObj<SubjectType>;
 
 const mockSiteBaseUrl = 'https://example.com'
 
@@ -18,20 +32,12 @@ const mockWebviewNavigation = {
   url: mockSiteBaseUrl
 };
 
-const baseArgs ={
+const baseArgs = {
   siteBaseUrl: mockSiteBaseUrl,
   webview: mockWebview,
   webviewNavigation: mockWebviewNavigation,
   showReload: true,
 };
-
-export default {
-  title: "components/WebViewNavToolbar",
-  component: WebViewNavToolbar,
-  decorators: [],
-} satisfies Meta<typeof WebViewNavToolbar>;
-
-type Story = StoryObj<typeof WebViewNavToolbar>;
 
 export const Default: Story = {
   args: baseArgs,

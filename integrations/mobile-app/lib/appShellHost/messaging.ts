@@ -1,6 +1,16 @@
 import WebView, { WebViewMessageEvent } from "react-native-webview";
 
-export type Payload = { [key: string]: string | Payload };
+export type JSONValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JSONValue[]
+  | { [key: string]: JSONValue }
+export interface JSONObject {
+  [k: string]: JSONValue
+}
+export type Payload = JSONObject
 
 export type MessageRequest = {
   type: "request";
@@ -33,9 +43,7 @@ export default class MessageHandler {
   constructor() {
     this.webview = undefined;
     this.deferredResponses = {};
-    this.requestHandlers = {
-      ping: () => ({ message: "pong" }),
-    };
+    this.requestHandlers = {};
   }
 
   get onMessage() {
@@ -64,6 +72,10 @@ export default class MessageHandler {
     return this.deferredResponses[id];
   }
 
+  postMessage(type: string, payload: Payload, id?: string) {
+    this.webview?.postMessage(JSON.stringify({ type, payload, id }));
+  }
+
   async handleMessage(event: WebViewMessageEvent) {
     const {
       nativeEvent: { data },
@@ -82,15 +94,14 @@ export default class MessageHandler {
       const request = message as MessageRequest;
       const { id, method, payload } = request;
 
-      const response: MessageResponse = { type: "response", id, payload: {} };
-
+      let responsePayload: Payload | undefined;
       if (method in this.requestHandlers) {
-        response.payload = await this.requestHandlers[method](payload, id);
+        responsePayload = await this.requestHandlers[method](payload, id);
       } else {
         // TODO: method not found error response?
       }
 
-      this.webview?.postMessage(JSON.stringify(response));
+      this.postMessage("response", responsePayload, id);
     }
   }
 }
