@@ -69,7 +69,7 @@ export class MessageHandler {
 
   async request<T extends keyof AppRequestMethods>(
     method: T,
-    payload: AppRequestMethods[T]['request']
+    payload?: AppRequestMethods[T]['request']
   ) {
     const request: MessageRequest<T> = {
       type: 'request',

@@ -26,16 +26,17 @@ const HomeAuth = observer(() => {
   const appShell = useAppShell()
   useEffect(() => {
     // Update the app shell with user & nav related details
-    if (!appShell.inAppWebView || !store.user) return
-    appShell.api.request("updateAppConfig", {
-      user: store.user,
-      links: {
-        user: pathBuilder.user(store.user.systemSlug),
-        userEdit: pathBuilder.userEdit(store.user.systemSlug),
-        newPost: pathBuilder.newPost(store.user.systemSlug),
-      },
-    })
-  }, [store.user, appShell.inAppWebView, appShell.api])
+    if (store.user && appShell.appReady) {
+      appShell.api.request('updateAppConfig', {
+        user: store.user,
+        links: {
+          user: pathBuilder.user(store.user.systemSlug),
+          userEdit: pathBuilder.userEdit(store.user.systemSlug),
+          newPost: pathBuilder.newPost(store.user.systemSlug),
+        },
+      })
+    }
+  }, [store.user, appShell.appReady, appShell.api])
 
   useEffect(() => {
     // this is a hack to prevent a failure of client vs server rendering state,

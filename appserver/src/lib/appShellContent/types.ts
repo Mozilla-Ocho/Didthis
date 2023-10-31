@@ -11,6 +11,10 @@ export type AppRequestMethods = {
     request: undefined,
     response: JSONObject,
   }
+  signin: {
+    request: undefined,
+    response: JSONObject,
+  }
   updateAppConfig: {
     request: {
       user: ApiUser

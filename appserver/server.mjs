@@ -109,6 +109,14 @@ app
         // XXX update to actual amplitude proxy path
         requireCsrf = false
       }
+      if (req.path.match(/^\/api\/getMe/)) {
+        // TODO find a way to configure this in the API page handler?
+        requireCsrf = false
+      }
+      if (req.path.match(/^\/api\/sessionLoginWithAppleId/)) {
+        // TODO find a way to configure this in the API page handler?
+        requireCsrf = false
+      }
       if (requireCsrf && (!csrfParam || csrfParam !== csrfCookie)) {
         // all write requests must have a non-empty csrf body param, and a csrf
         // cookie, and they must match.

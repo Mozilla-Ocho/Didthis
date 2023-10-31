@@ -23,9 +23,11 @@ export class AppShellAPI {
 
   async request<T extends keyof AppRequestMethods>(
     method: T,
-    payload: AppRequestMethods[T]['request']
+    payload?: AppRequestMethods[T]['request']
   ) {
-    return this.messaging.request(method, payload);
+    if (this.isInWebView()) {
+      return this.messaging.request(method, payload);
+    }
   }
 }
 

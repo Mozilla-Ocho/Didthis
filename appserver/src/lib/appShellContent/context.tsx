@@ -27,7 +27,7 @@ export default function AppShellContextProvider({
     api
       .request('ping', undefined)
       .then(() =>
-        dispatch({ type: 'update', key: 'inAppWebView', value: true })
+        dispatch({ type: 'update', key: 'appReady', value: true })
       )
     return () => api.deinit()
   }, [inAppWebView, api, dispatch])
