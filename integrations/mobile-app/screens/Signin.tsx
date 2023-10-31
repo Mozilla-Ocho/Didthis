@@ -5,6 +5,7 @@ import { RootStackParamList } from "../App";
 import { styles as globalStyles, colors } from "../styles";
 import * as AppleAuthentication from "expo-apple-authentication";
 import * as Storage from "../lib/storage";
+import * as SiteAPI from "../lib/siteApi";
 
 export type SigninScreenRouteParams = {};
 
@@ -17,8 +18,15 @@ export default function SigninScreen({ navigation }: SigninScreenProps) {
   const onSignin = async (
     credential: AppleAuthentication.AppleAuthenticationCredential
   ) => {
-    await Storage.setObject("APPLE_ID_CREDENTIAL", credential);
-    navigation.navigate("WebApp", { credential });
+    try {
+      // HACK: Not sharing cookies between app & webview, need to sign-in with both
+      await SiteAPI.signinWithCredential(credential);
+      navigation.navigate("WebApp", { credential });
+    } catch (e) {
+      // TODO: report sign-in error better
+      alert("Sign-in failed, please try again later.");
+      console.error("SIGN IN FAILED", e);
+    }
   };
 
   return (
@@ -40,10 +48,6 @@ export default function SigninScreen({ navigation }: SigninScreenProps) {
       <View style={styles.signinContainer}>
         <AppleSigninButton {...{ onSignin }} />
       </View>
-      <Text style={[styles.text]}>or</Text>
-      <Text style={[styles.text, styles.textNoAccountLink]}>
-        Use Didthis without an account
-      </Text>
     </SafeAreaView>
   );
 }

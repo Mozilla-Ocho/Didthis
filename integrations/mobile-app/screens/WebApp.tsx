@@ -1,14 +1,13 @@
 import useAppShellHost from "../lib/appShellHost";
 import { useEffect, useRef, useState } from "react";
 import WebView, { WebViewNavigation } from "react-native-webview";
-import { SafeAreaView, StatusBar, StyleSheet } from "react-native";
+import { Text, SafeAreaView, StatusBar, StyleSheet } from "react-native";
 import WebViewNavToolbar from "../components/WebViewNavToolbar";
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../App";
 import Config from "../lib/config";
 import Loader from "../components/Loader";
 import * as AppleAuthentication from "expo-apple-authentication";
-import { useRoute } from "@react-navigation/native";
 import { Payload } from "../lib/appShellHost/messaging";
 
 const { siteBaseUrl, originWhitelist } = Config;
@@ -23,7 +22,7 @@ export type WebAppScreenProps = {} & StackScreenProps<
 >;
 
 export default function WebAppScreen({ route }: WebAppScreenProps) {
-  const { credential } = route.params;
+  const { credential } = route.params || {};
   const appShellHost = useAppShellHost();
   const { messaging } = appShellHost;
   const { webContentReady } = appShellHost.state;
@@ -46,7 +45,6 @@ export default function WebAppScreen({ route }: WebAppScreenProps) {
         timeSent: Date.now(),
         credential: credential as unknown as Payload,
       });
-      console.log("SENT CREDENTIAL", Date.now());
     }
   }, [webContentReady, messaging, credential]);
 

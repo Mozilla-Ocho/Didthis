@@ -5,6 +5,7 @@ import { NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../App";
 import { Payload } from "./messaging";
 import { ApiUser } from "../types";
+import * as SiteAPI from "../siteApi";
 import Constants from "expo-constants";
 
 const { siteBaseUrl } = Constants.expoConfig.extra;
@@ -24,15 +25,7 @@ export default class AppShellHostAPI {
       dispatch,
       navigation,
     });
-
-    if (!this.messaging) return;
-
-    this.messaging.registerMethod("ping", this.handlePing.bind(this));
-    this.messaging.registerMethod("useScreen", this.handleUseScreen.bind(this));
-    this.messaging.registerMethod(
-      "updateAppConfig",
-      this.handleUpdateAppConfig.bind(this)
-    );
+    this.registerDefaultMethods();
   }
 
   navigateToPath(path: string) {
@@ -43,6 +36,22 @@ export default class AppShellHostAPI {
 
   get messaging() {
     return this.state?.messaging;
+  }
+
+  registerDefaultMethods() {
+    if (!this.messaging) return;
+
+    // TODO: declare these in a type shared with the server side
+    const methods = {
+      ping: this.handlePing,
+      useScreen: this.handleUseScreen,
+      updateAppConfig: this.handleUpdateAppConfig,
+      signin: this.handleSignin,
+    };
+
+    for (const [name, method] of Object.entries(methods)) {
+      this.messaging.registerMethod(name, method.bind(this));
+    }
   }
 
   async handlePing(payload: Payload) {
@@ -81,5 +90,10 @@ export default class AppShellHostAPI {
     // @ts-ignore throw a runtime error if web content asks for an unknown route
     this.navigation.navigate(payload.screen, { requestId: id, payload });
     return response;
+  }
+
+  async handleSignin(payload: Payload, id: string) {
+    await SiteAPI.resetSignin();
+    this.navigation.navigate("Signin");
   }
 }
