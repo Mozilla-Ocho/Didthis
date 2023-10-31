@@ -12,6 +12,7 @@ import { observer } from 'mobx-react-lite'
 import { useCallback, useState } from 'react'
 import ImageUpload, { UploadCallback } from '../ImageUpload'
 import { Button, CloudinaryImage, Input, Textarea } from '../uiLib'
+import { useAppShellTopBar } from '@/lib/appShellContent'
 
 class FormStore {
   name: string
@@ -335,9 +336,7 @@ const UserForm = observer(() => {
     return <></>
   }
   const [formStore] = useState(() => new FormStore(user, store.apiClient))
-  const handleSubmit = (e: React.FormEvent) => {
-    e.stopPropagation()
-    e.preventDefault()
+  const performSubmit = () => {
     // leave it spinning through the page nav
     formStore.setSpinning(true)
     store.saveProfile(
@@ -345,6 +344,26 @@ const UserForm = observer(() => {
       formStore.hasUserSlug() ? formStore.userSlug.trim() : undefined
     )
   }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.stopPropagation()
+    e.preventDefault()
+    performSubmit();
+  }
+  const handleCancel = () => store.goBack();
+
+  useAppShellTopBar(
+    {
+      show: true,
+      title: "Account details",
+      leftIsBack: true,
+      leftLabel: 'Back',
+      rightLabel: 'Save'
+    },
+    [],
+    handleCancel,
+    performSubmit
+  )
+
   const setName = (e: React.ChangeEvent<HTMLInputElement>) => {
     formStore.setName(e.target.value)
   }
@@ -549,7 +568,7 @@ const UserForm = observer(() => {
           </Button>
           <Button
             intent="secondary"
-            onClick={() => store.goBack()}
+            onClick={handleCancel}
             className="w-full sm:w-[150px]"
             trackEvent={trackingEvents.bcDiscardChanges}
             trackEventOpts={{ fromPage: 'userEdit' }}

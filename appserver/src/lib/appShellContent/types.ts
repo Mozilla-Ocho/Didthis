@@ -4,6 +4,8 @@ import { AppleAuthenticationCredential } from '../appleAuth'
 export type AppMessages = {
   response: JSONObject
   appleCredential: { credential: AppleAuthenticationCredential }
+  topNavLeftPress: { label: string },
+  topNavRightPress: { label: string },
 }
 
 export type AppRequestMethods = {
@@ -19,6 +21,16 @@ export type AppRequestMethods = {
     request: {
       user: ApiUser
       links: Record<string, string>
+    }
+    response: JSONObject
+  }
+  updateTopNav: {
+    request: {
+      show: boolean,
+      title?: string,
+      leftLabel?: string,
+      rightLabel?: string,
+      leftIsBack?: boolean,
     }
     response: JSONObject
   }

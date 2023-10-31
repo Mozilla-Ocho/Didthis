@@ -27,9 +27,11 @@ import PageTitle from '../PageTitle'
 import OgMeta from '../OgMeta'
 import RemindersAndAlerts from '../RemindersAndAlerts'
 import ViralWaitlistBlurb from '../ViralWaitlistBlurb'
+import useAppShell, { useAppShellTopBar } from '@/lib/appShellContent'
 
 const ProjectPage = observer(
   ({ targetUser }: { targetUser: ApiUser | false }) => {
+    useAppShellTopBar({ show: false });
     // const store = useStore();
     if (!targetUser) return <NotFound>user not found</NotFound>
     const router = useRouter()

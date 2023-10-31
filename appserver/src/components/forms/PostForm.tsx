@@ -26,6 +26,7 @@ import { trackingEvents } from '@/lib/trackingEvents'
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
 import dayjs, { Dayjs } from 'dayjs'
 import { getExifCreatedAtMillis } from '@/lib/cloudinaryConfig'
+import useAppShell, { useAppShellTopBar } from '@/lib/appShellContent'
 
 class PostStore {
   id: string
@@ -463,17 +464,15 @@ const PostForm = observer((props: Props) => {
   const { mode } = props
   const router = useRouter()
   const store = useStore()
-  if (!store.user) return <></>
+
   let defaultPid = getParamString(router, 'projectId')
-  if (mode === 'new' && !store.user.profile.projects[defaultPid])
+  if (mode === 'new' && store.user && !store.user.profile.projects[defaultPid])
     defaultPid = 'new'
   const [postStore] = useState(
     () =>
       new PostStore(mode, defaultPid, mode === 'edit' ? props.post : undefined)
   )
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
+  const performSubmit = () => {
     postStore.setSpinning(true)
     store
       .savePost(postStore.getApiPost(), mode, postStore.mediaType)
@@ -486,6 +485,11 @@ const PostForm = observer((props: Props) => {
           pathBuilder.post(store.user.systemSlug, newPost.projectId, newPost.id)
         )
       })
+  }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    performSubmit()
   }
   const handleMediaType = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log('handleMediaType', e)
@@ -500,6 +504,21 @@ const PostForm = observer((props: Props) => {
   const handleCancel = () => {
     store.goBack()
   }
+
+  useAppShellTopBar(
+    {
+      show: true,
+      title: mode === 'new' ? 'Create post' : 'Edit post',
+      leftIsBack: true,
+      leftLabel: 'Back',
+      rightLabel: mode === 'new' ? 'Add' : 'Save',
+    },
+    [mode],
+    handleCancel,
+    performSubmit
+  )
+
+  if (!store.user) return <></>
   return (
     <div>
       <form

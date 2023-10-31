@@ -16,6 +16,7 @@ import type { UploadCallback } from '../ImageUpload'
 import { makeAutoObservable } from 'mobx'
 import { trackingEvents } from '@/lib/trackingEvents'
 import { ClaimTrialAccountButton } from '../auth/ClaimTrialAccountButton'
+import { useAppShellTopBar } from '@/lib/appShellContent'
 
 class ProjectStore {
   title: string
@@ -121,9 +122,7 @@ const ProjectForm = observer((props: Props) => {
         mode === 'edit' ? props.project : undefined
       )
   )
-  const handleSubmit = (e: React.FormEvent) => {
-    e.stopPropagation()
-    e.preventDefault()
+  const performSubmit = () => {
     projectStore.setSpinning(true)
     store
       .saveProject(
@@ -139,6 +138,11 @@ const ProjectForm = observer((props: Props) => {
         if (!store.user) return
         router.push(pathBuilder.project(store.user.systemSlug, newProject.id))
       })
+  }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.stopPropagation()
+    e.preventDefault()
+    performSubmit();
   }
   const setTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
     projectStore.setTitle(e.target.value)
@@ -165,6 +169,20 @@ const ProjectForm = observer((props: Props) => {
   const handleCancel = () => {
     store.goBack()
   }
+
+  useAppShellTopBar(
+    {
+      show: true,
+      title: `${mode === 'new' ? 'Create' : 'Edit'} project`,
+      leftIsBack: true,
+      leftLabel: 'Back',
+      rightLabel: mode === 'new' ? 'Create' : 'Save'
+    },
+    [mode],
+    handleCancel,
+    performSubmit
+  )
+
   return (
     <div>
       <form
