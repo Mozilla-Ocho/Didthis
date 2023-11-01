@@ -15,6 +15,7 @@
     "@react-navigation/stack": "^6.3.17",
     "@reduxjs/toolkit": "^1.9.5",
     "@shopify/flash-list": "1.4.3",
+    "@types/set-cookie-parser": "^2.4.5",
     "expo": "^49.0.0",
     "expo-apple-authentication": "~6.1.0",
     "expo-constants": "~14.4.2",
@@ -40,7 +41,8 @@
     "react-native-web": "~0.19.6",
     "react-native-webview": "13.2.2",
     "react-navigation-stack": "^2.10.4",
-    "react-redux": "^8.1.2"
+    "react-redux": "^8.1.2",
+    "set-cookie-parser": "^2.6.0"
   },
   "devDependencies": {
     "@babel/core": "^7.19.3",
@@ -75,6 +77,9 @@
   },
   "jest": {
     "preset": "jest-expo",
+    "setupFiles": [
+      "./jestSetupFile.js"
+    ],
     "transformIgnorePatterns": [
       "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)"
     ]

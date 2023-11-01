@@ -1,5 +1,6 @@
 import Config from "./config";
 import * as AppleAuthentication from "expo-apple-authentication";
+import SetCookie from "set-cookie-parser";
 import * as Storage from "./storage";
 
 const { siteBaseUrl } = Config;
@@ -51,17 +52,15 @@ export async function resetSignin() {
   }
 }
 
-async function extractSessionCookie(resp: Response) {
-  for (const [headerName, headerValue] of resp.headers.entries()) {
-    if ("set-cookie" !== headerName) continue;
-
-    const parts = headerValue.split(/; ?/g);
-    if (parts.length === 0) continue;
-
-    const [name, value] = parts[0].split(/=/);
-    if (SESSION_COOKIE_NAME !== name) continue;
-
-    return value;
+export async function extractSessionCookie(resp: Response) {
+  // See: https://github.com/nfriedly/set-cookie-parser#usage-in-react-native-and-with-some-other-fetch-implementations
+  const cookieHeader = resp.headers.get("set-cookie");
+  const splitCookieHeader = SetCookie.splitCookiesString(cookieHeader);
+  const cookies = SetCookie.parse(splitCookieHeader);
+  for (const cookie of cookies) {
+    if (SESSION_COOKIE_NAME === cookie.name) {
+      return cookie.value;
+    }
   }
   return null;
 }
