@@ -61,29 +61,23 @@ function ConditionalTopNav() {
   const { topNav } = appShellHost.state;
   if (!topNav?.show) return;
 
-  const { title, leftLabel, rightLabel, leftIsBack } = topNav;
-
-  let onLeftPress = undefined;
-  if (leftLabel) {
-    onLeftPress = () =>
-      messaging.postMessage("topNavLeftPress", { label: leftLabel });
-  }
-
-  let onRightPress = undefined;
-  if (rightLabel) {
-    onRightPress = () =>
-      messaging.postMessage("topNavRightPress", { label: rightLabel });
-  }
+  const onLeftPress = () =>
+    messaging.postMessage("topNavLeftPress", { label: topNav.leftLabel });
+  const onRightPress = () =>
+    messaging.postMessage("topNavRightPress", { label: topNav.rightLabel });
+  const onSharePress = () =>
+    messaging.postMessage("topNavSharePress", { label: "Share" });
+  const onEditPress = () =>
+    messaging.postMessage("topNavEditPress", { label: "Edit" });
 
   return (
     <TopNav
       {...{
-        title,
-        leftLabel,
-        leftIsBack,
+        ...topNav,
         onLeftPress,
-        rightLabel,
         onRightPress,
+        onSharePress,
+        onEditPress,
       }}
     />
   );

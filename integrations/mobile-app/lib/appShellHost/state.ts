@@ -1,19 +1,12 @@
 import { useReducer, Dispatch } from "react";
 import { ApiUser } from "../types";
+import { AppRequestMethods } from "./types";
 
 export type State = {
   webContentReady: boolean;
   user?: ApiUser;
   links: Record<string, string>;
-  topNav?: {
-    show?: boolean;
-    title?: string;
-    leftIsBack?: boolean;
-    leftIsDisabled?: boolean;
-    leftLabel?: string;
-    rightIsDisabled?: boolean;
-    rightLabel?: string;
-  };
+  topNav?: AppRequestMethods["updateTopNav"]["request"];
 };
 
 export function createInitialState(): State {

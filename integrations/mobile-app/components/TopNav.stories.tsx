@@ -53,15 +53,21 @@ function MockAppDecorator(
 
 type Story = StoryObj<SubjectType>;
 
-const baseArgs = {
+const baseArgs: Partial<TopNavProps> = {
   title: "Did this example?",
   leftIsBack: false,
   leftIsDisabled: false,
   leftLabel: "Cancel",
   rightIsDisabled: false,
   rightLabel: "Save",
+  showShare: false,
+  shareIsDisabled: false,
+  showEdit: false,
+  editIsDisabled: false,
   onLeftPress: action("onLeftPress"),
   onRightPress: action("onRightPress"),
+  onSharePress: action("onSharePress"),
+  onEditPress: action("onEditPress"),
 };
 
 export const Default: Story = {
@@ -102,4 +108,8 @@ export const TitleOnly: Story = {
 
 export const RightDisabled: Story = {
   args: { ...baseArgs, rightIsDisabled: true },
+};
+
+export const ShareAndEdit: Story = {
+  args: { ...baseArgs, rightLabel: undefined, showShare: true, showEdit: true },
 };

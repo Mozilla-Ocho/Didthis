@@ -43,7 +43,10 @@ function AppMainStack({}: AppMainStackProps) {
   return (
     <Stack.Navigator
       detachInactiveScreens={false}
-      screenOptions={{ headerShown: false }}
+      screenOptions={{
+        headerShown: false,
+        gestureEnabled: false,
+      }}
     >
       <Stack.Screen name="Startup" component={StartupScreen} />
       <Stack.Screen name="Signin" component={SigninScreen} />

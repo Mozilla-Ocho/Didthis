@@ -9,6 +9,8 @@ export type AppMessages = {
   appleCredential: { credential: AppleAuthenticationCredential };
   topNavLeftPress: { label: string };
   topNavRightPress: { label: string };
+  topNavSharePress: { label: string };
+  topNavEditPress: { label: string };
 };
 
 export type AppRequestMethods = {
@@ -33,13 +35,17 @@ export type AppRequestMethods = {
   };
   updateTopNav: {
     request: {
-      show: boolean;
+      show?: boolean;
       title?: string;
       leftIsBack?: boolean;
       leftLabel?: string;
       leftIsDisabled?: boolean;
       rightLabel?: string;
       rightIsDisabled?: boolean;
+      showShare?: boolean;
+      shareIsDisabled?: boolean;
+      showEdit?: boolean;
+      editIsDisabled?: boolean;
     };
     response: JSONObject;
   };
@@ -73,7 +79,7 @@ export type DeferredResponse = {
   [K in AppRequestMethodNames]: {
     resolve: (payload: AppRequestMethods[K]["response"]) => void;
     reject: (error: any) => void;
-  }
+  };
 }[AppRequestMethodNames];
 
 export type Success = { success: true };
