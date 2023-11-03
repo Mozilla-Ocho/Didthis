@@ -37,8 +37,8 @@ export default function AppShellContextProvider({
   // for routes not using it.
   useEffect(() => {
     const handleRouteChange = () => api.request('updateTopNav', { show: false })
-    router.events.on('routeChangeStart', handleRouteChange)
-    return () => router.events.off('routeChangeStart', handleRouteChange)
+    router.events.on('routeChangeComplete', handleRouteChange)
+    return () => router.events.off('routeChangeComplete', handleRouteChange)
   }, [api, router])
 
   // TODO: Send the app messages on all route changes? Since they're
