@@ -1,10 +1,7 @@
 import { useReducer, Dispatch } from "react";
-import AppShellHostAPI from "./api";
-import MessageHandler from "./messaging";
 import { ApiUser } from "../types";
 
 export type State = {
-  messaging: MessageHandler;
   webContentReady: boolean;
   user?: ApiUser;
   links: Record<string, string>;
@@ -21,7 +18,6 @@ export type State = {
 
 export function createInitialState(): State {
   return {
-    messaging: new MessageHandler(),
     webContentReady: false,
     links: {},
   };
@@ -53,11 +49,8 @@ export function statePropertyUpdateAction<
 
 export function reducer(state: State, action: Action) {
   switch (action.type) {
-    case "update": {
-      // Treat "messaging" as read-only
-      if (action.key === "messaging") return state;
+    case "update":
       return { ...state, [action.key]: action.value };
-    }
     default:
       return state;
   }

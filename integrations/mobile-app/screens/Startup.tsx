@@ -21,7 +21,6 @@ export type StartupScreenProps = {} & StackScreenProps<
 export default function StartupScreen({ navigation }: StartupScreenProps) {
   useEffect(() => {
     SiteAPI.fetchSignedInUser().then((apiUser) => {
-      console.log("SIGNED IN USER", apiUser);
       navigation.navigate("WebApp");
     }).catch(err => {
       navigation.navigate("Signin");

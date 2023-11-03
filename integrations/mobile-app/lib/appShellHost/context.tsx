@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { createContext, ReactNode, useMemo } from "react";
+import { createContext, ReactNode, useEffect, useMemo, useRef } from "react";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { createInitialState, useAppShellHostState } from "./state";
 import AppShellHostAPI from "./api";
 import { RootStackParamList } from "../../App";
+import MessageHandler from "./messaging";
 
 export type State = ReturnType<typeof createInitialState>;
 
@@ -18,11 +19,12 @@ export type AppShellHostContextProps = {
 export default function AppShellHostContextProvider({
   children,
 }: AppShellHostContextProps) {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [state, dispatch] = useAppShellHostState();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const messaging = useMemo(() => new MessageHandler(), []);
   const appShellHostAPI = useMemo(
-    () => new AppShellHostAPI(state, dispatch, navigation),
-    [state, dispatch, navigation]
+    () => new AppShellHostAPI({ state, dispatch, navigation, messaging }),
+    [state, dispatch, navigation, messaging]
   );
   return (
     <AppShellHostContext.Provider value={appShellHostAPI}>
