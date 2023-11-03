@@ -347,22 +347,19 @@ const UserForm = observer(() => {
   const handleSubmit = (e: React.FormEvent) => {
     e.stopPropagation()
     e.preventDefault()
-    performSubmit();
+    performSubmit()
   }
-  const handleCancel = () => store.goBack();
+  const handleCancel = () => store.goBack()
 
-  useAppShellTopBar(
-    {
-      show: true,
-      title: "Account details",
-      leftIsBack: true,
-      leftLabel: 'Back',
-      rightLabel: 'Save'
-    },
-    [],
-    handleCancel,
-    performSubmit
-  )
+  useAppShellTopBar({
+    show: true,
+    title: 'Account details',
+    leftIsBack: true,
+    leftLabel: 'Back',
+    rightLabel: 'Save',
+    onLeftPress: handleCancel,
+    onRightPress: performSubmit,
+  })
 
   const setName = (e: React.ChangeEvent<HTMLInputElement>) => {
     formStore.setName(e.target.value)
@@ -396,8 +393,7 @@ const UserForm = observer(() => {
         {user.isTrial && (
           <p className="my-4 p-4 text-sm bg-yellow-100">
             Heads up: account details are not editable or publicly visible until
-            you{' '}
-            <ClaimTrialAccountButton intent="link" text="sign up" />.
+            you <ClaimTrialAccountButton intent="link" text="sign up" />.
           </p>
         )}
       </div>

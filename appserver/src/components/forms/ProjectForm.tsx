@@ -142,7 +142,7 @@ const ProjectForm = observer((props: Props) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.stopPropagation()
     e.preventDefault()
-    performSubmit();
+    performSubmit()
   }
   const setTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
     projectStore.setTitle(e.target.value)
@@ -170,18 +170,15 @@ const ProjectForm = observer((props: Props) => {
     store.goBack()
   }
 
-  useAppShellTopBar(
-    {
-      show: true,
-      title: `${mode === 'new' ? 'Create' : 'Edit'} project`,
-      leftIsBack: true,
-      leftLabel: 'Back',
-      rightLabel: mode === 'new' ? 'Create' : 'Save'
-    },
-    [mode],
-    handleCancel,
-    performSubmit
-  )
+  useAppShellTopBar({
+    show: true,
+    title: `${mode === 'new' ? 'Create' : 'Edit'} project`,
+    leftIsBack: true,
+    leftLabel: 'Back',
+    rightLabel: mode === 'new' ? 'Create' : 'Save',
+    onLeftPress: handleCancel,
+    onRightPress: performSubmit,
+  })
 
   return (
     <div>
@@ -301,8 +298,9 @@ const ProjectForm = observer((props: Props) => {
           </p>
           {user.isTrial && (
             <p className="my-4 p-4 text-sm bg-yellow-100">
-              Heads up: To make a project public (and to manage it from other devices),
-              you’ll need to <ClaimTrialAccountButton intent="link" text="sign up" /> first.
+              Heads up: To make a project public (and to manage it from other
+              devices), you’ll need to{' '}
+              <ClaimTrialAccountButton intent="link" text="sign up" /> first.
             </p>
           )}
         </div>

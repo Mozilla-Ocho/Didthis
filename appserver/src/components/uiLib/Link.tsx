@@ -68,6 +68,7 @@ const linkCVA = cva('link', {
 })
 
 interface LinkProps extends VariantProps<typeof linkCVA> {
+  id?: string
   href: string
   children: ReactNode
   className?: string
@@ -79,6 +80,7 @@ interface LinkProps extends VariantProps<typeof linkCVA> {
 }
 
 const Link: React.FC<LinkProps> = ({
+  id,
   href,
   intent,
   className,
@@ -97,6 +99,7 @@ const Link: React.FC<LinkProps> = ({
   if (external) {
     return (
       <a
+        id={id}
         rel="nofollow noreferer"
         target="_blank"
         className={linkCVA({ intent, className })}
@@ -109,6 +112,7 @@ const Link: React.FC<LinkProps> = ({
   }
   return (
     <NextLink
+      id={id}
       target={newTab ? '_blank' : undefined}
       className={linkCVA({ intent, className })}
       href={href}

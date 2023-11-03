@@ -505,18 +505,15 @@ const PostForm = observer((props: Props) => {
     store.goBack()
   }
 
-  useAppShellTopBar(
-    {
-      show: true,
-      title: mode === 'new' ? 'Create post' : 'Edit post',
-      leftIsBack: true,
-      leftLabel: 'Back',
-      rightLabel: mode === 'new' ? 'Add' : 'Save',
-    },
-    [mode],
-    handleCancel,
-    performSubmit
-  )
+  useAppShellTopBar({
+    show: true,
+    title: mode === 'new' ? 'Create post' : 'Edit post',
+    leftIsBack: true,
+    leftLabel: 'Back',
+    rightLabel: mode === 'new' ? 'Add' : 'Save',
+    onLeftPress: handleCancel,
+    onRightPress: performSubmit,
+  })
 
   if (!store.user) return <></>
   return (
