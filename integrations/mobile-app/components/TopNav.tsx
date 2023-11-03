@@ -11,8 +11,10 @@ export type TopNavProps = {
   title?: string;
   leftIsBack?: boolean;
   leftLabel?: string;
+  leftIsDisabled?: boolean;
   onLeftPress?: () => any;
   rightLabel?: string;
+  rightIsDisabled?: boolean;
   onRightPress?: () => any;
 };
 
@@ -21,7 +23,9 @@ const noop = () => {};
 export default function TopNav({
   title,
   leftIsBack,
+  leftIsDisabled,
   leftLabel,
+  rightIsDisabled,
   rightLabel,
   onLeftPress,
   onRightPress,
@@ -29,10 +33,12 @@ export default function TopNav({
   const { colors } = useTheme();
 
   return (
-    <View style={{
-      // HACK: figure out why this thing insists on inserting its own margin
-      marginTop: -47
-    }}>
+    <View
+      style={{
+        // HACK: figure out why this thing insists on inserting its own margin
+        marginTop: -47,
+      }}
+    >
       <Header
         headerStyle={{
           backgroundColor: colors.background,
@@ -42,11 +48,22 @@ export default function TopNav({
         headerShadowVisible={true}
         headerLeft={() => (
           <HeaderSideButton
-            {...{ onPress: onLeftPress, isBack: leftIsBack, label: leftLabel }}
+            {...{
+              onPress: onLeftPress,
+              isBack: leftIsBack,
+              isDisabled: leftIsDisabled,
+              label: leftLabel,
+            }}
           />
         )}
         headerRight={() => (
-          <HeaderSideButton {...{ onPress: onRightPress, label: rightLabel }} />
+          <HeaderSideButton
+            {...{
+              onPress: onRightPress,
+              isDisabled: rightIsDisabled,
+              label: rightLabel,
+            }}
+          />
         )}
       />
     </View>
@@ -56,14 +73,15 @@ export default function TopNav({
 function HeaderSideButton({
   onPress,
   isBack,
+  isDisabled,
   label,
 }: {
   onPress: () => any;
   isBack?: boolean;
+  isDisabled?: boolean;
   label: string;
 }) {
   const { colors } = useTheme();
-  let isDisabled = !onPress;
   let style = {
     fontWeight: undefined,
     fontSize: 17,

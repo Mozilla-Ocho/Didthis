@@ -55,14 +55,21 @@ type Story = StoryObj<SubjectType>;
 
 const baseArgs = {
   title: "Did this example?",
-  onLeftPress: action("onLeftPress"),
+  leftIsBack: false,
+  leftIsDisabled: false,
   leftLabel: "Cancel",
-  onRightPress: action("onRightPress"),
+  rightIsDisabled: false,
   rightLabel: "Save",
+  onLeftPress: action("onLeftPress"),
+  onRightPress: action("onRightPress"),
 };
 
 export const Default: Story = {
   args: baseArgs,
+};
+
+export const NoTitle: Story = {
+  args: { ...baseArgs, title: undefined },
 };
 
 export const LeftOnly: Story = {
@@ -70,19 +77,18 @@ export const LeftOnly: Story = {
 };
 
 export const LeftDisabled: Story = {
-  args: { ...baseArgs, onLeftPress: undefined },
+  args: { ...baseArgs, leftIsDisabled: true },
 };
 
 export const LeftIsBack: Story = {
-  args: { ...baseArgs, leftIsBack: true, rightIsForward: true },
+  args: { ...baseArgs, leftIsBack: true },
 };
 
 export const LeftIsBackDisabled: Story = {
   args: {
     ...baseArgs,
     leftIsBack: true,
-    leftLabel: "Back",
-    onLeftPress: undefined,
+    leftIsDisabled: true,
   },
 };
 
@@ -95,5 +101,5 @@ export const TitleOnly: Story = {
 };
 
 export const RightDisabled: Story = {
-  args: { ...baseArgs, onRightPress: undefined },
+  args: { ...baseArgs, rightIsDisabled: true },
 };

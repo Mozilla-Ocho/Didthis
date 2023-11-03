@@ -1,51 +1,70 @@
-import { useReducer, Dispatch } from 'react'
-import AppShellHostAPI from './api'
-import MessageHandler from './messaging'
-import { ApiUser } from "../types"
+import { useReducer, Dispatch } from "react";
+import AppShellHostAPI from "./api";
+import MessageHandler from "./messaging";
+import { ApiUser } from "../types";
 
 export type State = {
-  messaging: MessageHandler,
-  webContentReady: boolean,
-  user?: ApiUser,
-  links: Record<string, string>,
+  messaging: MessageHandler;
+  webContentReady: boolean;
+  user?: ApiUser;
+  links: Record<string, string>;
   topNav?: {
-    show: boolean,
-    title: string,
-    leftLabel?: string,
-    rightLabel?: string,
-    leftIsBack?: boolean,
-  }
-}
+    show?: boolean;
+    title?: string;
+    leftIsBack?: boolean;
+    leftIsDisabled?: boolean;
+    leftLabel?: string;
+    rightIsDisabled?: boolean;
+    rightLabel?: string;
+  };
+};
 
 export function createInitialState(): State {
   return {
     messaging: new MessageHandler(),
     webContentReady: false,
-    links: {}
-  }
+    links: {},
+  };
 }
 
-type ObjectUpdateAction<T extends string, C extends object> = {
+export type ObjectUpdateAction<T extends string, C extends object> = {
   [K in keyof C]: {
-    type: T
-    key: K
-    value: C[K]
-  }
-}[keyof C]
+    type: T;
+    key: K;
+    value: C[K];
+  };
+}[keyof C];
 
-export type Action = ObjectUpdateAction<'update', State>
+export type StatePropertyUpdate = ObjectUpdateAction<"update", State>;
+
+export type Action = StatePropertyUpdate;
+
+export function statePropertyUpdateAction<
+  S extends State,
+  K extends keyof S,
+  V extends S[K]
+>(key: K, value: V) {
+  return {
+    type: "update",
+    key,
+    value,
+  } as StatePropertyUpdate;
+}
 
 export function reducer(state: State, action: Action) {
   switch (action.type) {
-    case 'update':
-      return { ...state, [action.key]: action.value }
+    case "update": {
+      // Treat "messaging" as read-only
+      if (action.key === "messaging") return state;
+      return { ...state, [action.key]: action.value };
+    }
     default:
-      return state
+      return state;
   }
 }
 
 export function useAppShellHostState(): [State, Dispatch<Action>] {
-  const [state, dispatch] = useReducer(reducer, null, createInitialState)
+  const [state, dispatch] = useReducer(reducer, null, createInitialState);
 
-  return [state, dispatch]
+  return [state, dispatch];
 }

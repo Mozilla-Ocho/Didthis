@@ -33,9 +33,11 @@ export type AppRequestMethods = {
     request: {
       show: boolean,
       title?: string,
-      leftLabel?: string,
-      rightLabel?: string,
       leftIsBack?: boolean,
+      leftLabel?: string,
+      leftIsDisabled?: boolean,
+      rightLabel?: string,
+      rightIsDisabled?: boolean,
     }
     response: JSONObject
   }

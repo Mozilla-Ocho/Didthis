@@ -1,13 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { createContext, ReactNode, useEffect, useMemo } from "react";
-import { Text } from "react-native";
-
-import {
-  NavigationProp,
-  useNavigation,
-} from "@react-navigation/native";
-
-import * as ImagePicker from "expo-image-picker";
+import { createContext, ReactNode, useMemo } from "react";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { createInitialState, useAppShellHostState } from "./state";
 import AppShellHostAPI from "./api";
 import { RootStackParamList } from "../../App";
@@ -31,33 +24,9 @@ export default function AppShellHostContextProvider({
     () => new AppShellHostAPI(state, dispatch, navigation),
     [state, dispatch, navigation]
   );
-
-  // HACK: Find a cleaner place to register these methods!
-  const { messaging } = state;
-  messaging.registerMethod("pickImage", async () => {
-    const result = await pickImage();
-    return JSON.parse(JSON.stringify(result));
-  });
-
   return (
     <AppShellHostContext.Provider value={appShellHostAPI}>
       {children}
     </AppShellHostContext.Provider>
   );
 }
-
-const pickImage = async () => {
-  // No permissions request is necessary for launching the image library
-  let result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ImagePicker.MediaTypeOptions.All,
-    allowsEditing: true,
-    aspect: [4, 3],
-    quality: 1,
-    exif: true,
-    base64: true,
-    allowsMultipleSelection: false,
-  });
-  if (!result.canceled) {
-    return result.assets[0];
-  }
-};

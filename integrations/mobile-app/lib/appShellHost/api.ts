@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Dispatch } from "react";
-import { Action, State } from "./state";
+import { Action, State, statePropertyUpdateAction } from "./state";
 import { NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../App";
 import { Payload } from "./messaging";
@@ -8,6 +8,7 @@ import { ApiUser } from "../types";
 import * as SiteAPI from "../siteApi";
 import Constants from "expo-constants";
 import { AppRequestMethods } from "./types";
+import * as ImagePicker from "expo-image-picker";
 
 const { siteBaseUrl } = Constants.expoConfig.extra;
 
@@ -21,11 +22,7 @@ export default class AppShellHostAPI {
     dispatch?: AppShellHostAPI["dispatch"],
     navigation?: AppShellHostAPI["navigation"]
   ) {
-    Object.assign(this, {
-      state,
-      dispatch,
-      navigation,
-    });
+    Object.assign(this, { state, dispatch, navigation });
     this.registerDefaultMethods();
   }
 
@@ -58,34 +55,21 @@ export default class AppShellHostAPI {
     }
   }
 
+  set(...args: Parameters<typeof statePropertyUpdateAction>) {
+    return this.dispatch(statePropertyUpdateAction(...args));
+  }
+
   async handlePing(payload: Payload) {
-    this.dispatch({
-      type: "update",
-      key: "webContentReady",
-      value: true,
-    });
+    this.set("webContentReady", true);
     return { message: "pong" };
   }
 
-  async handleUpdateAppConfig(payload: Payload) {
-    // HACK: should probably do some validation here?
+  async handleUpdateAppConfig(
+    payload: AppRequestMethods["updateAppConfig"]["request"]
+  ): Promise<AppRequestMethods["updateAppConfig"]["response"]> {
     const { user, links } = payload;
-
-    this.dispatch({
-      type: "update",
-      key: "user",
-      value: user as unknown as ApiUser,
-    });
-
-    this.dispatch({
-      type: "update",
-      key: "links",
-      value: {
-        ...this.state.links,
-        ...(links as State["links"]),
-      },
-    });
-
+    this.set("user", user);
+    this.set("links", { ...this.state.links, ...links });
     return { success: true };
   }
 
@@ -102,17 +86,25 @@ export default class AppShellHostAPI {
   }
 
   async handleUpdateTopNav(
-    payload: AppRequestMethods["updateTopNav"]["request"],
-    id: string
+    payload: AppRequestMethods["updateTopNav"]["request"]
   ): Promise<AppRequestMethods["updateTopNav"]["response"]> {
-    const { show, title, leftIsBack, leftLabel, rightLabel } = payload;
-    this.dispatch({
-      type: "update",
-      key: "topNav",
-      value: { show, title, leftIsBack, leftLabel, rightLabel }
-    });
+    this.set("topNav", payload);
     return { success: true };
   }
 
-  async handlePickImage(payload: Payload, id: string) {}
+  async handlePickImage(payload: Payload, id: string) {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+      exif: true,
+      base64: true,
+      allowsMultipleSelection: false,
+    });
+    if (!result.canceled) {
+      return result.assets[0];
+    }
+  }
 }
