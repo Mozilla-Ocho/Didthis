@@ -1,6 +1,6 @@
 import "react-native-gesture-handler";
 import * as React from "react";
-import { NavigationContainer } from "@react-navigation/native";
+import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import WebAppScreen, { WebAppScreenRouteParams } from "./screens/WebApp";
 import SigninScreen, { SigninScreenRouteParams } from "./screens/Signin";
 import StartupScreen, { StartupScreenRouteParams } from "./screens/Startup";
@@ -9,6 +9,7 @@ import AppShellHostContextProvider from "./lib/appShellHost/context";
 import Config from "./lib/config";
 import useAppFonts from "./lib/fonts";
 import LogoLoader from "./components/LogoLoader";
+import { colors } from "./styles";
 
 export type RootStackParamList = {
   Startup: StartupScreenRouteParams;
@@ -28,8 +29,18 @@ function App() {
     console.error(fontError);
   }
 
+  // https://reactnavigation.org/docs/themes
+  const globalTheme = {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+      background: colors["white"],
+      primary: colors["yellow-600"]
+    }
+  }
+
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={globalTheme}>
       <AppShellHostContextProvider>
         <AppMainStack />
       </AppShellHostContextProvider>
