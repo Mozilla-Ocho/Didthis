@@ -4,7 +4,9 @@ Rough notes on deployment of release builds to the App Store
 
 ## tl;dr
 
-Every commit to `main` branch results in an automated build and upload to the App Store. However, it's a manual process in the Apple App Store Connect portal to ship one of these uploaded builds to TestFlight or general release.
+- Every commit to `main` branch results in an automated build and upload to the App Store.
+- If the app version number in that commit matches a currently shipped TestFlight release, it will be automatically shipped to all users enrolled in that release.
+- If the app version number has not yet been shipped to TestFlight, a manual process to ship that version is required.
 
 ## Build automation in Bitrise
 
@@ -36,7 +38,6 @@ These previews are built and deployed to [the `mozilla-ocho-hey` EAS account](ht
 
 - [expo-pr-preview.yml](../.github/workflows/expo-pr-preview.yml)
 
-
 ## App Store Connect
 
 [App Store Connect](https://appstoreconnect.apple.com/) is the management portal for all apps. You'll need [an Apple Developer Account in the Mozilla team](./development.md) to access the portal.
@@ -53,7 +54,9 @@ However, some aspects of the app are managed by Mozilla Release Engineering. If 
 
 ## Shipping to TestFlight
 
-Shipping to TestFlight basically consists of manually selecting an uploaded build and releasing it to a testing group in App Store Connect.
+Shipping to TestFlight basically consists of manually selecting a version and releasing it to a testing group in App Store Connect.
+
+Each subsequent build for that version will be automatically shipped.
 
 Builds should be performed & uploaded via Bitrise upon pushes to the `main` branch, so this part should be automated.
 
