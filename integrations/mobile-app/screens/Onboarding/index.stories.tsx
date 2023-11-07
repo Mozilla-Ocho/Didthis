@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-native";
-import OnboardingScreen, { OnboardingScreenProps } from "./Onboarding";
+import OnboardingScreen, { OnboardingScreenProps } from ".";
 import { action } from "@storybook/addon-actions";
-import { ThemedNavigationContainer } from "../lib/storybook/decorators";
+import { ThemedNavigationContainer } from "../../lib/storybook/decorators";
 
 const Subject = OnboardingScreen;
 type SubjectProps = OnboardingScreenProps;
