@@ -14,6 +14,7 @@ export const colors = {
   "black-700": "#2C2727",
   white: "#ffffff",
   "charcoal-main": "#0d0d0d",
+  "charcoal-medium": "#bcbcbc",
   "charcoal-light": "#3d3d3d",
   "gl-black": "#1f1f1f",
 };

@@ -2,8 +2,10 @@ import { View, Text, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
 import { useNavigation, useNavigationState } from "@react-navigation/native";
 import { styles } from "./styles";
+import { colors } from "../../styles";
 import { OnboardingScreenContext } from "./context";
 import { useContext } from "react";
+import IndicatorDotImage from "../../assets/ellipse-dot.svg";
 
 export type OnboardingPaginatorProps = {};
 
@@ -20,14 +22,14 @@ export function OnboardingPaginator({}: OnboardingPaginatorProps) {
             style={styles.paginatorPageIndicator}
             key={`page-indicator-${routeNameIndex}`}
           >
-            <Image
-              // TODO: switch to using an svg fill color here rather than separate assets
-              source={
+            <IndicatorDotImage
+              width={12}
+              height={12}
+              fill={
                 routeNameIndex === index
-                  ? require("../../assets/ellipse-dot-active.svg")
-                  : require("../../assets/ellipse-dot.svg")
+                  ? colors["yellow-500"]
+                  : colors["charcoal-medium"]
               }
-              style={{ width: 12, height: 12 }}
             />
           </View>
         ))}
