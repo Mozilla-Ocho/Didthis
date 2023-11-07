@@ -59,6 +59,16 @@ export const methods: Methods = {
     return response;
   },
 
+  webviewRouterEvent: async(api, payload, id) => {
+    const { event, url } = payload;
+    console.debug("WEBVIEW ROUTER EVENT", event, url);
+
+    // TODO: match URL patterns here to decide what to do about top & bottom nav, transitions, etc
+    // TODO: show loading spinner between start / complete events?
+
+    return { success: true };
+  },
+
   signin: async (api) => {
     await SiteAPI.resetSignin();
     api.navigation.navigate("Signin");

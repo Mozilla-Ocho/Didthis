@@ -26,14 +26,21 @@ export type AppRequestMethods = {
     request: JSONObject;
     response: JSONObject;
   };
+  webviewRouterEvent: {
+    request: {
+      event: "routeChangeStart" | "routeChangeComplete";
+      url: string;
+    };
+    response: Success;
+  };
   updateAppConfig: {
     request: {
       user: ApiUser;
       links: {
-        user: string,
-        userEdit: string,
-        newPost: string,
-      }
+        user: string;
+        userEdit: string;
+        newPost: string;
+      };
     };
     response: JSONObject;
   };

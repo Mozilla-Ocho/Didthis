@@ -33,6 +33,6 @@ const styles = StyleSheet.create({
     borderTopColor: "#CAC7C1", // TODO: move to styles.ts
   },
   addButton: {
-    marginTop: -10,
+    marginTop: -25,
   }
 });
