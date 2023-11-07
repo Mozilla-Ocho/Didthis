@@ -5,10 +5,16 @@ import discordLogo from '@/assets/img/discord-logo.svg'
 import Image from 'next/image'
 import { useStore } from '@/lib/store'
 import { trackingEvents } from '@/lib/trackingEvents'
+import useAppShell from '@/lib/appShellContent'
 
 const AppFooter = observer(
   ({ unauthHomepage }: { unauthHomepage?: boolean }) => {
     const store = useStore()
+    const appShell = useAppShell()
+
+    // Hide this component when viewed in the native app shell.
+    if (appShell.inAppWebView) return <></>
+
     const discordIcon = (
       <Image className="inline" src={discordLogo} alt="discord logo" />
     )

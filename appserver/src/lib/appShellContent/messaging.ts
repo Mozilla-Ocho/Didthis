@@ -138,10 +138,11 @@ export class MessageHandler {
  */
 export function useAppShellListener<T extends keyof AppMessages>(
   expectedType: T,
-  handler: (payload: AppMessages[T], id: string) => void
+  handler?: (payload: AppMessages[T], id: string) => void
 ) {
   const listener = useRef<(evt: Event) => void>()
   useEffect(() => {
+    if (!handler) return;
     if (typeof document !== 'undefined') {
       listener.current = ev => {
         const { detail } = ev as CustomEvent

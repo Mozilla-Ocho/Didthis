@@ -27,6 +27,7 @@ import PageTitle from '../PageTitle'
 import OgMeta from '../OgMeta'
 import RemindersAndAlerts from '../RemindersAndAlerts'
 import ViralWaitlistBlurb from '../ViralWaitlistBlurb'
+import { useAppShellTopBar } from '@/lib/appShellContent'
 
 const ProjectPage = observer(
   ({ targetUser }: { targetUser: ApiUser | false }) => {
@@ -89,6 +90,18 @@ const ProjectPage = observer(
     const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
       e.target.select()
     }
+
+    useAppShellTopBar({
+      show: true,
+      leftIsBack: true,
+      showShare: true,
+      showEdit: true,
+      // HACK: probably want some better handlers here?
+      onLeftPress: () => store.goBack(),
+      onSharePress: () => document.getElementById('buttonShare')?.click(),
+      onEditPress: () => document.getElementById('buttonEdit')?.click(),
+    })
+
     return (
       <>
         <PageTitle title={project.title} />
@@ -134,8 +147,11 @@ const ProjectPage = observer(
           </Link>
         </ConfirmationModal>
         <Breadcrumbs crumbs={[{ name: project.title }]} />
-        <ViralWaitlistBlurb fromPage='project' targetUserSlug={targetUser.publicPageSlug} />
-        <RemindersAndAlerts/>
+        <ViralWaitlistBlurb
+          fromPage="project"
+          targetUserSlug={targetUser.publicPageSlug}
+        />
+        <RemindersAndAlerts />
         <PagePad>
           <UserPreview user={targetUser} compact={true} />
 
@@ -180,15 +196,20 @@ const ProjectPage = observer(
             {store.user && // store.user redundant when isSelf but tsserver needs it
               isSelf && (
                 <Link
+                  id="buttonEdit"
                   className="w-full sm:w-auto"
                   intent="secondary"
-                  href={pathBuilder.projectEdit(store.user.systemSlug, project.id)}
+                  href={pathBuilder.projectEdit(
+                    store.user.systemSlug,
+                    project.id
+                  )}
                   trackEvent={trackingEvents.bcEditProject}
                 >
                   Edit project
                 </Link>
               )}
             <Button
+              id="buttonShare"
               className="w-full sm:w-auto"
               intent="secondary"
               onClick={

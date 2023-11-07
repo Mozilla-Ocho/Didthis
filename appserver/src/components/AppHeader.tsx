@@ -7,9 +7,15 @@ import LogoWordmarkSvg from '@/assets/img/didthis_wordmark_light.svg'
 import Image from 'next/image'
 import { LoginButton } from './auth/LoginButton'
 import { trackingEvents } from '@/lib/trackingEvents'
+import useAppShell from '@/lib/appShellContent'
 
 const AppHeader = observer(({ isThe404 }: { isThe404?: boolean }) => {
   const store = useStore()
+  const appShell = useAppShell()
+
+  // Hide this component when viewed in the native app shell.
+  if (appShell.inAppWebView) return <></>
+
   return (
     <div>
       <PagePad wide noPadY>
