@@ -1,31 +1,27 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Dispatch } from "react";
-import { Action, State } from "./state";
+import { Action, State, statePropertyUpdateAction } from "./state";
 import { NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../App";
-import { Payload } from "./messaging";
-import { ApiUser } from "../types";
-import * as SiteAPI from "../siteApi";
 import Constants from "expo-constants";
+import MessageHandler from "./messaging";
+import { WebViewMessageEvent } from "react-native-webview";
 
 const { siteBaseUrl } = Constants.expoConfig.extra;
 
 export default class AppShellHostAPI {
-  state?: State;
-  dispatch?: Dispatch<Action> | undefined;
-  navigation?: NavigationProp<RootStackParamList>;
+  messaging: MessageHandler;
+  state: State;
+  dispatch: Dispatch<Action> | undefined;
+  navigation: NavigationProp<RootStackParamList>;
 
-  constructor(
-    state?: AppShellHostAPI["state"],
-    dispatch?: AppShellHostAPI["dispatch"],
-    navigation?: AppShellHostAPI["navigation"]
-  ) {
-    Object.assign(this, {
-      state,
-      dispatch,
-      navigation,
-    });
-    this.registerDefaultMethods();
+  constructor(context?: {
+    messaging: MessageHandler;
+    state: State;
+    dispatch: Dispatch<Action> | undefined;
+    navigation: NavigationProp<RootStackParamList>;
+  }) {
+    Object.assign(this, context);
   }
 
   navigateToPath(path: string) {
@@ -34,66 +30,20 @@ export default class AppShellHostAPI {
     webview.injectJavaScript(`window.location = "${siteBaseUrl}${path}"`);
   }
 
-  get messaging() {
-    return this.state?.messaging;
+  set(...args: Parameters<typeof statePropertyUpdateAction>) {
+    return this.dispatch(statePropertyUpdateAction(...args));
   }
 
-  registerDefaultMethods() {
-    if (!this.messaging) return;
-
-    // TODO: declare these in a type shared with the server side
-    const methods = {
-      ping: this.handlePing,
-      useScreen: this.handleUseScreen,
-      updateAppConfig: this.handleUpdateAppConfig,
-      signin: this.handleSignin,
-    };
-
-    for (const [name, method] of Object.entries(methods)) {
-      this.messaging.registerMethod(name, method.bind(this));
-    }
+  get onMessage() {
+    return (event: WebViewMessageEvent) =>
+      this.messaging.handleMessage(this, event);
   }
 
-  async handlePing(payload: Payload) {
-    this.dispatch({
-      type: "update",
-      key: "webContentReady",
-      value: true,
-    });
-    return { message: "pong" };
+  setWebView(...args: Parameters<MessageHandler["setWebView"]>) {
+    return this.messaging.setWebView(...args)
   }
 
-  async handleUpdateAppConfig(payload: Payload) {
-    // HACK: should probably do some validation here?
-    const { user, links } = payload;
-
-    this.dispatch({
-      type: "update",
-      key: "user",
-      value: user as unknown as ApiUser,
-    });
-
-    this.dispatch({
-      type: "update",
-      key: "links",
-      value: {
-        ...this.state.links,
-        ...(links as State["links"]),
-      },
-    });
-
-    return { success: true };
-  }
-
-  async handleUseScreen(payload: Payload, id: string) {
-    const response = this.messaging.deferResponse(id);
-    // @ts-ignore throw a runtime error if web content asks for an unknown route
-    this.navigation.navigate(payload.screen, { requestId: id, payload });
-    return response;
-  }
-
-  async handleSignin(payload: Payload, id: string) {
-    await SiteAPI.resetSignin();
-    this.navigation.navigate("Signin");
+  postMessage(...args: Parameters<MessageHandler["postMessage"]>) {
+    return this.messaging.postMessage(...args)
   }
 }

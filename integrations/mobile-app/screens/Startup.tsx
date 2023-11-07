@@ -21,7 +21,6 @@ export type StartupScreenProps = {} & StackScreenProps<
 export default function StartupScreen({ navigation }: StartupScreenProps) {
   useEffect(() => {
     SiteAPI.fetchSignedInUser().then((apiUser) => {
-      console.log("SIGNED IN USER", apiUser);
       navigation.navigate("WebApp");
     }).catch(err => {
       navigation.navigate("Signin");
@@ -38,7 +37,7 @@ export default function StartupScreen({ navigation }: StartupScreenProps) {
 const styles = StyleSheet.create({
   screen: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: colors["yellow-100"],
+    backgroundColor: colors["white"],
     flex: 1,
     flexDirection: "column",
     justifyContent: "center",

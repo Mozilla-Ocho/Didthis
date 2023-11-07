@@ -29,7 +29,6 @@ function MockAppDecorator(
       style={{
         ...StyleSheet.absoluteFillObject,
         flexDirection: "column",
-        marginTop: -47, // HACK: account for nav header asserting its own margin in storybook
       }}
     >
       <View>
@@ -54,16 +53,29 @@ function MockAppDecorator(
 
 type Story = StoryObj<SubjectType>;
 
-const baseArgs = {
+const baseArgs: Partial<TopNavProps> = {
   title: "Did this example?",
-  onLeftPress: action("onLeftPress"),
+  leftIsBack: false,
+  leftIsDisabled: false,
   leftLabel: "Cancel",
-  onRightPress: action("onRightPress"),
+  rightIsDisabled: false,
   rightLabel: "Save",
+  showShare: false,
+  shareIsDisabled: false,
+  showEdit: false,
+  editIsDisabled: false,
+  onLeftPress: action("onLeftPress"),
+  onRightPress: action("onRightPress"),
+  onSharePress: action("onSharePress"),
+  onEditPress: action("onEditPress"),
 };
 
 export const Default: Story = {
   args: baseArgs,
+};
+
+export const NoTitle: Story = {
+  args: { ...baseArgs, title: undefined },
 };
 
 export const LeftOnly: Story = {
@@ -71,19 +83,18 @@ export const LeftOnly: Story = {
 };
 
 export const LeftDisabled: Story = {
-  args: { ...baseArgs, onLeftPress: undefined },
+  args: { ...baseArgs, leftIsDisabled: true },
 };
 
 export const LeftIsBack: Story = {
-  args: { ...baseArgs, leftIsBack: true, rightIsForward: true },
+  args: { ...baseArgs, leftIsBack: true },
 };
 
 export const LeftIsBackDisabled: Story = {
   args: {
     ...baseArgs,
     leftIsBack: true,
-    leftLabel: "Back",
-    onLeftPress: undefined,
+    leftIsDisabled: true,
   },
 };
 
@@ -96,5 +107,9 @@ export const TitleOnly: Story = {
 };
 
 export const RightDisabled: Story = {
-  args: { ...baseArgs, onRightPress: undefined },
+  args: { ...baseArgs, rightIsDisabled: true },
+};
+
+export const ShareAndEdit: Story = {
+  args: { ...baseArgs, rightLabel: undefined, showShare: true, showEdit: true },
 };

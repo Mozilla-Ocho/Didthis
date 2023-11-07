@@ -1,14 +1,13 @@
 import useAppShellHost from "../lib/appShellHost";
 import { useEffect, useRef, useState } from "react";
 import WebView, { WebViewNavigation } from "react-native-webview";
-import { Text, SafeAreaView, StatusBar, StyleSheet } from "react-native";
-import WebViewNavToolbar from "../components/WebViewNavToolbar";
+import { SafeAreaView, StatusBar, StyleSheet } from "react-native";
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../App";
 import Config from "../lib/config";
 import Loader from "../components/Loader";
 import * as AppleAuthentication from "expo-apple-authentication";
-import { Payload } from "../lib/appShellHost/messaging";
+import TopNav from "../components/TopNav";
 
 const { siteBaseUrl, originWhitelist } = Config;
 
@@ -23,50 +22,63 @@ export type WebAppScreenProps = {} & StackScreenProps<
 
 export default function WebAppScreen({ route }: WebAppScreenProps) {
   const { credential } = route.params || {};
+
   const appShellHost = useAppShellHost();
-  const { messaging } = appShellHost;
-  const { webContentReady } = appShellHost.state;
 
   const webviewRef = useRef<WebView>(null);
-
-  const [webviewNavigation, setWebviewNavigation] = useState<
-    WebViewNavigation | undefined
-  >();
-
   useEffect(
-    () => messaging?.setWebView(webviewRef.current),
-    [messaging, webviewRef.current]
+    () => appShellHost.setWebView(webviewRef.current),
+    [appShellHost, webviewRef.current]
   );
 
+  const { webContentReady } = appShellHost.state || {};
   useEffect(() => {
-    if (messaging && credential && webContentReady) {
-      messaging.postMessage("appleCredential", {
-        // HACK: credential is compatible with Payload, might be a better way to handle this.
-        timeSent: Date.now(),
-        credential: credential as unknown as Payload,
-      });
+    if (credential && webContentReady) {
+      appShellHost.postMessage("appleCredential", { credential });
     }
-  }, [webContentReady, messaging, credential]);
-
-  const handleNavigationStateChange = (navState: WebViewNavigation) =>
-    setWebviewNavigation(navState);
+  }, [webContentReady, appShellHost, credential]);
 
   return (
     <SafeAreaView style={{ ...StyleSheet.absoluteFillObject }}>
       <StatusBar barStyle="dark-content" />
+      <ConditionalTopNav />
       <WebView
         source={{ uri: siteBaseUrl }}
         originWhitelist={originWhitelist}
         startInLoadingState={true}
         renderLoading={() => <Loader />}
         ref={webviewRef}
-        onNavigationStateChange={handleNavigationStateChange}
-        onMessage={messaging.onMessage}
-      />
-      <WebViewNavToolbar
-        webview={webviewRef.current}
-        webviewNavigation={webviewNavigation}
+        onMessage={appShellHost.onMessage}
       />
     </SafeAreaView>
+  );
+}
+
+function ConditionalTopNav() {
+  const appShellHost = useAppShellHost();
+  const { messaging } = appShellHost;
+
+  const { topNav } = appShellHost.state;
+  if (!topNav?.show) return;
+
+  const onLeftPress = () =>
+    messaging.postMessage("topNavLeftPress", { label: topNav.leftLabel });
+  const onRightPress = () =>
+    messaging.postMessage("topNavRightPress", { label: topNav.rightLabel });
+  const onSharePress = () =>
+    messaging.postMessage("topNavSharePress", { label: "Share" });
+  const onEditPress = () =>
+    messaging.postMessage("topNavEditPress", { label: "Edit" });
+
+  return (
+    <TopNav
+      {...{
+        ...topNav,
+        onLeftPress,
+        onRightPress,
+        onSharePress,
+        onEditPress,
+      }}
+    />
   );
 }
