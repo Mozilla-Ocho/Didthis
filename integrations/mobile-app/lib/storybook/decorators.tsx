@@ -6,12 +6,12 @@ import {
   NavigationContainer,
 } from "@react-navigation/native";
 import { SafeAreaView, useColorScheme, StyleSheet } from "react-native";
+import { globalTheme } from "../../styles";
 
 export function ThemedNavigationContainer<TArgs>(
   Story: PartialStoryFn<ReactNativeFramework, TArgs>
 ) {
-  const colorScheme = useColorScheme();
-  const theme = colorScheme === "dark" ? DarkTheme : DefaultTheme;
+  const theme = globalTheme;
   return (
     <NavigationContainer theme={theme}>
       <Story />
@@ -22,17 +22,15 @@ export function ThemedNavigationContainer<TArgs>(
 export function ThemedSafeViewDecorator<TArgs>(
   Story: PartialStoryFn<ReactNativeFramework, TArgs>
 ) {
-  const colorScheme = useColorScheme();
-  const theme = colorScheme === "dark" ? DarkTheme : DefaultTheme;
+  const theme = globalTheme;
   const { colors } = theme;
-
   return (
     <NavigationContainer theme={theme}>
       <SafeAreaView
         style={{
           ...StyleSheet.absoluteFillObject,
           flexDirection: "column",
-          backgroundColor: colors.background
+          backgroundColor: colors.background,
         }}
       >
         <Story />

@@ -3,11 +3,11 @@ import { Dispatch } from "react";
 import { Action, State, statePropertyUpdateAction } from "./state";
 import { NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../App";
-import Constants from "expo-constants";
+import Config from "../../lib/config";
 import MessageHandler from "./messaging";
 import { WebViewMessageEvent } from "react-native-webview";
 
-const { siteBaseUrl } = Constants.expoConfig.extra;
+const { siteBaseUrl, originWhitelist } = Config;
 
 export default class AppShellHostAPI {
   messaging: MessageHandler;

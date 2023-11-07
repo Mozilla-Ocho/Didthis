@@ -29,7 +29,11 @@ export type AppRequestMethods = {
   updateAppConfig: {
     request: {
       user: ApiUser;
-      links: Record<string, string>;
+      links: {
+        user: string,
+        userEdit: string,
+        newPost: string,
+      }
     };
     response: JSONObject;
   };

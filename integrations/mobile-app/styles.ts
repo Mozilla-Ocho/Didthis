@@ -10,6 +10,7 @@ export const colors = {
   "yellow-home": "#fff968",
   "yellow-home-light": "rgba(255,255,255,0.8)",
   "black-100": "#E6E6E6",
+  "black-200": "#CAC7C1",
   "black-300": "#757470",
   "black-500": "#47453E",
   "black-700": "#2C2727",
