@@ -4,6 +4,7 @@ import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import WebAppScreen, { WebAppScreenRouteParams } from "./screens/WebApp";
 import SigninScreen, { SigninScreenRouteParams } from "./screens/Signin";
 import StartupScreen, { StartupScreenRouteParams } from "./screens/Startup";
+import * as Onboarding from "./screens/Onboarding";
 import { createStackNavigator } from "@react-navigation/stack";
 import AppShellHostContextProvider from "./lib/appShellHost/context";
 import Config from "./lib/config";
@@ -15,6 +16,7 @@ export type RootStackParamList = {
   Startup: StartupScreenRouteParams;
   Signin: SigninScreenRouteParams;
   WebApp: WebAppScreenRouteParams;
+  Onboarding: Onboarding.RouteParams;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -61,6 +63,7 @@ function AppMainStack({}: AppMainStackProps) {
     >
       <Stack.Screen name="Startup" component={StartupScreen} />
       <Stack.Screen name="Signin" component={SigninScreen} />
+      <Stack.Screen name="Onboarding" component={Onboarding.default} />
       <Stack.Screen name="WebApp" component={WebAppScreen} />
     </Stack.Navigator>
   );

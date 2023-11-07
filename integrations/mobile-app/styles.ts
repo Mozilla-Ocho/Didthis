@@ -33,6 +33,10 @@ export const styles = StyleSheet.create({
   text: {
     fontFamily: fonts.text,
   },
+  textLink: {
+    textDecorationColor: "#000",
+    textDecorationLine: "underline",
+  },
   logoText: {
     color: colors["yellow-700"],
     fontFamily: fonts.logo,
@@ -40,7 +44,6 @@ export const styles = StyleSheet.create({
     fontSize: 49.396,
     letterSpacing: 0.988,
   },
-
   drawer: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: colors["yellow-300"],

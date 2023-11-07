@@ -11,7 +11,7 @@ export type SigninScreenRouteParams = {};
 
 export type SigninScreenProps = {} & StackScreenProps<
   RootStackParamList,
-  "WebApp"
+  "Signin"
 >;
 
 export default function SigninScreen({ navigation }: SigninScreenProps) {
