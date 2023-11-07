@@ -36,13 +36,20 @@ export default function AppShellContextProvider({
   // On start of route change, reset top nav bar so it doesn't stick around
   // for routes not using it.
   useEffect(() => {
-    const handleRouteChange = () => api.request('updateTopNav', { show: false })
-    router.events.on('routeChangeComplete', handleRouteChange)
-    return () => router.events.off('routeChangeComplete', handleRouteChange)
+    const handleRouteChangeStart = (url: string) => {
+      api.request('webviewRouterEvent', { event: "routeChangeStart", url });
+    };
+    const handleRouteChangeComplete = (url: string) => {
+      api.request('webviewRouterEvent', { event: "routeChangeComplete", url });
+      api.request('updateTopNav', { show: false });
+    };
+    router.events.on('routeChangeStart', handleRouteChangeStart);
+    router.events.on('routeChangeComplete', handleRouteChangeComplete);
+    return () => {
+      router.events.off('routeChangeStart', handleRouteChangeStart);
+      router.events.off('routeChangeComplete', handleRouteChangeComplete);
+      }
   }, [api, router])
-
-  // TODO: Send the app messages on all route changes? Since they're
-  // client-side, the webview doesn't report them as navigation changes
 
   return (
     <AppShellContext.Provider value={state}>
