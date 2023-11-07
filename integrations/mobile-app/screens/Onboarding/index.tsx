@@ -5,7 +5,9 @@ import {
 } from "@react-navigation/native";
 import { StackScreenProps } from "@react-navigation/stack";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import * as AppleAuthentication from "expo-apple-authentication";
 import { RootStackParamList } from "../../App";
+import * as Storage from "../../lib/storage";
 import { styles } from "./styles";
 import { OnboardingPaginator } from "./paginator";
 import { OnboardingPage } from "./page";
@@ -14,7 +16,9 @@ import {
   OnboardingScreenContextValue,
 } from "./context";
 
-export type RouteParams = {};
+export type RouteParams = {
+  credential?: AppleAuthentication.AppleAuthenticationCredential;
+};
 
 export type OnboardingScreenProps = {} & StackScreenProps<
   RootStackParamList,
@@ -31,23 +35,27 @@ const PageStack = createNativeStackNavigator<PageStackParamList>();
 
 export default function OnboardingScreen({
   navigation,
+  route,
 }: OnboardingScreenProps) {
-  const navigationRef = useNavigationContainerRef<PageStackParamList>();
+  const { credential } = route.params || {};
 
   const context: OnboardingScreenContextValue = {
-    completeOnboarding: () => {
-      navigation.navigate("WebApp");
+    completeOnboarding: async () => {
+      await Storage.setItem("ONBOARDING_COMPLETED", "true");
+      navigation.navigate("WebApp", { credential });
     },
   };
 
+  const onboardingNavigationRef =
+    useNavigationContainerRef<PageStackParamList>();
   return (
     <SafeAreaView style={styles.screen}>
       <StatusBar backgroundColor={styles.screen.backgroundColor} />
       <OnboardingScreenContext.Provider value={context}>
         <NavigationContainer
           independent={true}
-          ref={navigationRef}
-          onReady={() => navigationRef.navigate("Page1")}
+          ref={onboardingNavigationRef}
+          onReady={() => onboardingNavigationRef.navigate("Page1")}
         >
           <PageStack.Navigator screenOptions={{ headerShown: false }}>
             <PageStack.Screen name="Page1" component={OnboardingPage1} />

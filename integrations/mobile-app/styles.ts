@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { DefaultTheme, Theme } from "@react-navigation/native";
 
 export const colors = {
   "yellow-100": "#fffce3",
@@ -17,6 +18,16 @@ export const colors = {
   "charcoal-medium": "#bcbcbc",
   "charcoal-light": "#3d3d3d",
   "gl-black": "#1f1f1f",
+};
+
+// https://reactnavigation.org/docs/themes
+export const globalTheme: Theme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: colors["white"],
+    primary: colors["yellow-600"],
+  },
 };
 
 export const fonts = {

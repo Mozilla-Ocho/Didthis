@@ -14,6 +14,7 @@ import {
 import ShareIcon from "../assets/share.svg";
 import EditIcon from "../assets/edit.svg";
 import { SvgProps } from "react-native-svg";
+import useAppShellHost from "../lib/appShellHost";
 
 export type TopNavProps = {
   title?: string;
@@ -200,4 +201,33 @@ function HeaderSideButton({
       />
     );
   }
+}
+
+export function ConditionalTopNav() {
+  const appShellHost = useAppShellHost();
+  const { messaging } = appShellHost;
+
+  const { topNav } = appShellHost.state;
+  if (!topNav?.show) return;
+
+  const onLeftPress = () =>
+    messaging.postMessage("topNavLeftPress", { label: topNav.leftLabel });
+  const onRightPress = () =>
+    messaging.postMessage("topNavRightPress", { label: topNav.rightLabel });
+  const onSharePress = () =>
+    messaging.postMessage("topNavSharePress", { label: "Share" });
+  const onEditPress = () =>
+    messaging.postMessage("topNavEditPress", { label: "Edit" });
+
+  return (
+    <TopNav
+      {...{
+        ...topNav,
+        onLeftPress,
+        onRightPress,
+        onSharePress,
+        onEditPress,
+      }}
+    />
+  );
 }

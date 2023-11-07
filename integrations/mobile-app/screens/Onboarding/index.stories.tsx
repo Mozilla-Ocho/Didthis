@@ -11,9 +11,7 @@ type SubjectArgs = Partial<SubjectProps>;
 export default {
   title: "screens/OnboardingScreen",
   component: Subject,
-  decorators: [
-    ThemedNavigationContainer<SubjectArgs>,
-  ],
+  decorators: [ThemedNavigationContainer<SubjectArgs>],
 } satisfies Meta<SubjectType>;
 
 type Story = StoryObj<SubjectType>;
@@ -21,14 +19,20 @@ type Story = StoryObj<SubjectType>;
 const actionNavigate = action("navigate");
 
 const baseArgs: Partial<SubjectArgs> = {
-  // @ts-ignore mocking navigate() only
+  // @ts-ignore mocking navigate()
   navigation: {
     // @ts-ignore
     navigate: (screen: string, params: object) => {
       console.log("navigate", screen, JSON.stringify(params, null, "  "));
       actionNavigate(screen, params);
-    }
-  }
+    },
+  },
+  // @ts-ignore only mocking credential param
+  route: {
+    params: {
+      // credential,
+    },
+  },
 };
 
 export const Default: Story = {
