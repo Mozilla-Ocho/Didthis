@@ -1,13 +1,13 @@
 import useAppShellHost from "../lib/appShellHost";
-import { useEffect, useRef, useState } from "react";
-import WebView, { WebViewNavigation } from "react-native-webview";
+import { useEffect, useRef } from "react";
+import WebView from "react-native-webview";
 import { SafeAreaView, StatusBar, StyleSheet } from "react-native";
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../App";
 import Config from "../lib/config";
 import Loader from "../components/Loader";
 import * as AppleAuthentication from "expo-apple-authentication";
-import TopNav from "../components/TopNav";
+import { ConditionalTopNav } from "../components/TopNav";
 
 const { siteBaseUrl, originWhitelist } = Config;
 
@@ -51,34 +51,5 @@ export default function WebAppScreen({ route }: WebAppScreenProps) {
         onMessage={appShellHost.onMessage}
       />
     </SafeAreaView>
-  );
-}
-
-function ConditionalTopNav() {
-  const appShellHost = useAppShellHost();
-  const { messaging } = appShellHost;
-
-  const { topNav } = appShellHost.state;
-  if (!topNav?.show) return;
-
-  const onLeftPress = () =>
-    messaging.postMessage("topNavLeftPress", { label: topNav.leftLabel });
-  const onRightPress = () =>
-    messaging.postMessage("topNavRightPress", { label: topNav.rightLabel });
-  const onSharePress = () =>
-    messaging.postMessage("topNavSharePress", { label: "Share" });
-  const onEditPress = () =>
-    messaging.postMessage("topNavEditPress", { label: "Edit" });
-
-  return (
-    <TopNav
-      {...{
-        ...topNav,
-        onLeftPress,
-        onRightPress,
-        onSharePress,
-        onEditPress,
-      }}
-    />
   );
 }

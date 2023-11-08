@@ -11,7 +11,7 @@ export type SigninScreenRouteParams = {};
 
 export type SigninScreenProps = {} & StackScreenProps<
   RootStackParamList,
-  "WebApp"
+  "Signin"
 >;
 
 export default function SigninScreen({ navigation }: SigninScreenProps) {
@@ -21,7 +21,12 @@ export default function SigninScreen({ navigation }: SigninScreenProps) {
     try {
       // HACK: Not sharing cookies between app & webview, need to sign-in with both
       await SiteAPI.signinWithCredential(credential);
-      navigation.navigate("WebApp", { credential });
+      const onboardingCompleted = await Storage.getItem("ONBOARDING_COMPLETED");
+      if (onboardingCompleted === "true") {
+        navigation.navigate("WebApp", { credential });
+      } else {
+        navigation.navigate("Onboarding", { credential });
+      }
     } catch (e) {
       // TODO: report sign-in error better
       alert("Sign-in failed, please try again later.");

@@ -3,7 +3,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export type StorageKey =
   | "APPLE_ID_CREDENTIAL"
   | "AUTH_SESSION_COOKIE"
-  | "SIGNED_IN_USER";
+  | "SIGNED_IN_USER"
+  | "ONBOARDING_COMPLETED";
+
+// TODO: implement specific accessor functions for known storage keys?
 
 export async function setItem(key: StorageKey, value: string) {
   return AsyncStorage.setItem(key, value);

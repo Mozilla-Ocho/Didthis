@@ -54,6 +54,7 @@ try {
 
 const getStories = () => {
   return {
+    "./screens/Onboarding/index.stories.tsx": require("../screens/Onboarding/index.stories.tsx"),
     "./screens/Signin.stories.tsx": require("../screens/Signin.stories.tsx"),
     "./screens/Startup.stories.tsx": require("../screens/Startup.stories.tsx"),
     "./screens/WebApp.stories.tsx": require("../screens/WebApp.stories.tsx"),
