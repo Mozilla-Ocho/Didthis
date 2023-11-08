@@ -450,7 +450,7 @@ const verifySessionCookie = async (
       newCookie: cookie,
       roundtrip: false,
     }
-  } else if (roundtrip && (uid.startsWith('trial-') || uid.startsWith('apple-'))) {
+  } else if (roundtrip && (uid.startsWith('trial-') || uid.startsWith('appleid-'))) {
     log.serverApi('skipping roundtrip revalidation for non-firebase account')
     return {
       valid: true,
