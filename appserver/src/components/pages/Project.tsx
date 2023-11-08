@@ -97,7 +97,7 @@ const ProjectPage = observer(
       showShare: true,
       showEdit: true,
       // HACK: probably want some better handlers here?
-      onLeftPress: () => store.goBack(),
+      onLeftPress: () => router.push("/"),
       onSharePress: () => document.getElementById('buttonShare')?.click(),
       onEditPress: () => document.getElementById('buttonEdit')?.click(),
     })
