@@ -1,10 +1,22 @@
 import AppShellHostAPI from "../api";
 import type { Methods } from "./index";
 
+/**
+ * Handle the start of a route change in the web content app
+ *
+ * @param api AppShellHostAPI
+ * @param route MatchRouteResult
+ */
 function routeChangeStart(api: AppShellHostAPI, route: MatchRouteResult) {
   api.set("webContentRouteChanging", true);
 }
 
+/**
+ * Handle the completion of a route change in the web content app
+ *
+ * @param api AppShellHostAPI
+ * @param route MatchRouteResult
+ */
 function routeChangeComplete(api: AppShellHostAPI, route: MatchRouteResult) {
   api.set("webContentRouteChanging", false);
 
@@ -13,13 +25,22 @@ function routeChangeComplete(api: AppShellHostAPI, route: MatchRouteResult) {
   api.set("topNav", { show: false });
 }
 
+// List of routes for which the bottom nav bar will be hidden
 const hideBottomNavRoutes: RoutePatternName[] = [
+  "userEdit",
   "postNew",
   "postEdit",
   "projectEdit",
   "projectNew",
 ];
 
+/**
+ * Handle notifications of route change start & end events
+ *
+ * @param api AppShellHostAPI
+ * @param payload AppRequestMethods["webRouterEvent"]["request"]
+ * @returns Success
+ */
 export const webviewRouterEvent: Methods["webviewRouterEvent"] = async (
   api,
   payload
@@ -36,6 +57,12 @@ export const webviewRouterEvent: Methods["webviewRouterEvent"] = async (
   return { success: true };
 };
 
+/**
+ * Utility to match route URL and extract parameters
+ *
+ * @param url string
+ * @returns MatchRouteResult
+ */
 function matchRoute(url: string): MatchRouteResult | undefined {
   for (const [name, pattern] of routePatterns) {
     const match = pattern.exec(url);
@@ -44,6 +71,7 @@ function matchRoute(url: string): MatchRouteResult | undefined {
   }
 }
 
+// Quick & dirty regexes to detect next.js routes and parameters
 const userRoute = `/user/(?<user>[^/]+)`;
 const projectRoute = `${userRoute}/project/(?<project>[^/]+)`;
 const postRoute = `${projectRoute}/post/(?<post>[^/]+)`;
