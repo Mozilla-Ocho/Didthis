@@ -5,6 +5,7 @@ import { AppleAuthenticationCredential } from '../appleAuth'
 export type AppMessages = {
   response: AppRequestMethods[AppRequestMethodNames]["response"];
   request: AppRequestMethods[AppRequestMethodNames]["request"];
+  navigateToPath: { path: string };
   appleCredential: { credential: AppleAuthenticationCredential };
   topNavLeftPress: { label: string };
   topNavRightPress: { label: string };

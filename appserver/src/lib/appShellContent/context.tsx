@@ -2,6 +2,7 @@
 import { createContext, ReactNode, useEffect, useRef } from 'react'
 import { createInitialState, State, useAppShellState } from './state'
 import { useRouter } from 'next/router'
+import { useAppShellListener } from './messaging'
 
 export const AppShellContext = createContext<State>(createInitialState())
 
@@ -37,19 +38,21 @@ export default function AppShellContextProvider({
   // for routes not using it.
   useEffect(() => {
     const handleRouteChangeStart = (url: string) => {
-      api.request('webviewRouterEvent', { event: "routeChangeStart", url });
-    };
+      api.request('webviewRouterEvent', { event: 'routeChangeStart', url })
+    }
     const handleRouteChangeComplete = (url: string) => {
-      api.request('webviewRouterEvent', { event: "routeChangeComplete", url });
-      api.request('updateTopNav', { show: false });
-    };
-    router.events.on('routeChangeStart', handleRouteChangeStart);
-    router.events.on('routeChangeComplete', handleRouteChangeComplete);
+      api.request('webviewRouterEvent', { event: 'routeChangeComplete', url })
+      api.request('updateTopNav', { show: false })
+    }
+    router.events.on('routeChangeStart', handleRouteChangeStart)
+    router.events.on('routeChangeComplete', handleRouteChangeComplete)
     return () => {
-      router.events.off('routeChangeStart', handleRouteChangeStart);
-      router.events.off('routeChangeComplete', handleRouteChangeComplete);
-      }
+      router.events.off('routeChangeStart', handleRouteChangeStart)
+      router.events.off('routeChangeComplete', handleRouteChangeComplete)
+    }
   }, [api, router])
+
+  useAppShellListener('navigateToPath', ({ path }) => router.push(path))
 
   return (
     <AppShellContext.Provider value={state}>
