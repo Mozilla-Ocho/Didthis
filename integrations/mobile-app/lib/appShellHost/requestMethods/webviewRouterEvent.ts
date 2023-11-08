@@ -1,29 +1,17 @@
+import AppShellHostAPI from "../api";
 import type { Methods } from "./index";
 
-export const webviewRouterEvent: Methods["webviewRouterEvent"] = async (
-  api,
-  payload
-) => {
-  const { event, url } = payload;
-  const { state } = api;
+function routeChangeStart(api: AppShellHostAPI, route: MatchRouteResult) {
+  api.set("webContentRouteChanging", true);
+}
 
-  const route = matchRoute(url);
-  if (!route) {
-    console.debug("WEBVIEW ROUTER EVENT UNMATCHED", event, url);
-    return { success: true };
-  }
+function routeChangeComplete(api: AppShellHostAPI, route: MatchRouteResult) {
+  api.set("webContentRouteChanging", false);
 
-  if (event === "routeChangeStart") {
-    api.set("webContentRouteChanging", true);
-  } else if (event === "routeChangeComplete") {
-    const showBottomNav = !hideBottomNavRoutes.includes(route?.name);
-    api.set("bottomNav", { show: showBottomNav });
-    api.set("topNav", { show: false });
-    api.set("webContentRouteChanging", false);
-  }
-
-  return { success: true };
-};
+  const showBottomNav = !hideBottomNavRoutes.includes(route?.name);
+  api.set("bottomNav", { show: showBottomNav });
+  api.set("topNav", { show: false });
+}
 
 const hideBottomNavRoutes: RoutePatternName[] = [
   "postNew",
@@ -31,6 +19,22 @@ const hideBottomNavRoutes: RoutePatternName[] = [
   "projectEdit",
   "projectNew",
 ];
+
+export const webviewRouterEvent: Methods["webviewRouterEvent"] = async (
+  api,
+  payload
+) => {
+  const { event, url } = payload;
+  const route = matchRoute(url);
+  if (route) {
+    if (event === "routeChangeStart") {
+      routeChangeStart(api, route);
+    } else if (event === "routeChangeComplete") {
+      routeChangeComplete(api, route);
+    }
+  }
+  return { success: true };
+};
 
 function matchRoute(url: string): MatchRouteResult | undefined {
   for (const [name, pattern] of routePatterns) {
@@ -43,7 +47,6 @@ function matchRoute(url: string): MatchRouteResult | undefined {
 const userRoute = `/user/(?<user>[^/]+)`;
 const projectRoute = `${userRoute}/project/(?<project>[^/]+)`;
 const postRoute = `${projectRoute}/post/(?<post>[^/]+)`;
-
 const routePatternsSource = [
   ["index", `^/$`],
   ["userEdit", `^${userRoute}/edit$`],

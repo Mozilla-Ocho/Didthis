@@ -26,8 +26,6 @@ export default function BottomNav({}: BottomNavProps) {
 
 export function ConditionalBottomNav() {
   const appShellHost = useAppShellHost();
-  const { messaging } = appShellHost;
-
   const { bottomNav } = appShellHost.state;
   if (!bottomNav?.show) return <></>;
 

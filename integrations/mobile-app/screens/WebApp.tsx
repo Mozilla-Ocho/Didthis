@@ -9,7 +9,6 @@ import Loader, { WebviewRouteChangeLoader } from "../components/Loader";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { ConditionalTopNav } from "../components/TopNav";
 import { ConditionalBottomNav } from "../components/BottomNav";
-import { webviewRouterEvent } from "../lib/appShellHost/requestMethods/webviewRouterEvent";
 
 const { siteBaseUrl, originWhitelist } = Config;
 
