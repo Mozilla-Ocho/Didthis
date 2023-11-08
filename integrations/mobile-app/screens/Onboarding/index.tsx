@@ -1,10 +1,7 @@
-import { Text, SafeAreaView, Button, StatusBar } from "react-native";
-import {
-  NavigationContainer,
-  useNavigationContainerRef,
-} from "@react-navigation/native";
+import { Text, SafeAreaView, StatusBar } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
 import { StackScreenProps } from "@react-navigation/stack";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { RootStackParamList } from "../../App";
 import * as Storage from "../../lib/storage";
@@ -31,7 +28,7 @@ export type PageStackParamList = {
   Page3: {};
 };
 
-const PageStack = createNativeStackNavigator<PageStackParamList>();
+const PageTab = createMaterialTopTabNavigator();
 
 export default function OnboardingScreen({
   navigation,
@@ -46,23 +43,20 @@ export default function OnboardingScreen({
     },
   };
 
-  const onboardingNavigationRef =
-    useNavigationContainerRef<PageStackParamList>();
   return (
     <SafeAreaView style={styles.screen}>
       <StatusBar backgroundColor={styles.screen.backgroundColor} />
       <OnboardingScreenContext.Provider value={context}>
-        <NavigationContainer
-          independent={true}
-          ref={onboardingNavigationRef}
-          onReady={() => onboardingNavigationRef.navigate("Page1")}
-        >
-          <PageStack.Navigator screenOptions={{ headerShown: false }}>
-            <PageStack.Screen name="Page1" component={OnboardingPage1} />
-            <PageStack.Screen name="Page2" component={OnboardingPage2} />
-            <PageStack.Screen name="Page3" component={OnboardingPage3} />
-          </PageStack.Navigator>
-          <OnboardingPaginator />
+        <NavigationContainer independent={true}>
+          <PageTab.Navigator
+            initialRouteName="Page1"
+            tabBarPosition="bottom"
+            tabBar={OnboardingPaginator}
+          >
+            <PageTab.Screen name="Page1" component={OnboardingPage1} />
+            <PageTab.Screen name="Page2" component={OnboardingPage2} />
+            <PageTab.Screen name="Page3" component={OnboardingPage3} />
+          </PageTab.Navigator>
         </NavigationContainer>
       </OnboardingScreenContext.Provider>
     </SafeAreaView>
@@ -105,6 +99,7 @@ function OnboardingPage3(params: OnboardingPage3Props) {
     <OnboardingPage
       title="Record your update"
       heroImageSource={require("../../assets/onboarding-3.png")}
+      lastPage
     >
       <Text style={styles.pageContentText}>
         Once you've created a project, you can use the app to track your

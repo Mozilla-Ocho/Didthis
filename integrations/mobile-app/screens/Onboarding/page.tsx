@@ -4,23 +4,36 @@ import { ReactNode, useContext } from "react";
 import { styles } from "./styles";
 import { PageStackParamList } from ".";
 import { OnboardingScreenContext } from "./context";
-import { NavigationProp, useNavigation } from "@react-navigation/native";
+import {
+  NavigationProp,
+  useNavigation,
+  useNavigationState,
+} from "@react-navigation/native";
 
 type OnboardingPageProps = {
   title: string;
   heroImageSource: ImageSource;
   children: ReactNode;
+  lastPage?: boolean;
 };
 
 export function OnboardingPage({
   title,
   heroImageSource,
   children,
+  lastPage,
 }: OnboardingPageProps) {
-  const navigation = useNavigation<NavigationProp<PageStackParamList>>();
   const { completeOnboarding } = useContext(OnboardingScreenContext);
-  const { index, routeNames } = navigation.getState();
-  const nextPage = routeNames[index + 1];
+  const navigation = useNavigation<NavigationProp<PageStackParamList>>();
+  const nextPage = useNavigationState<
+    PageStackParamList,
+    keyof PageStackParamList | undefined
+  >(({ index, routeNames }) => routeNames[index + 1]);
+
+  const nextLabel = !lastPage ? "Next" : "Use Didthis";
+  const onNextPress = !lastPage
+    ? () => navigation.navigate(nextPage)
+    : completeOnboarding;
 
   return (
     <View style={styles.page}>
@@ -34,15 +47,8 @@ export function OnboardingPage({
       <View style={styles.pageContent}>
         <Text style={styles.pageContentTitle}>{title}</Text>
         {children}
-        <TouchableOpacity
-          style={styles.pageNextButton}
-          onPress={
-            nextPage ? () => navigation.navigate(nextPage) : completeOnboarding
-          }
-        >
-          <Text style={styles.pageNextButtonLabel}>
-            {nextPage ? "Next" : "Use Didthis"}
-          </Text>
+        <TouchableOpacity style={styles.pageNextButton} onPress={onNextPress}>
+          <Text style={styles.pageNextButtonLabel}>{nextLabel}</Text>
         </TouchableOpacity>
       </View>
     </View>
