@@ -24,6 +24,16 @@ export default function BottomNav({}: BottomNavProps) {
   );
 }
 
+export function ConditionalBottomNav() {
+  const appShellHost = useAppShellHost();
+  const { messaging } = appShellHost;
+
+  const { bottomNav } = appShellHost.state;
+  if (!bottomNav?.show) return <></>;
+
+  return <BottomNav />;
+}
+
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "white",
@@ -34,5 +44,5 @@ const styles = StyleSheet.create({
   },
   addButton: {
     marginTop: -25,
-  }
+  },
 });

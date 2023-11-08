@@ -1,7 +1,9 @@
-import AppShellHostAPI from "./api";
-import { AppRequestMethods, MessageRequest } from "./types";
-import * as SiteAPI from "../siteApi";
+import AppShellHostAPI from "../api";
+import { AppRequestMethods, MessageRequest } from "../types";
+import * as SiteAPI from "../../siteApi";
 import * as ImagePicker from "expo-image-picker";
+
+import webviewRouterEvent from "./webviewRouterEvent";
 
 export async function handleRequest(
   api: AppShellHostAPI,
@@ -40,6 +42,8 @@ export type Methods = {
 };
 
 export const methods: Methods = {
+  webviewRouterEvent,
+
   ping: async (api, payload) => {
     api.set("webContentReady", true);
     return { message: "pong" };
@@ -57,16 +61,6 @@ export const methods: Methods = {
     // @ts-ignore throw a runtime error if web content asks for an unknown route
     api.navigation.navigate(payload.screen, { requestId: id, payload });
     return response;
-  },
-
-  webviewRouterEvent: async(api, payload, id) => {
-    const { event, url } = payload;
-    console.debug("WEBVIEW ROUTER EVENT", event, url);
-
-    // TODO: match URL patterns here to decide what to do about top & bottom nav, transitions, etc
-    // TODO: show loading spinner between start / complete events?
-
-    return { success: true };
   },
 
   signin: async (api) => {
