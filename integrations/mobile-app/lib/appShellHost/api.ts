@@ -25,12 +25,7 @@ export default class AppShellHostAPI {
   }
 
   navigateToPath(path: string) {
-    // TODO: need to change this to use the next.js router so all the events work as expected?
-
-    const webview = this.messaging.webview;
-    if (!webview) return;
-    this.set("webContentRouteChanging", true);
-    webview.injectJavaScript(`window.location = "${siteBaseUrl}${path}"`);
+    this.postMessage("navigateToPath", { path });
   }
 
   set(...args: Parameters<typeof statePropertyUpdateAction>) {
@@ -43,10 +38,10 @@ export default class AppShellHostAPI {
   }
 
   setWebView(...args: Parameters<MessageHandler["setWebView"]>) {
-    return this.messaging.setWebView(...args)
+    return this.messaging.setWebView(...args);
   }
 
   postMessage(...args: Parameters<MessageHandler["postMessage"]>) {
-    return this.messaging.postMessage(...args)
+    return this.messaging.postMessage(...args);
   }
 }
