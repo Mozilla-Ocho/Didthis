@@ -9,6 +9,7 @@ import Loader, { WebviewRouteChangeLoader } from "../components/Loader";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { ConditionalTopNav } from "../components/TopNav";
 import { ConditionalBottomNav } from "../components/BottomNav";
+import { webviewRouterEvent } from "../lib/appShellHost/requestMethods/webviewRouterEvent";
 
 const { siteBaseUrl, originWhitelist } = Config;
 
@@ -48,6 +49,22 @@ export default function WebAppScreen({ route }: WebAppScreenProps) {
         originWhitelist={originWhitelist}
         startInLoadingState={true}
         renderLoading={() => <Loader />}
+        onNavigationStateChange={(navState) => {
+          const { url: fullUrl, navigationType } = navState;
+          // TODO: trigger webviewRouterEvent() from here?
+          console.debug("NAV STATE CHANGE", navState);
+          // HACK: simulate a webview router event on navigation
+          if (fullUrl.indexOf(siteBaseUrl) === 0) {
+            webviewRouterEvent(
+              appShellHost,
+              {
+                event: "routeChangeComplete",
+                url: fullUrl.substring(siteBaseUrl.length),
+              },
+              ""
+            );
+          }
+        }}
         ref={webviewRef}
         onMessage={appShellHost.onMessage}
       />

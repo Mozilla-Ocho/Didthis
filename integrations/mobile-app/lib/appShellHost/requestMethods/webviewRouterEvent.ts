@@ -32,7 +32,7 @@ const hideBottomNavRoutes: RoutePatternName[] = [
   "projectNew",
 ];
 
-function matchRoute(url: string): MatchRouteResult {
+function matchRoute(url: string): MatchRouteResult | undefined {
   for (const [name, pattern] of routePatterns) {
     const match = pattern.exec(url);
     if (!match) continue;
