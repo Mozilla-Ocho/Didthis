@@ -14,25 +14,40 @@ jobs:
       pull-requests: write # Allow comments on PRs
     runs-on: ubuntu-latest
     steps:
+      - name: Check for EXPO_TOKEN
+        id: checksecrets
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          if [ "$EXPO_TOKEN" == "" ]; then
+            echo "secretspresent=NO" >> $GITHUB_OUTPUT
+          else
+            echo "secretspreseng=YES" >> $GITHUB_OUTPUT
+          fi
       - name: 🏗 Setup repo
+        if: (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: actions/checkout@v3
 
       - name: 🏗 Setup Node
+        if: (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: actions/setup-node@v3
         with:
           node-version: 18.x
           cache: yarn
 
       - name: 🏗 Setup EAS
+        if: (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: 📦 Install dependencies
+        if: (steps.checksecrets.outputs.secretspresent == 'YES')
         run: yarn install
 
       - name: 🚀 Create preview
+        if: (steps.checksecrets.outputs.secretspresent == 'YES')
         id: preview
         uses: expo/expo-github-action/preview@v8
         with:
@@ -40,6 +55,7 @@ jobs:
           comment: false
 
       - name: Comment PR
+        if: (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: thollander/actions-comment-pull-request@v2
         with:
           comment_tag: preview-storybook-build
