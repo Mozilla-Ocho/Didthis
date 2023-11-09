@@ -22,16 +22,22 @@ export type AppRequestMethods = {
     request: undefined;
     response: JSONObject;
   };
-  useScreen: {
-    request: JSONObject;
-    response: JSONObject;
-  };
   webviewRouterEvent: {
     request: {
       event: "routeChangeStart" | "routeChangeComplete";
       url: string;
     };
     response: Success;
+  };
+  pickDateTime: {
+    request: {
+      title?: string;
+      initialDateTime?: number;
+    };
+    response: {
+      dateTime: number;
+      changed: boolean;
+    }
   };
   updateAppConfig: {
     request: {

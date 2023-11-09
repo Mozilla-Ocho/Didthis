@@ -14,9 +14,11 @@ import { PagePad } from '../uiLib'
 import {trackingEvents} from '@/lib/trackingEvents'
 import PageTitle from '../PageTitle'
 import RemindersAndAlerts from '../RemindersAndAlerts'
+import useAppShell from '@/lib/appShellContent'
 
 const PostEditPage = observer(() => {
   const store = useStore()
+  const appShell = useAppShell()
   store.useTrackedPageEvent(trackingEvents.pvEditPost)
   const router = useRouter()
   const user = store.user
@@ -41,7 +43,7 @@ const PostEditPage = observer(() => {
       />
       <RemindersAndAlerts />
       <PagePad>
-        <h3>Edit post</h3>
+        {!appShell.inAppWebView && <h3>Edit post</h3>}
         <PostForm mode="edit" post={post} />
       </PagePad>
     </>

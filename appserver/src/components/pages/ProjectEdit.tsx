@@ -14,11 +14,13 @@ import pathBuilder from '@/lib/pathBuilder'
 import {trackingEvents} from '@/lib/trackingEvents'
 import PageTitle from '../PageTitle'
 import RemindersAndAlerts from '../RemindersAndAlerts'
+import useAppShell from '@/lib/appShellContent'
 
 const ProjectEditPage = observer(() => {
   const store = useStore()
   store.useTrackedPageEvent(trackingEvents.pvEditProject)
   const router = useRouter()
+  const appShell = useAppShell();
   const user = store.user
   // this condition is really just for typescript to assert user is present,
   // this component wont be rendered w/o a user.
@@ -38,10 +40,14 @@ const ProjectEditPage = observer(() => {
           { name: 'Edit' },
         ]}
       />
-      <RemindersAndAlerts/>
+      <RemindersAndAlerts />
       <PagePad>
-        <h3>Edit project</h3>
-        <div className="pt-8" />
+        {!appShell.inAppWebView && (
+          <>
+            <h3>Edit project</h3>
+            <div className="pt-8" />
+          </>
+        )}
         <ProjectForm mode="edit" project={project} />
       </PagePad>
     </>
