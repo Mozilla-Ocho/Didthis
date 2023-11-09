@@ -27,7 +27,7 @@ import PageTitle from '../PageTitle'
 import OgMeta from '../OgMeta'
 import RemindersAndAlerts from '../RemindersAndAlerts'
 import ViralWaitlistBlurb from '../ViralWaitlistBlurb'
-import { useAppShellTopBar } from '@/lib/appShellContent'
+import useAppShell, { useAppShellTopBar } from '@/lib/appShellContent'
 
 const ProjectPage = observer(
   ({ targetUser }: { targetUser: ApiUser | false }) => {
@@ -35,6 +35,7 @@ const ProjectPage = observer(
     if (!targetUser) return <NotFound>user not found</NotFound>
     const router = useRouter()
     const store = useStore()
+    const appShell = useAppShell()
     store.useTrackedPageEvent(trackingEvents.pvProject, {
       slug: targetUser.publicPageSlug,
     })
@@ -91,15 +92,40 @@ const ProjectPage = observer(
       e.target.select()
     }
 
+    const handleConditionalShare = () => {
+      if (isPrivate) {
+        handleSharePriv()
+      } else {
+        if (!appShell.appReady) {
+          handleShare()
+        } else {
+          appShell.api.request('shareProjectUrl', {
+            title: project.title,
+            url: window.location.href,
+          })
+        }
+      }
+    }
+
+    const handleBack = () => router.push("/")
+
+    const handleEdit = () => {
+      if (!store.user) return;
+      store.trackEvent(trackingEvents.bcEditProject);
+      router.push(pathBuilder.projectEdit(
+        store.user.systemSlug,
+        project.id
+      ));
+    }
+
     useAppShellTopBar({
       show: true,
       leftIsBack: true,
       showShare: true,
       showEdit: true,
-      // HACK: probably want some better handlers here?
-      onLeftPress: () => router.push("/"),
-      onSharePress: () => document.getElementById('buttonShare')?.click(),
-      onEditPress: () => document.getElementById('buttonEdit')?.click(),
+      onLeftPress: handleBack,
+      onSharePress: handleConditionalShare,
+      onEditPress: handleEdit,
     })
 
     return (
@@ -212,11 +238,7 @@ const ProjectPage = observer(
               id="buttonShare"
               className="w-full sm:w-auto"
               intent="secondary"
-              onClick={
-                isPrivate /* tracking handled in these handler fns */
-                  ? handleSharePriv
-                  : handleShare
-              }
+              onClick={handleConditionalShare}
             >
               Share project
             </Button>
