@@ -220,9 +220,17 @@ export const getOrCreateUser = async ({
   signupCode: string | false
 }): Promise<[ApiUser, UserDbRow] | [false, false]> => {
   const millis = new Date().getTime()
-  let dbRow = (await knex('users').where('id', id).first()) as
-    | UserDbRow
-    | undefined
+  let dbRow: UserDbRow | undefined
+  if (autoVivifyWithEmail) {
+    // Check if we already have an account for this email address.
+    dbRow = await knex('users')
+      .where('id', id)
+      .orWhere('email', autoVivifyWithEmail)
+      .first()
+  } else {
+    // Just check for the user ID, presumably from firebase.
+    dbRow = await knex('users').where('id', id).first()
+  }
   const codeInfo = getValidCodeInfo(signupCode)
   if (dbRow) {
     // found
