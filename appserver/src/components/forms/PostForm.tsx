@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@/lib/store'
-import { useCallback, useEffect, useState } from 'react'
+import { MouseEventHandler, useCallback, useEffect, useState } from 'react'
 import {
   Button,
   Input,
@@ -386,7 +386,7 @@ const ImageField = observer(({ postStore }: { postStore: PostStore }) => {
 const DateTimeField = observer(({ postStore }: { postStore: PostStore }) => {
   const appShell = useAppShell();
 
-  const handleNativeDateTimePickerOpen = async () => {
+  const handleNativeDateTimePickerOpen: MouseEventHandler<HTMLInputElement> = async (ev) => {
     const initialDateTime = postStore.didThisAtFormValue?.toDate().getTime()
     const result = await appShell.api.request('pickDateTime', {
       title: 'Did this when?',
@@ -440,10 +440,12 @@ const DateTimeField = observer(({ postStore }: { postStore: PostStore }) => {
           }
         >
           {appShell.appReady ? (
-            <Input
-              value={postStore.didThisAtFormValue?.format('L LT')}
+            <Button
               onClick={handleNativeDateTimePickerOpen}
-            />
+              intent="inputTrigger"
+            >
+              {postStore.didThisAtFormValue?.format('L LT') || 'Now'}
+            </Button>
           ) : (
             <DateTimePicker
               disableFuture

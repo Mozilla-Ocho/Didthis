@@ -50,6 +50,14 @@ const buttonCVA = cva('button px-4 py-3 rounded text-sm', {
         'active:text-links-active',
         'p-0',
       ],
+      inputTrigger: [
+        'form-input',
+        'block',
+        'w-full',
+        'sm:w-[150px]',
+        'text-base',
+        'text-left',
+      ],
     },
   },
   defaultVariants: {
