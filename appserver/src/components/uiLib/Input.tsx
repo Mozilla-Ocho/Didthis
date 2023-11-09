@@ -31,7 +31,8 @@ type Props = React.InputHTMLAttributes<HTMLInputElement> &
   }
 
 const Input: FC<Props> = ({
-  onClick,
+  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
+  onClick = () => {},
   children,
   className,
   customError,
@@ -76,6 +77,7 @@ const Input: FC<Props> = ({
   return (
     <div>
       <input
+        onClick={onClick}
         className={twMerge(inputCVA({}), className, errorClass)}
         {...props}
       >

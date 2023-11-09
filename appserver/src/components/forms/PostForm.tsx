@@ -384,6 +384,20 @@ const ImageField = observer(({ postStore }: { postStore: PostStore }) => {
 })
 
 const DateTimeField = observer(({ postStore }: { postStore: PostStore }) => {
+  const appShell = useAppShell();
+
+  const handleNativeDateTimePickerOpen = async () => {
+    const initialDateTime = postStore.didThisAtFormValue?.toDate().getTime()
+    const result = await appShell.api.request('pickDateTime', {
+      title: 'Did this when?',
+      initialDateTime,
+    })
+    if (result) {
+      const { changed, dateTime } = result
+      if (changed) handleChange(dayjs(dateTime))
+    }
+  };
+
   const handleChange = (x: Dayjs | null) => {
     postStore.setDidThisAtDayjs(x)
   }
@@ -425,12 +439,20 @@ const DateTimeField = observer(({ postStore }: { postStore: PostStore }) => {
             'grid grid-cols-1 transition-colors duration-300 ' + pickerBgClass
           }
         >
-          <DateTimePicker
-            disableFuture
-            label={postStore.didThisAtFormValue === null ? 'now' : ''}
-            value={postStore.didThisAtFormValue}
-            onChange={handleChange}
-          />
+          {appShell.appReady ? (
+            <Input
+              value={postStore.didThisAtFormValue?.format('L LT')}
+              onClick={handleNativeDateTimePickerOpen}
+            />
+          ) : (
+            <DateTimePicker
+              disableFuture
+              label={postStore.didThisAtFormValue === null ? 'now' : ''}
+              value={postStore.didThisAtFormValue}
+              onChange={handleChange}
+              open={false}
+            />
+          )}
         </div>
         {err && (
           <p className="text-red-400 text-xs text-right">
@@ -464,6 +486,8 @@ const PostForm = observer((props: Props) => {
   const { mode } = props
   const router = useRouter()
   const store = useStore()
+  const appShell = useAppShell()
+  if (!store.user) return <></>
 
   let defaultPid = getParamString(router, 'projectId')
   if (mode === 'new' && store.user && !store.user.profile.projects[defaultPid])
@@ -525,7 +549,11 @@ const PostForm = observer((props: Props) => {
       >
         {defaultPid === 'new' && <ProjectSelector postStore={postStore} />}
         {mode === 'new' && (
-          <div className="grid grid-cols-3 gap-4 text-center mt-8">
+          <div
+            className={`grid grid-cols-3 gap-4 text-center ${
+              appShell.inAppWebView ? 'mt-4' : 'mt-8'
+            }`}
+          >
             <label htmlFor="mediaImage" className={labelClass('image')}>
               <input
                 id="mediaImage"
@@ -561,7 +589,7 @@ const PostForm = observer((props: Props) => {
             </label>
           </div>
         )}
-        {mode === 'edit' && <div className="p-1" />}
+        {mode === 'edit' && !appShell.inAppWebView && <div className="p-1" />}
         {postStore.mediaType === 'image' && (
           <ImageField postStore={postStore} />
         )}

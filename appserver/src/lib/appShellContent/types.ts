@@ -33,6 +33,16 @@ export type AppRequestMethods = {
     };
     response: Success;
   };
+  pickDateTime: {
+    request: {
+      title?: string;
+      initialDateTime?: number;
+    };
+    response: {
+      dateTime: number;
+      changed: boolean;
+    }
+  };
   updateAppConfig: {
     request: {
       user: ApiUser;
