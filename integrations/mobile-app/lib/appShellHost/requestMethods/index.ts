@@ -4,6 +4,7 @@ import * as SiteAPI from "../../siteApi";
 import * as ImagePicker from "expo-image-picker";
 
 import webviewRouterEvent from "./webviewRouterEvent";
+import pickDateTime from "./pickDateTime";
 
 export async function handleRequest(
   api: AppShellHostAPI,
@@ -43,6 +44,7 @@ export type Methods = {
 
 export const methods: Methods = {
   webviewRouterEvent,
+  pickDateTime,
 
   ping: async (api, payload) => {
     api.set("webContentReady", true);
@@ -54,13 +56,6 @@ export const methods: Methods = {
     api.set("user", user);
     api.set("links", { ...api.state.links, ...links });
     return { success: true };
-  },
-
-  useScreen: async (api, payload, id) => {
-    const response = api.messaging.deferResponse(id);
-    // @ts-ignore throw a runtime error if web content asks for an unknown route
-    api.navigation.navigate(payload.screen, { requestId: id, payload });
-    return response;
   },
 
   signin: async (api) => {
