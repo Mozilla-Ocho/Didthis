@@ -39,6 +39,13 @@ export type AppRequestMethods = {
       changed: boolean;
     }
   };
+  shareProjectUrl: {
+    request: {
+      title: string;
+      url: string;
+    };
+    response: Success;
+  };
   updateAppConfig: {
     request: {
       user: ApiUser;
