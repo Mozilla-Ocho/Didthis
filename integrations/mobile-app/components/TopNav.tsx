@@ -15,6 +15,7 @@ import ShareIcon from "../assets/share.svg";
 import EditIcon from "../assets/edit.svg";
 import { SvgProps } from "react-native-svg";
 import useAppShellHost from "../lib/appShellHost";
+import { colors as globalColors } from "../styles";
 
 export type TopNavProps = {
   title?: string;
@@ -63,7 +64,8 @@ export default function TopNav({
       <Header
         headerStyle={{
           backgroundColor: colors.background,
-          borderBottomColor: colors.text,
+          borderBottomWidth: 1,
+          borderBottomColor: "rgba(0, 0, 0, 0.1)"
         }}
         title={title}
         headerShadowVisible={true}

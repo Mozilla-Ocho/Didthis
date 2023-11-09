@@ -23,16 +23,22 @@ export type AppRequestMethods = {
     request: undefined;
     response: JSONObject;
   };
-  useScreen: {
-    request: JSONObject;
-    response: JSONObject;
-  };
   webviewRouterEvent: {
     request: {
       event: "routeChangeStart" | "routeChangeComplete";
       url: string;
     };
     response: Success;
+  };
+  pickDateTime: {
+    request: {
+      title?: string;
+      initialDateTime?: number;
+    };
+    response: {
+      dateTime: number;
+      changed: boolean;
+    }
   };
   updateAppConfig: {
     request: {
@@ -87,12 +93,14 @@ export type MessageResponse = {
   };
 }[AppRequestMethodNames];
 
-export type DeferredResponse = {
+export type DeferredResponses = {
   [K in AppRequestMethodNames]: {
     resolve: (payload: AppRequestMethods[K]["response"]) => void;
     reject: (error: any) => void;
   };
-}[AppRequestMethodNames];
+}
+
+export type DeferredResponse = DeferredResponses[AppRequestMethodNames];
 
 export type Success = { success: true };
 

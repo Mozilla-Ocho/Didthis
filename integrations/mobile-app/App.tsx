@@ -1,10 +1,6 @@
 import "react-native-gesture-handler";
 import * as React from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import WebAppScreen, { WebAppScreenRouteParams } from "./screens/WebApp";
-import SigninScreen, { SigninScreenRouteParams } from "./screens/Signin";
-import StartupScreen, { StartupScreenRouteParams } from "./screens/Startup";
-import * as Onboarding from "./screens/Onboarding";
 import { createStackNavigator } from "@react-navigation/stack";
 import AppShellHostContextProvider from "./lib/appShellHost/context";
 import Config from "./lib/config";
@@ -12,11 +8,18 @@ import useAppFonts from "./lib/fonts";
 import LogoLoader from "./components/LogoLoader";
 import { globalTheme } from "./styles";
 
+import WebAppScreen, { WebAppScreenRouteParams } from "./screens/WebApp";
+import SigninScreen, { SigninScreenRouteParams } from "./screens/Signin";
+import StartupScreen, { StartupScreenRouteParams } from "./screens/Startup";
+import * as Onboarding from "./screens/Onboarding";
+import * as DateTimePicker from "./screens/DateTimePicker";
+
 export type RootStackParamList = {
   Startup: StartupScreenRouteParams;
   Signin: SigninScreenRouteParams;
   WebApp: WebAppScreenRouteParams;
   Onboarding: Onboarding.RouteParams;
+  DateTimePicker: DateTimePicker.RouteParams;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -43,6 +46,7 @@ function App() {
           <Stack.Screen name="Signin" component={SigninScreen} />
           <Stack.Screen name="Onboarding" component={Onboarding.default} />
           <Stack.Screen name="WebApp" component={WebAppScreen} />
+          <Stack.Screen name="DateTimePicker" component={DateTimePicker.default} />
         </Stack.Navigator>
       </AppShellHostContextProvider>
     </NavigationContainer>

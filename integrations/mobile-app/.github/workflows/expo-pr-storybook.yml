@@ -22,7 +22,7 @@ jobs:
           if [ "$EXPO_TOKEN" == "" ]; then
             echo "secretspresent=NO" >> $GITHUB_OUTPUT
           else
-            echo "secretspreseng=YES" >> $GITHUB_OUTPUT
+            echo "secretspresent=YES" >> $GITHUB_OUTPUT
           fi
       - name: 🏗 Setup repo
         if: (steps.checksecrets.outputs.secretspresent == 'YES')

@@ -6,6 +6,9 @@ import {
   MessageRequest,
   MessageResponse,
   DeferredResponse,
+  AppRequestMethodNames,
+  AppRequestMethods,
+  DeferredResponses,
 } from "./types";
 
 export default class MessageHandler {
@@ -22,8 +25,8 @@ export default class MessageHandler {
     this.webview = webview;
   }
 
-  async deferResponse(id: MessageResponse["id"]) {
-    return new Promise<MessageResponse["payload"]>((resolve, reject) => {
+  async deferResponse<K extends AppRequestMethodNames>(id: MessageResponse["id"]) {
+    return new Promise<AppRequestMethods[K]["response"]>((resolve, reject) => {
       this.deferredResponses[id] = { resolve, reject };
     }).then((result) => {
       delete this.deferredResponses[id];
@@ -32,8 +35,8 @@ export default class MessageHandler {
     // TODO: catch?
   }
 
-  getDeferredResponse(id: MessageResponse["id"]) {
-    return this.deferredResponses[id];
+  getDeferredResponse<K extends AppRequestMethodNames>(id: MessageResponse["id"]) {
+    return this.deferredResponses[id] as DeferredResponses[K];
   }
 
   postMessage<T extends keyof AppMessages>(
