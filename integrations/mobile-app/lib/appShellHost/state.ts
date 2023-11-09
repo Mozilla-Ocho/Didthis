@@ -4,15 +4,21 @@ import { AppRequestMethods } from "./types";
 
 export type State = {
   webContentReady: boolean;
+  webContentRouteChanging: boolean;
   user?: ApiUser;
   links: Record<string, string>;
   topNav?: AppRequestMethods["updateTopNav"]["request"];
+  bottomNav?: {
+    show?: boolean;
+  };
 };
 
 export function createInitialState(): State {
   return {
     webContentReady: false,
+    webContentRouteChanging: false,
     links: {},
+    bottomNav: { show: true },
   };
 }
 

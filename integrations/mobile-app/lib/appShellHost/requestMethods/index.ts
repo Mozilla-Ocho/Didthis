@@ -1,7 +1,9 @@
-import AppShellHostAPI from "./api";
-import { AppRequestMethods, MessageRequest } from "./types";
-import * as SiteAPI from "../siteApi";
+import AppShellHostAPI from "../api";
+import { AppRequestMethods, MessageRequest } from "../types";
+import * as SiteAPI from "../../siteApi";
 import * as ImagePicker from "expo-image-picker";
+
+import webviewRouterEvent from "./webviewRouterEvent";
 
 export async function handleRequest(
   api: AppShellHostAPI,
@@ -40,6 +42,8 @@ export type Methods = {
 };
 
 export const methods: Methods = {
+  webviewRouterEvent,
+
   ping: async (api, payload) => {
     api.set("webContentReady", true);
     return { message: "pong" };

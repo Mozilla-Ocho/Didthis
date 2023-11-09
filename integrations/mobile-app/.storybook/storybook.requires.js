@@ -59,6 +59,7 @@ const getStories = () => {
     "./screens/Startup.stories.tsx": require("../screens/Startup.stories.tsx"),
     "./screens/WebApp.stories.tsx": require("../screens/WebApp.stories.tsx"),
     "./components/AppleSigninButton.stories.tsx": require("../components/AppleSigninButton.stories.tsx"),
+    "./components/BottomNav.stories.tsx": require("../components/BottomNav.stories.tsx"),
     "./components/DateTimePicker.stories.tsx": require("../components/DateTimePicker.stories.tsx"),
     "./components/Loader.stories.tsx": require("../components/Loader.stories.tsx"),
     "./components/LogoLoader.stories.tsx": require("../components/LogoLoader.stories.tsx"),

@@ -6,6 +6,7 @@ import { AppleAuthenticationCredential } from "expo-apple-authentication";
 export type AppMessages = {
   response: AppRequestMethods[AppRequestMethodNames]["response"];
   request: AppRequestMethods[AppRequestMethodNames]["request"];
+  navigateToPath: { path: string };
   appleCredential: { credential: AppleAuthenticationCredential };
   topNavLeftPress: { label: string };
   topNavRightPress: { label: string };
@@ -26,10 +27,21 @@ export type AppRequestMethods = {
     request: JSONObject;
     response: JSONObject;
   };
+  webviewRouterEvent: {
+    request: {
+      event: "routeChangeStart" | "routeChangeComplete";
+      url: string;
+    };
+    response: Success;
+  };
   updateAppConfig: {
     request: {
       user: ApiUser;
-      links: Record<string, string>;
+      links: {
+        user: string;
+        userEdit: string;
+        newPost: string;
+      };
     };
     response: JSONObject;
   };

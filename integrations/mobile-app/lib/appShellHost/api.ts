@@ -3,11 +3,11 @@ import { Dispatch } from "react";
 import { Action, State, statePropertyUpdateAction } from "./state";
 import { NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../App";
-import Constants from "expo-constants";
+import Config from "../../lib/config";
 import MessageHandler from "./messaging";
 import { WebViewMessageEvent } from "react-native-webview";
 
-const { siteBaseUrl } = Constants.expoConfig.extra;
+const { siteBaseUrl, originWhitelist } = Config;
 
 export default class AppShellHostAPI {
   messaging: MessageHandler;
@@ -25,9 +25,7 @@ export default class AppShellHostAPI {
   }
 
   navigateToPath(path: string) {
-    const webview = this.messaging.webview;
-    if (!webview) return;
-    webview.injectJavaScript(`window.location = "${siteBaseUrl}${path}"`);
+    this.postMessage("navigateToPath", { path });
   }
 
   set(...args: Parameters<typeof statePropertyUpdateAction>) {
@@ -40,10 +38,10 @@ export default class AppShellHostAPI {
   }
 
   setWebView(...args: Parameters<MessageHandler["setWebView"]>) {
-    return this.messaging.setWebView(...args)
+    return this.messaging.setWebView(...args);
   }
 
   postMessage(...args: Parameters<MessageHandler["postMessage"]>) {
-    return this.messaging.postMessage(...args)
+    return this.messaging.postMessage(...args);
   }
 }
