@@ -5,6 +5,7 @@ import * as ImagePicker from "expo-image-picker";
 
 import webviewRouterEvent from "./webviewRouterEvent";
 import pickDateTime from "./pickDateTime";
+import shareProjectUrl from "./shareProjectUrl";
 
 export async function handleRequest(
   api: AppShellHostAPI,
@@ -45,6 +46,7 @@ export type Methods = {
 export const methods: Methods = {
   webviewRouterEvent,
   pickDateTime,
+  shareProjectUrl,
 
   ping: async (api, payload) => {
     api.set("webContentReady", true);

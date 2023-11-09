@@ -38,7 +38,14 @@ export type AppRequestMethods = {
     response: {
       dateTime: number;
       changed: boolean;
-    }
+    };
+  };
+  shareProjectUrl: {
+    request: {
+      title: string;
+      url: string;
+    };
+    response: Success;
   };
   updateAppConfig: {
     request: {
@@ -98,7 +105,7 @@ export type DeferredResponses = {
     resolve: (payload: AppRequestMethods[K]["response"]) => void;
     reject: (error: any) => void;
   };
-}
+};
 
 export type DeferredResponse = DeferredResponses[AppRequestMethodNames];
 
