@@ -40,6 +40,24 @@ export type AppRequestMethods = {
       changed: boolean;
     };
   };
+  pickImage: {
+    request: {
+      intent: CldImageIntent;
+    };
+    response:
+      | { cancelled: true }
+      | {
+          asset_id: string;
+          created_at: string;
+          format: string;
+          image_metadata: JSONObject;
+          resource_type: string;
+          secure_url: string;
+          url: string;
+          width: number;
+          height: number;
+        };
+  };
   shareProjectUrl: {
     request: {
       title: string;
@@ -72,10 +90,6 @@ export type AppRequestMethods = {
       showEdit?: boolean;
       editIsDisabled?: boolean;
     };
-    response: JSONObject;
-  };
-  pickImage: {
-    request: JSONObject;
     response: JSONObject;
   };
 };
@@ -122,3 +136,5 @@ export type JSONValue =
 export interface JSONObject {
   [k: string]: JSONValue;
 }
+
+export type CldImageIntent = 'avatar' | 'post' | 'project';

@@ -1,11 +1,11 @@
 import AppShellHostAPI from "../api";
 import { AppRequestMethods, MessageRequest } from "../types";
 import * as SiteAPI from "../../siteApi";
-import * as ImagePicker from "expo-image-picker";
 
 import webviewRouterEvent from "./webviewRouterEvent";
 import pickDateTime from "./pickDateTime";
 import shareProjectUrl from "./shareProjectUrl";
+import pickImage from "./pickImage";
 
 export async function handleRequest(
   api: AppShellHostAPI,
@@ -47,6 +47,7 @@ export const methods: Methods = {
   webviewRouterEvent,
   pickDateTime,
   shareProjectUrl,
+  pickImage,
 
   ping: async (api, payload) => {
     api.set("webContentReady", true);
@@ -69,21 +70,5 @@ export const methods: Methods = {
   updateTopNav: async (api, payload) => {
     api.set("topNav", payload);
     return { success: true };
-  },
-
-  pickImage: async (api, payload, string) => {
-    // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-      exif: true,
-      base64: true,
-      allowsMultipleSelection: false,
-    });
-    if (!result.canceled) {
-      return result.assets[0];
-    }
   },
 };
