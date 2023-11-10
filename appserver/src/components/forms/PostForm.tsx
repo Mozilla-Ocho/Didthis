@@ -339,6 +339,7 @@ const LinkField = observer(({ postStore }: { postStore: PostStore }) => {
 })
 
 const ImageField = observer(({ postStore }: { postStore: PostStore }) => {
+  const appShell = useAppShell();
   const onResult = useCallback(
     res => {
       postStore.setImageAssetId(res.cloudinaryAssetId, res.imageMetaPrivate)
@@ -350,6 +351,15 @@ const ImageField = observer(({ postStore }: { postStore: PostStore }) => {
   }
   return (
     <div>
+      <Button
+        onClick={async () => {
+          const result = await appShell.api.request('pickImage', { intent: "post" })
+          window.alert(JSON.stringify(result))
+        }}
+      >
+        Pick native image
+      </Button>
+
       {postStore.imageAssetId && (
         <CloudinaryImage
           assetId={postStore.imageAssetId}
