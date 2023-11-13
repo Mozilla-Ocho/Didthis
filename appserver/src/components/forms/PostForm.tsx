@@ -18,7 +18,8 @@ import apiClient from '@/lib/apiClient'
 import log from '@/lib/log'
 import { ApiError } from '@/lib/apiCore'
 import LinkPreview from '../LinkPreview'
-import ImageUpload from '../ImageUpload'
+import ImageUploadWeb from '../ImageUpload'
+import ImageUploadAppShell from "../ImageUploadAppShell"
 import type { UploadCallback } from '../ImageUpload'
 import profileUtils from '@/lib/profileUtils'
 import { twMerge } from 'tailwind-merge'
@@ -339,7 +340,7 @@ const LinkField = observer(({ postStore }: { postStore: PostStore }) => {
 })
 
 const ImageField = observer(({ postStore }: { postStore: PostStore }) => {
-  const appShell = useAppShell();
+  const appShell = useAppShell()
   const onResult = useCallback(
     res => {
       postStore.setImageAssetId(res.cloudinaryAssetId, res.imageMetaPrivate)
@@ -349,17 +350,9 @@ const ImageField = observer(({ postStore }: { postStore: PostStore }) => {
   const deleteImage = () => {
     postStore.setImageAssetId('', undefined)
   }
+  const ImageUpload = appShell.appReady ? ImageUploadAppShell : ImageUploadWeb
   return (
     <div>
-      <Button
-        onClick={async () => {
-          const result = await appShell.api.request('pickImage', { intent: "post" })
-          window.alert(JSON.stringify(result))
-        }}
-      >
-        Pick native image
-      </Button>
-
       {postStore.imageAssetId && (
         <CloudinaryImage
           assetId={postStore.imageAssetId}

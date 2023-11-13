@@ -11,12 +11,13 @@ import { useState, useCallback } from 'react'
 import profileUtils from '@/lib/profileUtils'
 import pathBuilder from '@/lib/pathBuilder'
 import { useRouter } from 'next/router'
-import ImageUpload from '../ImageUpload'
+import ImageUploadWeb from '../ImageUpload'
 import type { UploadCallback } from '../ImageUpload'
 import { makeAutoObservable } from 'mobx'
 import { trackingEvents } from '@/lib/trackingEvents'
 import { ClaimTrialAccountButton } from '../auth/ClaimTrialAccountButton'
-import { useAppShellTopBar } from '@/lib/appShellContent'
+import useAppShell, { useAppShellTopBar } from '@/lib/appShellContent'
+import ImageUploadAppShell from '../ImageUploadAppShell'
 
 class ProjectStore {
   title: string
@@ -112,6 +113,7 @@ const ProjectForm = observer((props: Props) => {
   const { mode } = props
   const router = useRouter()
   const store = useStore()
+  const appShell = useAppShell()
   const user = store.user
   if (!user) return <></>
   const [projectStore] = useState(
@@ -169,6 +171,8 @@ const ProjectForm = observer((props: Props) => {
   const handleCancel = () => {
     store.goBack()
   }
+
+  const ImageUpload = appShell.appReady ? ImageUploadAppShell : ImageUploadWeb
 
   useAppShellTopBar({
     show: true,

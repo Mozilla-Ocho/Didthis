@@ -43,17 +43,21 @@ export type AppRequestMethods = {
     request: {
       intent: CldImageIntent;
     };
-    response: {
-      asset_id: string,
-      created_at: string,
-      format: string,
-      image_metadata: JSONObject,
-      resource_type: string,
-      secure_url: string,
-      url: string,
-      width: number,
-      height: number,
-    };
+    response:
+      | { cancelled: true }
+      | {
+          asset_id: string;
+          public_id: string;
+          created_at: string;
+          format: string;
+          image_metadata: JSONObject;
+          exif: JSONObject;
+          resource_type: string;
+          secure_url: string;
+          url: string;
+          width: number;
+          height: number;
+        };
   };
   shareProjectUrl: {
     request: {

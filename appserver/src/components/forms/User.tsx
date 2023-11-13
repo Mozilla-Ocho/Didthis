@@ -10,9 +10,10 @@ import { debounce } from 'lodash-es'
 import { action, makeAutoObservable } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useState } from 'react'
-import ImageUpload, { UploadCallback } from '../ImageUpload'
+import ImageUploadWeb, { UploadCallback } from '../ImageUpload'
 import { Button, CloudinaryImage, Input, Textarea } from '../uiLib'
-import { useAppShellTopBar } from '@/lib/appShellContent'
+import useAppShell, { useAppShellTopBar } from '@/lib/appShellContent'
+import ImageUploadAppShell from '../ImageUploadAppShell'
 
 class FormStore {
   name: string
@@ -282,6 +283,7 @@ class FormStore {
 }
 
 const ImageField = observer(({ formStore }: { formStore: FormStore }) => {
+  const appShell = useAppShell()
   const onResult = useCallback(
     res => {
       formStore.setImageAssetId(res.cloudinaryAssetId, res.imageMetaPrivate)
@@ -291,6 +293,7 @@ const ImageField = observer(({ formStore }: { formStore: FormStore }) => {
   const deleteImage = () => {
     formStore.setImageAssetId('', undefined)
   }
+  const ImageUpload = appShell.appReady ? ImageUploadAppShell : ImageUploadWeb
   return (
     <div>
       <h5 className="mb-4">Avatar</h5>
