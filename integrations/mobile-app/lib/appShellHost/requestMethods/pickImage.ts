@@ -10,34 +10,24 @@ import { Cloudinary } from "@cloudinary/url-gen";
 import { AppRequestMethods, CldImageIntent, JSONObject } from "../types";
 
 const baseCloudinaryConfig = {
-  cloud: {
-    cloudName: "dbpulyvbq",
-  },
-  url: {
-    secure: true,
-  },
+  cloud: { cloudName: "dbpulyvbq" },
+  url: { secure: true },
 };
 
-const uploadConfigs: Record<CldImageIntent, UploadApiOptions> = {
+const baseUploadOptions = { unsigned: true };
+
+const uploadOptions: Record<CldImageIntent, UploadApiOptions> = {
   avatar: {
     tags: ["avatar"],
     upload_preset: "avatar_uploads",
   },
   project: {
-    cropping: false,
-    croppingAspectRatio: undefined,
-    croppingCoordinatesMode: undefined,
-    showSkipCropButton: undefined,
     tags: ["post"],
     upload_preset: "obyw5ywa",
-    folder: "posts",
   },
   post: {
     tags: ["project"],
-    croppingAspectRatio: 1.5,
-
     upload_preset: "wuty6ww4",
-    folder: "projects",
   },
 };
 
@@ -45,43 +35,43 @@ export const pickImage: Methods["pickImage"] = async (api, payload) => {
   const { intent } = payload;
 
   let result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ImagePicker.MediaTypeOptions.All,
-    allowsEditing: true,
-    aspect: [4, 3],
-    quality: 1,
-    exif: true,
-    base64: false, //true,
+    mediaTypes: ImagePicker.MediaTypeOptions.Images,
     allowsMultipleSelection: false,
+    allowsEditing: true,
+    quality: 1,
+    base64: false,
+    exif: true,
   });
 
   if (result.canceled) return { cancelled: true };
 
-  const { uri } = result.assets[0];
+  const { uri, exif } = result.assets[0];
 
-  const cld = new Cloudinary({ ...baseCloudinaryConfig });
-
-  // TODO: set a loading indicator during upload
+  // TODO: switch this to a more specific photo uploading status message
+  // to web content, rather than global app loading?
+  api.set("loading", true);
 
   // Weird mashup of promise and callback, but that seems to be the way
   // https://cloudinary.com/documentation/react_native_image_and_video_upload
   let uploadResponse: UploadApiResponse | undefined,
     uploadError: UploadApiErrorResponse | undefined;
+  const cld = new Cloudinary({ ...baseCloudinaryConfig });
   await upload(cld, {
     file: uri,
-    options: { ...uploadConfigs[intent], unsigned: true },
-    callback: (error: UploadApiErrorResponse, response: UploadApiResponse) => {
+    options: { ...baseUploadOptions, ...uploadOptions[intent] },
+    callback: (error, response) => {
+      uploadError = error;
       uploadResponse = response;
-      console.debug("ERROR", error);
-      console.debug("RESPONSE", response);
     },
   });
 
-  // TODO: clear a loading indicator after upload
+  api.set("loading", false);
 
   if (uploadError) {
     throw new Error(`Failed to upload image ${uploadError.message}`);
   }
 
+  // TODO: perform some validation of uploadResponse?
   const {
     asset_id,
     created_at,
@@ -94,13 +84,12 @@ export const pickImage: Methods["pickImage"] = async (api, payload) => {
     height,
   } = uploadResponse;
 
-  // TODO: perform some validation of uploadResponse?
-
   const response: AppRequestMethods["pickImage"]["response"] = {
     asset_id: asset_id as string,
     created_at,
     format,
     image_metadata: image_metadata as JSONObject,
+    exif, // iOS exif differs a bit from cloudinary exif?
     resource_type,
     secure_url,
     url,

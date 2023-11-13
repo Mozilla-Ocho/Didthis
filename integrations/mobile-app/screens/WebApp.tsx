@@ -5,7 +5,7 @@ import { SafeAreaView, StatusBar, StyleSheet } from "react-native";
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../App";
 import Config from "../lib/config";
-import Loader, { WebviewRouteChangeLoader } from "../components/Loader";
+import Loader from "../components/Loader";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { ConditionalTopNav } from "../components/TopNav";
 import { ConditionalBottomNav } from "../components/BottomNav";
@@ -52,7 +52,6 @@ export default function WebAppScreen({ route }: WebAppScreenProps) {
         onMessage={appShellHost.onMessage}
       />
       <ConditionalBottomNav />
-      <WebviewRouteChangeLoader />
     </SafeAreaView>
   );
 }

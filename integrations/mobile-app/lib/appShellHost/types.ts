@@ -51,6 +51,7 @@ export type AppRequestMethods = {
           created_at: string;
           format: string;
           image_metadata: JSONObject;
+          exif: JSONObject;
           resource_type: string;
           secure_url: string;
           url: string;
