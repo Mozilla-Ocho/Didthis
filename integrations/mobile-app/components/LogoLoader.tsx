@@ -10,13 +10,10 @@ export type LogoLoaderProps = {};
 export default function LogoLoader({}: LogoLoaderProps) {
   return (
     <SafeAreaView
-      style={{
-        ...StyleSheet.absoluteFillObject,
-        flexDirection: "column",
-      }}
+      style={styles.container}
     >
       <LottieView
-        style={{ flexGrow: 1 }}
+        style={styles.loaderAnimation}
         source={require("../assets/DidThis-LoaderAnim.json")}
         autoPlay={true}
         loop={true}
@@ -24,3 +21,17 @@ export default function LogoLoader({}: LogoLoaderProps) {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    ...StyleSheet.absoluteFillObject,
+    flexDirection: "column",
+    justifyContent: "center",
+  },
+  loaderAnimation: {
+    width: 150,
+    height: 150,
+    alignSelf: "center",
+    // flexGrow: 1
+  }
+})
