@@ -122,8 +122,10 @@ const cloudinaryUrlDirect = (
    * this simple string code myself. i can't actually figure out how to get
    * c_limit,h_NNN,w_NNN out of the url-gen library from any docs... */
   const config = getCloudinaryConfig(intent)
+  // Projects want a 1.5 aspect ratio, others are square - but iOS will only offer square cropping
+  const aspectRatioTransform = intent === "project" ? "/c_fill,ar_1.5" : "/c_fill,ar_1";
   // note the assetId already contains the folder path
-  const url = `https://res.cloudinary.com/${config.cloudName}/image/upload/c_limit,h_2000,w_2000,f_jpg,q_auto/v1/${assetId}`
+  const url = `https://res.cloudinary.com/${config.cloudName}/image/upload/c_limit,h_2000,w_2000,f_jpg,q_auto${aspectRatioTransform}/v1/${assetId}`
   return url
 }
 

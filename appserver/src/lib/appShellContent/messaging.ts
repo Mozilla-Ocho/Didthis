@@ -1,5 +1,13 @@
 import { useEffect, useRef } from 'react'
-import { AppMessages, AppRequestMethods } from './types'
+import {
+  AppMessages,
+  AppRequestMethods,
+  MessageRequest,
+  MessageResponse,
+  MessageResponses,
+  Failure,
+  AppRequestMethodNames,
+} from './types'
 
 const MESSAGE_EVENT = 'AppShellMessage'
 
@@ -11,27 +19,14 @@ type WebViewWindow = typeof window & {
   }
 }
 
-type MessageRequest<T extends keyof AppRequestMethods> = {
-  type: 'request'
-  method: T
-  id: string
-  payload: AppRequestMethods[T]['request']
-}
-
-type MessageResponse<T extends keyof AppRequestMethods> = {
-  type: 'response'
-  id: string
-  payload: AppRequestMethods[T]['response']
-}
-
-type PendingMessageRequest<T extends keyof AppRequestMethods> =
+type PendingMessageRequest<T extends AppRequestMethodNames> =
   MessageRequest<T> & {
     resolve: (
       value:
         | AppRequestMethods[T]['response']
         | PromiseLike<AppRequestMethods[T]['response']>
     ) => void
-    reject: (result: Record<string, string>) => void
+    reject: (error: Failure) => void
   }
 
 export class MessageHandler {
@@ -70,7 +65,7 @@ export class MessageHandler {
   async request<T extends keyof AppRequestMethods>(
     method: T,
     payload?: AppRequestMethods[T]['request']
-  ) {
+  ): Promise<AppRequestMethods[T]['response']> {
     const request: MessageRequest<T> = {
       type: 'request',
       id: this.generateRequestId(),
@@ -121,7 +116,11 @@ export class MessageHandler {
         const pending = this.pendingRequests[id]
         if (pending && typeof payload === 'object') {
           delete this.pendingRequests[id]
-          pending.resolve(payload)
+          if ('failure' in payload) {
+            pending.reject(payload as Failure)
+          } else {
+            pending.resolve(payload as MessageResponses['payload'])
+          }
         }
       }
     } catch (e) {
@@ -142,7 +141,7 @@ export function useAppShellListener<T extends keyof AppMessages>(
 ) {
   const listener = useRef<(evt: Event) => void>()
   useEffect(() => {
-    if (!handler) return;
+    if (!handler) return
     if (typeof document !== 'undefined') {
       listener.current = ev => {
         const { detail } = ev as CustomEvent
