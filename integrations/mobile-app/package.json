@@ -23,6 +23,7 @@
     "expo-font": "~11.4.0",
     "expo-image": "~1.3.5",
     "expo-image-picker": "~14.3.2",
+    "expo-screen-orientation": "^6.2.0",
     "expo-sharing": "~11.5.0",
     "expo-splash-screen": "~0.20.5",
     "expo-status-bar": "~1.6.0",
