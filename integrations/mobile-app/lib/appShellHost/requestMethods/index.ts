@@ -1,5 +1,5 @@
 import AppShellHostAPI from "../api";
-import { AppRequestMethods, MessageRequest } from "../types";
+import { AppRequestMethods, Failure, MessageRequests } from "../types";
 import * as SiteAPI from "../../siteApi";
 
 import webviewRouterEvent from "./webviewRouterEvent";
@@ -9,15 +9,19 @@ import pickImage from "./pickImage";
 
 export async function handleRequest(
   api: AppShellHostAPI,
-  request: MessageRequest
+  request: MessageRequests
 ) {
   const { method, payload, id } = request;
   try {
     const responsePayload = await callRequestMethod(api, method, payload, id);
     api.messaging.postMessage("response", responsePayload, id);
   } catch (err) {
-    // TODO: establish a "responseError" message type?
     console.error(err);
+    const responseFailurePayload: Failure = {
+      failure: true,
+      message: "message" in err ? err.message : "" + err,
+    };
+    api.messaging.postMessage("response", responseFailurePayload, id);
   }
 }
 
@@ -26,11 +30,16 @@ export async function callRequestMethod<K extends keyof AppRequestMethods>(
   method: K,
   payload: AppRequestMethods[K]["request"],
   id: string
-) {
-  if (method in methods) {
-    return methods[method](api, payload, id);
+): Promise<AppRequestMethods[K]["response"] | Failure> {
+  try {
+    if (method in methods) {
+      return methods[method](api, payload, id);
+    }
+    throw new RequestMethodError(`unknown request method: ${method}`);
+  } catch (err) {
+    const message = "message" in err ? err.message : "" + err;
+    return { failure: true, message, ...err };
   }
-  throw new RequestMethodError(`unknown request method: ${method}`);
 }
 
 export class RequestMethodError extends Error {}

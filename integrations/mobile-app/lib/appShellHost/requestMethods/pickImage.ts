@@ -14,20 +14,23 @@ const baseCloudinaryConfig = {
   url: { secure: true },
 };
 
-const baseUploadOptions = { unsigned: true };
+const baseUploadOptions: UploadApiOptions = {
+  unsigned: true,
+};
 
 const uploadOptions: Record<CldImageIntent, UploadApiOptions> = {
   avatar: {
     tags: ["avatar"],
     upload_preset: "avatar_uploads",
   },
-  project: {
+  post: {
     tags: ["post"],
     upload_preset: "obyw5ywa",
   },
-  post: {
+  project: {
     tags: ["project"],
-    upload_preset: "wuty6ww4",
+    upload_preset: "ewriamfm", // trying to force an aspect radio 1.5 transform on upload
+    // upload_preset: "wuty6ww4", // same as web content
   },
 };
 
@@ -68,12 +71,14 @@ export const pickImage: Methods["pickImage"] = async (api, payload) => {
   api.set("loading", false);
 
   if (uploadError) {
+    console.error("upload error", uploadError);
     throw new Error(`Failed to upload image ${uploadError.message}`);
   }
 
   // TODO: perform some validation of uploadResponse?
   const {
     asset_id,
+    public_id,
     created_at,
     format,
     image_metadata,
@@ -86,6 +91,7 @@ export const pickImage: Methods["pickImage"] = async (api, payload) => {
 
   const response: AppRequestMethods["pickImage"]["response"] = {
     asset_id: asset_id as string,
+    public_id,
     created_at,
     format,
     image_metadata: image_metadata as JSONObject,
