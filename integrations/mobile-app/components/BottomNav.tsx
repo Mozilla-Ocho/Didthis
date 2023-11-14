@@ -1,4 +1,10 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import { styles as globalStyles, colors } from "../styles";
 import AddButtonImage from "../assets/add-button.svg";
 import useAppShellHost from "../lib/appShellHost";
@@ -6,29 +12,77 @@ import Animated, {
   useSharedValue,
   withSpring,
   FadeIn,
-  FadeOut,
+  // FadeOut,
   runOnJS,
 } from "react-native-reanimated";
 import { useState } from "react";
+import { Image } from "expo-image";
+import { ApiProject } from "../lib/types";
 
 export type BottomNavProps = {};
 
 export default function BottomNav({}: BottomNavProps) {
-  // const appShellHost = useAppShellHost();
-  // const { state, messaging } = appShellHost;
-  const drawerPos = useSharedValue(0);
-  const [showBackdrop, setShowBackdrop] = useState(false);
+  const appShellHost = useAppShellHost();
+  const { state, messaging } = appShellHost;
+  const gridSquareSize = 100;
+  const drawerHeight = 400;
+  const drawerHiddenY = -1 * drawerHeight - 50;
+  const drawerPos = useSharedValue(drawerHiddenY);
 
-  const damping = 13;
+  // drawerActive is the logical state of the drawer, but when it goes false,
+  // it's still shown for the duration of the close animation.
+  const [drawerActive, setDrawerActive] = useState(false);
+  // renderDrawer is the UI boolean that is only false once the close animations
+  // are done.
+  const [renderDrawer, setRenderDrawer] = useState(false);
+
+  const damping = 16;
   const onAddPress = () => {
-    drawerPos.value = withSpring(drawerPos.value + 300, { damping });
-    setShowBackdrop(true);
+    drawerPos.value = withSpring(0, { damping });
+    setRenderDrawer(true);
+    setDrawerActive(true);
   };
   const animDone = () => {
+    if (!drawerActive) setRenderDrawer(false);
   };
   const onClose = () => {
-    drawerPos.value = withSpring(0, { damping }, () => runOnJS(animDone)());
-    setShowBackdrop(false);
+    drawerPos.value = withSpring(drawerHiddenY, { damping }, () =>
+      runOnJS(animDone)(),
+    );
+    setDrawerActive(false);
+  };
+  const onCreateProject = () => {
+    // TODO: path construction logic is dependent on, and shared with, web app.
+    const path =
+      "/user/" + encodeURIComponent(state.user.publicPageSlug) + "/project/new";
+    messaging.postMessage("navigateToPath", { path });
+    onClose();
+  };
+  const onAddToProject = (project: ApiProject) => {
+    // TODO: path construction logic is dependent on, and shared with, web app.
+    const path =
+      "/user/" +
+      encodeURI(state.user.publicPageSlug) +
+      "/post?projectId=" +
+      encodeURIComponent(project.id);
+    messaging.postMessage("navigateToPath", { path });
+    onClose();
+  };
+
+  // TODO / BUG: this doesn't update right after a project is created. when
+  // does it actually update? seems to update when topnav is used...
+  const projects = Object.values(state.user ? state.user.profile.projects : {});
+  projects.sort((a, b) => b.createdAt - a.createdAt);
+
+  const projectImgUrl = (project: ApiProject) => {
+    // TODO: cloudinary url construction, like other paths, is dependent and
+    // shared w/ web app.
+    const cloudinaryBase = `https://res.cloudinary.com/dbpulyvbq/image/upload/c_limit,h_2000,w_2000,f_jpg,q_auto/v1/`;
+    if (project.imageAssetId) {
+      return cloudinaryBase + project.imageAssetId;
+    } else {
+      return cloudinaryBase + "projects/owj4cttaiwevemryev8x";
+    }
   };
 
   return (
@@ -38,24 +92,80 @@ export default function BottomNav({}: BottomNavProps) {
           <AddButtonImage width={54} height={54} />
         </TouchableOpacity>
       </View>
-      {showBackdrop && (
+      {drawerActive && (
         <Animated.View
           style={styles.overlay}
           entering={FadeIn}
           // exiting={FadeOut}
         >
+          {/* FadeOut is disabled for now b/c it's rendering oddly in the notch area. */}
           <TouchableOpacity
             style={styles.backdrop}
             onPress={onClose}
           ></TouchableOpacity>
         </Animated.View>
       )}
-      <Animated.View
-        style={{
-          ...styles.drawer,
-          height: drawerPos,
-        }}
-      ></Animated.View>
+      {renderDrawer && (
+        <Animated.View
+          style={{
+            ...styles.drawer,
+            height: drawerHeight,
+            bottom: drawerPos,
+            padding: 15,
+          }}
+        >
+          <Text style={{ fontWeight: "bold", textAlign: "center" }}>
+            Add update to which project?
+          </Text>
+          <ScrollView
+            style={{
+              paddingTop: 15,
+            }}
+          >
+            <View
+              style={{
+                flex: 1,
+                flexDirection: "row",
+                flexWrap: "wrap",
+                gap: 20,
+              }}
+            >
+              <TouchableOpacity
+                style={{ width: gridSquareSize }}
+                onPress={onCreateProject}
+              >
+                <AddButtonImage
+                  width={gridSquareSize}
+                  height={gridSquareSize}
+                />
+                <Text style={{ marginTop: 5, textAlign: "center" }}>
+                  Create project
+                </Text>
+              </TouchableOpacity>
+              {projects.map((project) => (
+                <TouchableOpacity
+                  key={project.id}
+                  style={{ width: gridSquareSize }}
+                  onPress={() => onAddToProject(project)}
+                >
+                  <Image
+                    style={{
+                      width: gridSquareSize,
+                      height: gridSquareSize,
+                      borderRadius: 15,
+                    }}
+                    contentFit="cover"
+                    source={projectImgUrl(project)}
+                  />
+                  <Text style={{ marginTop: 5, textAlign: "center" }}>
+                    {project.title}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </ScrollView>
+        </Animated.View>
+      )}
     </>
   );
 }
@@ -100,7 +210,7 @@ const styles = StyleSheet.create({
     left: 0,
     bottom: 0,
     right: 0,
-    shadowOffset: {width:0,height:0},
+    shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 1,
     shadowRadius: 10,
   },
