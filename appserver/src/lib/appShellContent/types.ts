@@ -37,7 +37,7 @@ export type AppRequestMethods = {
     response: {
       dateTime: number;
       changed: boolean;
-    }
+    };
   };
   pickImage: {
     request: {
@@ -95,34 +95,38 @@ export type AppRequestMethods = {
   };
 };
 
+export type CldImageIntent = "avatar" | "post" | "project";
+
 export type AppRequestMethodNames = keyof AppRequestMethods;
 
-export type MessageRequest = {
-  [K in AppRequestMethodNames]: {
-    type: "request";
-    id: string;
-    method: K;
-    payload: AppRequestMethods[K]["request"];
-  };
-}[AppRequestMethodNames];
+export type MessageRequest<K extends keyof AppRequestMethods> = {
+  type: "request";
+  id: string;
+  method: K;
+  payload: AppRequestMethods[K]["request"];
+};
 
-export type MessageResponse = {
-  [K in AppRequestMethodNames]: {
-    type: "response";
-    id: string;
-    method: K;
-    payload: AppRequestMethods[K]["response"];
-  };
-}[AppRequestMethodNames];
+export type MessageRequests = {
+  [K in AppRequestMethodNames]: MessageRequest<K>;
+}[AppRequestMethodNames]
 
-export type DeferredResponse = {
-  [K in AppRequestMethodNames]: {
-    resolve: (payload: AppRequestMethods[K]["response"]) => void;
-    reject: (error: any) => void;
-  };
+export type MessageResponse<K extends keyof AppRequestMethods> = {
+  type: "response";
+  id: string;
+  method: K;
+  payload: AppRequestMethods[K]["response"] | Failure;
+};
+
+export type MessageResponses = {
+  [K in AppRequestMethodNames]: MessageResponse<K>;
 }[AppRequestMethodNames];
 
 export type Success = { success: true };
+
+export type Failure = { failure: true; message: string } & Record<
+  string,
+  JSONObject
+>;
 
 export type JSONValue =
   | string

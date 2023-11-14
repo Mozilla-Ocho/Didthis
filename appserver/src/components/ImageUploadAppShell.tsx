@@ -33,23 +33,29 @@ const ImageUploadAppShell = ({
   const store = useStore()
 
   const handlePickImage = async () => {
-    const result = await appShell.api.request('pickImage', { intent: 'post' })
-    // TODO: report an error here?
-    if (!result || 'cancelled' in result) return
-    store.trackEvent(trackingEvents.caUploadImage, { imgIntent: intent })
-    onUploadWithUseCallback({
-      cloudinaryAssetId: result.public_id,
-      imageMetaPrivate: {
-        ...result,
-        image_metadata: {
-          ...result.image_metadata,
-          // HACK: result.exif is from native OS and seems to have more
-          // reliable data than cloudinary's response
-          ...result.exif,
-        },
-        metaOrigin: 'private',
-      } as CldImageMetaPrivate,
-    })
+    try {
+      const result = await appShell.api.request('pickImage', { intent: 'post' })
+      if (!result || 'cancelled' in result) return
+
+      store.trackEvent(trackingEvents.caUploadImage, { imgIntent: intent })
+
+      onUploadWithUseCallback({
+        cloudinaryAssetId: result.public_id,
+        imageMetaPrivate: {
+          ...result,
+          image_metadata: {
+            ...result.image_metadata,
+            // HACK: result.exif is from native OS and seems to have more
+            // reliable data than cloudinary's response
+            ...result.exif,
+          },
+          metaOrigin: 'private',
+        } as CldImageMetaPrivate,
+      })
+    } catch (err) {
+      window.alert(`Image upload failed, please try again later.`);
+      console.error("image upload failed", err);
+    }
   }
 
   return (
