@@ -13,6 +13,7 @@ import SigninScreen, { SigninScreenRouteParams } from "./screens/Signin";
 import StartupScreen, { StartupScreenRouteParams } from "./screens/Startup";
 import * as Onboarding from "./screens/Onboarding";
 import * as DateTimePicker from "./screens/DateTimePicker";
+import { ConditionalLoader } from "./components/Loader";
 
 export type RootStackParamList = {
   Startup: StartupScreenRouteParams;
@@ -48,6 +49,7 @@ function App() {
           <Stack.Screen name="WebApp" component={WebAppScreen} />
           <Stack.Screen name="DateTimePicker" component={DateTimePicker.default} />
         </Stack.Navigator>
+        <ConditionalLoader />
       </AppShellHostContextProvider>
     </NavigationContainer>
   );

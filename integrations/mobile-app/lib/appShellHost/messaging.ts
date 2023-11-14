@@ -3,18 +3,16 @@ import AppShellHostAPI from "./api";
 import { handleRequest } from "./requestMethods";
 import {
   AppMessages,
-  MessageRequest,
-  MessageResponse,
-  DeferredResponse,
+  MessageRequests,
+  MessageResponses,
   AppRequestMethodNames,
   AppRequestMethods,
-  DeferredResponses,
 } from "./types";
 
 export default class MessageHandler {
   api: AppShellHostAPI;
   webview: WebView | undefined;
-  deferredResponses: Record<MessageResponse["id"], DeferredResponse>;
+  deferredResponses: Record<MessageResponses["id"], DeferredResponse>;
 
   constructor() {
     this.webview = undefined;
@@ -25,17 +23,31 @@ export default class MessageHandler {
     this.webview = webview;
   }
 
-  async deferResponse<K extends AppRequestMethodNames>(id: MessageResponse["id"]) {
-    return new Promise<AppRequestMethods[K]["response"]>((resolve, reject) => {
-      this.deferredResponses[id] = { resolve, reject };
-    }).then((result) => {
-      delete this.deferredResponses[id];
-      return result;
+  async deferResponse<K extends AppRequestMethodNames>(
+    id: MessageResponses["id"]
+  ) {
+    type Response = AppRequestMethods[K]["response"];
+    return new Promise<Response>((resolve, reject) => {
+      this.deferredResponses[id] = {
+        resolve: this.withDeferredResponseCleanup(id, resolve),
+        reject: this.withDeferredResponseCleanup(id, reject),
+      };
     });
-    // TODO: catch?
   }
 
-  getDeferredResponse<K extends AppRequestMethodNames>(id: MessageResponse["id"]) {
+  withDeferredResponseCleanup<U extends (...args: any[]) => any>(
+    id: MessageResponses["id"],
+    func: U
+  ) {
+    return (...args: Parameters<U>): ReturnType<U> => {
+      delete this.deferredResponses[id];
+      return func(...args);
+    };
+  }
+
+  getDeferredResponse<K extends AppRequestMethodNames>(
+    id: MessageResponses["id"]
+  ) {
     return this.deferredResponses[id] as DeferredResponses[K];
   }
 
@@ -56,7 +68,7 @@ export default class MessageHandler {
       const message = JSON.parse(data);
       if (!message || !message.type || !message.id) return;
       if (message.type === "request") {
-        await handleRequest(api, message as MessageRequest);
+        await handleRequest(api, message as MessageRequests);
       }
     } catch (err) {
       // TODO: handle exceptions more usefully here?
@@ -64,3 +76,12 @@ export default class MessageHandler {
     }
   }
 }
+
+type DeferredResponses = {
+  [K in AppRequestMethodNames]: {
+    resolve: (payload: AppRequestMethods[K]["response"]) => void;
+    reject: (error: Error) => void;
+  };
+};
+
+type DeferredResponse = DeferredResponses[AppRequestMethodNames];

@@ -1,8 +1,4 @@
-import {
-  StyleSheet, SafeAreaView,
-  StyleProp,
-  ViewStyle
-} from "react-native";
+import { StyleSheet, SafeAreaView, StyleProp, ViewStyle } from "react-native";
 import LottieView from "lottie-react-native";
 import useAppShellHost from "../lib/appShellHost";
 
@@ -31,12 +27,9 @@ export default function Loader({ style }: LoaderProps) {
   );
 }
 
-export function WebviewRouteChangeLoader() {
+export function ConditionalLoader() {
   const appShellHost = useAppShellHost();
-  const webContentRouteChanging = appShellHost.state?.webContentRouteChanging;
-  if (!webContentRouteChanging) return <></>;
-
-  return (
-    <Loader style={{ backgroundColor: "rgba(0, 0, 0, 0.3)" }} />
-  );
+  const loading = appShellHost.state?.loading;
+  if (!loading) return <></>;
+  return <Loader style={{ backgroundColor: "rgba(0, 0, 0, 0.3)" }} />;
 }

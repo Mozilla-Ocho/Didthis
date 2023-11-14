@@ -8,6 +8,7 @@ import type { Methods } from "./index";
  * @param route MatchRouteResult
  */
 function routeChangeStart(api: AppShellHostAPI, route: MatchRouteResult) {
+  api.set("loading", true);
   api.set("webContentRouteChanging", true);
 }
 
@@ -18,6 +19,7 @@ function routeChangeStart(api: AppShellHostAPI, route: MatchRouteResult) {
  * @param route MatchRouteResult
  */
 function routeChangeComplete(api: AppShellHostAPI, route: MatchRouteResult) {
+  api.set("loading", false);
   api.set("webContentRouteChanging", false);
 
   const showBottomNav = !hideBottomNavRoutes.includes(route?.name);

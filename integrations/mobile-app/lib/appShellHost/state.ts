@@ -3,6 +3,7 @@ import { ApiUser } from "../types";
 import { AppRequestMethods } from "./types";
 
 export type State = {
+  loading: boolean;
   webContentReady: boolean;
   webContentRouteChanging: boolean;
   user?: ApiUser;
@@ -15,6 +16,7 @@ export type State = {
 
 export function createInitialState(): State {
   return {
+    loading: false,
     webContentReady: false,
     webContentRouteChanging: false,
     links: {},
