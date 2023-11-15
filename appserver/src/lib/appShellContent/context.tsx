@@ -3,6 +3,8 @@ import { createContext, ReactNode, useEffect, useRef } from 'react'
 import { createInitialState, State, useAppShellState } from './state'
 import { useRouter } from 'next/router'
 import { useAppShellListener } from './messaging'
+import { useStore } from '../store'
+import pathBuilder from '../pathBuilder'
 
 export const AppShellContext = createContext<State>(createInitialState())
 
@@ -15,6 +17,7 @@ export default function AppShellContextProvider({
 }: AppShellContextProps) {
   const [state, dispatch] = useAppShellState()
   const router = useRouter()
+  const store = useStore()
 
   const { inAppWebView, api } = state
   const isInWebView = api.isInWebView()
@@ -41,6 +44,16 @@ export default function AppShellContextProvider({
       api.request('webviewRouterEvent', { event: 'routeChangeStart', url })
     }
     const handleRouteChangeComplete = (url: string) => {
+      if (store.user) {
+        api.request('updateAppConfig', {
+          user: store.user,
+          links: {
+            user: pathBuilder.user(store.user.systemSlug),
+            userEdit: pathBuilder.userEdit(store.user.systemSlug),
+            newPost: pathBuilder.newPost(store.user.systemSlug),
+          },
+        })
+      }
       api.request('webviewRouterEvent', { event: 'routeChangeComplete', url })
       api.request('updateTopNav', { show: false })
     }
@@ -50,7 +63,7 @@ export default function AppShellContextProvider({
       router.events.off('routeChangeStart', handleRouteChangeStart)
       router.events.off('routeChangeComplete', handleRouteChangeComplete)
     }
-  }, [api, router])
+  }, [api, router, store.user, state.appReady])
 
   useAppShellListener('navigateToPath', ({ path }) => router.push(path))
 
