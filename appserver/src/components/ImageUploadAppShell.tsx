@@ -53,7 +53,7 @@ const ImageUploadAppShell = ({
         } as CldImageMetaPrivate,
       })
     } catch (err) {
-      window.alert(`Image upload failed, please try again later.`);
+      window.alert(`Image upload failed, please try again later. Reason: ${err}`);
       console.error("image upload failed", err);
     }
   }

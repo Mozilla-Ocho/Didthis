@@ -1,9 +1,10 @@
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@/lib/store'
+import Image from 'next/image'
 import ProjectList from '@/components/ProjectList'
 import { Button, Divider, Link, PagePad } from '@/components/uiLib'
 import pathBuilder from '@/lib/pathBuilder'
-import UserPreview from '../UserPreview'
+import UserPreview, { UserAvatar } from '../UserPreview'
 import { useLocalStorage } from 'usehooks-ts'
 import { useEffect, useState } from 'react'
 import { trackingEvents } from '@/lib/trackingEvents'
@@ -13,6 +14,8 @@ import RemindersAndAlerts from '../RemindersAndAlerts'
 import branding from '@/lib/branding'
 import useAppShell from '@/lib/appShellContent'
 
+import settingsGear from '@/assets/img/settings-gear.svg'
+
 const HomeAuth = observer(() => {
   const store = useStore()
   const [skipBlankSlate, setSkipBlankSlate] = useLocalStorage(
@@ -21,21 +24,6 @@ const HomeAuth = observer(() => {
   )
   const [rendered, setRendered] = useState(false)
   store.useTrackedPageEvent(trackingEvents.pvHomeAuth)
-
-  const appShell = useAppShell()
-  useEffect(() => {
-    // Update the app shell with user & nav related details
-    if (store.user && appShell.appReady) {
-      appShell.api.request('updateAppConfig', {
-        user: store.user,
-        links: {
-          user: pathBuilder.user(store.user.systemSlug),
-          userEdit: pathBuilder.userEdit(store.user.systemSlug),
-          newPost: pathBuilder.newPost(store.user.systemSlug),
-        },
-      })
-    }
-  }, [store.user, appShell.appReady, appShell.api])
 
   useEffect(() => {
     // this is a hack to prevent a failure of client vs server rendering state,
@@ -56,6 +44,65 @@ const HomeAuth = observer(() => {
   const handleSkip = () => {
     setSkipBlankSlate(true)
   }
+
+  const ugcUsername = store.user.userSlug || store.user.profile.name
+  const title = ugcUsername ? ugcUsername + '’s projects' : 'My projects'
+
+  const appShell = useAppShell()
+  if (appShell.inAppWebView) {
+    return (
+      <>
+        <PageTitle title={title} />
+        <OgMeta user={store.user} />
+        <PagePad yControlOnly>
+          <PagePad wide noPadY>
+            <div className="flex flex-row mb-6">
+              <div className="flex-column">
+                <div className="font-bold text-sm text-yellow-600">
+                  {ugcUsername}
+                </div>
+                <h3>My projects</h3>
+              </div>
+              <div className="flex flex-column grow justify-end items-center relative">
+                <Link
+                  href={pathBuilder.userEdit(store.user.systemSlug)}
+                  style={{ width: 54, height: 54 }}
+                  className="flex shrink no-underline block"
+                >
+                  <UserAvatar user={store.user} />
+                  <Image
+                    className="absolute right-0 bottom-2"
+                    width={16}
+                    height={16}
+                    src={settingsGear}
+                    alt="profile settings"
+                  />
+                </Link>
+              </div>
+            </div>
+            {hasProjects ? (
+              <ProjectList targetUser={store.user} />
+            ) : (
+              <>
+                <div className="flex flex-row gap-4 my-2 mb-10">
+                  <Link
+                    intent="primary"
+                    className="grow basis-1 sm:grow-0 sm:basis-auto"
+                    href={pathBuilder.newProject(store.user.systemSlug)}
+                    trackEvent={trackingEvents.bcCreatProjectHomeAuth}
+                  >
+                    Create project
+                  </Link>
+                </div>
+                <p>You don't have any projects yet. Create a project.</p>
+              </>
+            )}
+          </PagePad>
+        </PagePad>
+      </>
+    )
+  }
+
   const addCreatBtns = (
     <div className="flex flex-row gap-4 my-2 mb-10">
       <Link
@@ -103,8 +150,6 @@ const HomeAuth = observer(() => {
       </>
     )
   }
-  const ugcUsername = store.user.userSlug || store.user.profile.name
-  const title = ugcUsername ? ugcUsername + '’s projects' : 'My projects'
   return (
     <>
       <PageTitle title={title} />

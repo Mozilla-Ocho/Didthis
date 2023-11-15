@@ -10,6 +10,18 @@ import rdIcon from '@/assets/img/reddit_2x.png'
 import fbIcon from '@/assets/img/facebook_2x.png'
 import igIcon from '@/assets/img/instagram_2x.png'
 
+export const UserAvatar = observer(({ user }: { user: ApiUser }) => {
+  const store = useStore()
+  return user.profile.imageAssetId ? (
+    <CloudinaryImage assetId={user.profile.imageAssetId} intent="avatar" />
+  ) : (
+    <CloudinaryImage
+      assetId={specialAssetIds.defaultAvatarID}
+      intent="avatar"
+    />
+  )
+})
+
 const UserPreview = observer(
   ({ user, compact }: { user: ApiUser; compact: boolean }) => {
     const store = useStore()
@@ -17,21 +29,9 @@ const UserPreview = observer(
     if (compact) {
       return (
         <div className="flex flex-row gap-4 items-center">
-          {user.profile.imageAssetId ? (
-            <p className="w-8">
-              <CloudinaryImage
-                assetId={user.profile.imageAssetId}
-                intent="avatar"
-              />
-            </p>
-          ) : (
-            <p className="w-8">
-              <CloudinaryImage
-                assetId={specialAssetIds.defaultAvatarID}
-                intent="avatar"
-              />
-            </p>
-          )}
+          <p className="w-8">
+            <UserAvatar user={user} />
+          </p>
           <p className="m-0 text-sm">
             <Link
               intent="internalNav"
