@@ -30,9 +30,9 @@ const Config = {
   siteBaseUrl,
   originWhitelist: [siteBaseUrl, ...baseOriginWhitelist],
   legalUrls: {
-    terms: 'https://didthis.app/terms',
-    privacy: 'https://didthis.app/privacy',
-    content: 'https://didthis.app/content',
+    terms: `${siteBaseUrl}/terms`,
+    privacy: `${siteBaseUrl}/privacy`,
+    content: `${siteBaseUrl}/content`,
   },
 };
 
