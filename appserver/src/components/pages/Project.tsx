@@ -181,12 +181,14 @@ const ProjectPage = observer(
         <PagePad>
           <UserPreview user={targetUser} compact={true} />
 
+          <h4 className="mt-4 mb-2">{project.title}</h4>
+
           <div className="grid grid-cols-[66%_34%] my-4">
             <p className="body-bs">
-              <strong>{isPrivate ? 'Private' : 'Public'}</strong> &mdash;{' '}
               {project.currentStatus === 'active' && <span>In Progress</span>}
               {project.currentStatus === 'complete' && <span>Completed</span>}
               {project.currentStatus === 'paused' && <span>Paused</span>}
+              &mdash; <strong>{isPrivate ? 'Private' : 'Public'}</strong>
             </p>
             <p className="body-bs text-right">
               {numPosts} post{numPosts === 1 ? '' : 's'}
@@ -210,41 +212,43 @@ const ProjectPage = observer(
             )}
           </div>
 
-          <h4 className="mt-4 mb-2">{project.title}</h4>
-
           {project.description && (
             <p className="break-words whitespace-pre-line my-2">
               {project.description}
             </p>
           )}
 
-          <div className="my-4 flex flex-col sm:flex-row items-center gap-4">
-            {store.user && // store.user redundant when isSelf but tsserver needs it
-              isSelf && (
-                <Link
-                  id="buttonEdit"
+          {!appShell.inAppWebView && (
+            <>
+              <div className="my-4 flex flex-col sm:flex-row items-center gap-4">
+                {store.user && // store.user redundant when isSelf but tsserver needs it
+                  isSelf && (
+                    <Link
+                      id="buttonEdit"
+                      className="w-full sm:w-auto"
+                      intent="secondary"
+                      href={pathBuilder.projectEdit(
+                        store.user.systemSlug,
+                        project.id
+                      )}
+                      trackEvent={trackingEvents.bcEditProject}
+                    >
+                      Edit project
+                    </Link>
+                  )}
+                <Button
+                  id="buttonShare"
                   className="w-full sm:w-auto"
                   intent="secondary"
-                  href={pathBuilder.projectEdit(
-                    store.user.systemSlug,
-                    project.id
-                  )}
-                  trackEvent={trackingEvents.bcEditProject}
+                  onClick={handleConditionalShare}
                 >
-                  Edit project
-                </Link>
-              )}
-            <Button
-              id="buttonShare"
-              className="w-full sm:w-auto"
-              intent="secondary"
-              onClick={handleConditionalShare}
-            >
-              Share project
-            </Button>
-          </div>
+                  Share project
+                </Button>
+              </div>
 
-          <Divider light className="my-6" />
+              <Divider light className="my-6" />
+            </>
+          )}
 
           {store.user && // store.user redundant when isSelf but tsserver needs it
             isSelf && (

@@ -28,13 +28,14 @@ const UserPreview = observer(
     const isSelf = store.user && store.user.id === user.id
     if (compact) {
       return (
-        <div className="flex flex-row gap-4 items-center">
+        <div className="flex flex-row gap-2 items-center">
           <p className="w-8">
             <UserAvatar user={user} />
           </p>
           <p className="m-0 text-sm">
             <Link
               intent="internalNav"
+              className="no-underline font-bold text-sm text-yellow-600"
               href={pathBuilder.user(user.publicPageSlug)}
             >
               {user.profile.name || 'Unnamed user'}
