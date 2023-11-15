@@ -3,6 +3,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  TouchableHighlight,
   ScrollView,
 } from "react-native";
 import { styles as globalStyles, colors } from "../styles";
@@ -217,9 +218,9 @@ export default function BottomNav({}: BottomNavProps) {
   return (
     <>
       <View style={styles.container}>
-        <TouchableOpacity style={styles.addButton} onPress={onAddPress}>
-          <AddButtonImage width={54} height={54} />
-        </TouchableOpacity>
+        <TouchableHighlight style={styles.addButton} underlayColor="#FFF1A6" onPress={onAddPress}>
+          <AddButtonImage width={70} height={70} />
+        </TouchableHighlight>
       </View>
       <ProjectDrawer isOpen={drawerOpen} requestClose={requestClose} />
     </>
@@ -292,5 +293,6 @@ const styles = StyleSheet.create({
   },
   addButton: {
     marginTop: -25,
+    borderRadius: 100
   },
 });
