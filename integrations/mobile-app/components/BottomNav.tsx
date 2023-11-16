@@ -15,74 +15,192 @@ import Animated, {
   // FadeOut,
   runOnJS,
 } from "react-native-reanimated";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Image } from "expo-image";
 import { ApiProject } from "../lib/types";
 
 export type BottomNavProps = {};
 
-export default function BottomNav({}: BottomNavProps) {
+// TODO: path construction logic is dependent on, and shared with, web app.
+
+type VoidFn = () => void;
+
+function CreateProjectSquare({ requestClose }: { requestClose: VoidFn }) {
   const appShellHost = useAppShellHost();
   const { state, messaging } = appShellHost;
-  const gridSquareSize = 100;
-  const drawerHeight = 400;
-  const drawerHiddenY = -1 * drawerHeight - 50;
-  const drawerPos = useSharedValue(drawerHiddenY);
-
-  // drawerActive is the logical state of the drawer, but when it goes false,
-  // it's still shown for the duration of the close animation.
-  const [drawerActive, setDrawerActive] = useState(false);
-  // renderDrawer is the UI boolean that is only false once the close animations
-  // are done.
-  const [renderDrawer, setRenderDrawer] = useState(false);
-
-  const damping = 16;
-  const onAddPress = () => {
-    drawerPos.value = withSpring(0, { damping });
-    setRenderDrawer(true);
-    setDrawerActive(true);
-  };
-  const animDone = () => {
-    if (!drawerActive) setRenderDrawer(false);
-  };
-  const onClose = () => {
-    drawerPos.value = withSpring(drawerHiddenY, { damping }, () =>
-      runOnJS(animDone)(),
-    );
-    setDrawerActive(false);
-  };
   const onCreateProject = () => {
-    // TODO: path construction logic is dependent on, and shared with, web app.
     const path =
       "/user/" + encodeURIComponent(state.user.publicPageSlug) + "/project/new";
     messaging.postMessage("navigateToPath", { path });
-    onClose();
+    requestClose();
   };
-  const onAddToProject = (project: ApiProject) => {
-    // TODO: path construction logic is dependent on, and shared with, web app.
+  return (
+    <TouchableOpacity
+      style={{ ...styles.projectSquare, height: "auto" }}
+      onPress={onCreateProject}
+    >
+      <AddButtonImage
+        width={styles.projectSquare.width}
+        height={styles.projectSquare.height}
+      />
+      <Text style={styles.projectGridItemText}>Create project</Text>
+    </TouchableOpacity>
+  );
+}
+
+function ProjectSquare({
+  project,
+  requestClose,
+}: {
+  project: ApiProject;
+  requestClose: VoidFn;
+}) {
+  const appShellHost = useAppShellHost();
+  const { state, messaging } = appShellHost;
+  const onAddToProject = () => {
     const path =
       "/user/" +
       encodeURI(state.user.publicPageSlug) +
       "/post?projectId=" +
       encodeURIComponent(project.id);
     messaging.postMessage("navigateToPath", { path });
-    onClose();
+    requestClose();
   };
+  // TODO: cloudinary url construction, like other paths, is dependent and
+  // shared w/ web app.
+  const cloudinaryBase = `https://res.cloudinary.com/dbpulyvbq/image/upload/c_limit,h_2000,w_2000,f_jpg,q_auto/v1/`;
+  let projectImgUrl = project.imageAssetId
+    ? cloudinaryBase + project.imageAssetId
+    : cloudinaryBase + "projects/owj4cttaiwevemryev8x";
 
-  // TODO / BUG: this doesn't update right after a project is created. when
-  // does it actually update? seems to update when topnav is used...
+  return (
+    <TouchableOpacity
+      key={project.id}
+      style={{ ...styles.projectSquare, height: "auto" }}
+      onPress={onAddToProject}
+    >
+      <Image
+        style={styles.projectSquare}
+        contentFit="cover"
+        source={projectImgUrl}
+      />
+      <Text style={styles.projectGridItemText}>{project.title}</Text>
+    </TouchableOpacity>
+  );
+}
+
+function ProjectDrawer({
+  isOpen,
+  requestClose,
+}: {
+  // isOpen is the logical state of the drawer, and turns on/off the overlay,
+  // but the drawer is always rendered below the screen, animates up on true,
+  // and animates down after this goes false.
+  isOpen: boolean;
+  // since this is a controlled component where the parent controls the
+  // open/close state, we need a signal that it needs to close, like when a
+  // user clicks a project and the navigation starts.
+  requestClose: VoidFn;
+}) {
+  const appShellHost = useAppShellHost();
+  const { state } = appShellHost;
+
+  const damping = 16;
+  const drawerHiddenY = -1 * styles.drawer.height - 50;
+  const drawerPos = useSharedValue(drawerHiddenY);
+  const [renderDrawer, setRenderDrawer] = useState(false);
+  const [doneClosing, setDoneClosing] = useState(false);
+
+  const onCloseAnimDone = useCallback(() => {
+    // the callback dance here is a bit weird:
+    // - reanimated library runs on another thread so callbacks need to be wrapped in runOnJS
+    // - we need to use useCallback so that the useEffect that registers the
+    // callback doesn't fire every render
+    // - useCallback can't really access current state values, so it sets a
+    // secondary value to false and another useEffect monitors the combo of the
+    // animation done signal and the isOpen state (so that if the user reopens
+    // the drawer before the animation is done, we don't destroy the view.)
+    setDoneClosing(false);
+  }, [setDoneClosing]);
+
+  useEffect(() => {
+    if (isOpen) {
+      drawerPos.value = withSpring(0, { damping });
+      setRenderDrawer(true);
+    } else {
+      drawerPos.value = withSpring(drawerHiddenY, { damping }, () =>
+        runOnJS(onCloseAnimDone)(),
+      );
+    }
+  }, [isOpen, onCloseAnimDone]);
+
+  useEffect(() => {
+    if (doneClosing && !isOpen) {
+      setRenderDrawer(false);
+    }
+    if (doneClosing && isOpen) {
+      setDoneClosing(false);
+    }
+  });
+
   const projects = Object.values(state.user ? state.user.profile.projects : {});
   projects.sort((a, b) => b.createdAt - a.createdAt);
 
-  const projectImgUrl = (project: ApiProject) => {
-    // TODO: cloudinary url construction, like other paths, is dependent and
-    // shared w/ web app.
-    const cloudinaryBase = `https://res.cloudinary.com/dbpulyvbq/image/upload/c_limit,h_2000,w_2000,f_jpg,q_auto/v1/`;
-    if (project.imageAssetId) {
-      return cloudinaryBase + project.imageAssetId;
-    } else {
-      return cloudinaryBase + "projects/owj4cttaiwevemryev8x";
-    }
+  return (
+    <>
+      {isOpen && (
+        <Animated.View
+          style={styles.backdropContainer}
+          entering={FadeIn}
+          // exiting={FadeOut}
+        >
+          {/* FadeOut is disabled for now b/c it's rendering oddly in the notch area. */}
+          <TouchableOpacity
+            style={styles.backdrop}
+            onPress={requestClose}
+          ></TouchableOpacity>
+        </Animated.View>
+      )}
+      {renderDrawer && (
+        <Animated.View
+          style={{
+            ...styles.drawer,
+            bottom: drawerPos,
+          }}
+        >
+          <Text style={styles.projectGridHeading}>
+            Add update to which project?
+          </Text>
+          <ScrollView
+            style={{
+              paddingTop: 15,
+            }}
+          >
+            <View style={styles.projectGrid}>
+              <CreateProjectSquare requestClose={requestClose} />
+              {projects.map((project) => (
+                <ProjectSquare
+                  key={project.id}
+                  project={project}
+                  requestClose={requestClose}
+                />
+              ))}
+            </View>
+          </ScrollView>
+        </Animated.View>
+      )}
+    </>
+  );
+}
+
+export default function BottomNav({}: BottomNavProps) {
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const onAddPress = () => {
+    setDrawerOpen(true);
+  };
+  const requestClose = () => {
+    setDrawerOpen(false);
   };
 
   return (
@@ -92,80 +210,7 @@ export default function BottomNav({}: BottomNavProps) {
           <AddButtonImage width={54} height={54} />
         </TouchableOpacity>
       </View>
-      {drawerActive && (
-        <Animated.View
-          style={styles.overlay}
-          entering={FadeIn}
-          // exiting={FadeOut}
-        >
-          {/* FadeOut is disabled for now b/c it's rendering oddly in the notch area. */}
-          <TouchableOpacity
-            style={styles.backdrop}
-            onPress={onClose}
-          ></TouchableOpacity>
-        </Animated.View>
-      )}
-      {renderDrawer && (
-        <Animated.View
-          style={{
-            ...styles.drawer,
-            height: drawerHeight,
-            bottom: drawerPos,
-            padding: 15,
-          }}
-        >
-          <Text style={{ fontWeight: "bold", textAlign: "center" }}>
-            Add update to which project?
-          </Text>
-          <ScrollView
-            style={{
-              paddingTop: 15,
-            }}
-          >
-            <View
-              style={{
-                flex: 1,
-                flexDirection: "row",
-                flexWrap: "wrap",
-                gap: 20,
-              }}
-            >
-              <TouchableOpacity
-                style={{ width: gridSquareSize }}
-                onPress={onCreateProject}
-              >
-                <AddButtonImage
-                  width={gridSquareSize}
-                  height={gridSquareSize}
-                />
-                <Text style={{ marginTop: 5, textAlign: "center" }}>
-                  Create project
-                </Text>
-              </TouchableOpacity>
-              {projects.map((project) => (
-                <TouchableOpacity
-                  key={project.id}
-                  style={{ width: gridSquareSize }}
-                  onPress={() => onAddToProject(project)}
-                >
-                  <Image
-                    style={{
-                      width: gridSquareSize,
-                      height: gridSquareSize,
-                      borderRadius: 15,
-                    }}
-                    contentFit="cover"
-                    source={projectImgUrl(project)}
-                  />
-                  <Text style={{ marginTop: 5, textAlign: "center" }}>
-                    {project.title}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </ScrollView>
-        </Animated.View>
-      )}
+      <ProjectDrawer isOpen={drawerOpen} requestClose={requestClose} />
     </>
   );
 }
@@ -179,7 +224,7 @@ export function ConditionalBottomNav() {
 }
 
 const styles = StyleSheet.create({
-  overlay: {
+  backdropContainer: {
     position: "absolute",
     top: 0,
     left: 0,
@@ -206,13 +251,33 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 30,
     position: "absolute",
-    height: 0,
+    padding: 15,
+    height: 400,
     left: 0,
     bottom: 0,
     right: 0,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 1,
     shadowRadius: 10,
+  },
+  projectGridHeading: {
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  projectGridItemText: {
+    marginTop: 5,
+    textAlign: "center",
+  },
+  projectGrid: {
+    flex: 1,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 20,
+  },
+  projectSquare: {
+    width: 100,
+    height: 100,
+    borderRadius: 15,
   },
   addButton: {
     marginTop: -25,
