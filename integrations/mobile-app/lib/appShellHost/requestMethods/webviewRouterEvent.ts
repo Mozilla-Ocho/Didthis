@@ -25,6 +25,18 @@ function routeChangeComplete(api: AppShellHostAPI, route: MatchRouteResult) {
   const showBottomNav = !hideBottomNavRoutes.includes(route?.name);
   api.set("bottomNav", { show: showBottomNav });
   api.set("topNav", { show: false });
+
+  // detect when the route is viewing a project id. this changes the behavior
+  // of the bottom bar plus button to add to this project id instead of showing
+  // the drawer to pick one.
+  let projectId = ''
+  if (route?.name === 'projectView') {
+    if (route?.params.project) {
+      projectId = route?.params.project
+    }
+  }
+  api.set("viewingProjectId", projectId);
+
 }
 
 // List of routes for which the bottom nav bar will be hidden

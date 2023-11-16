@@ -6,6 +6,8 @@ import { styles as globalStyles, colors } from "../styles";
 import * as AppleAuthentication from "expo-apple-authentication";
 import * as Storage from "../lib/storage";
 import * as SiteAPI from "../lib/siteApi";
+import * as Linking from 'expo-linking';
+import config from '../lib/config';
 
 export type SigninScreenRouteParams = {};
 
@@ -34,6 +36,10 @@ export default function SigninScreen({ navigation }: SigninScreenProps) {
     }
   };
 
+  const handleLegalTerms = () => Linking.openURL(config.legalUrls.terms)
+  const handleLegalPrivacy = () => Linking.openURL(config.legalUrls.privacy)
+  const handleLegalContent = () => Linking.openURL(config.legalUrls.content)
+
   return (
     <SafeAreaView style={styles.screen}>
       <View style={styles.logoContainer}>
@@ -53,6 +59,15 @@ export default function SigninScreen({ navigation }: SigninScreenProps) {
       <View style={styles.signinContainer}>
         <AppleSigninButton {...{ onSignin }} />
       </View>
+      <Text style={[styles.text, styles.textLegalLink]} onPress={handleLegalTerms}>
+        Terms of service
+      </Text>
+      <Text style={[styles.text, styles.textLegalLink]} onPress={handleLegalPrivacy}>
+        Privacy notice
+      </Text>
+      <Text style={[styles.text, styles.textLegalLink]} onPress={handleLegalContent}>
+        Content policies
+      </Text>
     </SafeAreaView>
   );
 }
@@ -81,7 +96,7 @@ const styles = StyleSheet.create({
   },
   textIntroTitle: {
     ...globalStyles.textHeading,
-    marginVertical: 16,
+    marginBottom: 16,
   },
   text: {
     ...globalStyles.text,
@@ -90,6 +105,11 @@ const styles = StyleSheet.create({
     marginHorizontal: 64,
     flexDirection: "row",
     textAlign: "center",
+  },
+  textLegalLink: {
+    color: 'blue',
+    fontSize: 17,
+    marginBottom: 15,
   },
   signinContainer: {
     marginVertical: 24,

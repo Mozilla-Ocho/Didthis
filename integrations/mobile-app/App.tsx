@@ -7,6 +7,7 @@ import Config from "./lib/config";
 import useAppFonts from "./lib/fonts";
 import LogoLoader from "./components/LogoLoader";
 import { globalTheme } from "./styles";
+import * as ScreenOrientation from 'expo-screen-orientation';
 
 import WebAppScreen, { WebAppScreenRouteParams } from "./screens/WebApp";
 import SigninScreen, { SigninScreenRouteParams } from "./screens/Signin";
@@ -24,6 +25,10 @@ export type RootStackParamList = {
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
+
+// https://docs.expo.dev/versions/latest/sdk/screen-orientation/
+// note that PORTRAIT doesn't work, it's gotta be PORTRAIT_UP
+ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP).catch(() => {});
 
 function App() {
   const [fontsLoaded, fontError] = useAppFonts();
