@@ -603,6 +603,11 @@ const UserForm = observer(() => {
               Terms of service
             </Link>
           </p>
+          <p className="my-6">
+            <Link intent="internalNav" className="text-sm" href={pathBuilder.legal('cp')}>
+              Content policies
+            </Link>
+          </p>
           <LogoutButton intent="link" />
           <p className="my-6">
             {/* TODO: implement delete account https://github.com/Mozilla-Ocho/h3y/issues/97 */}
