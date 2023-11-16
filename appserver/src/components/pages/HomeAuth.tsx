@@ -4,7 +4,7 @@ import Image from 'next/image'
 import ProjectList from '@/components/ProjectList'
 import { Button, Divider, Link, PagePad } from '@/components/uiLib'
 import pathBuilder from '@/lib/pathBuilder'
-import UserPreview, { UserAvatar } from '../UserPreview'
+import UserPreview, { UserAvatar, UserSocialLinks } from '../UserPreview'
 import { useLocalStorage } from 'usehooks-ts'
 import { useEffect, useState } from 'react'
 import { trackingEvents } from '@/lib/trackingEvents'
@@ -48,6 +48,7 @@ const HomeAuth = observer(() => {
   const ugcUsername = store.user.userSlug || store.user.profile.name
   const title = ugcUsername ? ugcUsername + '’s projects' : 'My projects'
 
+  // TODO: this should probably be extracted into its own component?
   const appShell = useAppShell()
   if (appShell.inAppWebView) {
     return (
@@ -56,7 +57,7 @@ const HomeAuth = observer(() => {
         <OgMeta user={store.user} />
         <PagePad yControlOnly>
           <PagePad wide noPadY>
-            <div className="flex flex-row mb-6">
+            <div className="flex flex-row mb-3">
               <div className="flex-column">
                 <div className="font-bold text-sm text-yellow-600">
                   {ugcUsername}
@@ -80,6 +81,12 @@ const HomeAuth = observer(() => {
                 </Link>
               </div>
             </div>
+            {store.user.profile.bio && (
+              <p className="text-sm text-bodytext break-words whitespace-pre-line">
+                {store.user.profile.bio}
+              </p>
+            )}
+            <UserSocialLinks user={store.user} />
             {hasProjects ? (
               <ProjectList targetUser={store.user} />
             ) : (
