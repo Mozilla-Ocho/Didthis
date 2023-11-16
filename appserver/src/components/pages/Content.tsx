@@ -3,10 +3,20 @@ import { useStore } from '@/lib/store'
 import { trackingEvents } from '@/lib/trackingEvents'
 import RemindersAndAlerts from '../RemindersAndAlerts'
 import PageTitle from '../PageTitle'
+import { useAppShellTopBar } from '@/lib/appShellContent'
 
 const Content = () => {
   const store = useStore()
   store.useTrackedPageEvent(trackingEvents.pvTerms)
+
+  useAppShellTopBar({
+    show: true,
+    title: "",
+    leftIsBack: true,
+    leftLabel: 'Back',
+    onLeftPress: () => store.goBack(),
+  })
+
   return (
     <>
       <RemindersAndAlerts />
