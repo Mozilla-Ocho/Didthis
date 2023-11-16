@@ -180,6 +180,7 @@ const ProjectForm = observer((props: Props) => {
     leftIsBack: true,
     leftLabel: 'Back',
     rightLabel: mode === 'new' ? 'Create' : 'Save',
+    rightIsDisabled: !projectStore.isPostable(),
     onLeftPress: handleCancel,
     onRightPress: performSubmit,
   })
@@ -309,23 +310,27 @@ const ProjectForm = observer((props: Props) => {
           )}
         </div>
         <div className="flex flex-col sm:flex-row gap-4 flex-wrap">
-          <Button
-            spinning={projectStore.spinning}
-            type="submit"
-            disabled={!projectStore.isPostable()}
-            className="w-full sm:w-[150px]"
-          >
-            {mode === 'new' ? 'Create' : 'Save'}
-          </Button>
-          <Button
-            intent="secondary"
-            onClick={handleCancel}
-            className="w-full sm:w-[150px]"
-            trackEvent={trackingEvents.bcDiscardChanges}
-            trackEventOpts={{ fromPage: 'projectEdit' }}
-          >
-            {mode === 'edit' ? 'Discard changes' : 'Cancel'}
-          </Button>
+          {!appShell.inAppWebView && (
+            <>
+              <Button
+                spinning={projectStore.spinning}
+                type="submit"
+                disabled={!projectStore.isPostable()}
+                className="w-full sm:w-[150px]"
+              >
+                {mode === 'new' ? 'Create' : 'Save'}
+              </Button>
+              <Button
+                intent="secondary"
+                onClick={handleCancel}
+                className="w-full sm:w-[150px]"
+                trackEvent={trackingEvents.bcDiscardChanges}
+                trackEventOpts={{ fromPage: 'projectEdit' }}
+              >
+                {mode === 'edit' ? 'Discard changes' : 'Cancel'}
+              </Button>
+            </>
+          )}
           {mode === 'edit' && (
             <div className="text-center sm:w-full sm:text-left">
               <Button

@@ -63,7 +63,7 @@ const LogoutButton = observer(
         </Button>
         <ConfirmationModal
           isOpen={modalOpen}
-          title={'Lose unsaved posts and projects?'}
+          title={'Lose unsaved updates and projects?'}
           yesText="Yes"
           noText="No"
           onYes={completeLogout}
@@ -77,7 +77,7 @@ const LogoutButton = observer(
               intent="link"
               className="text-base"
             />{' '}
-            for {branding.productName}, any projects and posts you’ve created
+            for {branding.productName}, any projects and updates you’ve created
             are not saved and will be lost.
           </p>
           <p className="mt-6 mb-6">

@@ -120,6 +120,7 @@ const ProjectPage = observer(
 
     useAppShellTopBar({
       show: true,
+      leftLabel: " ", // HACK: undefined label defaults to "Back"
       leftIsBack: true,
       showShare: true,
       showEdit: true,
@@ -181,17 +182,22 @@ const ProjectPage = observer(
         <PagePad>
           <UserPreview user={targetUser} compact={true} />
 
-          <h4 className="mt-4 mb-2">{project.title}</h4>
+          <h4 className="mt-4 mb-1">{project.title}</h4>
 
-          <div className="grid grid-cols-[66%_34%] my-4">
-            <p className="body-bs">
+          <div className="grid grid-cols-[66%_34%] my-2">
+            <p className="body-bs uppercase text-sm font-bold">
               {project.currentStatus === 'active' && <span>In Progress</span>}
               {project.currentStatus === 'complete' && <span>Completed</span>}
               {project.currentStatus === 'paused' && <span>Paused</span>}
-              &mdash; <strong>{isPrivate ? 'Private' : 'Public'}</strong>
+              {isPrivate && (
+                <>
+                  {' '}
+                  &mdash; <strong>Private</strong>
+                </>
+              )}
             </p>
             <p className="body-bs text-right">
-              {numPosts} post{numPosts === 1 ? '' : 's'}
+              {numPosts} update{numPosts === 1 ? '' : 's'}
             </p>
           </div>
 
@@ -218,7 +224,21 @@ const ProjectPage = observer(
             </p>
           )}
 
-          {!appShell.inAppWebView && (
+          {appShell.inAppWebView ? (
+            !isPrivate &&
+            posts.length > 0 && (
+              <div className="my-4 flex flex-col sm:flex-row items-center gap-4">
+                <Button
+                  id="buttonShare"
+                  className="w-full sm:w-auto"
+                  intent="secondary"
+                  onClick={handleConditionalShare}
+                >
+                  Share project
+                </Button>
+              </div>
+            )
+          ) : (
             <>
               <div className="my-4 flex flex-col sm:flex-row items-center gap-4">
                 {store.user && // store.user redundant when isSelf but tsserver needs it
@@ -247,25 +267,27 @@ const ProjectPage = observer(
               </div>
 
               <Divider light className="my-6" />
+              {store.user && // store.user redundant when isSelf but tsserver needs it
+                isSelf && (
+                  <div className="my-4 flex flex-row items-center gap-4">
+                    <Link
+                      className="grow basis-1 sm:grow-0 sm:basis-auto"
+                      intent="primary"
+                      href={pathBuilder.newPost(
+                        store.user.systemSlug,
+                        project.id
+                      )}
+                      trackEvent={trackingEvents.bcAddPost}
+                      trackEventOpts={{ fromPage: 'project' }}
+                    >
+                      Add update
+                    </Link>
+                  </div>
+                )}
             </>
           )}
 
-          {store.user && // store.user redundant when isSelf but tsserver needs it
-            isSelf && (
-              <div className="my-4 flex flex-row items-center gap-4">
-                <Link
-                  className="grow basis-1 sm:grow-0 sm:basis-auto"
-                  intent="primary"
-                  href={pathBuilder.newPost(store.user.systemSlug, project.id)}
-                  trackEvent={trackingEvents.bcAddPost}
-                  trackEventOpts={{ fromPage: 'project' }}
-                >
-                  Add post
-                </Link>
-              </div>
-            )}
-
-          <div className="flex flex-row items-baseline gap-4 my-12 text-sm">
+          <div className="flex flex-row items-baseline gap-4 mt-10 mb-7 text-sm">
             <label htmlFor="block sortby">Sort by:</label>
             <div className="grow sm:grow-0">
               <Select
@@ -284,20 +306,39 @@ const ProjectPage = observer(
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-16">
-            {/* even though we return above if targetUser is falsy, because map is
+          {posts.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 gap-8">
+                {/* even though we return above if targetUser is falsy, because map is
            passed a function, typescript can't assert that inside that function
            scope that targetUser is still surely not false. hence "as ApiUser"*/}
-            {posts.map(p => (
-              <PostCard
-                key={p.id}
-                post={p}
-                authUser={store.user}
-                targetUser={targetUser as ApiUser}
-                focused={focusPostId === p.id}
-              />
-            ))}
-          </div>
+                {posts.map(p => (
+                  <PostCard
+                    key={p.id}
+                    post={p}
+                    authUser={store.user}
+                    targetUser={targetUser as ApiUser}
+                    focused={focusPostId === p.id}
+                  />
+                ))}
+              </div>
+            </>
+          ) : (
+            appShell.inAppWebView && store.user && <>
+              <div className="my-4 flex flex-row items-center gap-4">
+                <Link
+                  className="grow basis-1 sm:grow-0 sm:basis-auto"
+                  intent="primary"
+                  href={pathBuilder.newPost(store.user.systemSlug, project.id)}
+                  trackEvent={trackingEvents.bcAddPost}
+                  trackEventOpts={{ fromPage: 'project' }}
+                >
+                  Add update
+                </Link>
+              </div>
+              <p>This project has no updates yet. Add an update.</p>
+            </>
+          )}
         </PagePad>
       </>
     )

@@ -84,7 +84,7 @@ const PostCard = observer(
               )}
               trackEvent={trackingEvents.bcEditPost}
             >
-              Edit post
+              Edit update
             </Link>
           </div>
         )}

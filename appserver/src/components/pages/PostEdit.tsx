@@ -28,22 +28,22 @@ const PostEditPage = observer(() => {
   if (!project) return <NotFound>project not found</NotFound>
   const postId = getParamString(router, 'postId')
   const post = project.posts[postId]
-  if (!post) return <NotFound>post not found</NotFound>
+  if (!post) return <NotFound>update not found</NotFound>
   return (
     <>
-      <PageTitle title="Edit post" />
+      <PageTitle title="Edit update" />
       <Breadcrumbs
         crumbs={[
           {
             name: project.title,
             href: pathBuilder.project(user.systemSlug, project.id),
           },
-          { name: post ? 'Edit post' : 'New post' },
+          { name: post ? 'Edit update' : 'New update' },
         ]}
       />
       <RemindersAndAlerts />
       <PagePad>
-        {!appShell.inAppWebView && <h3>Edit post</h3>}
+        {!appShell.inAppWebView && <h3>Edit update</h3>}
         <PostForm mode="edit" post={post} />
       </PagePad>
     </>
