@@ -9,6 +9,8 @@ import { LoginButton } from './auth/LoginButton'
 import { trackingEvents } from '@/lib/trackingEvents'
 import useAppShell from '@/lib/appShellContent'
 
+// TODO: isThe404 should be called 'isStatic' and StaticLayout component is misleadingly named.
+
 const AppHeader = observer(({ isThe404 }: { isThe404?: boolean }) => {
   const store = useStore()
   const appShell = useAppShell()

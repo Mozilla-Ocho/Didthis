@@ -13,6 +13,9 @@ import { LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import AppShellContextProvider from '@/lib/appShellContent/context'
 
+// TODO: isThe404 should be called 'isStatic' and StaticLayout component is
+// misleadingly named as it's used for all pages really.
+
 // Inner is separate because it has to be a store observer for when
 // headerFooter=authed and the outer layer is the store provider itself.
 const Inner = observer(

@@ -2,6 +2,9 @@ import AppHeader from '@/components/AppHeader'
 import AppFooter from '@/components/AppFooter'
 import type { ReactNode } from 'react'
 
+// TODO: isThe404 should be called 'isStatic' and StaticLayout component is
+// misleadingly named as it's used for all pages really.
+
 const StaticLayout = ({
   children,
   unauthHomepage,
