@@ -11,6 +11,7 @@ export type State = {
   bottomNav?: {
     show?: boolean;
   };
+  viewingProjectId: string; // empty string when not viewing a project
 };
 
 export function createInitialState(): State {
@@ -19,6 +20,7 @@ export function createInitialState(): State {
     webContentRouteChanging: false,
     links: {},
     bottomNav: { show: true },
+    viewingProjectId: '',
   };
 }
 

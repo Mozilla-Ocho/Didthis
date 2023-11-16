@@ -195,9 +195,20 @@ function ProjectDrawer({
 
 export default function BottomNav({}: BottomNavProps) {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const appShellHost = useAppShellHost();
+  const { state, messaging } = appShellHost;
 
   const onAddPress = () => {
-    setDrawerOpen(true);
+    if (state.viewingProjectId) {
+      const path =
+        "/user/" +
+        encodeURI(state.user.publicPageSlug) +
+        "/post?projectId=" +
+        encodeURIComponent(state.viewingProjectId);
+      messaging.postMessage("navigateToPath", { path });
+    } else {
+      setDrawerOpen(true);
+    }
   };
   const requestClose = () => {
     setDrawerOpen(false);
