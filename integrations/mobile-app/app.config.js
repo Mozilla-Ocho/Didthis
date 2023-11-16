@@ -32,6 +32,15 @@ export default ({ config }) => {
       ...(config.plugins ?? []),
       [withRemoveiOSNotificationEntitlement],
       "expo-apple-authentication",
+      [
+        "expo-image-picker",
+        {
+          photosPermission:
+            "The app accesses your photos to let you share project updates.",
+          cameraPermission:
+            "This app accesses your camera to let you share project updates.",
+        },
+      ],
     ],
   };
 };

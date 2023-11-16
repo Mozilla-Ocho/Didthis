@@ -77,11 +77,11 @@ export default class MessageHandler {
   }
 }
 
-type DeferredResponses = {
+export type DeferredResponses = {
   [K in AppRequestMethodNames]: {
     resolve: (payload: AppRequestMethods[K]["response"]) => void;
     reject: (error: Error) => void;
   };
 };
 
-type DeferredResponse = DeferredResponses[AppRequestMethodNames];
+export type DeferredResponse = DeferredResponses[AppRequestMethodNames];
