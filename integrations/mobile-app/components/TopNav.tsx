@@ -68,7 +68,7 @@ export default function TopNav({
           borderBottomColor: "rgba(0, 0, 0, 0.1)"
         }}
         title={title}
-        headerShadowVisible={true}
+        headerShadowVisible={false}
         headerLeft={() => (
           <HeaderSideButton
             {...{
@@ -181,12 +181,13 @@ function HeaderSideButton({
       opacity: 0.3,
     },
   });
+  const hasLabel = typeof label !== "undefined";
   if (isBack) {
     return (
       <HeaderBackButton
         style={[disabled && styles.disabled]}
         tintColor={colors.primary}
-        label={label || "Back"}
+        label={hasLabel ? label : "Back"}
         onPress={disabled ? noop : onPress}
       />
     );
@@ -198,7 +199,7 @@ function HeaderSideButton({
         backImage={() => ""}
         style={[disabled && styles.disabled, { marginHorizontal: 10 }]}
         tintColor={colors.primary}
-        label={label || "Back"}
+        label={label}
         onPress={disabled ? noop : onPress}
       />
     );
