@@ -31,6 +31,8 @@ export const KEY_TRIAL_ACCOUNT_CLAIMED = 'trialAccountClaimed'
 export type ApiClient = typeof apiClientBase
 export type AmplitudeClient = typeof amplitudeBase
 
+type UserListenerFn = (user: ApiUser) => void
+
 class Store {
   user: false | ApiUser = false
   // we don't have a type for the firebase ref
@@ -54,6 +56,7 @@ class Store {
   apiClient: ApiClient
   amplitude: AmplitudeClient
   trialAccountClaimed?: boolean
+  userListeners : Array<UserListenerFn> = []
 
   constructor({
     authUser,
@@ -85,6 +88,7 @@ class Store {
         firebaseRefNonReactive: false,
         trackedPageEvent: false,
         router: false,
+        userListeners: false,
       },
       { autoBind: true }
     )
@@ -483,6 +487,7 @@ class Store {
       if (this.signupCodeInfo) {
         this.signupCodeInfo = false
       }
+      this.userListeners.forEach(fn => fn(x))
       // DRY_47693 signup code logic
       // if we have a signup code on the url, clear it
       if (this.signupCodeInfo && typeof window !== 'undefined') {
@@ -493,6 +498,14 @@ class Store {
       }
     } else {
       log.auth('store clearing user')
+    }
+  }
+
+  registerUserListener(fn: UserListenerFn) {
+    this.userListeners.push(fn)
+    if (this.user) fn(this.user)
+    return () => {
+      this.userListeners.filter(x => x !== fn)
     }
   }
 

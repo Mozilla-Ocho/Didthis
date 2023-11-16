@@ -44,26 +44,32 @@ export default function AppShellContextProvider({
       api.request('webviewRouterEvent', { event: 'routeChangeStart', url })
     }
     const handleRouteChangeComplete = (url: string) => {
-      if (store.user) {
-        api.request('updateAppConfig', {
-          user: store.user,
-          links: {
-            user: pathBuilder.user(store.user.systemSlug),
-            userEdit: pathBuilder.userEdit(store.user.systemSlug),
-            newPost: pathBuilder.newPost(store.user.systemSlug),
-          },
-        })
-      }
       api.request('webviewRouterEvent', { event: 'routeChangeComplete', url })
       api.request('updateTopNav', { show: false })
     }
     router.events.on('routeChangeStart', handleRouteChangeStart)
     router.events.on('routeChangeComplete', handleRouteChangeComplete)
+    // register a user listener. note this callback will be called right away
+    // if the user exists. note also the user updates any time profile data
+    // updates from the webview, e.g. new posts, projects, edits, etc.
+    const deregUserListen = store.registerUserListener((theUser: ApiUser) => {
+      if (theUser) {
+        api.request('updateAppConfig', {
+          user: theUser,
+          links: {
+            user: pathBuilder.user(theUser.systemSlug),
+            userEdit: pathBuilder.userEdit(theUser.systemSlug),
+            newPost: pathBuilder.newPost(theUser.systemSlug),
+          },
+        })
+      }
+    })
     return () => {
+      deregUserListen()
       router.events.off('routeChangeStart', handleRouteChangeStart)
       router.events.off('routeChangeComplete', handleRouteChangeComplete)
     }
-  }, [api, router, store.user, state.appReady])
+  }, [api, router, store, state.appReady])
 
   useAppShellListener('navigateToPath', ({ path }) => router.push(path))
 
