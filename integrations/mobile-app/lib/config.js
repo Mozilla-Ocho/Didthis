@@ -29,6 +29,11 @@ const Config = {
   storybookEnabled,
   siteBaseUrl,
   originWhitelist: [siteBaseUrl, ...baseOriginWhitelist],
+  legalUrls: {
+    terms: 'https://didthis.app/terms',
+    privacy: 'https://didthis.app/privacy',
+    content: 'https://didthis.app/content',
+  },
 };
 
 export default Config;
