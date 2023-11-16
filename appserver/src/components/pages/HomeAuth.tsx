@@ -25,6 +25,21 @@ const HomeAuth = observer(() => {
   const [rendered, setRendered] = useState(false)
   store.useTrackedPageEvent(trackingEvents.pvHomeAuth)
 
+  const appShell = useAppShell()
+  useEffect(() => {
+    // Update the app shell with user & nav related details
+    if (store.user && appShell.appReady) {
+      appShell.api.request('updateAppConfig', {
+        user: store.user,
+        links: {
+          user: pathBuilder.user(store.user.systemSlug),
+          userEdit: pathBuilder.userEdit(store.user.systemSlug),
+          newPost: pathBuilder.newPost(store.user.systemSlug),
+        },
+      })
+    }
+  }, [store.user, appShell.appReady, appShell.api])
+
   useEffect(() => {
     // this is a hack to prevent a failure of client vs server rendering state,
     // by just rendering blank initially, and then using useState (which is
@@ -49,7 +64,6 @@ const HomeAuth = observer(() => {
   const title = ugcUsername ? ugcUsername + '’s projects' : 'My projects'
 
   // TODO: this should probably be extracted into its own component?
-  const appShell = useAppShell()
   if (appShell.inAppWebView) {
     return (
       <>
