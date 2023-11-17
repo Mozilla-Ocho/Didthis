@@ -278,36 +278,39 @@ const ProjectSelector = observer(({ postStore }: { postStore: PostStore }) => {
   )
 })
 
-const DescriptionField = observer(({ postStore }: { postStore: PostStore }) => {
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    postStore.setDescription(e.target.value)
+const DescriptionField = observer(
+  ({ postStore, mode }: { postStore: PostStore; mode: 'new' | 'edit' }) => {
+    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      postStore.setDescription(e.target.value)
+    }
+    const hint =
+      postStore.mediaType === 'text'
+        ? 'Write something...'
+        : postStore.mediaType === 'image'
+        ? 'Write about this image...'
+        : postStore.mediaType === 'link'
+        ? 'Write about this link...'
+        : ''
+    return (
+      <>
+        <label htmlFor="description-field">
+          <span className="sr-only">description:</span>
+          <Textarea
+            id="description-field"
+            placeholder={hint}
+            name="description"
+            value={postStore.description}
+            onChange={handleChange}
+            className="text-bodytext"
+            touched={true}
+            maxLen={profileUtils.maxChars.blurb}
+            style={{ minHeight: mode === 'new' ? 141 : 308 }}
+          />
+        </label>
+      </>
+    )
   }
-  const hint =
-    postStore.mediaType === 'text'
-      ? 'Write something...'
-      : postStore.mediaType === 'image'
-      ? 'Write about this image...'
-      : postStore.mediaType === 'link'
-      ? 'Write about this link...'
-      : ''
-  return (
-    <>
-      <label htmlFor="description-field">
-        <span className="sr-only">description:</span>
-        <Textarea
-          id="description-field"
-          placeholder={hint}
-          name="description"
-          value={postStore.description}
-          onChange={handleChange}
-          className="text-bodytext"
-          touched={true}
-          maxLen={profileUtils.maxChars.blurb}
-        />
-      </label>
-    </>
-  )
-})
+)
 
 const LinkField = observer(({ postStore }: { postStore: PostStore }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -461,7 +464,7 @@ const DateTimeField = observer(({ postStore }: { postStore: PostStore }) => {
         </div>
         {err && (
           <p className="text-red-400 text-xs text-right">
-            Post dates can’t be in the future
+            Update dates can’t be in the future
           </p>
         )}
         {canShowDateTip && (
@@ -536,10 +539,11 @@ const PostForm = observer((props: Props) => {
 
   useAppShellTopBar({
     show: true,
-    title: mode === 'new' ? 'Create post' : 'Edit post',
+    title: mode === 'new' ? 'Add update' : 'Edit update',
     leftIsBack: true,
     leftLabel: 'Back',
     rightLabel: mode === 'new' ? 'Add' : 'Save',
+    rightIsDisabled: !postStore.isPostable(),
     onLeftPress: handleCancel,
     onRightPress: performSubmit,
   })
@@ -559,17 +563,6 @@ const PostForm = observer((props: Props) => {
               appShell.inAppWebView ? 'mt-4' : 'mt-8'
             }`}
           >
-            <label htmlFor="mediaImage" className={labelClass('image')}>
-              <input
-                id="mediaImage"
-                onChange={handleMediaType}
-                className="sr-only"
-                type="radio"
-                value="image"
-                checked={postStore.mediaType === 'image'}
-              />{' '}
-              Image
-            </label>
             <label htmlFor="mediaText" className={labelClass('text')}>
               <input
                 id="mediaText"
@@ -578,8 +571,19 @@ const PostForm = observer((props: Props) => {
                 type="radio"
                 value="text"
                 checked={postStore.mediaType === 'text'}
-              />{' '}
+              />
               Text
+            </label>
+            <label htmlFor="mediaImage" className={labelClass('image')}>
+              <input
+                id="mediaImage"
+                onChange={handleMediaType}
+                className="sr-only"
+                type="radio"
+                value="image"
+                checked={postStore.mediaType === 'image'}
+              />
+              Image
             </label>
             <label htmlFor="mediaLink" className={labelClass('link')}>
               <input
@@ -589,7 +593,7 @@ const PostForm = observer((props: Props) => {
                 type="radio"
                 value="link"
                 checked={postStore.mediaType === 'link'}
-              />{' '}
+              />
               Link
             </label>
           </div>
@@ -600,26 +604,30 @@ const PostForm = observer((props: Props) => {
         )}
         {postStore.mediaType === 'link' && <LinkField postStore={postStore} />}
         <DateTimeField postStore={postStore} />
-        <DescriptionField postStore={postStore} />
+        <DescriptionField mode={mode} postStore={postStore} />
 
         <div className="flex flex-col sm:flex-row gap-4 mt-8 flex-wrap">
-          <Button
-            type="submit"
-            disabled={!postStore.isPostable()}
-            spinning={postStore.spinning}
-            className="w-full sm:w-[150px]"
-          >
-            {mode === 'new' ? 'Add' : 'Save'}
-          </Button>
-          <Button
-            intent="secondary"
-            onClick={handleCancel}
-            className="w-full sm:w-[150px]"
-            trackEvent={trackingEvents.bcDiscardChanges}
-            trackEventOpts={{ fromPage: 'postEdit' }}
-          >
-            {mode === 'edit' ? 'Discard changes' : 'Cancel'}
-          </Button>
+          {!appShell.inAppWebView && (
+            <>
+              <Button
+                type="submit"
+                disabled={!postStore.isPostable()}
+                spinning={postStore.spinning}
+                className="w-full sm:w-[150px]"
+              >
+                {mode === 'new' ? 'Add' : 'Save'}
+              </Button>
+              <Button
+                intent="secondary"
+                onClick={handleCancel}
+                className="w-full sm:w-[150px]"
+                trackEvent={trackingEvents.bcDiscardChanges}
+                trackEventOpts={{ fromPage: 'postEdit' }}
+              >
+                {mode === 'edit' ? 'Discard changes' : 'Cancel'}
+              </Button>
+            </>
+          )}
           {mode === 'edit' && (
             <div className="text-center sm:w-full sm:text-left">
               <Button

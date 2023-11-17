@@ -11,9 +11,11 @@ import { action, makeAutoObservable } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useState } from 'react'
 import ImageUploadWeb, { UploadCallback } from '../ImageUpload'
-import { Button, CloudinaryImage, Input, Textarea } from '../uiLib'
+import { Button, CloudinaryImage, Input, Link, Textarea } from '../uiLib'
 import useAppShell, { useAppShellTopBar } from '@/lib/appShellContent'
 import ImageUploadAppShell from '../ImageUploadAppShell'
+import { LogoutButton } from '../auth/LogoutButton'
+import pathBuilder from '@/lib/pathBuilder'
 
 class FormStore {
   name: string
@@ -296,7 +298,7 @@ const ImageField = observer(({ formStore }: { formStore: FormStore }) => {
   const ImageUpload = appShell.appReady ? ImageUploadAppShell : ImageUploadWeb
   return (
     <div>
-      <h5 className="mb-4">Avatar</h5>
+      <h5 className="mb-4">Your avatar</h5>
       <div>
         <p className="w-[150px]">
           {formStore.imageAssetId ? (
@@ -334,6 +336,7 @@ const ImageField = observer(({ formStore }: { formStore: FormStore }) => {
 
 const UserForm = observer(() => {
   const store = useStore()
+  const appShell = useAppShell();
   const user = store.user
   if (!user) {
     return <></>
@@ -360,6 +363,7 @@ const UserForm = observer(() => {
     leftIsBack: true,
     leftLabel: 'Back',
     rightLabel: 'Save',
+    rightIsDisabled: !formStore.isPostable(),
     onLeftPress: handleCancel,
     onRightPress: performSubmit,
   })
@@ -387,19 +391,24 @@ const UserForm = observer(() => {
   }
   return (
     <>
-      <div className="mb-10">
-        <h3>Account Details</h3>
-        <p>
-          The information you add here will be publicly visible to anyone who
-          visits your page.
-        </p>
-        {user.isTrial && (
-          <p className="my-4 p-4 text-sm bg-yellow-100">
-            Heads up: account details are not editable or publicly visible until
-            you <ClaimTrialAccountButton intent="link" text="sign up" />.
-          </p>
-        )}
-      </div>
+      {!appShell.inAppWebView && (
+        <>
+          <div className="mb-10">
+            <h3>Account Details</h3>
+            <p>
+              The information you add here will be publicly visible to anyone
+              who visits your page.
+            </p>
+            {user.isTrial && (
+              <p className="my-4 p-4 text-sm bg-yellow-100">
+                Heads up: account details are not editable or publicly visible
+                until you{' '}
+                <ClaimTrialAccountButton intent="link" text="sign up" />.
+              </p>
+            )}
+          </div>
+        </>
+      )}
       <form
         onSubmit={handleSubmit}
         method="POST"
@@ -407,7 +416,7 @@ const UserForm = observer(() => {
       >
         <div>
           <label htmlFor="nameField">
-            <h5>Real name</h5>
+            <h5>Your name</h5>
             <p className="text-form-labels text-sm">Your full display name</p>
             <Input
               id="nameField"
@@ -425,12 +434,13 @@ const UserForm = observer(() => {
         </div>
         <div>
           <label htmlFor="slugField">
-            <h5>Username</h5>
+            <h5>Your custom URL path</h5>
             <p className="text-form-labels text-sm">
-              Your unique handle on {branding.productName}
-              {formStore.suggestedSlug() && (
-                <span> (suggestion: {formStore.suggestedSlug()})</span>
-              )}
+              A custom URL path helps people find your Didthis page, this is a
+              link that you can share with your friends so they can find you.
+            </p>
+            <p className="text-form-labels text-sm my-2">
+              {`https://didthis.app/user/${formStore.userSlug}`}
             </p>
             <Input
               type="text"
@@ -553,29 +563,60 @@ const UserForm = observer(() => {
               touched={formStore.bioTouched}
               maxLen={profileUtils.maxChars.blurb}
               disabled={user.isTrial}
+              style={{ minHeight: 123 }}
             />
           </label>
         </div>
-        <div className="flex flex-col sm:flex-row gap-4">
-          <Button
-            spinning={formStore.spinning}
-            type="submit"
-            disabled={!formStore.isPostable() || user.isTrial}
-            className="w-full sm:w-[150px]"
-          >
-            Save
-          </Button>
-          <Button
-            intent="secondary"
-            onClick={handleCancel}
-            className="w-full sm:w-[150px]"
-            trackEvent={trackingEvents.bcDiscardChanges}
-            trackEventOpts={{ fromPage: 'userEdit' }}
-          >
-            Discard changes
-          </Button>
-        </div>
+        {!appShell.inAppWebView && (
+          <>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button
+                spinning={formStore.spinning}
+                type="submit"
+                disabled={!formStore.isPostable() || user.isTrial}
+                className="w-full sm:w-[150px]"
+              >
+                Save
+              </Button>
+              <Button
+                intent="secondary"
+                onClick={handleCancel}
+                className="w-full sm:w-[150px]"
+                trackEvent={trackingEvents.bcDiscardChanges}
+                trackEventOpts={{ fromPage: 'userEdit' }}
+              >
+                Discard changes
+              </Button>
+            </div>
+          </>
+        )}
       </form>
+      {appShell.inAppWebView && (
+        <div className="my-10">
+          <p className="my-6">
+            <Link intent="internalNav" className="text-sm" href={pathBuilder.legal('pp')}>
+              Privacy notice
+            </Link>
+          </p>
+          <p className="my-6">
+            <Link intent="internalNav" className="text-sm" href={pathBuilder.legal('tos')}>
+              Terms of service
+            </Link>
+          </p>
+          <p className="my-6">
+            <Link intent="internalNav" className="text-sm" href={pathBuilder.legal('cp')}>
+              Content policies
+            </Link>
+          </p>
+          <LogoutButton intent="link" />
+          <p className="my-6">
+            {/* TODO: implement delete account https://github.com/Mozilla-Ocho/h3y/issues/97 */}
+            <Link intent="internalNav" className="text-sm text-red-500" href={"/"}>
+              Delete account
+            </Link>
+          </p>
+        </div>
+      )}
     </>
   )
 })

@@ -1,12 +1,22 @@
 import { PagePad } from '@/components/uiLib'
 import { useStore } from '@/lib/store'
 import { trackingEvents } from '@/lib/trackingEvents'
+import { useAppShellTopBar } from '@/lib/appShellContent'
 import RemindersAndAlerts from '../RemindersAndAlerts'
 import PageTitle from '../PageTitle'
 
 const Terms = () => {
   const store = useStore()
   store.useTrackedPageEvent(trackingEvents.pvTerms)
+
+  useAppShellTopBar({
+    show: true,
+    title: "",
+    leftIsBack: true,
+    leftLabel: 'Back',
+    onLeftPress: () => store.goBack(),
+  })
+
   return (
     <>
       <RemindersAndAlerts />

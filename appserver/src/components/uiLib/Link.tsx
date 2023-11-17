@@ -1,5 +1,5 @@
 import NextLink from 'next/link'
-import React, { ReactNode } from 'react'
+import React, { CSSProperties, ReactNode } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { track } from '@amplitude/analytics-browser'
 import { useStore } from '@/lib/store'
@@ -72,6 +72,7 @@ interface LinkProps extends VariantProps<typeof linkCVA> {
   href: string
   children: ReactNode
   className?: string
+  style?: CSSProperties
   external?: boolean
   newTab?: boolean
   trackEvent?: EventSpec
@@ -84,6 +85,7 @@ const Link: React.FC<LinkProps> = ({
   href,
   intent,
   className,
+  style = {},
   children,
   external,
   newTab,
@@ -103,6 +105,7 @@ const Link: React.FC<LinkProps> = ({
         rel="nofollow noreferer"
         target="_blank"
         className={linkCVA({ intent, className })}
+        style={style}
         href={href}
         onClick={ourOnClick}
       >
@@ -115,6 +118,7 @@ const Link: React.FC<LinkProps> = ({
       id={id}
       target={newTab ? '_blank' : undefined}
       className={linkCVA({ intent, className })}
+      style={style}
       href={href}
       onClick={ourOnClick}
     >
