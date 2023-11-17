@@ -1,7 +1,8 @@
 import useAppShellHost from "../lib/appShellHost";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import WebView from "react-native-webview";
 import { SafeAreaView, StatusBar, StyleSheet } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../App";
 import Config from "../lib/config";
@@ -9,11 +10,13 @@ import Loader from "../components/Loader";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { ConditionalTopNav } from "../components/TopNav";
 import { ConditionalBottomNav } from "../components/BottomNav";
+import AppShellHostAPI from "../lib/appShellHost/api";
 
 const { siteBaseUrl, originWhitelist } = Config;
 
 export type WebAppScreenRouteParams = {
   credential?: AppleAuthentication.AppleAuthenticationCredential;
+  resetWebViewAfter?: number;
 };
 
 export type WebAppScreenProps = {} & StackScreenProps<
@@ -22,7 +25,7 @@ export type WebAppScreenProps = {} & StackScreenProps<
 >;
 
 export default function WebAppScreen({ route }: WebAppScreenProps) {
-  const { credential } = route.params || {};
+  const { credential, resetWebViewAfter = 0 } = route.params || {};
 
   const appShellHost = useAppShellHost();
 
@@ -32,18 +35,15 @@ export default function WebAppScreen({ route }: WebAppScreenProps) {
     [appShellHost, webviewRef.current]
   );
 
-  const { webContentReady } = appShellHost.state || {};
-  useEffect(() => {
-    if (credential && webContentReady) {
-      appShellHost.postMessage("appleCredential", { credential });
-    }
-  }, [webContentReady, appShellHost, credential]);
+  useSendAppleCredentialToWebContent(credential, appShellHost);
+  const webviewKey = useResettableWebviewKey(resetWebViewAfter);
 
   return (
     <SafeAreaView style={{ ...StyleSheet.absoluteFillObject }}>
       <StatusBar barStyle="dark-content" />
       <ConditionalTopNav />
       <WebView
+        key={webviewKey}
         source={{ uri: siteBaseUrl }}
         originWhitelist={originWhitelist}
         startInLoadingState={true}
@@ -54,4 +54,56 @@ export default function WebAppScreen({ route }: WebAppScreenProps) {
       <ConditionalBottomNav />
     </SafeAreaView>
   );
+}
+
+/**
+ * Send the given Apple ID credential to web content when it's ready and if
+ * we haven't sent it already.
+ *
+ * @param credential
+ * @param appShellHost
+ */
+function useSendAppleCredentialToWebContent(
+  credential: AppleAuthentication.AppleAuthenticationCredential,
+  appShellHost: AppShellHostAPI
+) {
+  const webContentReady = appShellHost.state?.webContentReady;
+  const [lastCredential, setLastCredential] = useState<
+    AppleAuthentication.AppleAuthenticationCredential | undefined
+  >();
+  useEffect(() => {
+    if (webContentReady && credential && credential !== lastCredential) {
+      appShellHost.postMessage("appleCredential", { credential });
+      setLastCredential(credential);
+    }
+  }, [webContentReady, appShellHost, credential]);
+}
+
+/**
+ * Produce a key which changes when the webview should be re-rendered & reset
+ * on focus of the current screen.
+ *
+ * @param resetWebViewAfter value of Date.now() after which to reset the webview
+ * @param appShellHost app shell host API used for reset
+ * @returns string current react component key for webview
+ */
+function useResettableWebviewKey(resetWebViewAfter: number): string {
+  // Resetting the webview is kind of a hack: We maintain a "generation"
+  // counter which, when incremented, forces a re-render of the component.
+  //
+  // This, in turn, discards state and forces a reset. Need to do this
+  // in cases like signin where a fresh session is expected after signout.
+  const [webviewGeneration, setWebviewGeneration] = useState(0);
+  const [lastResetWebView, setLastResetWebView] = useState(Date.now());
+
+  useFocusEffect(
+    useCallback(() => {
+      if (resetWebViewAfter !== 0 && resetWebViewAfter > lastResetWebView) {
+        setLastResetWebView(Date.now());
+        setWebviewGeneration((gen) => gen + 1);
+      }
+    }, [resetWebViewAfter])
+  );
+
+  return `webapp-webview-${webviewGeneration}`;
 }

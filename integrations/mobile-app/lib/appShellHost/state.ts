@@ -26,6 +26,12 @@ export function createInitialState(): State {
   };
 }
 
+export function resetStateAction() {
+  return { type: "reset" } as const;
+}
+
+export type ResetStateAction = ReturnType<typeof resetStateAction>;
+
 export type ObjectUpdateAction<T extends string, C extends object> = {
   [K in keyof C]: {
     type: T;
@@ -35,8 +41,6 @@ export type ObjectUpdateAction<T extends string, C extends object> = {
 }[keyof C];
 
 export type StatePropertyUpdate = ObjectUpdateAction<"update", State>;
-
-export type Action = StatePropertyUpdate;
 
 export function statePropertyUpdateAction<
   S extends State,
@@ -50,8 +54,12 @@ export function statePropertyUpdateAction<
   } as StatePropertyUpdate;
 }
 
+export type Action = ResetStateAction | StatePropertyUpdate;
+
 export function reducer(state: State, action: Action) {
   switch (action.type) {
+    case "reset":
+      return createInitialState();
     case "update":
       return { ...state, [action.key]: action.value };
     default:

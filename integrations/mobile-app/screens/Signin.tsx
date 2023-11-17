@@ -1,15 +1,15 @@
 import { View, Text, Image, SafeAreaView, StyleSheet } from "react-native";
 import AppleSigninButton from "../components/AppleSigninButton";
 import { StackScreenProps } from "@react-navigation/stack";
-import { A } from '@expo/html-elements';
+import { A } from "@expo/html-elements";
 import { RootStackParamList } from "../App";
 import { styles as globalStyles, colors } from "../styles";
 import * as AppleAuthentication from "expo-apple-authentication";
 import Config from "../lib/config";
 import * as Storage from "../lib/storage";
 import * as SiteAPI from "../lib/siteApi";
-import * as Linking from 'expo-linking';
-import config from '../lib/config';
+import * as Linking from "expo-linking";
+import config from "../lib/config";
 
 const { siteBaseUrl } = Config;
 
@@ -29,7 +29,10 @@ export default function SigninScreen({ navigation }: SigninScreenProps) {
       await SiteAPI.signinWithCredential(credential);
       const onboardingCompleted = await Storage.getItem("ONBOARDING_COMPLETED");
       if (onboardingCompleted === "true") {
-        navigation.navigate("WebApp", { credential });
+        navigation.navigate("WebApp", {
+          credential,
+          resetWebViewAfter: Date.now(),
+        });
       } else {
         navigation.navigate("Onboarding", { credential });
       }
@@ -114,7 +117,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   textLegalLink: {
-    color: 'blue',
+    color: "blue",
     fontSize: 17,
     marginBottom: 15,
   },
@@ -129,5 +132,5 @@ const styles = StyleSheet.create({
     ...globalStyles.textLink,
     marginVertical: 6,
     textAlign: "center",
-  }
+  },
 });
