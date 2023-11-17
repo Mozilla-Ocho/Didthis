@@ -449,11 +449,13 @@ const DateTimeField = observer(({ postStore }: { postStore: PostStore }) => {
             <Button
               onClick={handleNativeDateTimePickerOpen}
               intent="inputTrigger"
+              className="rounded-sm border-form-borders"
             >
               {postStore.didThisAtFormValue?.format('L LT') || 'Now'}
             </Button>
           ) : (
             <DateTimePicker
+              className="rounded-sm border-form-borders"
               disableFuture
               label={postStore.didThisAtFormValue === null ? 'now' : ''}
               value={postStore.didThisAtFormValue}
