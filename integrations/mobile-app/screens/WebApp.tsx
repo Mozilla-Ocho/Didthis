@@ -57,8 +57,7 @@ export default function WebAppScreen({ route }: WebAppScreenProps) {
 }
 
 /**
- * Send the given Apple ID credential to web content when it's ready and if
- * we haven't sent it already.
+ * Send the given Apple ID credential to web content when it's ready
  *
  * @param credential
  * @param appShellHost
@@ -68,13 +67,9 @@ function useSendAppleCredentialToWebContent(
   appShellHost: AppShellHostAPI
 ) {
   const webContentReady = appShellHost.state?.webContentReady;
-  const [lastCredential, setLastCredential] = useState<
-    AppleAuthentication.AppleAuthenticationCredential | undefined
-  >();
   useEffect(() => {
-    if (webContentReady && credential && credential !== lastCredential) {
+    if (webContentReady && credential) {
       appShellHost.postMessage("appleCredential", { credential });
-      setLastCredential(credential);
     }
   }, [webContentReady, appShellHost, credential]);
 }
