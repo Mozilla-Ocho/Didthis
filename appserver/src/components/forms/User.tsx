@@ -357,6 +357,10 @@ const UserForm = observer(() => {
   }
   const handleCancel = () => store.goBack()
 
+  // have to pass the appshell api reference so that it can send the reset sign
+  // in signal to the app shell.
+  const handleDeleteAccount = () => store.promptDeleteAccount(appShell.api)
+
   useAppShellTopBar({
     show: true,
     title: 'Account details',
@@ -609,11 +613,21 @@ const UserForm = observer(() => {
             </Link>
           </p>
           <LogoutButton intent="link" />
-          <p className="my-6">
-            {/* TODO: implement delete account https://github.com/Mozilla-Ocho/h3y/issues/97 */}
-            <Link intent="internalNav" className="text-sm text-red-500" href={"/"}>
+          <hr className="my-6"/>
+          <p className="leading-5">
+            <strong>Account deletion:</strong>{' '}
+            If you would like to delete your account, you can do so here. This
+            will permanently destroy all your public and private content, log
+            you out on all devices, and cannot be undone &mdash; not even by
+            customer support.{' '}
+            <Button
+              intent="link"
+              onClick={handleDeleteAccount}
+              className="text-md text-red-500"
+              trackEvent={trackingEvents.bcDeleteAccount}
+            >
               Delete account
-            </Link>
+            </Button>
           </p>
         </div>
       )}

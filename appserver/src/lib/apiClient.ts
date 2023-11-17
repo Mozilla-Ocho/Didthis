@@ -140,6 +140,14 @@ const deleteProject = async ({
   return wrapper
 }
 
+const deleteAccount = async (): Promise<EmptySuccessWrapper> => {
+  const wrapper = (await wrapFetch({
+    action: 'deleteAccount',
+    method: 'POST',
+  })) as EmptySuccessWrapper
+  return wrapper
+}
+
 const getUrlMeta = async ({
   url,
 }: {
@@ -261,6 +269,7 @@ const apiClient = {
   sessionLoginWithAppleId,
   sessionLoginAsTrialUser,
   claimTrialUser,
+  deleteAccount,
   deletePost,
   deleteProject,
   // getHealthCheck,

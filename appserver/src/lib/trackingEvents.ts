@@ -99,6 +99,10 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
       /* imgIntent */
     },
   },
+  caDeleteAccount: {
+    eventName: 'deleteAccount',
+    opts: {}
+  },
 
   // edit actions
   edProfile: {
@@ -201,6 +205,10 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   bcDiscardChanges: {
     eventName: 'buttonClick',
     opts: { name: 'bcDiscardChanges' /* fromPage */ },
+  },
+  bcDeleteAccount: {
+    eventName: 'deleteAccount',
+    opts: { name: 'bcDeleteAccount' },
   },
 
   // errors
