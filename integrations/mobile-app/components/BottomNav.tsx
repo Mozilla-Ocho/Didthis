@@ -57,7 +57,7 @@ function ProjectSquare({
 }: {
   project: ApiProject;
   requestClose: VoidFn;
-  isViewingProject?: boolean,
+  isViewingProject?: boolean;
 }) {
   const appShellHost = useAppShellHost();
   const { state, messaging } = appShellHost;
@@ -78,8 +78,8 @@ function ProjectSquare({
     : cloudinaryBase + "projects/owj4cttaiwevemryev8x";
 
   // highlighting the currently viewed project if any
-  const textStyle = isViewingProject ?
-    { ...styles.projectGridItemText, ...styles.currentProjectText}
+  const textStyle = isViewingProject
+    ? { ...styles.projectGridItemText, ...styles.currentProjectText }
     : styles.projectGridItemText;
   const outerStyle = isViewingProject ? styles.currentProjectOuter : {};
 
@@ -141,7 +141,7 @@ function ProjectDrawer({
       setRenderDrawer(true);
     } else {
       drawerPos.value = withSpring(drawerHiddenY, { damping }, () =>
-        runOnJS(onCloseAnimDone)(),
+        runOnJS(onCloseAnimDone)()
       );
     }
   }, [isOpen, onCloseAnimDone]);
@@ -160,10 +160,12 @@ function ProjectDrawer({
 
   // // if the user is on a project page, move it first.
   const viewingProjectId = state.viewingProjectId;
-  const viewingProject = viewingProjectId ? projects.find(x => x.id === viewingProjectId) : false;
-  if (viewingProjectId) {
-    projects = projects.filter(x => x.id !== viewingProjectId)
-    projects.unshift(viewingProject)
+  const viewingProject = viewingProjectId
+    ? projects.find((x) => x.id === viewingProjectId)
+    : false;
+  if (viewingProjectId && viewingProject) {
+    projects = projects.filter((x) => x.id !== viewingProjectId);
+    projects.unshift(viewingProject);
   }
 
   return (
@@ -225,7 +227,11 @@ export default function BottomNav({}: BottomNavProps) {
   return (
     <>
       <View style={styles.container}>
-        <TouchableHighlight style={styles.addButton} underlayColor="#FFF1A6" onPress={onAddPress}>
+        <TouchableHighlight
+          style={styles.addButton}
+          underlayColor="#FFF1A6"
+          onPress={onAddPress}
+        >
           <AddButtonImage width={70} height={70} />
         </TouchableHighlight>
       </View>
@@ -301,15 +307,15 @@ const styles = StyleSheet.create({
   },
   addButton: {
     marginTop: -25,
-    borderRadius: 100
+    borderRadius: 100,
   },
   currentProjectText: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   currentProjectOuter: {
     shadowRadius: 5,
-    shadowColor: 'black',
-    shadowOffset: {with:0,height:0},
+    shadowColor: "black",
+    shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.6,
-  }
+  },
 });
