@@ -68,7 +68,7 @@ export default function TopNav({
           borderBottomColor: "rgba(0, 0, 0, 0.1)"
         }}
         title={title}
-        headerShadowVisible={false}
+        headerShadowVisible={true}
         headerLeft={() => (
           <HeaderSideButton
             {...{
