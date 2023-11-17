@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { styles as globalStyles, colors } from "../styles";
 import AddButtonImage from "../assets/add-button.svg";
+import CreateProjectButtonImage from "../assets/create-project-square.svg";
 import useAppShellHost from "../lib/appShellHost";
 import Animated, {
   useSharedValue,
@@ -40,7 +41,7 @@ function CreateProjectSquare({ requestClose }: { requestClose: VoidFn }) {
       style={{ ...styles.projectSquare, height: "auto" }}
       onPress={onCreateProject}
     >
-      <AddButtonImage
+      <CreateProjectButtonImage
         width={styles.projectSquare.width}
         height={styles.projectSquare.height}
       />
