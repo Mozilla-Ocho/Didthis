@@ -509,7 +509,7 @@ class Store {
     this.userListeners.push(fn)
     if (this.user) fn(this.user)
     return () => {
-      this.userListeners.filter(x => x !== fn)
+      this.userListeners = this.userListeners.filter(x => x !== fn)
     }
   }
 
