@@ -19,6 +19,7 @@ function routeChangeStart(api: AppShellHostAPI, route: MatchRouteResult) {
  * @param route MatchRouteResult
  */
 function routeChangeComplete(api: AppShellHostAPI, route: MatchRouteResult) {
+  // console.log("routeChangeComplete",route)
   api.set("loading", false);
   api.set("webContentRouteChanging", false);
 
@@ -30,10 +31,8 @@ function routeChangeComplete(api: AppShellHostAPI, route: MatchRouteResult) {
   // of the bottom bar plus button to add to this project id instead of showing
   // the drawer to pick one.
   let projectId = ''
-  if (route?.name === 'projectView') {
-    if (route?.params.project) {
-      projectId = route?.params.project
-    }
+  if (route?.params.project) {
+    projectId = route?.params.project
   }
   api.set("viewingProjectId", projectId);
 

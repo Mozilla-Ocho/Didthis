@@ -1,11 +1,11 @@
 import AppShellHostAPI from "../api";
 import { AppRequestMethods, Failure, MessageRequests } from "../types";
-import * as SiteAPI from "../../siteApi";
 
 import webviewRouterEvent from "./webviewRouterEvent";
 import pickDateTime from "./pickDateTime";
 import shareProjectUrl from "./shareProjectUrl";
 import pickImage from "./pickImage";
+import signin from "./signin";
 
 export async function handleRequest(
   api: AppShellHostAPI,
@@ -57,6 +57,7 @@ export const methods: Methods = {
   pickDateTime,
   shareProjectUrl,
   pickImage,
+  signin,
 
   ping: async (api, payload) => {
     api.set("webContentReady", true);
@@ -67,12 +68,6 @@ export const methods: Methods = {
     const { user, links } = payload;
     api.set("user", user);
     api.set("links", { ...api.state.links, ...links });
-    return { success: true };
-  },
-
-  signin: async (api) => {
-    await SiteAPI.resetSignin();
-    api.navigation.navigate("Signin");
     return { success: true };
   },
 

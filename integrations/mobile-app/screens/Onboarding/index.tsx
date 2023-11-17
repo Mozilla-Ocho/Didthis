@@ -39,7 +39,10 @@ export default function OnboardingScreen({
   const context: OnboardingScreenContextValue = {
     completeOnboarding: async () => {
       await Storage.setItem("ONBOARDING_COMPLETED", "true");
-      navigation.navigate("WebApp", { credential });
+      navigation.navigate("WebApp", {
+        credential,
+        resetWebViewAfter: Date.now(),
+      });
     },
   };
 

@@ -3,10 +3,12 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  TouchableHighlight,
   ScrollView,
 } from "react-native";
 import { styles as globalStyles, colors } from "../styles";
 import AddButtonImage from "../assets/add-button.svg";
+import CreateProjectButtonImage from "../assets/create-project-square.svg";
 import useAppShellHost from "../lib/appShellHost";
 import Animated, {
   useSharedValue,
@@ -39,7 +41,7 @@ function CreateProjectSquare({ requestClose }: { requestClose: VoidFn }) {
       style={{ ...styles.projectSquare, height: "auto" }}
       onPress={onCreateProject}
     >
-      <AddButtonImage
+      <CreateProjectButtonImage
         width={styles.projectSquare.width}
         height={styles.projectSquare.height}
       />
@@ -51,9 +53,11 @@ function CreateProjectSquare({ requestClose }: { requestClose: VoidFn }) {
 function ProjectSquare({
   project,
   requestClose,
+  isViewingProject,
 }: {
   project: ApiProject;
   requestClose: VoidFn;
+  isViewingProject?: boolean;
 }) {
   const appShellHost = useAppShellHost();
   const { state, messaging } = appShellHost;
@@ -73,18 +77,26 @@ function ProjectSquare({
     ? cloudinaryBase + project.imageAssetId
     : cloudinaryBase + "projects/owj4cttaiwevemryev8x";
 
+  // highlighting the currently viewed project if any
+  const textStyle = isViewingProject
+    ? { ...styles.projectGridItemText, ...styles.currentProjectText }
+    : styles.projectGridItemText;
+  const outerStyle = isViewingProject ? styles.currentProjectOuter : {};
+
   return (
     <TouchableOpacity
       key={project.id}
       style={{ ...styles.projectSquare, height: "auto" }}
       onPress={onAddToProject}
     >
-      <Image
-        style={styles.projectSquare}
-        contentFit="cover"
-        source={projectImgUrl}
-      />
-      <Text style={styles.projectGridItemText}>{project.title}</Text>
+      <View style={outerStyle}>
+        <Image
+          style={styles.projectSquare}
+          contentFit="cover"
+          source={projectImgUrl}
+        />
+      </View>
+      <Text style={textStyle}>{project.title}</Text>
     </TouchableOpacity>
   );
 }
@@ -129,7 +141,7 @@ function ProjectDrawer({
       setRenderDrawer(true);
     } else {
       drawerPos.value = withSpring(drawerHiddenY, { damping }, () =>
-        runOnJS(onCloseAnimDone)(),
+        runOnJS(onCloseAnimDone)()
       );
     }
   }, [isOpen, onCloseAnimDone]);
@@ -143,8 +155,18 @@ function ProjectDrawer({
     }
   });
 
-  const projects = Object.values(state.user ? state.user.profile.projects : {});
+  let projects = Object.values(state.user ? state.user.profile.projects : {});
   projects.sort((a, b) => b.createdAt - a.createdAt);
+
+  // // if the user is on a project page, move it first.
+  const viewingProjectId = state.viewingProjectId;
+  const viewingProject = viewingProjectId
+    ? projects.find((x) => x.id === viewingProjectId)
+    : false;
+  if (viewingProjectId && viewingProject) {
+    projects = projects.filter((x) => x.id !== viewingProjectId);
+    projects.unshift(viewingProject);
+  }
 
   return (
     <>
@@ -183,6 +205,7 @@ function ProjectDrawer({
                   key={project.id}
                   project={project}
                   requestClose={requestClose}
+                  isViewingProject={project.id === viewingProjectId}
                 />
               ))}
             </View>
@@ -195,31 +218,22 @@ function ProjectDrawer({
 
 export default function BottomNav({}: BottomNavProps) {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const appShellHost = useAppShellHost();
-  const { state, messaging } = appShellHost;
-
   const onAddPress = () => {
-    if (state.viewingProjectId) {
-      const path =
-        "/user/" +
-        encodeURI(state.user.publicPageSlug) +
-        "/post?projectId=" +
-        encodeURIComponent(state.viewingProjectId);
-      messaging.postMessage("navigateToPath", { path });
-    } else {
-      setDrawerOpen(true);
-    }
+    setDrawerOpen(true);
   };
   const requestClose = () => {
     setDrawerOpen(false);
   };
-
   return (
     <>
       <View style={styles.container}>
-        <TouchableOpacity style={styles.addButton} onPress={onAddPress}>
-          <AddButtonImage width={54} height={54} />
-        </TouchableOpacity>
+        <TouchableHighlight
+          style={styles.addButton}
+          underlayColor="#FFF1A6"
+          onPress={onAddPress}
+        >
+          <AddButtonImage width={70} height={70} />
+        </TouchableHighlight>
       </View>
       <ProjectDrawer isOpen={drawerOpen} requestClose={requestClose} />
     </>
@@ -274,6 +288,7 @@ const styles = StyleSheet.create({
   projectGridHeading: {
     fontWeight: "bold",
     textAlign: "center",
+    marginBottom: 5,
   },
   projectGridItemText: {
     marginTop: 5,
@@ -292,5 +307,15 @@ const styles = StyleSheet.create({
   },
   addButton: {
     marginTop: -25,
+    borderRadius: 100,
+  },
+  currentProjectText: {
+    fontWeight: "bold",
+  },
+  currentProjectOuter: {
+    shadowRadius: 5,
+    shadowColor: "black",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
   },
 });

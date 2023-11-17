@@ -1,13 +1,17 @@
 import { View, Text, Image, SafeAreaView, StyleSheet } from "react-native";
 import AppleSigninButton from "../components/AppleSigninButton";
 import { StackScreenProps } from "@react-navigation/stack";
+import { A } from "@expo/html-elements";
 import { RootStackParamList } from "../App";
 import { styles as globalStyles, colors } from "../styles";
 import * as AppleAuthentication from "expo-apple-authentication";
+import Config from "../lib/config";
 import * as Storage from "../lib/storage";
 import * as SiteAPI from "../lib/siteApi";
-import * as Linking from 'expo-linking';
-import config from '../lib/config';
+import * as Linking from "expo-linking";
+import config from "../lib/config";
+
+const { siteBaseUrl } = Config;
 
 export type SigninScreenRouteParams = {};
 
@@ -25,7 +29,10 @@ export default function SigninScreen({ navigation }: SigninScreenProps) {
       await SiteAPI.signinWithCredential(credential);
       const onboardingCompleted = await Storage.getItem("ONBOARDING_COMPLETED");
       if (onboardingCompleted === "true") {
-        navigation.navigate("WebApp", { credential });
+        navigation.navigate("WebApp", {
+          credential,
+          resetWebViewAfter: Date.now(),
+        });
       } else {
         navigation.navigate("Onboarding", { credential });
       }
@@ -35,10 +42,6 @@ export default function SigninScreen({ navigation }: SigninScreenProps) {
       console.error("SIGN IN FAILED", e);
     }
   };
-
-  const handleLegalTerms = () => Linking.openURL(config.legalUrls.terms)
-  const handleLegalPrivacy = () => Linking.openURL(config.legalUrls.privacy)
-  const handleLegalContent = () => Linking.openURL(config.legalUrls.content)
 
   return (
     <SafeAreaView style={styles.screen}>
@@ -59,15 +62,17 @@ export default function SigninScreen({ navigation }: SigninScreenProps) {
       <View style={styles.signinContainer}>
         <AppleSigninButton {...{ onSignin }} />
       </View>
-      <Text style={[styles.text, styles.textLegalLink]} onPress={handleLegalTerms}>
-        Terms of service
-      </Text>
-      <Text style={[styles.text, styles.textLegalLink]} onPress={handleLegalPrivacy}>
-        Privacy notice
-      </Text>
-      <Text style={[styles.text, styles.textLegalLink]} onPress={handleLegalContent}>
-        Content policies
-      </Text>
+      <View style={styles.footerLinksContainer}>
+        <A href={config.legalUrls.privacy} style={styles.footerLink}>
+          Privacy policy
+        </A>
+        <A href={config.legalUrls.terms} style={styles.footerLink}>
+          Terms and conditions
+        </A>
+        <A href={config.legalUrls.content} style={styles.footerLink}>
+          Content policies
+        </A>
+      </View>
     </SafeAreaView>
   );
 }
@@ -86,6 +91,8 @@ const styles = StyleSheet.create({
     alignContent: "center",
     justifyContent: "center",
     marginBottom: 9.88,
+    // balances the marginTop in footerLinksContainer
+    marginTop: 48,
   },
   logo: { width: 185, height: 185 },
   logoTitleContainer: {
@@ -101,13 +108,16 @@ const styles = StyleSheet.create({
   text: {
     ...globalStyles.text,
   },
+  textLink: {
+    ...globalStyles.textLink,
+  },
   textIntro: {
     marginHorizontal: 64,
     flexDirection: "row",
     textAlign: "center",
   },
   textLegalLink: {
-    color: 'blue',
+    color: "blue",
     fontSize: 17,
     marginBottom: 15,
   },
@@ -115,8 +125,12 @@ const styles = StyleSheet.create({
     marginVertical: 24,
     marginHorizontal: 12,
   },
-  textNoAccountLink: {
-    marginVertical: 24,
-    marginHorizontal: 12,
+  footerLinksContainer: {
+    marginTop: 48,
+  },
+  footerLink: {
+    ...globalStyles.textLink,
+    marginVertical: 6,
+    textAlign: "center",
   },
 });

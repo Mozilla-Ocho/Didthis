@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Dispatch } from "react";
-import { Action, State, statePropertyUpdateAction } from "./state";
+import { Action, State, statePropertyUpdateAction, resetStateAction } from "./state";
 import { NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../App";
 import Config from "../../lib/config";
@@ -30,6 +30,10 @@ export default class AppShellHostAPI {
 
   set(...args: Parameters<typeof statePropertyUpdateAction>) {
     return this.dispatch(statePropertyUpdateAction(...args));
+  }
+
+  reset() {
+    return this.dispatch(resetStateAction());
   }
 
   get onMessage() {
