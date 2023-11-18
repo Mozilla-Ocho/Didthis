@@ -15,6 +15,8 @@ import StartupScreen, { StartupScreenRouteParams } from "./screens/Startup";
 import * as Onboarding from "./screens/Onboarding";
 import * as DateTimePicker from "./screens/DateTimePicker";
 import { ConditionalLoader } from "./components/Loader";
+import { ConditionalActivityIndicator, ConditionalActivityIndicatorProps } from "./components/ActivityIndicator";
+import useAppShellHost from "./lib/appShellHost";
 
 export type RootStackParamList = {
   Startup: StartupScreenRouteParams;
@@ -54,10 +56,23 @@ function App() {
           <Stack.Screen name="WebApp" component={WebAppScreen} />
           <Stack.Screen name="DateTimePicker" component={DateTimePicker.default} />
         </Stack.Navigator>
-        <ConditionalLoader />
+        <AppShellActivityIndicator delay={125} label="Working" />
       </AppShellHostContextProvider>
     </NavigationContainer>
   );
+}
+
+type AppShellActivityIndicatorProps = Omit<
+  ConditionalActivityIndicatorProps,
+  "visible"
+>;
+
+export function AppShellActivityIndicator(
+  props: AppShellActivityIndicatorProps
+) {
+  const appShellHost = useAppShellHost();
+  const loading = appShellHost.state?.loading;
+  return <ConditionalActivityIndicator {...props} visible={loading} />;
 }
 
 let AppEntryPoint = App;
