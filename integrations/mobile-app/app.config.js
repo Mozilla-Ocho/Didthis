@@ -13,6 +13,7 @@ export default ({ config }) => {
     ios: {
       bundleIdentifier: "org.mozilla.Didthis",
       buildNumber: "4",
+      usesAppleSignIn: true,
       config: {
         usesNonExemptEncryption: false,
       },
