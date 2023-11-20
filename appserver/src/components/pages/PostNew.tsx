@@ -10,10 +10,12 @@ import pathBuilder from '@/lib/pathBuilder'
 import {trackingEvents} from '@/lib/trackingEvents'
 import PageTitle from '../PageTitle'
 import RemindersAndAlerts from '../RemindersAndAlerts'
+import useAppShell from '@/lib/appShellContent'
 
 const NewPostPage = observer(() => {
   const store = useStore()
   const router = useRouter()
+  const appShell = useAppShell()
   if (!store.user) {
     return <LoginBouncer />
   }
@@ -41,7 +43,7 @@ const NewPostPage = observer(() => {
       />
       <RemindersAndAlerts/>
       <PagePad>
-        <h3>Add post</h3>
+        {!appShell.inAppWebView && <h3>Add post</h3>}
         <PostForm mode="new" />
       </PagePad>
     </>

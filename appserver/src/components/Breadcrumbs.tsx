@@ -3,6 +3,7 @@ import { useStore } from '@/lib/store'
 import { observer } from 'mobx-react-lite'
 import React from 'react'
 import { Link, PagePad } from './uiLib'
+import useAppShell from '@/lib/appShellContent'
 
 type Crumb = {
   name: string
@@ -11,6 +12,11 @@ type Crumb = {
 
 const Breadcrumbs = observer(({ crumbs }: { crumbs: Crumb[] }) => {
   const store = useStore()
+  const appShell = useAppShell()
+
+  // Hide this component when viewed in the native app shell.
+  if (appShell.inAppWebView) return <></>;
+
   if (crumbs.length) {
     const numCrumbs = crumbs.length + 1 // plus one for home
     const numCols = numCrumbs * 2 - 1 // each arrow is a column in between each crumb column

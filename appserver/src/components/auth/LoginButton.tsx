@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { useStore } from '@/lib/store'
 import { trackingEvents } from '@/lib/trackingEvents'
 import branding from '@/lib/branding'
+import useAppShell from '@/lib/appShellContent'
 
 const LoginButton = observer(
   ({
@@ -19,9 +20,14 @@ const LoginButton = observer(
     className?: string
   }) => {
     const store = useStore()
-    const handleClick = () => {
+    const appShell = useAppShell()
+    const handleClick = async () => {
       store.trackEvent(trackingEvents.bcLoginSignup)
-      store.launchGlobalLoginOverlay(false)
+      if (appShell.appReady) {
+        await appShell.api.request('signin')
+      } else {
+        store.launchGlobalLoginOverlay(false)
+      }
     }
     const defaultText = branding.loginButtonTxt
     return (

@@ -11,11 +11,13 @@ import { useState, useCallback } from 'react'
 import profileUtils from '@/lib/profileUtils'
 import pathBuilder from '@/lib/pathBuilder'
 import { useRouter } from 'next/router'
-import ImageUpload from '../ImageUpload'
+import ImageUploadWeb from '../ImageUpload'
 import type { UploadCallback } from '../ImageUpload'
 import { makeAutoObservable } from 'mobx'
 import { trackingEvents } from '@/lib/trackingEvents'
 import { ClaimTrialAccountButton } from '../auth/ClaimTrialAccountButton'
+import useAppShell, { useAppShellTopBar } from '@/lib/appShellContent'
+import ImageUploadAppShell from '../ImageUploadAppShell'
 
 class ProjectStore {
   title: string
@@ -111,6 +113,7 @@ const ProjectForm = observer((props: Props) => {
   const { mode } = props
   const router = useRouter()
   const store = useStore()
+  const appShell = useAppShell()
   const user = store.user
   if (!user) return <></>
   const [projectStore] = useState(
@@ -121,9 +124,7 @@ const ProjectForm = observer((props: Props) => {
         mode === 'edit' ? props.project : undefined
       )
   )
-  const handleSubmit = (e: React.FormEvent) => {
-    e.stopPropagation()
-    e.preventDefault()
+  const performSubmit = () => {
     projectStore.setSpinning(true)
     store
       .saveProject(
@@ -139,6 +140,11 @@ const ProjectForm = observer((props: Props) => {
         if (!store.user) return
         router.push(pathBuilder.project(store.user.systemSlug, newProject.id))
       })
+  }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.stopPropagation()
+    e.preventDefault()
+    performSubmit()
   }
   const setTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
     projectStore.setTitle(e.target.value)
@@ -165,6 +171,20 @@ const ProjectForm = observer((props: Props) => {
   const handleCancel = () => {
     store.goBack()
   }
+
+  const ImageUpload = appShell.appReady ? ImageUploadAppShell : ImageUploadWeb
+
+  useAppShellTopBar({
+    show: true,
+    title: `${mode === 'new' ? 'Create' : 'Edit'} project`,
+    leftIsBack: true,
+    leftLabel: 'Back',
+    rightLabel: mode === 'new' ? 'Create' : 'Save',
+    rightIsDisabled: !projectStore.isPostable(),
+    onLeftPress: handleCancel,
+    onRightPress: performSubmit,
+  })
+
   return (
     <div>
       <form
@@ -283,29 +303,34 @@ const ProjectForm = observer((props: Props) => {
           </p>
           {user.isTrial && (
             <p className="my-4 p-4 text-sm bg-yellow-100">
-              Heads up: To make a project public (and to manage it from other devices),
-              you’ll need to <ClaimTrialAccountButton intent="link" text="sign up" /> first.
+              Heads up: To make a project public (and to manage it from other
+              devices), you’ll need to{' '}
+              <ClaimTrialAccountButton intent="link" text="sign up" /> first.
             </p>
           )}
         </div>
         <div className="flex flex-col sm:flex-row gap-4 flex-wrap">
-          <Button
-            spinning={projectStore.spinning}
-            type="submit"
-            disabled={!projectStore.isPostable()}
-            className="w-full sm:w-[150px]"
-          >
-            {mode === 'new' ? 'Create' : 'Save'}
-          </Button>
-          <Button
-            intent="secondary"
-            onClick={handleCancel}
-            className="w-full sm:w-[150px]"
-            trackEvent={trackingEvents.bcDiscardChanges}
-            trackEventOpts={{ fromPage: 'projectEdit' }}
-          >
-            {mode === 'edit' ? 'Discard changes' : 'Cancel'}
-          </Button>
+          {!appShell.inAppWebView && (
+            <>
+              <Button
+                spinning={projectStore.spinning}
+                type="submit"
+                disabled={!projectStore.isPostable()}
+                className="w-full sm:w-[150px]"
+              >
+                {mode === 'new' ? 'Create' : 'Save'}
+              </Button>
+              <Button
+                intent="secondary"
+                onClick={handleCancel}
+                className="w-full sm:w-[150px]"
+                trackEvent={trackingEvents.bcDiscardChanges}
+                trackEventOpts={{ fromPage: 'projectEdit' }}
+              >
+                {mode === 'edit' ? 'Discard changes' : 'Cancel'}
+              </Button>
+            </>
+          )}
           {mode === 'edit' && (
             <div className="text-center sm:w-full sm:text-left">
               <Button

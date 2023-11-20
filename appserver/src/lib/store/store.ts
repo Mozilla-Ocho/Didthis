@@ -11,6 +11,7 @@ import { useEffect } from 'react'
 import { NextRouter } from 'next/router'
 import pathBuilder from '../pathBuilder'
 import profileUtils from '../profileUtils'
+import { AppleAuthenticationCredential } from '../appleAuth'
 // import { UrlMetaWrapper } from '../apiConstants'
 
 type GeneralError = false | '_get_me_first_fail_' | '_api_fail_'
@@ -29,6 +30,8 @@ export const KEY_TRIAL_ACCOUNT_CLAIMED = 'trialAccountClaimed'
 
 export type ApiClient = typeof apiClientBase
 export type AmplitudeClient = typeof amplitudeBase
+
+type UserListenerFn = (user: ApiUser) => void
 
 class Store {
   user: false | ApiUser = false
@@ -53,6 +56,7 @@ class Store {
   apiClient: ApiClient
   amplitude: AmplitudeClient
   trialAccountClaimed?: boolean
+  userListeners : Array<UserListenerFn> = []
 
   constructor({
     authUser,
@@ -84,6 +88,7 @@ class Store {
         firebaseRefNonReactive: false,
         trackedPageEvent: false,
         router: false,
+        userListeners: false,
       },
       { autoBind: true }
     )
@@ -384,6 +389,13 @@ class Store {
     this.loginErrorMode = false
   }
 
+  async loginWithAppleId(credential: AppleAuthenticationCredential) {
+    if (this.user) throw new Error('must be unauthed')
+    const wrapper = await this.apiClient.sessionLoginWithAppleId({ credential })
+    this.trackEvent(trackingEvents.caAppleIDLogin, {})
+    window.location.assign(`/`)
+  }
+
   async loginAsNewTrialUser() {
     if (this.signupCodeInfo === false) {
       // TODO: this shouldn't happen - need to log an error?
@@ -475,6 +487,7 @@ class Store {
       if (this.signupCodeInfo) {
         this.signupCodeInfo = false
       }
+      this.userListeners.forEach(fn => fn(x))
       // DRY_47693 signup code logic
       // if we have a signup code on the url, clear it
       if (this.signupCodeInfo && typeof window !== 'undefined') {
@@ -485,6 +498,14 @@ class Store {
       }
     } else {
       log.auth('store clearing user')
+    }
+  }
+
+  registerUserListener(fn: UserListenerFn) {
+    this.userListeners.push(fn)
+    if (this.user) fn(this.user)
+    return () => {
+      this.userListeners.filter(x => x !== fn)
     }
   }
 

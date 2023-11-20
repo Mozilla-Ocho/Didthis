@@ -7,9 +7,12 @@ const Wrapper = ({
 }: {
   authUser: ApiUser | false
 }) => {
+  // isThe404 is really a boolean meaning it's a static page that shouldn't
+  // have auth stuff in the header.
   return (
     <DefaultLayout
       authUser={authUser}
+      isThe404
     >
       <Terms />
     </DefaultLayout>

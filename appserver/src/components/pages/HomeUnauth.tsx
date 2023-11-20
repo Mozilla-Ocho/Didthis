@@ -16,10 +16,17 @@ import { trackingEvents } from '@/lib/trackingEvents'
 import { useEffect } from 'react'
 import { WaitlistButton } from '../WaitlistButton'
 import { PagePad } from '../uiLib'
+import { useAppShellListener } from '@/lib/appShellContent'
+import { AppleAuthenticationCredential } from '@/lib/appleAuth'
 
 // DRY_20334 outer page width styles
 const HomeUnauth = () => {
   const store = useStore()
+
+  useAppShellListener('appleCredential', payload => {
+    store.loginWithAppleId(payload.credential)
+  })
+
   const bucketInt = (store.testBucket ? store.testBucket.value : 0) % 5
   let topicBucket: 'combo' | 'authentic' | 'storytelling' | 'utility' | 'wip'
   // safe default to the combo bucket in case something's oddly wrong with

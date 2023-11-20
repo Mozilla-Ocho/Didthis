@@ -10,6 +10,7 @@ const Wrapper = ({
   return (
     <DefaultLayout
       authUser={authUser}
+      isThe404
     >
       <Privacy />
     </DefaultLayout>

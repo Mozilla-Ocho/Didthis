@@ -109,6 +109,11 @@ interface SessionLoginAsTrialUserWrapper extends SuccessWrapper {
   payload: ApiUser
 }
 
+interface SessionLoginWithAppleIdWrapper extends SuccessWrapper {
+  action: "sessionLoginWithAppleId",
+  payload: ApiUser
+}
+
 interface ClaimTrialUserWrapper extends SuccessWrapper {
   action: "claimTrialUser",
   payload: ApiUser
@@ -127,6 +132,7 @@ export type {
   SavedPostWrapper,
   SavedProjectWrapper,
   SessionLoginAsTrialUserWrapper,
+  SessionLoginWithAppleIdWrapper,
   SlugCheckWrapper,
   SuccessWrapper,
   UrlMetaWrapper,

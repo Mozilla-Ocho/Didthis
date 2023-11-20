@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@/lib/store'
-import { useCallback, useEffect, useState } from 'react'
+import { MouseEventHandler, useCallback, useEffect, useState } from 'react'
 import {
   Button,
   Input,
@@ -18,7 +18,8 @@ import apiClient from '@/lib/apiClient'
 import log from '@/lib/log'
 import { ApiError } from '@/lib/apiCore'
 import LinkPreview from '../LinkPreview'
-import ImageUpload from '../ImageUpload'
+import ImageUploadWeb from '../ImageUpload'
+import ImageUploadAppShell from "../ImageUploadAppShell"
 import type { UploadCallback } from '../ImageUpload'
 import profileUtils from '@/lib/profileUtils'
 import { twMerge } from 'tailwind-merge'
@@ -26,6 +27,7 @@ import { trackingEvents } from '@/lib/trackingEvents'
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
 import dayjs, { Dayjs } from 'dayjs'
 import { getExifCreatedAtMillis } from '@/lib/cloudinaryConfig'
+import useAppShell, { useAppShellTopBar } from '@/lib/appShellContent'
 
 class PostStore {
   id: string
@@ -276,36 +278,39 @@ const ProjectSelector = observer(({ postStore }: { postStore: PostStore }) => {
   )
 })
 
-const DescriptionField = observer(({ postStore }: { postStore: PostStore }) => {
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    postStore.setDescription(e.target.value)
+const DescriptionField = observer(
+  ({ postStore, mode }: { postStore: PostStore; mode: 'new' | 'edit' }) => {
+    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      postStore.setDescription(e.target.value)
+    }
+    const hint =
+      postStore.mediaType === 'text'
+        ? 'Write something...'
+        : postStore.mediaType === 'image'
+        ? 'Write about this image...'
+        : postStore.mediaType === 'link'
+        ? 'Write about this link...'
+        : ''
+    return (
+      <>
+        <label htmlFor="description-field">
+          <span className="sr-only">description:</span>
+          <Textarea
+            id="description-field"
+            placeholder={hint}
+            name="description"
+            value={postStore.description}
+            onChange={handleChange}
+            className="text-bodytext"
+            touched={true}
+            maxLen={profileUtils.maxChars.blurb}
+            style={{ minHeight: mode === 'new' ? 141 : 308 }}
+          />
+        </label>
+      </>
+    )
   }
-  const hint =
-    postStore.mediaType === 'text'
-      ? 'Write something...'
-      : postStore.mediaType === 'image'
-      ? 'Write about this image...'
-      : postStore.mediaType === 'link'
-      ? 'Write about this link...'
-      : ''
-  return (
-    <>
-      <label htmlFor="description-field">
-        <span className="sr-only">description:</span>
-        <Textarea
-          id="description-field"
-          placeholder={hint}
-          name="description"
-          value={postStore.description}
-          onChange={handleChange}
-          className="text-bodytext"
-          touched={true}
-          maxLen={profileUtils.maxChars.blurb}
-        />
-      </label>
-    </>
-  )
-})
+)
 
 const LinkField = observer(({ postStore }: { postStore: PostStore }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -338,6 +343,7 @@ const LinkField = observer(({ postStore }: { postStore: PostStore }) => {
 })
 
 const ImageField = observer(({ postStore }: { postStore: PostStore }) => {
+  const appShell = useAppShell()
   const onResult = useCallback(
     res => {
       postStore.setImageAssetId(res.cloudinaryAssetId, res.imageMetaPrivate)
@@ -347,6 +353,7 @@ const ImageField = observer(({ postStore }: { postStore: PostStore }) => {
   const deleteImage = () => {
     postStore.setImageAssetId('', undefined)
   }
+  const ImageUpload = appShell.appReady ? ImageUploadAppShell : ImageUploadWeb
   return (
     <div>
       {postStore.imageAssetId && (
@@ -383,6 +390,20 @@ const ImageField = observer(({ postStore }: { postStore: PostStore }) => {
 })
 
 const DateTimeField = observer(({ postStore }: { postStore: PostStore }) => {
+  const appShell = useAppShell();
+
+  const handleNativeDateTimePickerOpen: MouseEventHandler<HTMLInputElement> = async (ev) => {
+    const initialDateTime = postStore.didThisAtFormValue?.toDate().getTime()
+    const result = await appShell.api.request('pickDateTime', {
+      title: 'Did this when?',
+      initialDateTime,
+    })
+    if (result) {
+      const { changed, dateTime } = result
+      if (changed) handleChange(dayjs(dateTime))
+    }
+  };
+
   const handleChange = (x: Dayjs | null) => {
     postStore.setDidThisAtDayjs(x)
   }
@@ -424,16 +445,28 @@ const DateTimeField = observer(({ postStore }: { postStore: PostStore }) => {
             'grid grid-cols-1 transition-colors duration-300 ' + pickerBgClass
           }
         >
-          <DateTimePicker
-            disableFuture
-            label={postStore.didThisAtFormValue === null ? 'now' : ''}
-            value={postStore.didThisAtFormValue}
-            onChange={handleChange}
-          />
+          {appShell.appReady ? (
+            <Button
+              onClick={handleNativeDateTimePickerOpen}
+              intent="inputTrigger"
+              className="rounded-sm border-form-borders"
+            >
+              {postStore.didThisAtFormValue?.format('L LT') || 'Now'}
+            </Button>
+          ) : (
+            <DateTimePicker
+              className="rounded-sm border-form-borders"
+              disableFuture
+              label={postStore.didThisAtFormValue === null ? 'now' : ''}
+              value={postStore.didThisAtFormValue}
+              onChange={handleChange}
+              open={false}
+            />
+          )}
         </div>
         {err && (
           <p className="text-red-400 text-xs text-right">
-            Post dates can’t be in the future
+            Update dates can’t be in the future
           </p>
         )}
         {canShowDateTip && (
@@ -463,17 +496,17 @@ const PostForm = observer((props: Props) => {
   const { mode } = props
   const router = useRouter()
   const store = useStore()
+  const appShell = useAppShell()
   if (!store.user) return <></>
+
   let defaultPid = getParamString(router, 'projectId')
-  if (mode === 'new' && !store.user.profile.projects[defaultPid])
+  if (mode === 'new' && store.user && !store.user.profile.projects[defaultPid])
     defaultPid = 'new'
   const [postStore] = useState(
     () =>
       new PostStore(mode, defaultPid, mode === 'edit' ? props.post : undefined)
   )
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
+  const performSubmit = () => {
     postStore.setSpinning(true)
     store
       .savePost(postStore.getApiPost(), mode, postStore.mediaType)
@@ -486,6 +519,11 @@ const PostForm = observer((props: Props) => {
           pathBuilder.post(store.user.systemSlug, newPost.projectId, newPost.id)
         )
       })
+  }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    performSubmit()
   }
   const handleMediaType = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log('handleMediaType', e)
@@ -500,6 +538,19 @@ const PostForm = observer((props: Props) => {
   const handleCancel = () => {
     store.goBack()
   }
+
+  useAppShellTopBar({
+    show: true,
+    title: mode === 'new' ? 'Add update' : 'Edit update',
+    leftIsBack: true,
+    leftLabel: 'Back',
+    rightLabel: mode === 'new' ? 'Add' : 'Save',
+    rightIsDisabled: !postStore.isPostable(),
+    onLeftPress: handleCancel,
+    onRightPress: performSubmit,
+  })
+
+  if (!store.user) return <></>
   return (
     <div>
       <form
@@ -509,18 +560,11 @@ const PostForm = observer((props: Props) => {
       >
         {defaultPid === 'new' && <ProjectSelector postStore={postStore} />}
         {mode === 'new' && (
-          <div className="grid grid-cols-3 gap-4 text-center mt-8">
-            <label htmlFor="mediaImage" className={labelClass('image')}>
-              <input
-                id="mediaImage"
-                onChange={handleMediaType}
-                className="sr-only"
-                type="radio"
-                value="image"
-                checked={postStore.mediaType === 'image'}
-              />{' '}
-              Image
-            </label>
+          <div
+            className={`grid grid-cols-3 gap-4 text-center ${
+              appShell.inAppWebView ? 'mt-4' : 'mt-8'
+            }`}
+          >
             <label htmlFor="mediaText" className={labelClass('text')}>
               <input
                 id="mediaText"
@@ -529,8 +573,19 @@ const PostForm = observer((props: Props) => {
                 type="radio"
                 value="text"
                 checked={postStore.mediaType === 'text'}
-              />{' '}
+              />
               Text
+            </label>
+            <label htmlFor="mediaImage" className={labelClass('image')}>
+              <input
+                id="mediaImage"
+                onChange={handleMediaType}
+                className="sr-only"
+                type="radio"
+                value="image"
+                checked={postStore.mediaType === 'image'}
+              />
+              Image
             </label>
             <label htmlFor="mediaLink" className={labelClass('link')}>
               <input
@@ -540,37 +595,41 @@ const PostForm = observer((props: Props) => {
                 type="radio"
                 value="link"
                 checked={postStore.mediaType === 'link'}
-              />{' '}
+              />
               Link
             </label>
           </div>
         )}
-        {mode === 'edit' && <div className="p-1" />}
+        {mode === 'edit' && !appShell.inAppWebView && <div className="p-1" />}
         {postStore.mediaType === 'image' && (
           <ImageField postStore={postStore} />
         )}
         {postStore.mediaType === 'link' && <LinkField postStore={postStore} />}
         <DateTimeField postStore={postStore} />
-        <DescriptionField postStore={postStore} />
+        <DescriptionField mode={mode} postStore={postStore} />
 
         <div className="flex flex-col sm:flex-row gap-4 mt-8 flex-wrap">
-          <Button
-            type="submit"
-            disabled={!postStore.isPostable()}
-            spinning={postStore.spinning}
-            className="w-full sm:w-[150px]"
-          >
-            {mode === 'new' ? 'Add' : 'Save'}
-          </Button>
-          <Button
-            intent="secondary"
-            onClick={handleCancel}
-            className="w-full sm:w-[150px]"
-            trackEvent={trackingEvents.bcDiscardChanges}
-            trackEventOpts={{ fromPage: 'postEdit' }}
-          >
-            {mode === 'edit' ? 'Discard changes' : 'Cancel'}
-          </Button>
+          {!appShell.inAppWebView && (
+            <>
+              <Button
+                type="submit"
+                disabled={!postStore.isPostable()}
+                spinning={postStore.spinning}
+                className="w-full sm:w-[150px]"
+              >
+                {mode === 'new' ? 'Add' : 'Save'}
+              </Button>
+              <Button
+                intent="secondary"
+                onClick={handleCancel}
+                className="w-full sm:w-[150px]"
+                trackEvent={trackingEvents.bcDiscardChanges}
+                trackEventOpts={{ fromPage: 'postEdit' }}
+              >
+                {mode === 'edit' ? 'Discard changes' : 'Cancel'}
+              </Button>
+            </>
+          )}
           {mode === 'edit' && (
             <div className="text-center sm:w-full sm:text-left">
               <Button
