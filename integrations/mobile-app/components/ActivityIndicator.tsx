@@ -1,16 +1,7 @@
-import {
-  Animated,
-  Easing,
-  StyleSheet,
-  Text,
-  SafeAreaView,
-  View,
-  Image,
-} from "react-native";
+import { Animated, Easing, StyleSheet, Text, View } from "react-native";
 import RollingLoaderImage from "../assets/rolling-loader.svg";
 import { fonts, colors } from "../styles";
 import { useEffect, useRef, useState } from "react";
-import useAppShellHost from "../lib/appShellHost";
 
 export type ActivityIndicatorProps = {
   label?: string;
