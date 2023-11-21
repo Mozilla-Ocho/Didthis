@@ -9,13 +9,20 @@ export default ({ config }) => {
     slug: "didthis",
     icon: "./assets/didthis-snap-logo.png",
     owner: "mozilla-ocho-h3y",
+    orientation: "portrait",
+    icon: "assets/didthis-appstore.png",
+    splash: {
+      image: "assets/didthis-appstore.png",
+    },
     android: {
       package: "org.mozilla.Didthis",
     },
     ios: {
       bundleIdentifier: "org.mozilla.Didthis",
       buildNumber: "4",
+      icon: "assets/didthis-appstore.png",
       usesAppleSignIn: true,
+      supportsTablet: false,
       config: {
         usesNonExemptEncryption: false,
       },
