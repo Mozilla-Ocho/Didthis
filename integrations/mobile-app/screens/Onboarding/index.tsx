@@ -2,9 +2,8 @@ import { Text, SafeAreaView, StatusBar } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { StackScreenProps } from "@react-navigation/stack";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import * as AppleAuthentication from "expo-apple-authentication";
 import { RootStackParamList } from "../../App";
-import * as Storage from "../../lib/storage";
+import { setOnboardingComplete } from "../../lib/storage";
 import { styles } from "./styles";
 import { OnboardingPaginator } from "./paginator";
 import { OnboardingPage } from "./page";
@@ -13,9 +12,7 @@ import {
   OnboardingScreenContextValue,
 } from "./context";
 
-export type RouteParams = {
-  credential?: AppleAuthentication.AppleAuthenticationCredential;
-};
+export type RouteParams = {};
 
 export type OnboardingScreenProps = {} & StackScreenProps<
   RootStackParamList,
@@ -32,17 +29,11 @@ const PageTab = createMaterialTopTabNavigator();
 
 export default function OnboardingScreen({
   navigation,
-  route,
 }: OnboardingScreenProps) {
-  const { credential } = route.params || {};
-
   const context: OnboardingScreenContextValue = {
     completeOnboarding: async () => {
-      await Storage.setItem("ONBOARDING_COMPLETED", "true");
-      navigation.navigate("WebApp", {
-        credential,
-        resetWebViewAfter: Date.now(),
-      });
+      await setOnboardingComplete();
+      navigation.goBack();
     },
   };
 

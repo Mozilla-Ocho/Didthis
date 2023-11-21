@@ -6,10 +6,10 @@ import { RootStackParamList } from "../App";
 import { styles as globalStyles, colors } from "../styles";
 import * as AppleAuthentication from "expo-apple-authentication";
 import Config from "../lib/config";
-import * as Storage from "../lib/storage";
 import * as SiteAPI from "../lib/siteApi";
-import * as Linking from "expo-linking";
 import config from "../lib/config";
+import { useState } from "react";
+import ActivityIndicator from "../components/ActivityIndicator";
 
 const { siteBaseUrl } = Config;
 
@@ -20,25 +20,28 @@ export type SigninScreenProps = {} & StackScreenProps<
   "Signin"
 >;
 
+type SigninStatus = undefined | "inprogress" | "success" | "error";
+
 export default function SigninScreen({ navigation }: SigninScreenProps) {
+  const [signinStatus, setSigninStatus] = useState<SigninStatus>();
+
+  const onSigninPress = () => setSigninStatus("inprogress");
+
+  const onSigninError = () => setSigninStatus("error");
+
   const onSignin = async (
     credential: AppleAuthentication.AppleAuthenticationCredential
   ) => {
     try {
       // HACK: Not sharing cookies between app & webview, need to sign-in with both
       await SiteAPI.signinWithCredential(credential);
-      const onboardingCompleted = await Storage.getItem("ONBOARDING_COMPLETED");
-      if (onboardingCompleted === "true") {
-        navigation.navigate("WebApp", {
-          credential,
-          resetWebViewAfter: Date.now(),
-        });
-      } else {
-        navigation.navigate("Onboarding", { credential });
-      }
+      setSigninStatus("success");
+      navigation.navigate("WebApp", {
+        credential,
+        resetWebViewAfter: Date.now(),
+      });
     } catch (e) {
-      // TODO: report sign-in error better
-      alert("Sign-in failed, please try again later.");
+      setSigninStatus("error");
       console.error("SIGN IN FAILED", e);
     }
   };
@@ -60,7 +63,11 @@ export default function SigninScreen({ navigation }: SigninScreenProps) {
         updates.
       </Text>
       <View style={styles.signinContainer}>
-        <AppleSigninButton {...{ onSignin }} />
+        <AppleSigninButton
+          onPress={onSigninPress}
+          onError={onSigninError}
+          onSignin={onSignin}
+        />
       </View>
       <View style={styles.footerLinksContainer}>
         <A href={config.legalUrls.privacy} style={styles.footerLink}>
@@ -73,6 +80,19 @@ export default function SigninScreen({ navigation }: SigninScreenProps) {
           Content policies
         </A>
       </View>
+      {signinStatus === "inprogress" && (
+        <ActivityIndicator label="Signing In" />
+      )}
+      {signinStatus === "success" && (
+        <ActivityIndicator spinner={false} label="Success!" />
+      )}
+      {signinStatus === "error" && (
+        <ActivityIndicator
+          intent="error"
+          spinner={false}
+          label="We ran into a problem. Try again"
+        />
+      )}
     </SafeAreaView>
   );
 }
