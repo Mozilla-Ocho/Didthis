@@ -4,9 +4,9 @@ Rough notes on deployment of release builds to the App Store
 
 ## tl;dr
 
-- Every commit to `main` branch results in an automated build and upload to the App Store.
-- If the app version number in that commit matches a currently shipped TestFlight release, it will be automatically shipped to all users enrolled in that release.
-- If the app version number has not yet been shipped to TestFlight, a manual process to ship that version is required.
+- Every commit to `releases/prod` branch results in an automated build in Bitrise - and the resulting app binary **is** uploaded to Apple
+- Every commit to `main` branch results in an automated test & build in Bitrise - but no binary is uploaded to Apple
+- Internal TestFlight is configured to automatically release all uploads to participating testers.
 
 ## Build automation in Bitrise
 
@@ -52,13 +52,15 @@ However, some aspects of the app are managed by Mozilla Release Engineering. If 
 
 - https://bugzilla.mozilla.org/enter_bug.cgi?product=Release+Engineering&component=General
 
-## Shipping to TestFlight
+## Shipping to Internal TestFlight
 
-Shipping to TestFlight basically consists of manually selecting a version and releasing it to a testing group in App Store Connect.
+The internal TestFlight group consists of essentially just core team members who also have Apple developer accounts.
 
-Each subsequent build for that version will be automatically shipped.
+Currently, every commit to the `releases/prod` branch results in Bitrise build and an automatic update sent to all internal testers.
 
-Builds should be performed & uploaded via Bitrise upon pushes to the `main` branch, so this part should be automated.
+## Shipping to External TestFlight
+
+TBD
 
 ## Shipping a new version
 

@@ -17,10 +17,6 @@ let baseOriginWhitelist = [
 // see eas.json for channel definitions
 if (Updates.channel === "production") {
   siteBaseUrl = "https://didthis.app";
-} else if (Updates.channel === "preview") {
-  siteBaseUrl = "https://test.didthis.app";
-} else if (Updates.channel === "storybook") {
-  storybookEnabled = true;
 } else if (Updates.channel === "development") {
   // e.g. EXPO_PUBLIC_SITE_BASE_URL='http://192.168.0.104:3000' yarn start
 }
