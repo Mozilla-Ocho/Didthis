@@ -1,5 +1,7 @@
 import withRemoveiOSNotificationEntitlement from "./config-plugins/withRemoveiOSNotificationEntitlement";
 
+const updateChannel = process.env.EXPO_CHANNEL || "development";
+
 export default ({ config }) => {
   return {
     ...config,
@@ -25,6 +27,9 @@ export default ({ config }) => {
     },
     updates: {
       url: "https://u.expo.dev/d1216396-7cf9-4a41-9543-ce7e31e0529b",
+      requestHeaders: {
+        "expo-channel-name": updateChannel,
+      },
     },
     runtimeVersion: {
       policy: "sdkVersion",
