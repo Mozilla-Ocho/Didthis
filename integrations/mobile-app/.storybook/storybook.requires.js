@@ -64,6 +64,7 @@ const getStories = () => {
     "./components/BottomNav.stories.tsx": require("../components/BottomNav.stories.tsx"),
     "./components/Loader.stories.tsx": require("../components/Loader.stories.tsx"),
     "./components/LogoLoader.stories.tsx": require("../components/LogoLoader.stories.tsx"),
+    "./components/OfflineWarning.stories.tsx": require("../components/OfflineWarning.stories.tsx"),
     "./components/TopNav.stories.tsx": require("../components/TopNav.stories.tsx"),
     "./components/WebViewNavToolbar.stories.tsx": require("../components/WebViewNavToolbar.stories.tsx"),
   };

@@ -1,7 +1,7 @@
 import { StyleSheet, SafeAreaView, StyleProp, ViewStyle } from "react-native";
 import LottieView from "lottie-react-native";
 import useAppShellHost from "../lib/appShellHost";
-import { useEffect, useRef, useState } from "react";
+import useDelay from "../lib/useDelay";
 
 export type LoaderProps = {
   style?: StyleProp<ViewStyle>;
@@ -34,22 +34,8 @@ export type ConditionalLoaderProps = {
 export function ConditionalLoader({ delay = 100 }) {
   const appShellHost = useAppShellHost();
   const loading = appShellHost.state?.loading;
-  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>();
-  const [delayPassed, setDelayPassed] = useState(false);
+  const shouldShow = useDelay({ delay, active: loading });
 
-  useEffect(() => {
-    setDelayPassed(false);
-    if (timerRef.current) clearTimeout(timerRef.current);
-
-    if (loading) {
-      timerRef.current = setTimeout(() => {
-        timerRef.current = undefined;
-        setDelayPassed(true);
-      }, delay);
-    }
-  }, [loading, delay, timerRef, setDelayPassed]);
-
-  const shouldShow = loading && delayPassed;
   if (!shouldShow) return <></>;
   return <Loader style={{ backgroundColor: "rgba(0, 0, 0, 0.3)" }} />;
 }

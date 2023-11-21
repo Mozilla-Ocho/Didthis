@@ -8,15 +8,14 @@ import useAppFonts from "./lib/fonts";
 import LogoLoader from "./components/LogoLoader";
 import { globalTheme } from "./styles";
 import * as ScreenOrientation from 'expo-screen-orientation';
-
 import WebAppScreen, { WebAppScreenRouteParams } from "./screens/WebApp";
 import SigninScreen, { SigninScreenRouteParams } from "./screens/Signin";
 import StartupScreen, { StartupScreenRouteParams } from "./screens/Startup";
 import * as Onboarding from "./screens/Onboarding";
 import * as DateTimePicker from "./screens/DateTimePicker";
-import { ConditionalLoader } from "./components/Loader";
 import { ConditionalActivityIndicator, ConditionalActivityIndicatorProps } from "./components/ActivityIndicator";
 import useAppShellHost from "./lib/appShellHost";
+import OfflineWarning from "./components/OfflineWarning";
 
 export type RootStackParamList = {
   Startup: StartupScreenRouteParams;
@@ -56,6 +55,7 @@ function App() {
           <Stack.Screen name="WebApp" component={WebAppScreen} />
           <Stack.Screen name="DateTimePicker" component={DateTimePicker.default} />
         </Stack.Navigator>
+        <OfflineWarning />
         <AppShellActivityIndicator delay={125} label="Working" />
       </AppShellHostContextProvider>
     </NavigationContainer>
