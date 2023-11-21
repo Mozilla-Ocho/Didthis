@@ -65,7 +65,7 @@ export default function TopNav({
         headerStyle={{
           backgroundColor: colors.background,
           borderBottomWidth: 1,
-          borderBottomColor: "rgba(0, 0, 0, 0.1)"
+          borderBottomColor: "rgba(0, 0, 0, 0.1)",
         }}
         title={title}
         headerShadowVisible={true}
@@ -74,6 +74,7 @@ export default function TopNav({
             {...{
               onPress: onLeftPress,
               isBack: leftIsBack,
+              isLeft: true,
               disabled: leftIsDisabled,
               label: leftLabel,
             }}
@@ -127,13 +128,15 @@ function IconButton({
   color = "#fff",
 }: {
   icon: React.FC<SvgProps>;
-  accessibilityLabel: string,
+  accessibilityLabel: string;
   onPress: (event: GestureResponderEvent) => void;
   disabled: boolean;
   color?: string;
 }) {
   const styles = StyleSheet.create({
     container: {
+      marginLeft: 2,
+      paddingVertical: 12,
       paddingHorizontal: 12,
     },
     disabled: {
@@ -166,17 +169,31 @@ function IconButton({
 
 function HeaderSideButton({
   onPress,
-  isBack,
-  disabled,
+  isBack = false,
+  isLeft = false,
+  disabled = false,
   label,
 }: {
   onPress: () => any;
   isBack?: boolean;
+  isLeft?: boolean;
   disabled?: boolean;
   label: string;
 }) {
   const { colors } = useTheme();
   const styles = StyleSheet.create({
+    base: {
+      paddingVertical: 12,
+      paddingHorizontal: 10,
+      minWidth: 100,
+      justifyContent: "flex-end",
+    },
+    baseLeft: {
+      justifyContent: "flex-start",
+    },
+    baseBack: {
+      minWidth: 100,
+    },
     disabled: {
       opacity: 0.3,
     },
@@ -185,7 +202,7 @@ function HeaderSideButton({
   if (isBack) {
     return (
       <HeaderBackButton
-        style={[disabled && styles.disabled]}
+        style={[styles.baseBack, disabled && styles.disabled]}
         tintColor={colors.primary}
         label={hasLabel ? label : "Back"}
         onPress={disabled ? noop : onPress}
@@ -197,7 +214,11 @@ function HeaderSideButton({
     return (
       <HeaderBackButton
         backImage={() => ""}
-        style={[disabled && styles.disabled, { marginHorizontal: 10 }]}
+        style={[
+          styles.base,
+          isLeft && styles.baseLeft,
+          disabled && styles.disabled,
+        ]}
         tintColor={colors.primary}
         label={label}
         onPress={disabled ? noop : onPress}
