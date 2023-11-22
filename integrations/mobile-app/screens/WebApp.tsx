@@ -13,6 +13,7 @@ import { ConditionalBottomNav } from "../components/BottomNav";
 import AppShellHostAPI from "../lib/appShellHost/api";
 import { checkOnboarding } from "../lib/storage";
 import { ApiUser } from "../lib/types";
+import useDelay from "../lib/useDelay";
 
 const { siteBaseUrl, originWhitelist } = Config;
 
@@ -63,7 +64,7 @@ export default function WebAppScreen({ route, navigation }: WebAppScreenProps) {
         onMessage={appShellHost.onMessage}
       />
       <ConditionalBottomNav />
-      <WaitingForUserLoader user={user} />
+      <WaitingForUserLoader />
     </SafeAreaView>
   );
 }
@@ -72,8 +73,14 @@ export default function WebAppScreen({ route, navigation }: WebAppScreenProps) {
  * Kind of a hacky component to display a loader over everything until
  * we have a signed-in user available from web content.
  */
-function WaitingForUserLoader({ user }: { user: ApiUser }) {
-  if (user) return <></>;
+function WaitingForUserLoader() {
+  const appShellHost = useAppShellHost();
+
+  // HACK: Give it a small delay, once user is available before hiding loader
+  const { user } = appShellHost.state;
+  const hideLoader = useDelay({ active: !!user, delay: 100 });
+  if (hideLoader) return <></>;
+
   return (
     <SafeAreaView
       style={{
