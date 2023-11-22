@@ -11,6 +11,9 @@ import * as AppleAuthentication from "expo-apple-authentication";
 import { ConditionalTopNav } from "../components/TopNav";
 import { ConditionalBottomNav } from "../components/BottomNav";
 import AppShellHostAPI from "../lib/appShellHost/api";
+import { checkOnboarding } from "../lib/storage";
+import { ApiUser } from "../lib/types";
+import useDelay from "../lib/useDelay";
 
 const { siteBaseUrl, originWhitelist } = Config;
 
@@ -24,16 +27,25 @@ export type WebAppScreenProps = {} & StackScreenProps<
   "WebApp"
 >;
 
-export default function WebAppScreen({ route }: WebAppScreenProps) {
+export default function WebAppScreen({ route, navigation }: WebAppScreenProps) {
   const { credential, resetWebViewAfter = 0 } = route.params || {};
 
   const appShellHost = useAppShellHost();
+  const user = appShellHost.state?.user;
 
   const webviewRef = useRef<WebView>(null);
   useEffect(
     () => appShellHost.setWebView(webviewRef.current),
     [appShellHost, webviewRef.current]
   );
+
+  // Send the user off to onboarding once signed in, if necessary.
+  useEffect(() => {
+    if (!user) return;
+    checkOnboarding().then((onboardingCompleted) => {
+      if (!onboardingCompleted) navigation.navigate("Onboarding");
+    });
+  }, [user, navigation]);
 
   useSendAppleCredentialToWebContent(credential, appShellHost);
   const webviewKey = useResettableWebviewKey(resetWebViewAfter);
@@ -52,6 +64,34 @@ export default function WebAppScreen({ route }: WebAppScreenProps) {
         onMessage={appShellHost.onMessage}
       />
       <ConditionalBottomNav />
+      <WaitingForUserLoader />
+    </SafeAreaView>
+  );
+}
+
+/**
+ * Kind of a hacky component to display a loader over everything until
+ * we have a signed-in user available from web content.
+ */
+function WaitingForUserLoader() {
+  const appShellHost = useAppShellHost();
+
+  // HACK: Give it a small delay, once user is available before hiding loader
+  const { user } = appShellHost.state;
+  const hideLoader = useDelay({ active: !!user, delay: 100 });
+  if (hideLoader) return <></>;
+
+  return (
+    <SafeAreaView
+      style={{
+        ...StyleSheet.absoluteFillObject,
+        position: "absolute",
+        left: 0,
+        top: 0,
+        backgroundColor: "rgba(255, 255, 255, 1.0)",
+      }}
+    >
+      <Loader />
     </SafeAreaView>
   );
 }
