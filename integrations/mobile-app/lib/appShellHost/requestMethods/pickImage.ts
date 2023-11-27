@@ -78,7 +78,12 @@ async function pickFromCamera(
     return deferredResponse.resolve({ cancelled: true });
   }
 
-  const result = await ImagePicker.launchCameraAsync(commonImagePickerOptions);
+  const result = await ImagePicker.launchCameraAsync({
+    ...commonImagePickerOptions,
+    // TODO: re-enable after SDK 50, assuming positioning bug fix is released
+    // https://github.com/expo/expo/pull/22512
+    allowsEditing: false,
+  });
   if (result.canceled) return deferredResponse.resolve({ cancelled: true });
 
   return handleImagePickerResult(api, deferredResponse, intent, result);
