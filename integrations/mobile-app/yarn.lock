@@ -2200,6 +2200,11 @@
   resolved "https://registry.npmjs.org/@react-native-community/masked-view/-/masked-view-0.1.11.tgz"
   integrity sha512-rQfMIGSR/1r/SyN87+VD8xHHzDYeHaJq6elOSCAD+0iLagXkSI2pfA0LmSXP21uw5i3em7GkkRjfJ8wpqWXZNw==
 
+"@react-native-community/netinfo@9.3.10":
+  version "9.3.10"
+  resolved "https://registry.yarnpkg.com/@react-native-community/netinfo/-/netinfo-9.3.10.tgz#9b6cc2aec9329b5ccf35e866094c43aa420d927a"
+  integrity sha512-OwnqoJUp/4sa9e3ju+wQavAa8l0fiA3DheeLMKzKxtKeAe0CA7bNxWRM752JvRQ6A/igPnt1V0zSlu5owvQEuA==
+
 "@react-native-community/slider@4.4.2":
   version "4.4.2"
   resolved "https://registry.npmjs.org/@react-native-community/slider/-/slider-4.4.2.tgz"
@@ -6562,6 +6567,11 @@ expo-modules-core@1.5.11:
   dependencies:
     compare-versions "^3.4.0"
     invariant "^2.2.4"
+
+expo-network@~5.4.0:
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/expo-network/-/expo-network-5.4.0.tgz#4eddde3e54a80b46c7cd2e4ce22a98e61aa97468"
+  integrity sha512-6Hdm6CRmt7KpEYSTp9Q0fH1V63Y3tLlgkZfJBqJHksxEP/ooOjBLsK8M09q+FiWsStByI/PKj6NO86+uymz5ig==
 
 expo-pwa@0.0.127:
   version "0.0.127"
