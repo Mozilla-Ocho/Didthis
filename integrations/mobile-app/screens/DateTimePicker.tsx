@@ -13,6 +13,7 @@ export type RouteParams = {
   requestId: string;
   title?: string;
   initialDateTime?: number;
+  allowFuture?: boolean;
 };
 
 export type DateTimePickerScreenProps = {} & StackScreenProps<
@@ -28,6 +29,7 @@ export default function DateTimePickerScreen({
     requestId,
     title = "Did this when?",
     initialDateTime = Date.now(),
+    allowFuture = false,
   } = route.params || {};
   const api = useAppShellHost();
   const request = api.messaging.getDeferredResponse<"pickDateTime">(requestId);
@@ -50,6 +52,8 @@ export default function DateTimePickerScreen({
     if (date) setDateTimeValue(date);
   };
 
+  const maximumDate = allowFuture ? undefined : new Date();
+
   return (
     <SafeAreaView style={styles.screen}>
       <TopNav
@@ -66,6 +70,7 @@ export default function DateTimePickerScreen({
         value={currentDateTime}
         style={styles.datePicker}
         themeVariant={scheme}
+        maximumDate={maximumDate}
         onChange={handleOnChange}
       />
     </SafeAreaView>
