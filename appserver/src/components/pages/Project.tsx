@@ -120,7 +120,7 @@ const ProjectPage = observer(
 
     useAppShellTopBar({
       show: true,
-      leftLabel: " ", // HACK: undefined label defaults to "Back"
+      leftLabel: "Back", // HACK: undefined label defaults to "Back"
       leftIsBack: true,
       showShare: true,
       showEdit: true,
