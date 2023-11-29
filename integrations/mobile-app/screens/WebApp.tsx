@@ -1,7 +1,7 @@
 import useAppShellHost from "../lib/appShellHost";
 import { useCallback, useEffect, useRef, useState } from "react";
 import WebView from "react-native-webview";
-import { SafeAreaView, StatusBar, StyleSheet } from "react-native";
+import { SafeAreaView, StatusBar, StyleSheet, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../App";
@@ -14,6 +14,7 @@ import AppShellHostAPI from "../lib/appShellHost/api";
 import { checkOnboarding } from "../lib/storage";
 import { ApiUser } from "../lib/types";
 import useDelay from "../lib/useDelay";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { siteBaseUrl, originWhitelist } = Config;
 
@@ -50,8 +51,18 @@ export default function WebAppScreen({ route, navigation }: WebAppScreenProps) {
   useSendAppleCredentialToWebContent(credential, appShellHost);
   const webviewKey = useResettableWebviewKey(resetWebViewAfter);
 
+  const insets = useSafeAreaInsets();
+
   return (
-    <SafeAreaView style={{ ...StyleSheet.absoluteFillObject }}>
+    <View
+      style={{
+        ...StyleSheet.absoluteFillObject,
+        // Skip top margin, taken care of by ConditionalTopNav
+        marginLeft: insets.left,
+        marginRight: insets.right,
+        marginBottom: insets.bottom,
+      }}
+    >
       <StatusBar barStyle="dark-content" />
       <ConditionalTopNav />
       <WebView
@@ -65,7 +76,7 @@ export default function WebAppScreen({ route, navigation }: WebAppScreenProps) {
       />
       <ConditionalBottomNav />
       <WaitingForUserLoader />
-    </SafeAreaView>
+    </View>
   );
 }
 
