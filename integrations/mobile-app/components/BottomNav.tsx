@@ -20,6 +20,7 @@ import Animated, {
 import { useState, useEffect, useCallback } from "react";
 import { Image } from "expo-image";
 import { ApiProject } from "../lib/types";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export type BottomNavProps = {};
 
@@ -116,6 +117,7 @@ function ProjectDrawer({
 }) {
   const appShellHost = useAppShellHost();
   const { state } = appShellHost;
+  const insets = useSafeAreaInsets();
 
   const damping = 16;
   const drawerHiddenY = -1 * styles.drawer.height - 50;
@@ -137,7 +139,10 @@ function ProjectDrawer({
 
   useEffect(() => {
     if (isOpen) {
-      drawerPos.value = withSpring(0, { damping });
+      drawerPos.value = withSpring(
+        0 - insets.bottom - styles.drawer.borderRadius,
+        { damping }
+      );
       setRenderDrawer(true);
     } else {
       drawerPos.value = withSpring(drawerHiddenY, { damping }, () =>
