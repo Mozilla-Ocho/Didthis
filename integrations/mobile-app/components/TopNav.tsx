@@ -15,7 +15,7 @@ import ShareIcon from "../assets/share.svg";
 import EditIcon from "../assets/edit.svg";
 import { SvgProps } from "react-native-svg";
 import useAppShellHost from "../lib/appShellHost";
-import { colors as globalColors } from "../styles";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export type TopNavProps = {
   title?: string;
@@ -55,68 +55,61 @@ export default function TopNav({
   const { colors } = useTheme();
 
   return (
-    <View
-      style={{
-        // HACK: figure out why this thing insists on inserting its own margin
-        marginTop: -47,
+    <Header
+      headerStyle={{
+        backgroundColor: colors.background,
+        borderBottomWidth: 1,
+        borderBottomColor: "rgba(0, 0, 0, 0.1)",
       }}
-    >
-      <Header
-        headerStyle={{
-          backgroundColor: colors.background,
-          borderBottomWidth: 1,
-          borderBottomColor: "rgba(0, 0, 0, 0.1)",
-        }}
-        title={title}
-        headerShadowVisible={true}
-        headerLeft={() => (
+      title={title}
+      headerShadowVisible={true}
+      headerLeft={() => (
+        <HeaderSideButton
+          {...{
+            onPress: onLeftPress,
+            isBack: leftIsBack,
+            isLeft: true,
+            disabled: leftIsDisabled,
+            label: leftLabel,
+          }}
+        />
+      )}
+      headerRight={() => (
+        <View
+          style={{
+            flex: 1,
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+          {showShare && (
+            <IconButton
+              icon={ShareIcon}
+              accessibilityLabel="Share"
+              disabled={shareIsDisabled}
+              color={colors.primary}
+              onPress={onSharePress}
+            />
+          )}
+          {showEdit && (
+            <IconButton
+              icon={EditIcon}
+              accessibilityLabel="Edit"
+              disabled={editIsDisabled}
+              color={colors.primary}
+              onPress={onEditPress}
+            />
+          )}
           <HeaderSideButton
             {...{
-              onPress: onLeftPress,
-              isBack: leftIsBack,
-              isLeft: true,
-              disabled: leftIsDisabled,
-              label: leftLabel,
+              onPress: onRightPress,
+              disabled: rightIsDisabled,
+              label: rightLabel,
             }}
           />
-        )}
-        headerRight={() => (
-          <View
-            style={{
-              flex: 1,
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            {showShare && (
-              <IconButton
-                icon={ShareIcon}
-                accessibilityLabel="Share"
-                disabled={shareIsDisabled}
-                color={colors.primary}
-                onPress={onSharePress}
-              />
-            )}
-            {showEdit && (
-              <IconButton
-                icon={EditIcon}
-                accessibilityLabel="Edit"
-                disabled={editIsDisabled}
-                color={colors.primary}
-                onPress={onEditPress}
-              />
-            )}
-            <HeaderSideButton
-              {...{
-                onPress: onRightPress,
-                disabled: rightIsDisabled,
-                label: rightLabel,
-              }}
-            />
-          </View>
-        )}
-      />
-    </View>
+        </View>
+      )}
+    />
   );
 }
 
@@ -230,9 +223,14 @@ function HeaderSideButton({
 export function ConditionalTopNav() {
   const appShellHost = useAppShellHost();
   const { messaging } = appShellHost;
+  const insets = useSafeAreaInsets();
 
   const { topNav } = appShellHost.state;
-  if (!topNav?.show) return;
+  if (!topNav?.show) {
+    // TopNav takes care of top safe inset, so container view doesn't. But,
+    // if TopNav is not rendered, we still need to render that margin.
+    return <View style={{ height: insets.top }}></View>;
+  }
 
   const onLeftPress = () =>
     messaging.postMessage("topNavLeftPress", { label: topNav.leftLabel });
