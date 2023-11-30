@@ -71,9 +71,9 @@ const HomeAuth = observer(() => {
         <OgMeta user={store.user} />
         <PagePad yControlOnly>
           <PagePad wide noPadY>
-            <div className="flex flex-row mb-3">
+            <div className="flex flex-row mb-3 mt-3">
               <div className="flex-column">
-                <div className="font-bold text-sm text-yellow-600">
+                <div className="font-bold text-sm text-black-500">
                   {ugcUsername}
                 </div>
                 <h3>My projects</h3>
