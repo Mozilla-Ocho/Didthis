@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 20,
-    justifyContent: "space-between",
+    justifyContent:"space-evenly",
   },
   projectSquare: {
     width: 100,
