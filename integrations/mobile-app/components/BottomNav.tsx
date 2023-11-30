@@ -291,7 +291,8 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
   },
   projectGridHeading: {
-    fontWeight: "bold",
+    fontWeight: "600",
+    color:"#757470",
     textAlign: "center",
     marginBottom: 5,
   },
@@ -304,11 +305,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 20,
+    justifyContent: "space-between",
   },
   projectSquare: {
     width: 100,
     height: 100,
-    borderRadius: 15,
+    borderRadius: 16,
   },
   addButton: {
     marginTop: -25,
@@ -321,6 +323,6 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     shadowColor: "black",
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.6,
+    shadowOpacity: 0.3,
   },
 });
