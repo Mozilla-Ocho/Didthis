@@ -15,6 +15,7 @@ import { checkOnboarding } from "../lib/storage";
 import { ApiUser } from "../lib/types";
 import useDelay from "../lib/useDelay";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { WebViewTerminatedEvent } from "react-native-webview/lib/WebViewTypes";
 
 const { siteBaseUrl, originWhitelist } = Config;
 
@@ -53,6 +54,13 @@ export default function WebAppScreen({ route, navigation }: WebAppScreenProps) {
 
   const insets = useSafeAreaInsets();
 
+  // https://github.com/react-native-webview/react-native-webview/issues/2199
+  const onContentProcessDidTerminate = (syntheticEvent: WebViewTerminatedEvent) => {
+    const { nativeEvent } = syntheticEvent;
+    console.warn('Content process terminated, reloading', nativeEvent);
+    webviewRef.current.reload();
+  };
+
   return (
     <View
       style={{
@@ -73,6 +81,7 @@ export default function WebAppScreen({ route, navigation }: WebAppScreenProps) {
         renderLoading={() => <Loader />}
         ref={webviewRef}
         onMessage={appShellHost.onMessage}
+        onContentProcessDidTerminate={onContentProcessDidTerminate}
       />
       <ConditionalBottomNav />
       <WaitingForUserLoader />
