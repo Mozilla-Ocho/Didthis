@@ -4,7 +4,7 @@ import { colors, styles as globalStyles } from "../../styles";
 export const styles = StyleSheet.create({
   screen: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: colors["yellow-300"],
+    backgroundColor: colors["white"],
     flex: 1,
     flexDirection: "column",
     alignContent: "stretch",
