@@ -59,7 +59,7 @@ export default function TopNav({
       headerStyle={{
         backgroundColor: colors.background,
         borderBottomWidth: 1,
-        borderBottomColor: "rgba(0, 0, 0, 0.1)",
+        borderBottomColor: "#0000001D",
       }}
       title={title}
       headerShadowVisible={true}
