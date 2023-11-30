@@ -274,8 +274,10 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     flexDirection: "row",
     justifyContent: "center",
-    borderTopWidth: 1,
-    borderTopColor: "#CAC7C1", // TODO: move to styles.ts
+    shadowColor: "black",
+    shadowOffset: { width: 0, height: -7 },
+    shadowRadius: 5,
+    shadowOpacity: 0.08,
   },
   drawer: {
     backgroundColor: "white",
@@ -315,6 +317,9 @@ const styles = StyleSheet.create({
   addButton: {
     marginTop: -25,
     borderRadius: 100,
+    shadowOffset: { width: 0, height:1 },
+    shadowOpacity: .2,
+    shadowRadius: 3,
   },
   currentProjectText: {
     fontWeight: "bold",
