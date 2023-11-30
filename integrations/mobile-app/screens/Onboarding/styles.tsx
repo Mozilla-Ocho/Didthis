@@ -34,6 +34,10 @@ export const styles = StyleSheet.create({
     ...globalStyles.textHeading,
     marginVertical: 10,
   },
+  pageContentParagraph: {
+    fontSize: 16,
+    lineHeight: 23,
+  },
   pageContentText: {
     ...globalStyles.text,
   },

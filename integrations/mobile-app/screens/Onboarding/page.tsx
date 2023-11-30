@@ -46,7 +46,7 @@ export function OnboardingPage({
       </View>
       <View style={styles.pageContent}>
         <Text style={styles.pageContentTitle}>{title}</Text>
-        {children}
+        <Text style={styles.pageContentParagraph}>{children}</Text>
         <TouchableOpacity style={styles.pageNextButton} onPress={onNextPress}>
           <Text style={styles.pageNextButtonLabel}>{nextLabel}</Text>
         </TouchableOpacity>
