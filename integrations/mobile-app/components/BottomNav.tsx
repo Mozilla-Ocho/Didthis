@@ -237,7 +237,7 @@ export default function BottomNav({}: BottomNavProps) {
           underlayColor="#FFF1A6"
           onPress={onAddPress}
         >
-          <AddButtonImage width={70} height={70} />
+          <AddButtonImage width={65} height={65} />
         </TouchableHighlight>
       </View>
       <ProjectDrawer isOpen={drawerOpen} requestClose={requestClose} />
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
     left: 0,
     bottom: 0,
     right: 0,
-    shadowOffset: { width: 0, height: 0 },
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: .5,
     shadowRadius: 10,
   },
@@ -320,11 +320,16 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height:1 },
     shadowOpacity: .2,
     shadowRadius: 3,
+    backgroundColor: "#F4C005",
+    borderWidth: 1,
+    borderColor: "#FFD685",
   },
   currentProjectText: {
     fontWeight: "bold",
   },
   currentProjectOuter: {
+    backgroundColor: "white",
+    borderRadius: 16,
     shadowRadius: 5,
     shadowColor: "black",
     shadowOffset: { width: 0, height: 0 },
