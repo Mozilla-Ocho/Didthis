@@ -196,7 +196,7 @@ function ProjectDrawer({
           }}
         >
           <Text style={styles.projectGridHeading}>
-            Add update to which project?
+            Select project
           </Text>
           <ScrollView
             style={{
