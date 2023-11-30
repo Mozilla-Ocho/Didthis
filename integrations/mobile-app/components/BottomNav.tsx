@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     right: 0,
   },
   backdrop: {
-    backgroundColor: "#000000",
+    backgroundColor: "#757470",
     opacity: 0.5,
     position: "absolute",
     top: 0,
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     right: 0,
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1,
+    shadowOpacity: .5,
     shadowRadius: 10,
   },
   projectGridHeading: {
