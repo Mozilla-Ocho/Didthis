@@ -4,7 +4,6 @@ variable "autoscaling_min" { type = number }
 variable "db_deletion_protection" { type = bool }
 variable "db_tier" { type = string }
 variable "env_name" { type = string }
-variable "flag_enable_lb" { type = bool }
 variable "flag_use_firebase" { type = bool }
 variable "flag_destroy" { type = bool }
 variable "flag_use_db" { type = bool }
