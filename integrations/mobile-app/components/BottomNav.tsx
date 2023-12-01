@@ -196,7 +196,7 @@ function ProjectDrawer({
           }}
         >
           <Text style={styles.projectGridHeading}>
-            Add update to which project?
+            Select project
           </Text>
           <ScrollView
             style={{
@@ -237,7 +237,7 @@ export default function BottomNav({}: BottomNavProps) {
           underlayColor="#FFF1A6"
           onPress={onAddPress}
         >
-          <AddButtonImage width={70} height={70} />
+          <AddButtonImage width={65} height={65} />
         </TouchableHighlight>
       </View>
       <ProjectDrawer isOpen={drawerOpen} requestClose={requestClose} />
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     right: 0,
   },
   backdrop: {
-    backgroundColor: "#000000",
+    backgroundColor: "#757470",
     opacity: 0.5,
     position: "absolute",
     top: 0,
@@ -274,8 +274,10 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     flexDirection: "row",
     justifyContent: "center",
-    borderTopWidth: 1,
-    borderTopColor: "#CAC7C1", // TODO: move to styles.ts
+    shadowColor: "black",
+    shadowOffset: { width: 0, height: -7 },
+    shadowRadius: 5,
+    shadowOpacity: 0.08,
   },
   drawer: {
     backgroundColor: "white",
@@ -286,12 +288,13 @@ const styles = StyleSheet.create({
     left: 0,
     bottom: 0,
     right: 0,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: .5,
     shadowRadius: 10,
   },
   projectGridHeading: {
-    fontWeight: "bold",
+    fontWeight: "600",
+    color:"#757470",
     textAlign: "center",
     marginBottom: 5,
   },
@@ -304,23 +307,32 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 20,
+    justifyContent:"space-evenly",
   },
   projectSquare: {
     width: 100,
     height: 100,
-    borderRadius: 15,
+    borderRadius: 16,
   },
   addButton: {
     marginTop: -25,
     borderRadius: 100,
+    shadowOffset: { width: 0, height:1 },
+    shadowOpacity: .2,
+    shadowRadius: 3,
+    backgroundColor: "#F4C005",
+    borderWidth: 1,
+    borderColor: "#FFD685",
   },
   currentProjectText: {
     fontWeight: "bold",
   },
   currentProjectOuter: {
+    backgroundColor: "white",
+    borderRadius: 16,
     shadowRadius: 5,
     shadowColor: "black",
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.6,
+    shadowOpacity: 0.3,
   },
 });
