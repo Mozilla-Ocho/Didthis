@@ -278,6 +278,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: -7 },
     shadowRadius: 5,
     shadowOpacity: 0.08,
+    paddingBottom:6,
   },
   drawer: {
     backgroundColor: "white",
