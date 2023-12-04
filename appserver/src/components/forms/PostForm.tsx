@@ -507,6 +507,8 @@ const PostForm = observer((props: Props) => {
       new PostStore(mode, defaultPid, mode === 'edit' ? props.post : undefined)
   )
   const performSubmit = () => {
+    // Bail out of submit if already spinning
+    if (postStore.spinning) return;
     postStore.setSpinning(true)
     store
       .savePost(postStore.getApiPost(), mode, postStore.mediaType)
