@@ -96,7 +96,7 @@ const HomeAuth = observer(() => {
               </div>
             </div>
             {store.user.profile.bio && (
-              <p className="text-sm text-bodytext break-words whitespace-pre-line">
+              <p className="text-sm text-bodytext break-words whitespace-pre-line mb-2">
                 {store.user.profile.bio}
               </p>
             )}
