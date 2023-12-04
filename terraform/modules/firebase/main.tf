@@ -48,4 +48,9 @@ resource "google_firebase_web_app" "firebase_web_app" {
   depends_on = [google_firebase_project.default]
 }
 
-
+output "firebase_project_id" {
+  value = google_firebase_project.default.id
+}
+output "firebase_project_number" {
+  value = google_firebase_project.default.project_number
+}

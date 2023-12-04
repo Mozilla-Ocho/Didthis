@@ -1,6 +1,6 @@
-import Knex from 'knex';
-import config from '@/../knexfile.js';
+import Knex from 'knex'
+import config from '@/../knexfile.js'
 
-const knex = Knex(config);
+const knex = Knex(config)
 
-export default knex;
+export default knex

@@ -7,14 +7,93 @@
   --background-rgb: 255, 255, 255;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-rgb: 0, 0, 0;
-  }
-}
+/* @media (prefers-color-scheme: dark) { */
+/*   :root { */
+/*     --foreground-rgb: 255, 255, 255; */
+/*     --background-rgb: 0, 0, 0; */
+/*   } */
+/* } */
 
 body {
   color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-rgb));
+  font-family: Rubik, sans-serif;
+}
+
+@layer base {
+  h1 { @apply font-bold my-1 text-6xl; }
+  h2 { @apply font-bold my-1 text-5xl; }
+  h3 { @apply font-bold my-1 text-4xl; }
+  h4 { @apply font-bold my-1 text-3xl; }
+  h5 { @apply font-bold my-1 text-2xl; }
+  /* ... */
+}
+
+/* hack the firebase ui card to fit the modal */
+.firebaseui-container {
+  max-width: none;
+  margin: 0;
+}
+
+.textarea-grow {
+  display: grid;
+  grid-template-areas: 'foo';
+  position: relative;
+}
+.textarea-grow > textarea {
+  grid-area: foo;
+  white-space: pre-wrap !important;
+  word-wrap: break-word !important;
+  font-size: 16px !important;
+  line-height: 24px !important;
+  font-weight: 400 !important;
+  font-family: 'Rubik', sans-serif !important;
+  margin: 0 !important;
+  padding: 0.5rem 0.75rem 0.5rem 0.75rem !important;
+  resize: none;
+}
+.textarea-grow > pre {
+  grid-area: foo;
+  appearance: none;
+  visibility: hidden;
+  pointer-events: none;
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid transparent;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  color: transparent;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  font-family: 'Rubik', sans-serif;
+  margin: 0 !important;
+  padding: 0.5rem 0.75rem 0.5rem 0.75rem !important;
+  max-height: 400px;
+}
+
+.ReactModal__Body--open {
+  overflow: hidden;
+}
+.ReactModal__Overlay {
+  opacity: 0;
+  /* DRY_62447 modal transition time */
+  transition: opacity 200ms ease-in-out;
+}
+.ReactModal__Overlay--after-open {
+  opacity: 1;
+}
+.ReactModal__Overlay--before-close {
+  opacity: 0;
+}
+.ReactModal__Overlay .modal_content_container {
+  /* DRY_62447 modal transition time */
+  transition: transform 200ms ease-in-out;
+  transform: scale(0.9);
+}
+.ReactModal__Overlay--after-open .modal_content_container {
+  transform: scale(1);
+}
+.ReactModal__Overlay--before-close .modal_content_container {
+  transform: scale(0.9);
 }

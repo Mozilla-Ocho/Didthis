@@ -1,0 +1,1 @@
+favicons live in appserver/public so they can be loaded at the root path of the site

@@ -4,11 +4,11 @@ variable "autoscaling_min" { type = number }
 variable "db_deletion_protection" { type = bool }
 variable "db_tier" { type = string }
 variable "env_name" { type = string }
-variable "flag_enable_lb" { type = bool }
 variable "flag_use_firebase" { type = bool }
 variable "flag_destroy" { type = bool }
 variable "flag_use_db" { type = bool }
 variable "flag_use_dummy_appserver" { type = bool }
+variable "flag_enable_lb" { type = bool }
 variable "gcp_project_id" { type = string }
 variable "gcp_project_number" { type = string }
 variable "region" { type = string }
@@ -102,8 +102,12 @@ module "docker_repo" {
   depends_on = [module.gcp_apis]
 }
 
+
 module "firebase" {
-  count = var.flag_use_firebase ? 1 : 0
+  # in the boilerplate, it's now controlled by a flag, but we started w/o that
+  # so on merge, i commented that line out to avoid destruction/recreation of
+  # the module.
+  # count = var.flag_use_firebase ? 1 : 1
   source = "./modules/firebase"
   gcp_project_id = var.gcp_project_id
   app_name = var.app_name
@@ -138,7 +142,7 @@ module "appserver_main" {
 }
 
 module "lb_main" {
-  count = var.flag_destroy ? 0 : var.flag_enable_lb ? 1 : 0
+  # count = var.flag_destroy ? 0 : var.flag_enable_lb ? 1 : 0
   source = "./modules/lb"
   app_name = var.app_name
   name = "main"
@@ -164,4 +168,3 @@ output "public_lb_ip_address" {
 # output "dns_records_lb" {
 #   value = module.lb_main.dns_records
 # }
-

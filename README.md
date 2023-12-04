@@ -1,23 +1,14 @@
-# Innovation Studio boilerplate app template
+# hobby.me early mvp
 
-This boilerplate repo is still under heavy initial development. We are
-exercising the process of rapidly spinning up a reproducible application stack,
-see doc/system-archictecture.png for the current architecture.
+## Long-lived branches
 
-Goals:
-- Minimize technical effort that isn't germane to the ideas we want to test
-  - Select and develop tools we like as a team and commit to reusing them
-  - All pods benefit from other pod contributions to the boilerplate
-  - Re-use effort and learnings from Graceland’s stack
-  - Quick to spin up for simple demos/prototypes
-  - Encourage sharing dev effort and cross-contribution across pods with
-    normalized conventions
-- Serve also as a solid foundation for production MVPs and eventual GA releases
-  - Moco-friendly stack: GCP-based, built on best practices with generic
-    primitives, not reliant on third parties (e.g. heroku)
-  - Flexible, minimal, modular architecture that can replace or include new
-    components as needed (alternate backends, cloud functions, A/B testing,
-    CDNs, etc)
-- Innovation Studio is the first customer, but this might provide value in Moz
-  more broadly and/or as open source project.
+Note that this project is currently pursuing multiple extended branches of development:
 
+- [`main` branch](https://github.com/Mozilla-Ocho/h3y)
+  - The first phase of the project as a mobile-first website
+ 
+- [`react-native-integration` branch](https://github.com/Mozilla-Ocho/h3y/tree/react-native-integration)
+  - The next phase of the project as a mobile app implemented in React Native
+  - The app acts as a shell for the website, so we can incrementally move toward enhanced app features
+  - App shell lives here: https://github.com/Mozilla-Ocho/didthis-mobile-app
+ 
