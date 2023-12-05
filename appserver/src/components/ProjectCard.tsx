@@ -34,7 +34,7 @@ const ProjectCard = observer(
               {project.currentStatus === 'paused' && <span>Paused</span>}
             </p>
             <p className="body-bs text-right">
-              {numPosts} post{numPosts === 1 ? '' : 's'}
+              {numPosts} update{numPosts === 1 ? '' : 's'}
             </p>
           </div>
 
