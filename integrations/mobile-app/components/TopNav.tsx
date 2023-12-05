@@ -16,6 +16,7 @@ import EditIcon from "../assets/edit.svg";
 import { SvgProps } from "react-native-svg";
 import useAppShellHost from "../lib/appShellHost";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { colors as globalColors } from "../styles";
 
 export type TopNavProps = {
   title?: string;
@@ -179,25 +180,49 @@ function HeaderSideButton({
       paddingVertical: 12,
       paddingHorizontal: 10,
       minWidth: 100,
-      justifyContent: "flex-end",
-    },
-    baseLeft: {
       justifyContent: "flex-start",
     },
+    baseRight: {
+      justifyContent: "flex-end",
+    },
+    disabled: {},
     baseBack: {
       minWidth: 100,
     },
-    disabled: {
+    backDisabled: {
       opacity: 0.3,
+    },
+    labelBase: {},
+    labelDisabled: {
+      opacity: 0.3,
+    },
+    labelRight: {
+      color: globalColors["yellow-primary-content"],
+      backgroundColor: globalColors["yellow-500"],
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+      marginVertical: -8,
+      overflow: "hidden",
+      borderRadius: 6,
+    },
+    labelRightDisabled: {
+      opacity: 1.0,
+      color: globalColors["black-300"],
+      backgroundColor: globalColors["black-100"],
     },
   });
   const hasLabel = typeof label !== "undefined";
   if (isBack) {
     return (
       <HeaderBackButton
-        style={[styles.baseBack, disabled && styles.disabled]}
+        style={[styles.baseBack, disabled && styles.backDisabled]}
         tintColor={colors.primary}
         label={hasLabel ? label : "Back"}
+        labelStyle={[
+          styles.labelBase,
+          !isLeft && styles.labelRight,
+          !isLeft && disabled && styles.labelRightDisabled,
+        ]}
         onPress={disabled ? noop : onPress}
       />
     );
@@ -209,11 +234,17 @@ function HeaderSideButton({
         backImage={() => ""}
         style={[
           styles.base,
-          isLeft && styles.baseLeft,
+          !isLeft && styles.baseRight,
           disabled && styles.disabled,
         ]}
         tintColor={colors.primary}
         label={label}
+        labelStyle={[
+          styles.labelBase,
+          disabled && styles.labelDisabled,
+          !isLeft && styles.labelRight,
+          !isLeft && disabled && styles.labelRightDisabled,
+        ]}
         onPress={disabled ? noop : onPress}
       />
     );
