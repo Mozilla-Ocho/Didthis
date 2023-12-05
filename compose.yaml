@@ -12,37 +12,16 @@ services:
     volumes:
       - ./appserver:/appserver
     working_dir: /appserver
+    command: yarn dev
     env_file: env-dev
     environment:
       PORT: 3000
       DATABASE_URL: "postgresql://devuser:devdummypass@pgserver:5432/devdb"
-      # XXX_PORTING add this to boilerplate docs for firebase, vars list etc
-      GOOGLE_APPLICATION_CREDENTIALS: '/appserver/.firebase-dev-credentials.json'
-    command: "yarn dev"
     ports:
       - "3000:3000"
     depends_on:
       pgserver:
         condition: service_healthy
-
-  storybook:
-    build:
-      context: '.'
-      dockerfile: dockerfiles/appserver
-      target: appserver_dev
-    networks:
-      - allhosts
-    volumes:
-      - ./appserver:/appserver
-    working_dir: /appserver
-    env_file: env-dev
-    environment:
-      PORT: 6006
-      DATABASE_URL: "postgresql://devuser:devdummypass@pgserver:5432/devdb"
-      GOOGLE_APPLICATION_CREDENTIALS: '/appserver/.firebase-dev-credentials.json'
-    command: "yarn storybook"
-    ports:
-      - "6006:6006"
 
   pgserver:
     image: "postgres:14"

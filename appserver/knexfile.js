@@ -1,6 +1,6 @@
 const config = {
-  client: 'pg',
+  client: "pg",
   connection: process.env.DATABASE_URL,
-}
+};
 
-module.exports = config
+module.exports = config;
