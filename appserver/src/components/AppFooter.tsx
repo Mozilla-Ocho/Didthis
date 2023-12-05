@@ -54,6 +54,13 @@ const AppFooter = observer(
         </Link>
       </p>
     )
+    const supportLink = (
+      <p className="whitespace-nowrap">
+        <Link intent="internalNav" href={pathBuilder.support}>
+          Support
+        </Link>
+      </p>
+    )
     const bull = <p className="hidden md:block">&bull;</p>
     const ochoLink = (
       <p className="whitespace-nowrap">
@@ -80,6 +87,7 @@ const AppFooter = observer(
                 {tosLink}
                 {ppLink}
                 {cpLink}
+                {supportLink}
                 {bull}
                 {ochoLink}
               </div>
@@ -96,6 +104,7 @@ const AppFooter = observer(
               {tosLink}
               {ppLink}
               {cpLink}
+              {supportLink}
               {bull}
               {ochoLink}
             </div>

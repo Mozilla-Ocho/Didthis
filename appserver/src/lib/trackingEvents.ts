@@ -18,6 +18,7 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   pvPrivacyPolicy: { eventName: 'pageview', opts: { name: 'privacyPolicy' } },
   pvTerms: { eventName: 'pageview', opts: { name: 'terms' } },
   pvContentPolicy: { eventName: 'pageview', opts: { name: 'contentPolicy' } },
+  pvSupport: { eventName: 'pageview', opts: { name: 'support' } },
   pvNotFound: { eventName: 'pageview', opts: { name: 'notFound' } },
   pvPublicUser: { eventName: 'pageview', opts: { name: 'publicUser' } },
   pvPublicProject: { eventName: 'pageview', opts: { name: 'publicProject' } },

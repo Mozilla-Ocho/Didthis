@@ -29,6 +29,7 @@ const pathBuilder = {
     if (doc === "cp") return '/content'
     return '/terms'
   },
+  support: '/support',
   adminUser: (slug: string): string => '/admin/user/' + encodeURI(slug),
   makeFullUrl: (path: string) => {
     return process.env.NEXT_PUBLIC_API_ENDPOINT+path
