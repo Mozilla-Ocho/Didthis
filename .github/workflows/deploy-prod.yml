@@ -61,6 +61,20 @@ jobs:
       # note: it's important to have the regional domain here for auth to succeed
       run: gcloud auth configure-docker ${{vars.REGION}}-docker.pkg.dev
 
+    - name: pull latest image for cache
+      if: ${{ env.FLAG_DESTROY == 'false' && env.FLAG_USE_DUMMY_APPSERVER == 'false' }}
+      # continue on error because the first run will not have a docker repo.
+      continue-on-error: true
+      run: docker pull $IMAGE_PATH/appserver:latest
+
+    - name: build and push image
+      if: ${{ env.FLAG_DESTROY == 'false' && env.FLAG_USE_DUMMY_APPSERVER == 'false' }}
+      # continue on error because the first run will not have a docker repo.
+      run: |-
+        docker build --file=dockerfiles/appserver --target appserver_prod -t $IMAGE_PATH/appserver:$IMAGE_TAG -t $IMAGE_PATH/appserver:latest --cache-from $IMAGE_PATH/appserver:latest .
+        docker push $IMAGE_PATH/appserver:$IMAGE_TAG
+        docker push $IMAGE_PATH/appserver:latest
+
     - name: setup terraform
       uses: hashicorp/setup-terraform@v2
       with:
@@ -72,8 +86,6 @@ jobs:
       run: terraform init --backend-config="bucket=${{vars.TF_BACKEND_STATE_BUCKET}}"
 
     - name: terraform plan
-      # we do terraform plan first so that any syntax or config errors in the
-      # terraform are surfaced before having to wait for a docker build+push.
       id: plan
       working-directory: ./terraform
       run: |
@@ -81,32 +93,6 @@ jobs:
         echo "PLAN_OUTPUT<<EOF" >> $GITHUB_OUTPUT
         terraform show -no-color tfplan >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
-
-    - name: pull latest image for cache
-      if: ${{ env.FLAG_DESTROY == 'false' && env.FLAG_USE_DUMMY_APPSERVER == 'false' }}
-      # continue on error because the first run will not have a docker repo.
-      continue-on-error: true
-      run: docker pull $IMAGE_PATH/appserver:latest
-
-    - name: build and push image
-      if: ${{ env.FLAG_DESTROY == 'false' && env.FLAG_USE_DUMMY_APPSERVER == 'false' }}
-      # continue on error because the first run will not have a docker repo.
-      run: |-
-        docker build \
-          --file=dockerfiles/appserver \
-          --target appserver_prod \
-          -t $IMAGE_PATH/appserver:$IMAGE_TAG \
-          -t $IMAGE_PATH/appserver:latest \
-          --cache-from $IMAGE_PATH/appserver:latest \
-          --build-arg CLOUDINARY_JSON_SECRET_B64="${{secrets.CLOUDINARY_JSON_SECRET_B64}}" \
-          --build-arg ZYTE_SPLASH_USERNAME="${{secrets.ZYTE_SPLASH_USERNAME}}" \
-          --build-arg NEXT_PUBLIC_ENV_NAME="${{vars.NEXT_PUBLIC_ENV_NAME}}" \
-          --build-arg NEXT_PUBLIC_API_ENDPOINT="${{vars.NEXT_PUBLIC_API_ENDPOINT}}" \
-          --build-arg NEXT_PUBLIC_AMPLITUDE_API_KEY="${{vars.NEXT_PUBLIC_AMPLITUDE_API_KEY}}" \
-          --build-arg SESSION_COOKIE_SECRET="${{secrets.SESSION_COOKIE_SECRET}}" \
-          .
-        docker push $IMAGE_PATH/appserver:$IMAGE_TAG
-        docker push $IMAGE_PATH/appserver:latest
 
     - uses: trstringer/manual-approval@v1
       with:

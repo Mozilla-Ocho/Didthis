@@ -1,62 +1,27 @@
-import apiClient from '@/lib/apiClient'
-import DefaultLayout from '@/components/DefaultLayout'
-import Home from '@/components/pages/Home'
-import { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from 'next'
-import { sessionCookieName, csrfCookieName } from '@/lib/apiConstants'
-import { getAuthUser, getValidCodeInfo } from '@/lib/serverAuth';
-// import log from '@/lib/log'
+import knex from "@/knex";
 
-const Wrapper = ({
-  authUser,
-  signupCodeInfo,
-  testBucket,
-}: {
-  authUser: ApiUser | false
-  signupCodeInfo: ApiSignupCodeInfo | false
-  testBucket: TestBucket,
-}) => {
+export default function Home({ dbResult }: { dbResult: string }) {
   return (
-    <DefaultLayout
-      authUser={authUser}
-      signupCodeInfo={signupCodeInfo}
-      unauthHomepage={!authUser}
-      testBucket={testBucket}
-    >
-      <Home />
-    </DefaultLayout>
-  )
+    <main className="p-10">
+      <div>
+        <p>Appserver hello world from Next.js</p>
+        <p>database query result: {dbResult}</p>
+      </div>
+    </main>
+  );
 }
 
-export default Wrapper
-
-export const getServerSideProps = async (
-  context: GetServerSidePropsContext
-) => {
-  // DRY_47693 signup code logic
-  const url = new URL('http://anyhost.com' + context.resolvedUrl)
-  const signupCode = url.searchParams.get('signupCode') || false
-  // getValidCodeInfo will return the default open door code if none is present
-  // on the URL.
-  const signupCodeInfo = getValidCodeInfo(signupCode)
-  let authUser: ApiUser | false = false
-  const sessionCookie = context.req.cookies[sessionCookieName]
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  const testBucket = (context.req as any)._testBucket as TestBucket
-  if (sessionCookie) {
-    // in SSR, we call getAuthUser directly, forcibly coercing the
-    // NextApiRequest-ish context.req object and NextApiResponse-ish
-    // context.req objects. the coercion works for our use case in
-    // getAuthUser, which is about reading/writing cookies, not
-    // request content that doesn't have the same interface. otherwise, if we
-    // made a fetch call to the api, it would be slower and also we couldn't
-    // set cookies.
-    [authUser] = await getAuthUser(context.req as NextApiRequest, context.res as NextApiResponse)
+export async function getServerSideProps() {
+  let dbResult;
+  if (process.env.FLAG_USE_DB === "true") {
+    try {
+      dbResult = await knex('dummy_records').first();
+      dbResult = dbResult ? JSON.stringify(dbResult) : 'no rows found';
+    } catch (e: unknown) {
+      dbResult = `db error: ${String(e)}`;
+    }
+  } else {
+    dbResult = "FLAG_USE_DB is false";
   }
-  return {
-    props: {
-      signupCodeInfo,
-      authUser,
-      testBucket,
-    },
-  }
+  return { props: { dbResult } };
 }
