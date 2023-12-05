@@ -1,4 +1,4 @@
-import { SafeAreaView, StyleSheet } from "react-native";
+import { SafeAreaView, View, StyleSheet } from "react-native";
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../App";
 import { globalTheme } from "../styles";
@@ -55,7 +55,7 @@ export default function DateTimePickerScreen({
   const maximumDate = allowFuture ? undefined : new Date();
 
   return (
-    <SafeAreaView style={styles.screen}>
+    <View style={styles.screen}>
       <TopNav
         title={title}
         leftLabel="Cancel"
@@ -73,7 +73,7 @@ export default function DateTimePickerScreen({
         maximumDate={maximumDate}
         onChange={handleOnChange}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
