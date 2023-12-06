@@ -67,8 +67,8 @@ export async function extractSessionCookie(resp: Response) {
 
 export async function fetchSignedInUser() {
   const resp = await fetch(apiGetMeURL, {
+    ...(await authOptions()),
     method: "GET",
-    headers: { ...await authHeaders() },
   });
 
   if (resp.status !== 200) {
@@ -80,10 +80,13 @@ export async function fetchSignedInUser() {
   return result.payload;
 }
 
-async function authHeaders() {
+async function authOptions(): Promise<RequestInit> {
   const sessionCookie = await Storage.getItem("AUTH_SESSION_COOKIE");
   if (!sessionCookie) {
     throw new Error("No session cookie");
   }
-  return { "Cookie": `${SESSION_COOKIE_NAME}=${sessionCookie}` };
+  return {
+    credentials: "omit",
+    headers: { Cookie: `${SESSION_COOKIE_NAME}=${sessionCookie}` },
+  };
 }

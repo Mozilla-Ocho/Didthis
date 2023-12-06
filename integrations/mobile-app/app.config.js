@@ -34,6 +34,7 @@ export default ({ config }) => {
     },
     updates: {
       url: "https://u.expo.dev/d1216396-7cf9-4a41-9543-ce7e31e0529b",
+      fallbackToCacheTimeout: 10000,
       requestHeaders: {
         "expo-channel-name": updateChannel,
       },
