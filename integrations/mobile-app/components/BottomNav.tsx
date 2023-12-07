@@ -83,7 +83,6 @@ function ProjectSquare({
     ? { ...styles.projectGridItemText, ...styles.currentProjectText }
     : styles.projectGridItemText;
   const outerStyle = isViewingProject ? styles.currentProjectOuter : {};
-
   return (
     <TouchableOpacity
       key={project.id}
@@ -200,7 +199,7 @@ function ProjectDrawer({
           </Text>
           <ScrollView
             style={{
-              paddingTop: 15,
+              padding: 15,
             }}
           >
             <View style={styles.projectGrid}>
@@ -284,7 +283,8 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 30,
     position: "absolute",
-    padding: 15,
+    paddingTop: 15,
+    paddingBottom: 15,
     height: 400,
     left: 0,
     bottom: 0,
@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 20,
-    justifyContent:"space-evenly",
+    justifyContent: "space-evenly",
   },
   projectSquare: {
     width: 100,
