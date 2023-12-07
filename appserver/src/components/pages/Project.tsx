@@ -129,6 +129,31 @@ const ProjectPage = observer(
       onEditPress: handleEdit,
     })
 
+    // the cover image moves position in the native app and gets a gradient at
+    // the bottom, and also the UserPreview gets a negative margin to come up
+    // and overlap that gradient.
+    const coverImage = (
+      <div className="relative">
+        {appShell.inAppWebView && (
+          <div className="absolute left-0 right-0 bottom-0" style={{height:'60px',background:'linear-gradient(rgba(255, 255, 255, 0) 0%,rgba(255, 255, 255, 0.1) 20%, rgba(255, 255, 255, 0.9) 85%, rgba(255, 255, 255, 1) 100%)'}}></div>)}
+        {hasImage ? (
+          <CloudinaryImage
+            assetId={project.imageAssetId}
+            intent="project"
+            lightbox
+            fullW
+          />
+        ) : (
+          <CloudinaryImage
+            assetId={specialAssetIds.placholderProjectID}
+            rounded
+            intent="project"
+            fullW
+          />
+        )}
+      </div>
+    )
+
     return (
       <>
         <PageTitle title={project.title} />
@@ -179,8 +204,17 @@ const ProjectPage = observer(
           targetUserSlug={targetUser.publicPageSlug}
         />
         <RemindersAndAlerts />
+
+        {appShell.inAppWebView && (
+          <PagePad noPadY noPadX>
+            {coverImage}
+          </PagePad> 
+        )}
+
         <PagePad>
-          <UserPreview user={targetUser} compact={true} />
+          <div style={{position:'relative',marginTop: appShell.inAppWebView ? '-24px' : '0',zIndex:100}}>
+            <UserPreview user={targetUser} compact={true} />
+          </div>
 
           <h4 className="mt-4 mb-1">{project.title}</h4>
 
@@ -201,22 +235,7 @@ const ProjectPage = observer(
             </p>
           </div>
 
-          {/* final placeholder XXX */}
-          <div className="my-4">
-            {hasImage ? (
-              <CloudinaryImage
-                assetId={project.imageAssetId}
-                intent="project"
-                lightbox
-              />
-            ) : (
-              <CloudinaryImage
-                assetId={specialAssetIds.placholderProjectID}
-                rounded
-                intent="project"
-              />
-            )}
-          </div>
+          {!appShell.inAppWebView && <div className="my-4">{coverImage}</div>}
 
           {project.description && (
             <p className="break-words whitespace-pre-line my-2">

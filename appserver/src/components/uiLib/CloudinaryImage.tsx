@@ -16,6 +16,7 @@ const CloudinaryImage = ({
   linkTo,
   rounded,
   isProjectCard,
+  fullW,
 }: {
   assetId: string | undefined | false
   imageMeta?: CldImageMetaAny
@@ -25,6 +26,7 @@ const CloudinaryImage = ({
   linkTo?: string
   rounded?: boolean
   isProjectCard?: boolean
+  fullW?: boolean
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const store = useStore()
@@ -72,6 +74,7 @@ const CloudinaryImage = ({
           height={imageMeta?.height || null}
           src={cloudinaryUrlDirect(assetId, intent, imageMeta)}
           onClick={handleClick}
+          style={fullW ? {width:'100%'} : {}}
         />
       </span>
     </>
