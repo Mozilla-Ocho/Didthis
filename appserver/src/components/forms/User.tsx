@@ -593,14 +593,15 @@ const UserForm = observer(() => {
       </form>
       {appShell.inAppWebView && (
         <div className="my-10">
-          <ListItem />
-
-          <div className="list-item">
-            <div className="list-icon">Icon</div>
-            <div className="list-text">Text</div>
-            <div className="">Link</div>
+          <div>
+            <ListItem href={pathBuilder.legal('pp')} textlabel="Privacy Notice"/>
+            <ListItem href={pathBuilder.legal('tos')} textlabel="Terms of service"/>
+            <ListItem href={pathBuilder.legal('cp')} textlabel="Content Policies"/>
+            <ListItem href="" textlabel="Delete Account"/>
+            <ListItem href="" textlabel="Sign Out"/> 
           </div>
 
+          
           <p className="my-6">
             <Link intent="internalNav" className="text-sm" href={pathBuilder.legal('pp')}>
               Privacy notice

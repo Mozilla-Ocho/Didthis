@@ -1,21 +1,32 @@
-import React, { CSSProperties, ReactNode } from 'react'
-import { twMerge } from 'tailwind-merge'
+import React from 'react'
 import styles from './ListItem.module.css'
-import settingsGear from '@/assets/img/settings-gear.svg'
+import ExternalLinkIcon from '@/assets/icons/external-link'
+import FileTextIcon from '@/assets/icons/file-text'
+import LogOutIcon from '@/assets/icons/log-out'
+import UserX from '@/assets/icons/userx'
+import ChevronRight from '@/assets/icons/chevron-right'
 
-function ListItem() {
+const LeftIcon = ({file, logout, deleteacct}:any) => {
+    return (
+      {LeftIcon}
+    );
+  };
+  
+
+const ListItem = ({href, textlabel}:any) => {
 
     return (
-      <div className={styles.listitem}>
+      <a className={styles.listitem} href={href}>
         <div className={styles.listitemlabel}>
-            <div className={styles.listitemicon}>LI</div>
-            <div>Label Prop</div>
-        </div>
-
         <div className={styles.listitemicon}>
-            <Icon src="settingsGear"></Icon>
+            <FileTextIcon />
         </div>
-      </div>
+            <div> {textlabel} </div>
+        </div>
+        <div className={styles.listitemicon}>
+            <ChevronRight />
+        </div>
+      </a>
     );
   }
 
