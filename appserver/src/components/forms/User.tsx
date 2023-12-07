@@ -11,7 +11,7 @@ import { action, makeAutoObservable } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useState } from 'react'
 import ImageUploadWeb, { UploadCallback } from '../ImageUpload'
-import { Button, CloudinaryImage, Input, Link, Textarea } from '../uiLib'
+import { Button, CloudinaryImage, Icon, Input, Link, Textarea, ListItem } from '../uiLib'
 import useAppShell, { useAppShellTopBar } from '@/lib/appShellContent'
 import ImageUploadAppShell from '../ImageUploadAppShell'
 import { LogoutButton } from '../auth/LogoutButton'
@@ -593,6 +593,14 @@ const UserForm = observer(() => {
       </form>
       {appShell.inAppWebView && (
         <div className="my-10">
+          <ListItem />
+
+          <div className="list-item">
+            <div className="list-icon">Icon</div>
+            <div className="list-text">Text</div>
+            <div className="">Link</div>
+          </div>
+
           <p className="my-6">
             <Link intent="internalNav" className="text-sm" href={pathBuilder.legal('pp')}>
               Privacy notice
@@ -616,9 +624,12 @@ const UserForm = observer(() => {
             </Link>
           </p>
         </div>
+
       )}
     </>
   )
 })
 
 export default UserForm
+
+

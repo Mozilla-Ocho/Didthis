@@ -1,0 +1,13 @@
+.listitem {
+    background-color:coral;
+    display:flex;
+    justify-content: space-between;
+}
+
+.listitemlabel {
+    display:flex;
+}
+
+.listitemicon {
+    max-width:24px;
+}
