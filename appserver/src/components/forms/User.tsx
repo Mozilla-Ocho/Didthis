@@ -594,15 +594,17 @@ const UserForm = observer(() => {
       {appShell.inAppWebView && (
         <div className="my-10">
           <div>
-            <ListItem href={pathBuilder.legal('pp')} textlabel="Privacy Notice"/>
-            <ListItem href={pathBuilder.legal('tos')} textlabel="Terms of service"/>
-            <ListItem href={pathBuilder.legal('cp')} textlabel="Content Policies"/>
-            <ListItem href="" textlabel="Delete Account"/>
-            <ListItem href="" textlabel="Sign Out"/> 
+            <ListItem LegalDoc href={pathBuilder.legal('pp')} textlabel="Privacy Notice"/>
+            <ListItem LegalDoc href={pathBuilder.legal('tos')} textlabel="Terms of service"/>
+            <ListItem LegalDoc href={pathBuilder.legal('cp')} textlabel="Content Policies"/>
+            <p className="text-sm m-2 text-black-300">User account</p>
+            {/* The items below have more robust logic and need more work to be hooked up properly -- appearance is as designed */}
+            <ListItem DeleteAcct href="" textlabel="Delete Account"/>
+            <ListItem LogOut href="" textlabel="Sign Out"/> 
           </div>
 
           
-          <p className="my-6">
+          {/* <p className="my-6">
             <Link intent="internalNav" className="text-sm" href={pathBuilder.legal('pp')}>
               Privacy notice
             </Link>
@@ -616,8 +618,11 @@ const UserForm = observer(() => {
             <Link intent="internalNav" className="text-sm" href={pathBuilder.legal('cp')}>
               Content policies
             </Link>
-          </p>
+          </p> */}
+
+         <br></br>
           <LogoutButton intent="link" />
+
           <p className="my-6">
             {/* TODO: implement delete account https://github.com/Mozilla-Ocho/h3y/issues/97 */}
             <Link intent="internalNav" className="text-sm text-red-500" href={"/"}>

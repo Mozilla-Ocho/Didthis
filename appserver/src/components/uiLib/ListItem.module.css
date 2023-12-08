@@ -1,11 +1,9 @@
 .listitem {
-    background-color:var(--yellow-500);
     display:flex;
     justify-content: space-between;
     padding-top:1em;
     padding-bottom:1em;
     min-height:44px;
-    border-bottom:1px solid lightgray;
 }
 
 .listitemlabel {
@@ -18,6 +16,4 @@
 
 :first-of-type .listitemicon {
     margin-right:.5em;
-    color:coral;
-    font-weight: bold;
 }
