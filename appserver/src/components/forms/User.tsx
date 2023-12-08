@@ -414,9 +414,15 @@ const UserForm = observer(() => {
         method="POST"
         className={'flex flex-col gap-8 ' + (user.isTrial ? 'opacity-60' : '')}
       >
+
+        {/* Avatar */}        
+        {!user.isTrial && <ImageField formStore={formStore} />}
+
+
+        {/* Display Name */}
         <div>
           <label htmlFor="nameField">
-            <h5>Your name</h5>
+            <h5 className="text-sm">Display name</h5>
             <p className="text-form-labels text-sm">Your full display name</p>
             <Input
               id="nameField"
@@ -432,9 +438,10 @@ const UserForm = observer(() => {
             />
           </label>
         </div>
+        {/* URL Path */}
         <div>
           <label htmlFor="slugField">
-            <h5>Your custom URL path</h5>
+            <h5 className="text-sm">Your custom URL path</h5>
             <p className="text-form-labels text-sm">
               A custom URL path helps people find your Didthis page, this is a
               link that you can share with your friends so they can find you.
@@ -462,9 +469,51 @@ const UserForm = observer(() => {
             />
           </label>
         </div>
-        {!user.isTrial && <ImageField formStore={formStore} />}
+     
+        {/* Short Bio */}        
         <div>
-          <h5>Social links</h5>
+          <label htmlFor="bio">
+            <h5 className="text-sm">Short bio</h5>
+            <Textarea
+              name="bio"
+              onChange={setBio}
+              value={formStore.bio}
+              className="mt-2 text-bodytext"
+              touched={formStore.bioTouched}
+              maxLen={profileUtils.maxChars.blurb}
+              disabled={user.isTrial}
+              style={{ minHeight: 123 }}
+            />
+          </label>
+        </div>
+        {!appShell.inAppWebView && (
+          <>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button
+                spinning={formStore.spinning}
+                type="submit"
+                disabled={!formStore.isPostable() || user.isTrial}
+                className="w-full sm:w-[150px]"
+              >
+                Save
+              </Button>
+              <Button
+                intent="secondary"
+                onClick={handleCancel}
+                className="w-full sm:w-[150px]"
+                trackEvent={trackingEvents.bcDiscardChanges}
+                trackEventOpts={{ fromPage: 'userEdit' }}
+              >
+                Discard changes
+              </Button>
+            </div>
+          </>
+        )}
+      </form>
+
+        {/* Social Links */}
+        <div>
+          <h5 className="text-sm">Social links</h5>
           <label
             htmlFor="sl_twitter"
             className="block mt-2 text-form-labels text-sm"
@@ -552,52 +601,15 @@ const UserForm = observer(() => {
             />
           </label>
         </div>
-        <div>
-          <label htmlFor="bio">
-            <h5>Short bio</h5>
-            <Textarea
-              name="bio"
-              onChange={setBio}
-              value={formStore.bio}
-              className="mt-2 text-bodytext"
-              touched={formStore.bioTouched}
-              maxLen={profileUtils.maxChars.blurb}
-              disabled={user.isTrial}
-              style={{ minHeight: 123 }}
-            />
-          </label>
-        </div>
-        {!appShell.inAppWebView && (
-          <>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button
-                spinning={formStore.spinning}
-                type="submit"
-                disabled={!formStore.isPostable() || user.isTrial}
-                className="w-full sm:w-[150px]"
-              >
-                Save
-              </Button>
-              <Button
-                intent="secondary"
-                onClick={handleCancel}
-                className="w-full sm:w-[150px]"
-                trackEvent={trackingEvents.bcDiscardChanges}
-                trackEventOpts={{ fromPage: 'userEdit' }}
-              >
-                Discard changes
-              </Button>
-            </div>
-          </>
-        )}
-      </form>
+   
+      {/* Legal + Account actions */}      
       {appShell.inAppWebView && (
         <div className="my-10">
           <div>
             <ListItem LegalDoc href={pathBuilder.legal('pp')} textlabel="Privacy Notice"/>
             <ListItem LegalDoc href={pathBuilder.legal('tos')} textlabel="Terms of service"/>
             <ListItem LegalDoc href={pathBuilder.legal('cp')} textlabel="Content Policies"/>
-            <p className="text-sm m-2 text-black-300">User account</p>
+           <hr></hr>
             {/* The items below have more robust logic and need more work to be hooked up properly -- appearance is as designed */}
             <ListItem DeleteAcct href="" textlabel="Delete Account"/>
             <ListItem LogOut href="" textlabel="Sign Out"/> 
