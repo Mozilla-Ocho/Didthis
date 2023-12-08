@@ -10,7 +10,7 @@ export default function ListItem({href, LegalDoc, LogOut, DeleteAcct, textlabel}
         
         if (LegalDoc) {
         return (      
-            <a className={styles.listitem} href={href}>
+            <a className={`${styles.listitem} ${styles.border}`} href={href}>
                 <div className={styles.listitemlabel}>
                     <div className={styles.listitemicon}>
                         <FileTextIcon />
@@ -37,7 +37,7 @@ export default function ListItem({href, LegalDoc, LogOut, DeleteAcct, textlabel}
         }
         if (DeleteAcct) {
             return (      
-                <a className={styles.listitem} href={href}>
+                <a className={`${styles.listitem} ${styles.border}`} href={href}>
                     <div className={styles.listitemlabel}>
                         <div className={styles.listitemicon}>
                              <UserX />

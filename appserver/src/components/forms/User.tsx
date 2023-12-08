@@ -609,7 +609,6 @@ const UserForm = observer(() => {
             <ListItem LegalDoc href={pathBuilder.legal('pp')} textlabel="Privacy Notice"/>
             <ListItem LegalDoc href={pathBuilder.legal('tos')} textlabel="Terms of service"/>
             <ListItem LegalDoc href={pathBuilder.legal('cp')} textlabel="Content Policies"/>
-           <hr></hr>
             {/* The items below have more robust logic and need more work to be hooked up properly -- appearance is as designed */}
             <ListItem DeleteAcct href="" textlabel="Delete Account"/>
             <ListItem LogOut href="" textlabel="Sign Out"/> 

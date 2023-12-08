@@ -5,6 +5,9 @@
     padding-bottom:1em;
     min-height:44px;
 }
+.border {
+    border-bottom:1px solid lightgray;
+}
 
 .listitemlabel {
     display:flex;
