@@ -298,30 +298,28 @@ const ImageField = observer(({ formStore }: { formStore: FormStore }) => {
   const ImageUpload = appShell.appReady ? ImageUploadAppShell : ImageUploadWeb
   return (
     <div>
-      <h5 className="mb-4">Your avatar</h5>
-      <div>
-        <p className="w-[150px]">
+      <h5 className="text-sm mb-4">Your avatar</h5>
+      <div className="flex">
+        <p className="w-[200px]">
           {formStore.imageAssetId ? (
             <CloudinaryImage assetId={formStore.imageAssetId} intent="avatar" />
           ) : (
             <CloudinaryImage
-              assetId={specialAssetIds.defaultAvatarID}
-              intent="avatar"
-            />
+              assetId={specialAssetIds.defaultAvatarID} intent="avatar" />
           )}
         </p>
-        <div className="flex flex-row gap-4 mt-4 w-full sm:w-auto">
+        <div className="flex flex-col gap-4 mt-4 ml-4 w-full sm:w-auto">
           <ImageUpload
             intent="avatar"
             onUploadWithUseCallback={onResult}
             isReplace={!!formStore.imageAssetId}
-            className="grow sm:grow-0"
+            className="grow sm:grow-0 btn-height"
           />
           {formStore.imageAssetId && (
             <Button
               intent="secondary"
               onClick={deleteImage}
-              className="grow sm:grow-0"
+              className="grow sm:grow-0 btn-height"
               trackEvent={trackingEvents.bcRemoveImage}
               trackEventOpts={{ imgIntent: 'avatar' }}
             >
@@ -470,7 +468,7 @@ const UserForm = observer(() => {
           </label>
         </div>
      
-        {/* Short Bio */}        
+        {/* Short Bio */}
         <div>
           <label htmlFor="bio">
             <h5 className="text-sm">Short bio</h5>
@@ -509,7 +507,6 @@ const UserForm = observer(() => {
             </div>
           </>
         )}
-      </form>
 
         {/* Social Links */}
         <div>
@@ -601,6 +598,9 @@ const UserForm = observer(() => {
             />
           </label>
         </div>
+      </form>
+
+        
    
       {/* Legal + Account actions */}      
       {appShell.inAppWebView && (

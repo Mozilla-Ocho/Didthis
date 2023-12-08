@@ -72,6 +72,10 @@ body {
   max-height: 400px;
 }
 
+.btn-height {
+  min-height: 48px;
+}
+
 .ReactModal__Body--open {
   overflow: hidden;
 }

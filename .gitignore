@@ -14,3 +14,5 @@ node_modules
 
 # storybook static build
 storybook-static
+appserver/env.development.local
+appserver/firebase-dev-credentials.json
