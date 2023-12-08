@@ -392,7 +392,7 @@ const UserForm = observer(() => {
       {!appShell.inAppWebView && (
         <>
           <div className="mb-10">
-            <h3>Account Details</h3>
+            <h3 className="text-lg">Account Details</h3>
             <p>
               The information you add here will be publicly visible to anyone
               who visits your page.
@@ -484,29 +484,6 @@ const UserForm = observer(() => {
             />
           </label>
         </div>
-        {!appShell.inAppWebView && (
-          <>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button
-                spinning={formStore.spinning}
-                type="submit"
-                disabled={!formStore.isPostable() || user.isTrial}
-                className="w-full sm:w-[150px]"
-              >
-                Save
-              </Button>
-              <Button
-                intent="secondary"
-                onClick={handleCancel}
-                className="w-full sm:w-[150px]"
-                trackEvent={trackingEvents.bcDiscardChanges}
-                trackEventOpts={{ fromPage: 'userEdit' }}
-              >
-                Discard changes
-              </Button>
-            </div>
-          </>
-        )}
 
         {/* Social Links */}
         <div>
@@ -598,6 +575,29 @@ const UserForm = observer(() => {
             />
           </label>
         </div>
+        {!appShell.inAppWebView && (
+          <>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button
+                spinning={formStore.spinning}
+                type="submit"
+                disabled={!formStore.isPostable() || user.isTrial}
+                className="w-full sm:w-[150px]"
+              >
+                Save
+              </Button>
+              <Button
+                intent="secondary"
+                onClick={handleCancel}
+                className="w-full sm:w-[150px]"
+                trackEvent={trackingEvents.bcDiscardChanges}
+                trackEventOpts={{ fromPage: 'userEdit' }}
+              >
+                Discard changes
+              </Button>
+            </div>
+          </>
+        )}
       </form>
 
         
