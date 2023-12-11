@@ -212,7 +212,7 @@ const ProjectPage = observer(
         )}
 
         <PagePad>
-          <div style={{position:'relative',marginTop: appShell.inAppWebView ? '-24px' : '0',zIndex:100}}>
+          <div style={{position:'relative',marginTop: appShell.inAppWebView ? '-24px' : '0',zIndex:0}}>
             <UserPreview user={targetUser} compact={true} />
           </div>
 
