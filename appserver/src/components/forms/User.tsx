@@ -637,12 +637,12 @@ const UserForm = observer(() => {
          <br></br>
           <LogoutButton intent="link" />
 
-          <p className="my-6">
+          {/* <p className="my-6"> */}
             {/* TODO: implement delete account https://github.com/Mozilla-Ocho/h3y/issues/97 */}
-            <Link intent="internalNav" className="text-sm text-red-500" href={"/"}>
+            {/* <Link intent="internalNav" className="text-sm text-red-500" href={"/"}>
               Delete account
             </Link>
-          </p>
+          </p> */}
         </div>
 
       )}
