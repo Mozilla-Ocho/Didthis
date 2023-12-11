@@ -488,6 +488,9 @@ const UserForm = observer(() => {
         {/* Social Links */}
         <div>
           <h5 className="text-sm">Social links</h5>
+          <p className="text-form-labels text-sm">
+            Visible to others when viewing your profile
+          </p>
           <label
             htmlFor="sl_twitter"
             className="block mt-2 text-form-labels text-sm"
