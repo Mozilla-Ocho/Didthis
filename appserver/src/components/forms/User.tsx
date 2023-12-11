@@ -298,7 +298,7 @@ const ImageField = observer(({ formStore }: { formStore: FormStore }) => {
   const ImageUpload = appShell.appReady ? ImageUploadAppShell : ImageUploadWeb
   return (
     <div>
-      <h5 className="text-sm mb-4">Your avatar</h5>
+      <h5 className="text-sm mb-4">Profile picture</h5>
       <div className="flex">
         <p className="w-[200px]">
           {formStore.imageAssetId ? (
