@@ -1,10 +1,16 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { createContext, ReactNode, useEffect, useRef } from 'react'
 import { createInitialState, State, useAppShellState } from './state'
+import getConfig from 'next/config'
 import { useRouter } from 'next/router'
 import { useAppShellListener } from './messaging'
 import { useStore } from '../store'
 import pathBuilder from '../pathBuilder'
+
+const { publicRuntimeConfig } = getConfig()
+const SERVER_VERSION = publicRuntimeConfig?.version
+const SERVER_BUILD = publicRuntimeConfig?.build
+const SERVER_TAG = publicRuntimeConfig?.tag
 
 export const AppShellContext = createContext<State>(createInitialState())
 
@@ -32,8 +38,19 @@ export default function AppShellContextProvider({
     if (!inAppWebView) return
     api.init()
     api
-      .request('ping', undefined)
-      .then(() => dispatch({ type: 'update', key: 'appReady', value: true }))
+      .request('ping', {
+        version: SERVER_VERSION,
+        build: SERVER_BUILD,
+        tag: SERVER_TAG,
+      })
+      .then((appVersionInfo = {}) => {
+        dispatch({
+          type: 'update',
+          key: 'appVersionInfo',
+          value: appVersionInfo,
+        })
+        dispatch({ type: 'update', key: 'appReady', value: true })
+      })
     return () => api.deinit()
   }, [inAppWebView, api, dispatch])
 

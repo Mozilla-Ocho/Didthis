@@ -359,6 +359,8 @@ const UserForm = observer(() => {
   // in signal to the app shell.
   const handleDeleteAccount = () => store.promptDeleteAccount(appShell.api)
 
+  const handleShowAppInfo = () => appShell.api.request("showAppInfo");
+
   useAppShellTopBar({
     show: true,
     title: 'Account details',
@@ -636,8 +638,10 @@ const UserForm = observer(() => {
           </div>
           <hr className="my-6"/>
           <LogoutButton intent="secondary" />
+          <Button className="mx-4" intent="secondary" onClick={handleShowAppInfo}>
+            App info
+          </Button>
         </div>
-
       )}
     </>
   )

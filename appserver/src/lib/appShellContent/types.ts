@@ -15,12 +15,16 @@ export type AppMessages = {
 
 export type AppRequestMethods = {
   ping: {
-    request: undefined;
-    response: JSONObject;
+    request: VersionInfo;
+    response: VersionInfo;
   };
   signin: {
     request: undefined;
     response: JSONObject;
+  };
+  showAppInfo: {
+    request: undefined;
+    response: Success;
   };
   webviewRouterEvent: {
     request: {
@@ -93,6 +97,14 @@ export type AppRequestMethods = {
     };
     response: JSONObject;
   };
+};
+
+export type VersionInfo = {
+  version?: string;
+  build?: string;
+  tag?: string;
+  update?: string;
+  channel?: string;
 };
 
 export type CldImageIntent = "avatar" | "post" | "project";

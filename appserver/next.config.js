@@ -1,3 +1,5 @@
+const { version } = require('./package.json')
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -8,6 +10,11 @@ const nextConfig = {
       { source: '/privacy', destination: '/legal/privacy' },
       { source: '/content', destination: '/legal/content' },
     ]
+  },
+  publicRuntimeConfig: {
+    version,
+    build: Date.now(),
+    tag: process.env.IMAGE_TAG,
   },
 }
 

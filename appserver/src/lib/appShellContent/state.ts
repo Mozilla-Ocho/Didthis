@@ -1,10 +1,12 @@
 import { useReducer, Dispatch } from 'react'
 import AppShellAPI from './api'
+import { VersionInfo } from './types'
 
 export function createInitialState() {
   return {
     inAppWebView: false,
     appReady: false,
+    appVersionInfo: {} as VersionInfo,
     api: new AppShellAPI(),
   }
 }

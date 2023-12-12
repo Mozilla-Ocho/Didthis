@@ -24,6 +24,10 @@ RUN apt-get install -qq -y vim jq
 # disable next telemetry signalling across the board.
 ENV NEXT_TELEMETRY_DISABLED=1
 
+ARG IMAGE_TAG=development
+ENV IMAGE_TAG=$IMAGE_TAG
+ENV NEXT_PUBLIC_IMAGE_TAG=$IMAGE_TAG
+
 # appserver code is gonna be installed in /appserver
 WORKDIR /appserver
 
