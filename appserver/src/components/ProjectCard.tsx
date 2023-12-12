@@ -12,13 +12,14 @@ const ProjectCard = observer(
     return (
       <div className="border border-edges rounded-md overflow-hidden w-full basis-full sm:w-[373px] sm:basis-[373px]">
         {hasImage ? (
-          <CloudinaryImage linkTo={projUrl} assetId={project.imageAssetId} intent="project" />
+          <CloudinaryImage isProjectCard linkTo={projUrl} assetId={project.imageAssetId} intent="project" />
         ) : (
           <CloudinaryImage
             linkTo={projUrl}
             assetId={specialAssetIds.placholderProjectID}
             rounded
             intent="project"
+            isProjectCard
           />
         )}
 
@@ -34,7 +35,7 @@ const ProjectCard = observer(
               {project.currentStatus === 'paused' && <span>Paused</span>}
             </p>
             <p className="body-bs text-right">
-              {numPosts} post{numPosts === 1 ? '' : 's'}
+              {numPosts} update{numPosts === 1 ? '' : 's'}
             </p>
           </div>
 

@@ -10,6 +10,7 @@ const PagePad = ({
   wide,
   semiWide,
   noPadY,
+  noPadX,
   narrowColControlOnly,
   yControlOnly,
 }: {
@@ -18,6 +19,7 @@ const PagePad = ({
   wide?: boolean
   semiWide?: boolean
   noPadY?: boolean
+  noPadX?: boolean
   narrowColControlOnly?: boolean
   yControlOnly?: boolean
 }) => {
@@ -35,8 +37,9 @@ const PagePad = ({
   return (
     <div
       className={twMerge(
-        'w-full max-w-[1280px] mx-auto px-4 sm:px-6 md:px-8 lg:px-10 xl:px-16',
+        'w-full max-w-[1280px] mx-auto',
         noPadY ? '' : 'pt-4 pb-16',
+        noPadX ? '' : 'px-4 sm:px-6 md:px-8 lg:px-10 xl:px-16',
         className
       )}
     >

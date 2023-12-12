@@ -1,7 +1,4 @@
-import { Cloudinary } from '@cloudinary/url-gen'
-import { scale } from '@cloudinary/url-gen/actions/resize'
 import dayjs from 'dayjs'
-// import { autoGravity } from '@cloudinary/url-gen/qualifiers/gravity';
 
 const specialAssetIds = {
   // these have been manually uploaded to cloudinary and we are using the
@@ -21,15 +18,8 @@ const getCloudinaryConfig = (intent: CldImageIntent) => {
     multiple: false,
     maxFileSize: 15000000,
     maxImageFileSize: 15000000,
-    cropping: true,
-    croppingAspectRatio: 1,
-    croppingCoordinatesMode: 'custom',
-    // for image intents with fixed aspect ratios, we force the crop, and, we
-    // also have configured the upload preset to do an incoming transformation
-    // of the image to crop it to the user's crop region. that means the actual
-    // image stored is pre-cropped and we dont need to do any special
-    // transformation or gravity on it when rendering.
-    showSkipCropButton: false,
+    // DRY_64132 cropping and aspect ratios
+    cropping: false,
     clientAllowedFormats: ['png', 'jpg', 'jpeg', 'gif', 'webp'],
     maxImageWidth: 3000,
     maxImageHeight: 3000,
@@ -66,10 +56,6 @@ const getCloudinaryConfig = (intent: CldImageIntent) => {
   if (intent === 'post') {
     const x = {
       ...base,
-      cropping: false,
-      croppingAspectRatio: undefined,
-      croppingCoordinatesMode: undefined,
-      showSkipCropButton: undefined,
       tags: ['post'],
       uploadPreset: 'obyw5ywa',
       folder: 'posts',
@@ -80,31 +66,12 @@ const getCloudinaryConfig = (intent: CldImageIntent) => {
     const x = {
       ...base,
       tags: ['project'],
-      croppingAspectRatio: 1.5,
       uploadPreset: 'wuty6ww4',
       folder: 'projects',
     }
     return x
   }
   throw new Error('invalid component for cloudinary config')
-}
-
-const getCloudinaryTransform = (
-  intent: CldImageIntent,
-  assetId: string,
-  height?: 'original' | number
-) => {
-  const cloudConfig = getCloudinaryConfig(intent)
-  const cld = new Cloudinary({
-    cloud: {
-      cloudName: cloudConfig.cloudName,
-    },
-  })
-  if (height === 'original') {
-    return cld.image(assetId)
-  }
-  if (typeof height === 'undefined') height = 500
-  return cld.image(assetId).resize(scale().height(height || 500))
 }
 
 const cloudinaryUrlDirect = (
@@ -122,8 +89,10 @@ const cloudinaryUrlDirect = (
    * this simple string code myself. i can't actually figure out how to get
    * c_limit,h_NNN,w_NNN out of the url-gen library from any docs... */
   const config = getCloudinaryConfig(intent)
-  // Projects want a 1.5 aspect ratio, others are square - but iOS will only offer square cropping
-  const aspectRatioTransform = intent === "project" ? "/c_fill,ar_1.5" : "/c_fill,ar_1";
+  // DRY_64132 cropping and aspect ratios
+  // for avatars, we ask for a cropped image from cloudinary set to a square
+  // aspect ratio, with the gravity set to face detection.
+  const aspectRatioTransform = intent === "avatar" ? "/c_fill,ar_1,g_face" : "";
   // note the assetId already contains the folder path
   const url = `https://res.cloudinary.com/${config.cloudName}/image/upload/c_limit,h_2000,w_2000,f_jpg,q_auto${aspectRatioTransform}/v1/${assetId}`
   return url
@@ -168,7 +137,6 @@ const getExifCreatedAtMillis = (imageMeta: CldImageMetaAny): number | null => {
 
 export {
   getCloudinaryConfig,
-  getCloudinaryTransform,
   specialAssetIds,
   cloudinaryUrlDirect,
   getExifCreatedAtMillis,

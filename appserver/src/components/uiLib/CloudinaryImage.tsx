@@ -15,6 +15,8 @@ const CloudinaryImage = ({
   lightbox,
   linkTo,
   rounded,
+  isProjectCard,
+  fullW,
 }: {
   assetId: string | undefined | false
   imageMeta?: CldImageMetaAny
@@ -23,6 +25,8 @@ const CloudinaryImage = ({
   lightbox?: boolean
   linkTo?: string
   rounded?: boolean
+  isProjectCard?: boolean
+  fullW?: boolean
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const store = useStore()
@@ -38,13 +42,13 @@ const CloudinaryImage = ({
   if (!assetId) {
     return <></>
   }
-  // we force an aspect ratio using complicated tailwind plugin stuff so that
-  // when the image loads it doesn't cause a reflow
+  // DRY_64132 cropping and aspect ratios
   const aspect: string[] = []
-  if (intent === 'avatar') {
+  if (isProjectCard) {
+    aspect.push('aspect-w-3', 'aspect-h-2', '[&>img]:object-cover')
+  } else if (intent === 'avatar') {
     aspect.push('aspect-w-1', 'aspect-h-1')
   } else if (intent === 'project') {
-    aspect.push('aspect-w-3', 'aspect-h-2')
   } else if (intent === 'post') {
   }
   // leading-none fixes space after images
@@ -70,6 +74,7 @@ const CloudinaryImage = ({
           height={imageMeta?.height || null}
           src={cloudinaryUrlDirect(assetId, intent, imageMeta)}
           onClick={handleClick}
+          style={fullW ? {width:'100%'} : {}}
         />
       </span>
     </>
