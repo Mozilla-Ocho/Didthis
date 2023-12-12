@@ -3,6 +3,7 @@ import React, { CSSProperties, ReactNode } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { track } from '@amplitude/analytics-browser'
 import { useStore } from '@/lib/store'
+import { twMerge } from 'tailwind-merge'
 
 const linkCVA = cva('link', {
   variants: {
@@ -104,7 +105,7 @@ const Link: React.FC<LinkProps> = ({
         id={id}
         rel="nofollow noreferer"
         target="_blank"
-        className={linkCVA({ intent, className })}
+        className={twMerge(linkCVA({ intent}), className )}
         style={style}
         href={href}
         onClick={ourOnClick}
@@ -117,7 +118,7 @@ const Link: React.FC<LinkProps> = ({
     <NextLink
       id={id}
       target={newTab ? '_blank' : undefined}
-      className={linkCVA({ intent, className })}
+      className={twMerge(linkCVA({ intent}), className )}
       style={style}
       href={href}
       onClick={ourOnClick}
