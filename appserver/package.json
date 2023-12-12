@@ -58,6 +58,7 @@
     "cookies": "^0.8.0",
     "copy-to-clipboard": "^3.3.3",
     "dayjs": "^1.11.9",
+    "email-validator": "^2.0.4",
     "eslint": "8.38.0",
     "eslint-config-next": "13.3.0",
     "eslint-config-prettier": "^8.8.0",
