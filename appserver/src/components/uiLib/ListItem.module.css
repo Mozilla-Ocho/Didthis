@@ -1,0 +1,22 @@
+.listitem {
+    display:flex;
+    justify-content: space-between;
+    padding-top:1em;
+    padding-bottom:1em;
+    min-height:44px;
+}
+.border {
+    border-bottom:1px solid lightgray;
+}
+
+.listitemlabel {
+    display:flex;
+}
+
+.listitemicon {
+    max-width:24px;
+}
+
+:first-of-type .listitemicon {
+    margin-right:.5em;
+}

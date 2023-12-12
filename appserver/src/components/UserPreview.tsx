@@ -116,22 +116,25 @@ const UserPreview = observer(
             </Link>
           </p>
         )}
-        {user.profile.imageAssetId ? (
-          <p className="w-16 sm:w-32">
-            <CloudinaryImage
-              assetId={user.profile.imageAssetId}
-              intent="avatar"
-            />
-          </p>
-        ) : (
-          <p className="w-16 sm:w-32">
-            <CloudinaryImage
-              assetId={specialAssetIds.defaultAvatarID}
-              intent="avatar"
-            />
-          </p>
-        )}
-        <h5 className="m-0">{user.profile.name || 'Unnamed user'}</h5>
+        <div className="flex row">
+          {user.profile.imageAssetId ? (
+            <p className="w-16 sm:w-32 mr-4">
+              <CloudinaryImage
+                assetId={user.profile.imageAssetId}
+                intent="avatar"
+              />
+            </p>
+          ) : (
+            <p className="w-16 sm:w-32">
+              <CloudinaryImage
+                assetId={specialAssetIds.defaultAvatarID}
+                intent="avatar"
+              />
+            </p>
+          )}
+        <h5 className="mt-auto mb-auto">{user.profile.name || 'Unnamed user'}</h5>
+        </div>
+
         {user.profile.bio && (
           <p className="text-md text-bodytext my2 break-words whitespace-pre-line">
             {user.profile.bio}

@@ -11,7 +11,7 @@ import { action, makeAutoObservable } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useState } from 'react'
 import ImageUploadWeb, { UploadCallback } from '../ImageUpload'
-import { Button, CloudinaryImage, Input, Link, Textarea } from '../uiLib'
+import { Button, CloudinaryImage, Icon, Input, Link, Textarea, ListItem } from '../uiLib'
 import useAppShell, { useAppShellTopBar } from '@/lib/appShellContent'
 import ImageUploadAppShell from '../ImageUploadAppShell'
 import { LogoutButton } from '../auth/LogoutButton'
@@ -298,30 +298,28 @@ const ImageField = observer(({ formStore }: { formStore: FormStore }) => {
   const ImageUpload = appShell.appReady ? ImageUploadAppShell : ImageUploadWeb
   return (
     <div>
-      <h5 className="mb-4">Your avatar</h5>
-      <div>
-        <p className="w-[150px]">
+      <h5 className="text-sm mb-4">Profile picture</h5>
+      <div className="flex">
+        <p className="w-[200px]">
           {formStore.imageAssetId ? (
             <CloudinaryImage assetId={formStore.imageAssetId} intent="avatar" />
           ) : (
             <CloudinaryImage
-              assetId={specialAssetIds.defaultAvatarID}
-              intent="avatar"
-            />
+              assetId={specialAssetIds.defaultAvatarID} intent="avatar" />
           )}
         </p>
-        <div className="flex flex-row gap-4 mt-4 w-full sm:w-auto">
+        <div className="flex flex-col gap-4 mt-4 ml-4 w-full sm:w-auto">
           <ImageUpload
             intent="avatar"
             onUploadWithUseCallback={onResult}
             isReplace={!!formStore.imageAssetId}
-            className="grow sm:grow-0"
+            className="grow sm:grow-0 btn-height"
           />
           {formStore.imageAssetId && (
             <Button
               intent="secondary"
               onClick={deleteImage}
-              className="grow sm:grow-0"
+              className="grow sm:grow-0 btn-height"
               trackEvent={trackingEvents.bcRemoveImage}
               trackEventOpts={{ imgIntent: 'avatar' }}
             >
@@ -398,7 +396,7 @@ const UserForm = observer(() => {
       {!appShell.inAppWebView && (
         <>
           <div className="mb-10">
-            <h3>Account Details</h3>
+            <h3 className="text-lg">Account Details</h3>
             <p>
               The information you add here will be publicly visible to anyone
               who visits your page.
@@ -418,9 +416,15 @@ const UserForm = observer(() => {
         method="POST"
         className={'flex flex-col gap-8 ' + (user.isTrial ? 'opacity-60' : '')}
       >
+
+        {/* Avatar */}        
+        {!user.isTrial && <ImageField formStore={formStore} />}
+
+
+        {/* Display Name */}
         <div>
           <label htmlFor="nameField">
-            <h5>Your name</h5>
+            <h5 className="text-sm">Display name</h5>
             <p className="text-form-labels text-sm">Your full display name</p>
             <Input
               id="nameField"
@@ -436,9 +440,10 @@ const UserForm = observer(() => {
             />
           </label>
         </div>
+        {/* URL Path */}
         <div>
           <label htmlFor="slugField">
-            <h5>Your custom URL path</h5>
+            <h5 className="text-sm">Your custom URL path</h5>
             <p className="text-form-labels text-sm">
               A custom URL path helps people find your Didthis page, this is a
               link that you can share with your friends so they can find you.
@@ -466,9 +471,30 @@ const UserForm = observer(() => {
             />
           </label>
         </div>
-        {!user.isTrial && <ImageField formStore={formStore} />}
+     
+        {/* Short Bio */}
         <div>
-          <h5>Social links</h5>
+          <label htmlFor="bio">
+            <h5 className="text-sm">Short bio</h5>
+            <Textarea
+              name="bio"
+              onChange={setBio}
+              value={formStore.bio}
+              className="mt-2 text-bodytext"
+              touched={formStore.bioTouched}
+              maxLen={profileUtils.maxChars.blurb}
+              disabled={user.isTrial}
+              style={{ minHeight: 123 }}
+            />
+          </label>
+        </div>
+
+        {/* Social Links */}
+        <div>
+          <h5 className="text-sm">Social links</h5>
+          <p className="text-form-labels text-sm">
+            Visible to others when viewing your profile
+          </p>
           <label
             htmlFor="sl_twitter"
             className="block mt-2 text-form-labels text-sm"
@@ -556,21 +582,6 @@ const UserForm = observer(() => {
             />
           </label>
         </div>
-        <div>
-          <label htmlFor="bio">
-            <h5>Short bio</h5>
-            <Textarea
-              name="bio"
-              onChange={setBio}
-              value={formStore.bio}
-              className="mt-2 text-bodytext"
-              touched={formStore.bioTouched}
-              maxLen={profileUtils.maxChars.blurb}
-              disabled={user.isTrial}
-              style={{ minHeight: 123 }}
-            />
-          </label>
-        </div>
         {!appShell.inAppWebView && (
           <>
             <div className="flex flex-col sm:flex-row gap-4">
@@ -595,41 +606,38 @@ const UserForm = observer(() => {
           </>
         )}
       </form>
+
+        
+   
+      {/* Legal + Account actions */}      
       {appShell.inAppWebView && (
         <div className="my-10">
-          <p className="my-6">
-            <Link intent="internalNav" className="text-sm" href={pathBuilder.legal('pp')}>
-              Privacy notice
-            </Link>
-          </p>
-          <p className="my-6">
-            <Link intent="internalNav" className="text-sm" href={pathBuilder.legal('tos')}>
-              Terms of service
-            </Link>
-          </p>
-          <p className="my-6">
-            <Link intent="internalNav" className="text-sm" href={pathBuilder.legal('cp')}>
-              Content policies
-            </Link>
-          </p>
-          <LogoutButton intent="link" />
-          <hr className="my-6"/>
-          <p className="leading-5">
-            <strong>Account deletion:</strong>{' '}
+          <div>
+            <ListItem LegalDoc href={pathBuilder.legal('pp')} textlabel="Privacy Notice"/>
+            <ListItem LegalDoc href={pathBuilder.legal('tos')} textlabel="Terms of service"/>
+            <ListItem LegalDoc href={pathBuilder.legal('cp')} textlabel="Content Policies"/>
+          </div>
+
+          <div className="leading-5 text-sm mt-4">
+            <h5 className="text-sm">Account deletion:</h5>{' '}
             If you would like to delete your account, you can do so here. This
             will permanently destroy all your public and private content, log
             you out on all devices, and cannot be undone &mdash; not even by
             customer support.{' '}
+            <br></br>
             <Button
-              intent="link"
+              intent="secondary"
               onClick={handleDeleteAccount}
-              className="text-md text-red-500"
+              className="text-sm border-red-500 text-red-500 mt-4"
               trackEvent={trackingEvents.bcDeleteAccount}
             >
               Delete account
             </Button>
-          </p>
+          </div>
+          <hr className="my-6"/>
+          <LogoutButton intent="secondary" />
         </div>
+
       )}
     </>
   )
