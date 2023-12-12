@@ -13,6 +13,7 @@ import SigninScreen, { SigninScreenRouteParams } from "./screens/Signin";
 import StartupScreen, { StartupScreenRouteParams } from "./screens/Startup";
 import * as Onboarding from "./screens/Onboarding";
 import * as DateTimePicker from "./screens/DateTimePicker";
+import * as AppInfo from "./screens/AppInfo";
 import { ConditionalActivityIndicator, ConditionalActivityIndicatorProps } from "./components/ActivityIndicator";
 import useAppShellHost from "./lib/appShellHost";
 import OfflineWarning from "./components/OfflineWarning";
@@ -23,6 +24,7 @@ export type RootStackParamList = {
   WebApp: WebAppScreenRouteParams;
   Onboarding: Onboarding.RouteParams;
   DateTimePicker: DateTimePicker.RouteParams;
+  AppInfo: AppInfo.RouteParams;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -54,6 +56,7 @@ function App() {
           <Stack.Screen name="Onboarding" component={Onboarding.default} />
           <Stack.Screen name="WebApp" component={WebAppScreen} />
           <Stack.Screen name="DateTimePicker" component={DateTimePicker.default} />
+          <Stack.Screen name="AppInfo" component={AppInfo.default} />
         </Stack.Navigator>
         <OfflineWarning />
         <AppShellActivityIndicator delay={125} label="Working" />

@@ -47,6 +47,8 @@ jobs:
       - name: 🚀 Create preview
         if: (steps.checksecrets.outputs.secretspresent == 'YES')
         id: preview
+        env:
+          EXPO_PUBLIC_GIT_TAG: ${{ github.sha }}
         uses: expo/expo-github-action/preview@v8
         with:
           command: eas update --auto --branch=pr-${{ github.event.number }}

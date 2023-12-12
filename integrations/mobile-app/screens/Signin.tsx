@@ -10,6 +10,7 @@ import * as SiteAPI from "../lib/siteApi";
 import config from "../lib/config";
 import { useState } from "react";
 import ActivityIndicator from "../components/ActivityIndicator";
+import { TouchableHighlight } from "react-native-gesture-handler";
 
 const { siteBaseUrl } = Config;
 
@@ -46,6 +47,10 @@ export default function SigninScreen({ navigation }: SigninScreenProps) {
     }
   };
 
+  const onAppInfoPress = () => {
+    navigation.navigate("AppInfo");
+  }
+
   return (
     <SafeAreaView style={styles.screen}>
       <View style={styles.logoContainer}>
@@ -79,6 +84,9 @@ export default function SigninScreen({ navigation }: SigninScreenProps) {
         <A href={config.legalUrls.content} style={styles.footerLink}>
           Content policies
         </A>
+        <TouchableHighlight onPress={onAppInfoPress}>
+          <Text style={styles.footerLink}>App info</Text>
+        </TouchableHighlight>
       </View>
       {signinStatus === "inprogress" && (
         <ActivityIndicator label="Signing In" />

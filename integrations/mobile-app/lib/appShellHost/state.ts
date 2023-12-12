@@ -1,6 +1,6 @@
 import { useReducer, Dispatch } from "react";
 import { ApiUser } from "../types";
-import { AppRequestMethods } from "./types";
+import { AppRequestMethods, VersionInfo } from "./types";
 
 export type State = {
   loading: boolean;
@@ -12,6 +12,7 @@ export type State = {
   bottomNav?: {
     show?: boolean;
   };
+  contentVersionInfo?: VersionInfo;
   viewingProjectId: string; // empty string when not viewing a project
 };
 

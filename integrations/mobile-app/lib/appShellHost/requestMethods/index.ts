@@ -6,6 +6,8 @@ import pickDateTime from "./pickDateTime";
 import shareProjectUrl from "./shareProjectUrl";
 import pickImage from "./pickImage";
 import signin from "./signin";
+import showAppInfo from "./showAppInfo";
+import ping from "./ping";
 
 export async function handleRequest(
   api: AppShellHostAPI,
@@ -58,11 +60,8 @@ export const methods: Methods = {
   shareProjectUrl,
   pickImage,
   signin,
-
-  ping: async (api, payload) => {
-    api.set("webContentReady", true);
-    return { message: "pong" };
-  },
+  showAppInfo,
+  ping,
 
   updateAppConfig: async (api, payload) => {
     const { user, links } = payload;
