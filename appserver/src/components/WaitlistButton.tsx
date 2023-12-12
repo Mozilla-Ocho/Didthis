@@ -159,8 +159,8 @@ const WaitlistButton = observer(
             {!success && (
               <>
                 <p>
-                  {branding.productName} accounts are limited right now — join
-                  our wait list and we’ll notify you when you’re in!
+                  If you’re interested in {branding.productName} for Android or
+                  web, join our wait list and we’ll keep you posted!
                 </p>
                 <form
                   method="POST"
@@ -208,7 +208,7 @@ const WaitlistButton = observer(
           <Button
             onClick={handleClick}
             data-testid="waitlistbutton"
-            className={`my-6 px-6 py-4 text-lg ${className}`}
+            className={`my-6 px-6 py-4 text-md ${className}`}
           >
             Join the wait list
           </Button>

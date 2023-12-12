@@ -15,9 +15,8 @@ import { useStore } from '@/lib/store'
 import { trackingEvents } from '@/lib/trackingEvents'
 import { useEffect } from 'react'
 import { WaitlistButton } from '../WaitlistButton'
-import { PagePad } from '../uiLib'
+import { Button, Link, PagePad } from '../uiLib'
 import { useAppShellListener } from '@/lib/appShellContent'
-import { AppleAuthenticationCredential } from '@/lib/appleAuth'
 
 // DRY_20334 outer page width styles
 const HomeUnauth = () => {
@@ -27,21 +26,7 @@ const HomeUnauth = () => {
     store.loginWithAppleId(payload.credential)
   })
 
-  const bucketInt = (store.testBucket ? store.testBucket.value : 0) % 5
-  let topicBucket: 'combo' | 'authentic' | 'storytelling' | 'utility' | 'wip'
-  // safe default to the combo bucket in case something's oddly wrong with
-  // bucketInt inputs
-  topicBucket = 'combo'
-  if (bucketInt === 0) topicBucket = 'combo'
-  if (bucketInt === 1) topicBucket = 'authentic'
-  if (bucketInt === 2) topicBucket = 'storytelling'
-  if (bucketInt === 3) topicBucket = 'utility'
-  if (bucketInt === 4) topicBucket = 'wip'
-  if (store.signupCodeInfo && store.signupCodeInfo.name === 'usertesting') {
-    // all usertesting tests see the personal utility text
-    topicBucket = 'utility'
-  }
-  topicBucket = 'utility' // as of 09/05/23 all users see utility messaging
+  const topicBucket = 'utility' // as of 09/05/23 all users see utility messaging
   store.useTrackedPageEvent(trackingEvents.pvHomeUnauth, { topicBucket })
   useEffect(() => {
     // special tracking event for campaign conversion, if user viewed unauth
@@ -61,24 +46,32 @@ const HomeUnauth = () => {
   const invited = store.signupCodeInfo && store.signupCodeInfo.active
 
   let hobbyImg2x = woodworking2x
-  let hobbyAlt = "An iPhone screenshot showing the DidThis application featuring a woodworking project in progress"
+  let hobbyAlt =
+    'An iPhone screenshot showing the DidThis application featuring a woodworking project in progress'
   if (store.signupCodeInfo && store.signupCodeInfo.name === 'ads-knitting') {
     hobbyImg2x = knitting2x
-    hobbyAlt = "An iPhone screenshot showing the DidThis application featuring a knitting project in progress"
+    hobbyAlt =
+      'An iPhone screenshot showing the DidThis application featuring a knitting project in progress'
   }
   if (store.signupCodeInfo && store.signupCodeInfo.name === 'ads-textile') {
     hobbyImg2x = knitting2x
-    hobbyAlt = "An iPhone screenshot showing the DidThis application featuring a knitting project in progress"
+    hobbyAlt =
+      'An iPhone screenshot showing the DidThis application featuring a knitting project in progress'
   }
   if (store.signupCodeInfo && store.signupCodeInfo.name === 'ads-cooking') {
     hobbyImg2x = baking2x
-    hobbyAlt = "An iPhone screenshot showing the DidThis application featuring a bakingproject in progress"
+    hobbyAlt =
+      'An iPhone screenshot showing the DidThis application featuring a bakingproject in progress'
   }
   if (store.signupCodeInfo && store.signupCodeInfo.name === 'ads-hiking') {
     hobbyImg2x = hiking2x
-    hobbyAlt = "An iPhone screenshot showing the DidThis application featuring a hike in progress"
+    hobbyAlt =
+      'An iPhone screenshot showing the DidThis application featuring a hike in progress'
   }
-  if (!hobbyImg2x || (store.signupCodeInfo && store.signupCodeInfo.name === 'ads-woodworking')) {
+  if (
+    !hobbyImg2x ||
+    (store.signupCodeInfo && store.signupCodeInfo.name === 'ads-woodworking')
+  ) {
     // default
     hobbyImg2x = woodworking2x
   }
@@ -107,7 +100,20 @@ const HomeUnauth = () => {
       className="my-6 px-6 py-4 text-lg"
     />
   ) : (
-    <WaitlistButton className="mr-4" />
+    <>
+      <Link
+        data-testid="testflightbutton"
+        className={`mt-6 px-6 py-4 text-md `}
+        href={branding.testflightURL}
+        intent="primary"
+      >
+        <strong>Get {branding.productName} for iOS</strong> via Apple Testflight
+      </Link>
+      <p className="mt-6 mb-2">
+        Interested in our upcoming Android or web apps?
+      </p>
+      <WaitlistButton className="mr-4 mt-0" />
+    </>
   )
   return (
     <div className="grid grid-rows-[auto_1fr_auto] w-full min-h-screen">
@@ -118,78 +124,17 @@ const HomeUnauth = () => {
             <div className="sm:max-w-[40%] text-center sm:text-left lg:self-center">
               <h4 className="text-3xl sm:text-3xl2 lg:text-4xl leading-tight md:leading-tight mb-6">
                 <strong>
-                  {/*
-                  {topicBucket === 'authentic' && (
-                    <span>An authentic record of your passion projects</span>
-                  )}
-                  {topicBucket === 'utility' && (
-                  */}
-                    <span>Never forget a step in your passion projects</span>
-                  {/*
-                  )}
-                  {topicBucket === 'storytelling' && (
-                    <span>Every step is a story</span>
-                  )}
-                  {topicBucket === 'combo' && (
-                    <span>
-                      Tell the authentic story of your hobby projects
-                    </span>
-                  )}
-                  {topicBucket === 'wip' && (
-                    <span>
-                      A work in progress is worth celebrating
-                    </span>
-                  )}
-                  */}
+                  <span>Never forget a step in your passion projects</span>
                 </strong>
               </h4>
               <p className="text-base">
-                  {/*
-                {topicBucket === 'authentic' && (
-                  <span>
-                    DidThis is a positive space of your own to celebrate each
-                    step, stumble, or snapshot in your hobby journeys &mdash; a
-                    place to embrace progress over perfection. Keep your
-                    projects private or share them with people who appreciate
-                    your process.
-                  </span>
-                )}
-                {topicBucket === 'utility' && (
-                  */}
-                  <span>
-                    Journal your progress through your hobby journeys with
-                    images, text, or links that are a snap to capture in
-                    the moment.  Record and reflect on the wins and setbacks,
-                    and celebrate your growth. Keep your projects private, or
-                    share them with the people who appreciate your process.
-                  </span>
-                  {/*
-                )}
-                {topicBucket === 'storytelling' && (
-                  <span>
-                    Track and celebrate the progress of your passion projects from
-                    inception to reality. Share them with the people who delight
-                    in your journey, or keep them private to remember and reflect.
-                  </span>
-                )}
-                {topicBucket === 'combo' && (
-                  <span>
-                    Journal your progress through your hobby projects with
-                    images, text, or links that are a snap to capture in
-                    the moment.  Record and reflect on the wins and setbacks,
-                    and celebrate your growth. Keep your project stories
-                    private, or share them with the people who appreciate your
-                    journey.
-                  </span>
-                )}
-                {topicBucket === 'wip' && (
-                  <span>
-                    Didthis helps you keep track of your hobby projects,
-                    remember what you’ve learned and accomplished, and share
-                    your achievements with friends and fellow hobbyists.
-                  </span>
-                )}
-                  */}
+                <span>
+                  Journal your progress on your hobby journeys with images,
+                  text, or links that are a snap to capture in the moment.
+                  Record and reflect on the wins and setbacks, and celebrate
+                  your growth. Keep your projects private, or share them with
+                  the people who appreciate your process.
+                </span>
               </p>
               {ctaButton}
             </div>
@@ -209,12 +154,12 @@ const HomeUnauth = () => {
 
               <div className={flexPairRev}>
                 <div className={howWorksImgCont}>
-                    <Image
-                      src={captureProgres2x}
-                      height={captureProgres2x.height / 2}
-                      width={captureProgres2x.width / 2}
-                      alt="a series of illustrations showing the evolution of a baking project from mixing dough, to cooking in the oven, to a finished loaf of bread"
-                    />
+                  <Image
+                    src={captureProgres2x}
+                    height={captureProgres2x.height / 2}
+                    width={captureProgres2x.width / 2}
+                    alt="a series of illustrations showing the evolution of a baking project from mixing dough, to cooking in the oven, to a finished loaf of bread"
+                  />
                 </div>
                 <div className={howWorksTextCont}>
                   <h3 className={h4text}>Capture your progress</h3>
@@ -246,7 +191,7 @@ const HomeUnauth = () => {
                 </div>
               </div>
 
-              <div className={flexPairRev }>
+              <div className={flexPairRev}>
                 <div className={howWorksImgCont}>
                   <Image
                     src={shareAndCelebrate2x}

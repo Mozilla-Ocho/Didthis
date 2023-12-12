@@ -147,6 +147,10 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
     eventName: 'buttonClick',
     opts: { name: 'joinViralWaitlist', /* fromPage, targetUserSlug */ },
   },
+  bcGetYourOwnPage: {
+    eventName: 'buttonClick',
+    opts: { name: 'getYourOwnPage', /* fromPage, targetUserSlug */ },
+  },
   bcSharePublicProject: {
     eventName: 'buttonClick',
     opts: { name: 'sharePublicProject' },

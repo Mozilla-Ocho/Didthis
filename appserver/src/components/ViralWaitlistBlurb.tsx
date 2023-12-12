@@ -1,7 +1,8 @@
-import { PagePad } from '@/components/uiLib'
+import { Link, PagePad } from '@/components/uiLib'
 import { useStore } from '@/lib/store'
 import branding from '@/lib/branding'
-import { WaitlistButton } from './WaitlistButton'
+import { trackingEvents } from '@/lib/trackingEvents'
+// import { WaitlistButton } from './WaitlistButton'
 
 const ViralWaitlistBlurb = ({
   fromPage,
@@ -17,12 +18,16 @@ const ViralWaitlistBlurb = ({
       <div className={`py-4 px-6 mt-4 bg-discordnag`}>
         <p className="text-sm">
           Like what you see here?{' '}
-          <WaitlistButton
-            mode="viral"
-            fromPage={fromPage}
-            targetUserSlug={targetUserSlug}
-          />{' '}
-          now to get your own {branding.productName} page.
+          <strong>
+            <Link
+              href="/"
+              trackEvent={trackingEvents.bcGetYourOwnPage}
+              trackEventOpts={{ fromPage, targetUserSlug }}
+            >
+              Get your own {branding.productName} page
+            </Link>{' '}
+            &rarr;
+          </strong>
         </p>
       </div>
     </PagePad>
