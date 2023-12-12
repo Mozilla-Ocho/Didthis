@@ -4,6 +4,7 @@ import { useStore } from '@/lib/store'
 import { trackingEvents } from '@/lib/trackingEvents'
 import { useState } from 'react'
 import branding from '@/lib/branding'
+import emailValidator from 'email-validator'
 
 function minDelay<T>(delayMS: number, inputPromise: Promise<T>): Promise<T> {
   return new Promise<T>((resolve, reject) => {
@@ -135,7 +136,7 @@ const WaitlistButton = observer(
     }
     const handleEmailChg = (e: React.ChangeEvent<HTMLInputElement>) => {
       setEmail(e.target.value)
-      setValidEmail(!!e.target.value.match(/\w+@\w+\.\w+/))
+      setValidEmail(!!emailValidator.validate(e.target.value))
     }
     return (
       <>

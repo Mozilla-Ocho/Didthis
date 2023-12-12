@@ -12,6 +12,7 @@ import { NextRouter } from 'next/router'
 import pathBuilder from '../pathBuilder'
 import profileUtils from '../profileUtils'
 import { AppleAuthenticationCredential } from '../appleAuth'
+import AppShellAPI from '../appShellContent/api'
 // import { UrlMetaWrapper } from '../apiConstants'
 
 type GeneralError = false | '_get_me_first_fail_' | '_api_fail_'
@@ -47,6 +48,7 @@ class Store {
   fullpageLoading = false // used when signing in
   confirmingDelete:
     | false
+    | { kind: 'account'; thing: ApiUser; deleting: boolean }
     | { kind: 'post'; thing: ApiPost; deleting: boolean }
     | { kind: 'project'; thing: ApiProject; deleting: boolean } = false
   showConfirmDeleteModal = false
@@ -57,6 +59,7 @@ class Store {
   amplitude: AmplitudeClient
   trialAccountClaimed?: boolean
   userListeners : Array<UserListenerFn> = []
+  appShellApiRef: AppShellAPI | false = false
 
   constructor({
     authUser,
@@ -89,6 +92,7 @@ class Store {
         trackedPageEvent: false,
         router: false,
         userListeners: false,
+        appShellApiRef: false,
       },
       { autoBind: true }
     )
@@ -505,7 +509,7 @@ class Store {
     this.userListeners.push(fn)
     if (this.user) fn(this.user)
     return () => {
-      this.userListeners.filter(x => x !== fn)
+      this.userListeners = this.userListeners.filter(x => x !== fn)
     }
   }
 
@@ -533,6 +537,9 @@ class Store {
     return this.apiClient
       .sessionLogout()
       .then(() => {
+        if (this.appShellApiRef) {
+          this.appShellApiRef.request('signin')
+        }
         window.location.assign('/')
       })
       .catch(() => {
@@ -673,6 +680,17 @@ class Store {
     this.router.back()
   }
 
+  promptDeleteAccount(appshellapiref: AppShellAPI) {
+    if (!this.user) return false
+    this.appShellApiRef = appshellapiref // need this to tell app shell to log out
+    this.confirmingDelete = {
+      kind: 'account',
+      thing: this.user,
+      deleting: false,
+    }
+    this.showConfirmDeleteModal = true
+  }
+
   promptDeletePost(post: ApiPost) {
     this.confirmingDelete = {
       kind: 'post',
@@ -694,6 +712,26 @@ class Store {
   onDeleteResult(res: 'yes' | 'no') {
     if (this.confirmingDelete && res === 'yes') {
       this.confirmingDelete.deleting = true
+      if (this.confirmingDelete.kind === 'account') {
+        // i'm firing the caDeleteAccount event here before the api call,
+        // because i'm not trusting amplitude to track this event if we follow
+        // it right with a setUserId(undef) and flush() call, not sure.
+        this.trackEvent(trackingEvents.caDeleteAccount, { })
+        this.apiClient
+          .deleteAccount()
+          .then(() => {
+            this.showConfirmDeleteModal = false
+            setTimeout(() => {
+              this.confirmingDelete = false
+            }, modalTransitionTime)
+            this.amplitude.setUserId(undefined)
+            this.amplitude.flush()
+            if (this.appShellApiRef) {
+              this.appShellApiRef.request('signin')
+            }
+            window.location.assign('/')
+          })
+      }
       if (this.confirmingDelete.kind === 'post') {
         this.apiClient
           .deletePost({

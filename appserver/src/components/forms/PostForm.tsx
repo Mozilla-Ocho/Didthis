@@ -460,7 +460,6 @@ const DateTimeField = observer(({ postStore }: { postStore: PostStore }) => {
               label={postStore.didThisAtFormValue === null ? 'now' : ''}
               value={postStore.didThisAtFormValue}
               onChange={handleChange}
-              open={false}
             />
           )}
         </div>
