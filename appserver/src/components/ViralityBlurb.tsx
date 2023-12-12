@@ -4,7 +4,7 @@ import branding from '@/lib/branding'
 import { trackingEvents } from '@/lib/trackingEvents'
 // import { WaitlistButton } from './WaitlistButton'
 
-const ViralWaitlistBlurb = ({
+const ViralityBlurb = ({
   fromPage,
   targetUserSlug,
 }: {
@@ -34,4 +34,4 @@ const ViralWaitlistBlurb = ({
   )
 }
 
-export default ViralWaitlistBlurb
+export default ViralityBlurb
