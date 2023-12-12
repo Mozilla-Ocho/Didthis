@@ -616,46 +616,26 @@ const UserForm = observer(() => {
             <ListItem LegalDoc href={pathBuilder.legal('pp')} textlabel="Privacy Notice"/>
             <ListItem LegalDoc href={pathBuilder.legal('tos')} textlabel="Terms of service"/>
             <ListItem LegalDoc href={pathBuilder.legal('cp')} textlabel="Content Policies"/>
-            {/* The items below have more robust logic and need more work to be hooked up properly -- appearance is as designed */}
-            <ListItem DeleteAcct href="" textlabel="Delete Account"/>
-            <ListItem LogOut href="" textlabel="Sign Out"/> 
           </div>
 
-          
-          {/* <p className="my-6">
-            <Link intent="internalNav" className="text-sm" href={pathBuilder.legal('pp')}>
-              Privacy notice
-            </Link>
-          </p>
-          <p className="my-6">
-            <Link intent="internalNav" className="text-sm" href={pathBuilder.legal('tos')}>
-              Terms of service
-            </Link>
-          </p>
-          <p className="my-6">
-            <Link intent="internalNav" className="text-sm" href={pathBuilder.legal('cp')}>
-              Content policies
-            </Link>
-          </p> */}
-
-         <br></br>
-          <LogoutButton intent="link" />
-          <hr className="my-6"/>
-          <p className="leading-5">
-            <strong>Account deletion:</strong>{' '}
+          <div className="leading-5 text-sm mt-4">
+            <h5 className="text-sm">Account deletion:</h5>{' '}
             If you would like to delete your account, you can do so here. This
             will permanently destroy all your public and private content, log
             you out on all devices, and cannot be undone &mdash; not even by
             customer support.{' '}
+            <br></br>
             <Button
-              intent="link"
+              intent="secondary"
               onClick={handleDeleteAccount}
-              className="text-md text-red-500"
+              className="text-sm border-red-500 text-red-500 mt-4"
               trackEvent={trackingEvents.bcDeleteAccount}
             >
               Delete account
             </Button>
-          </p>
+          </div>
+          <hr className="my-6"/>
+          <LogoutButton intent="secondary" />
         </div>
 
       )}
