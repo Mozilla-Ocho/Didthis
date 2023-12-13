@@ -26,7 +26,7 @@ import { trackingEvents } from '@/lib/trackingEvents'
 import PageTitle from '../PageTitle'
 import OgMeta from '../OgMeta'
 import RemindersAndAlerts from '../RemindersAndAlerts'
-import ViralWaitlistBlurb from '../ViralWaitlistBlurb'
+import ViralityBlurb from '../ViralityBlurb'
 import useAppShell, { useAppShellTopBar } from '@/lib/appShellContent'
 
 const ProjectPage = observer(
@@ -199,7 +199,7 @@ const ProjectPage = observer(
           </Link>
         </ConfirmationModal>
         <Breadcrumbs crumbs={[{ name: project.title }]} />
-        <ViralWaitlistBlurb
+        <ViralityBlurb
           fromPage="project"
           targetUserSlug={targetUser.publicPageSlug}
         />
