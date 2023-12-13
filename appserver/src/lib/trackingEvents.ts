@@ -7,6 +7,10 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
 
   // pageviews
   // will also contain isAuthed:y|n, slug:string
+  // note the event "waitlistHomeUnauth" is historically and now badly named,
+  // it's logical meaning is views of the homepage that don't contain an invite
+  // code. whereas pvHomeUnauth might have an invite code. so pvHomeUnauth
+  // always fires, and then either validCodeHomeUnauth or waitlistHomeUnauth fires.
   pvHomeUnauth: { eventName: 'pageview', opts: { name: 'homeUnauth', /* topicBucket */ } },
   validCodeHomeUnauth: { eventName: 'validCodeHomeUnauth', opts: { name:
     'validCodeHomeUnauth', /* signupCodeName, topicBucket */ } },
@@ -214,6 +218,10 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   bcDeleteAccount: {
     eventName: 'deleteAccount',
     opts: { name: 'bcDeleteAccount' },
+  },
+  bcTestflightHP: {
+    eventName: 'buttonClick',
+    opts: { name: 'testflightHP' },
   },
 
   // errors

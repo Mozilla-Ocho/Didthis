@@ -39,6 +39,9 @@ const HomeUnauth = () => {
       })
     } else {
       // otherwise, track special event for homepage waitlist funnel
+      // 20231212 note this event is not quite named correctly now, since we're
+      // inviting users to install via testflight now. this event represents
+      // views of the homepage that don't have an invite code.
       store.trackEvent(trackingEvents.waitlistHomeUnauth, { topicBucket })
     }
   })
@@ -106,6 +109,7 @@ const HomeUnauth = () => {
         className={`mt-6 px-6 py-4 text-md `}
         href={branding.testflightURL}
         intent="primary"
+        trackEvent={trackingEvents.bcTestflightHP}
       >
         <strong>Get {branding.productName} for iOS</strong> via Apple Testflight
       </Link>
