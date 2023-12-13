@@ -5,12 +5,12 @@ import LogOutIcon from '@/assets/icons/log-out'
 import UserX from '@/assets/icons/userx'
 import ChevronRight from '@/assets/icons/chevron-right'
 import Info from '@/assets/icons/info'
-import { useStore } from '@/lib/store'
+import Link from './Link'
 
 export default function ListItem({href, LegalDoc, LogOut, DeleteAcct, textlabel, onClick}:any){
         if (LegalDoc) {
         return (      
-            <a className={`${styles.listitem} ${styles.border}`} href={href} onClick={onClick}>
+            <Link className={`${styles.listitem} ${styles.border}`} href={href}>
                 <div className={styles.listitemlabel}>
                     <div className={styles.listitemicon}>
                         <FileTextIcon />
@@ -20,35 +20,35 @@ export default function ListItem({href, LegalDoc, LogOut, DeleteAcct, textlabel,
                 <div className={styles.listitemicon}>
                     <ChevronRight />
                 </div>
-            </a>
+            </Link>
           );
         }
         if (LogOut) {
         return (      
-            <a className={styles.listitem} href={href}>
+            <Link className={styles.listitem} href={href}>
                 <div className={styles.listitemlabel}>
                     <div className={styles.listitemicon}>
                          <LogOutIcon />
                     </div>
                     <div> {textlabel} </div>
                 </div>
-            </a>
+            </Link>
             );
         }
         if (DeleteAcct) {
             return (      
-                <a className={`${styles.listitem} ${styles.border}`} href={href}>
+                <Link className={`${styles.listitem} ${styles.border}`} href={href}>
                     <div className={styles.listitemlabel}>
                         <div className={styles.listitemicon}>
                              <UserX />
                         </div>
                         <div> {textlabel} </div>
                     </div>
-                </a>
+                </Link>
                 );
             }
         return (      
-            <a className={styles.listitem} href={href}>
+            <Link className={styles.listitem} href={href}>
                 <div className={styles.listitemlabel}>
                     <div className={styles.listitemicon}>
                         <Info />
@@ -58,6 +58,6 @@ export default function ListItem({href, LegalDoc, LogOut, DeleteAcct, textlabel,
                 <div className={styles.listitemicon}>
                     <ChevronRight />
                 </div>
-            </a>
+            </Link>
           );
     }

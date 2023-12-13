@@ -8,7 +8,7 @@ import { trackingEvents } from '@/lib/trackingEvents'
 import PageTitle from '../PageTitle'
 import OgMeta from '../OgMeta'
 import RemindersAndAlerts from '../RemindersAndAlerts'
-import ViralWaitlistBlurb from '../ViralWaitlistBlurb'
+import ViralityBlurb from '../ViralityBlurb'
 
 // TODO: rename this to NonAuthUser or something, it's shown even in auth but
 // when looking at someone else's page
@@ -21,7 +21,7 @@ const UnauthUser = observer(
     })
     return (
       <>
-        <ViralWaitlistBlurb fromPage='user' targetUserSlug={targetUser.publicPageSlug} />
+        <ViralityBlurb fromPage='user' targetUserSlug={targetUser.publicPageSlug} />
         <RemindersAndAlerts />
         <PagePad>
           <OgMeta user={targetUser} />
