@@ -4,13 +4,13 @@ import FileTextIcon from '@/assets/icons/file-text'
 import LogOutIcon from '@/assets/icons/log-out'
 import UserX from '@/assets/icons/userx'
 import ChevronRight from '@/assets/icons/chevron-right'
+import Info from '@/assets/icons/info'
+import { useStore } from '@/lib/store'
 
-
-export default function ListItem({href, LegalDoc, LogOut, DeleteAcct, textlabel}:any){
-        
+export default function ListItem({href, LegalDoc, LogOut, DeleteAcct, textlabel, onClick}:any){
         if (LegalDoc) {
         return (      
-            <a className={`${styles.listitem} ${styles.border}`} href={href}>
+            <a className={`${styles.listitem} ${styles.border}`} href={href} onClick={onClick}>
                 <div className={styles.listitemlabel}>
                     <div className={styles.listitemicon}>
                         <FileTextIcon />
@@ -51,8 +51,12 @@ export default function ListItem({href, LegalDoc, LogOut, DeleteAcct, textlabel}
             <a className={styles.listitem} href={href}>
                 <div className={styles.listitemlabel}>
                     <div className={styles.listitemicon}>
+                        <Info />
                     </div>
                     <div> {textlabel} </div>
+                </div>
+                <div className={styles.listitemicon}>
+                    <ChevronRight />
                 </div>
             </a>
           );

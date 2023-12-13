@@ -618,6 +618,7 @@ const UserForm = observer(() => {
             <ListItem LegalDoc href={pathBuilder.legal('pp')} textlabel="Privacy Notice"/>
             <ListItem LegalDoc href={pathBuilder.legal('tos')} textlabel="Terms of service"/>
             <ListItem LegalDoc href={pathBuilder.legal('cp')} textlabel="Content Policies"/>
+            <ListItem className="mx-4" href='' textlabel="App Info" onClick={handleShowAppInfo} />
           </div>
 
           <div className="leading-5 text-sm mt-4">
@@ -638,6 +639,7 @@ const UserForm = observer(() => {
           </div>
           <hr className="my-6"/>
           <LogoutButton intent="secondary" />
+          <br></br>
           <Button className="mx-4" intent="secondary" onClick={handleShowAppInfo}>
             App info
           </Button>
