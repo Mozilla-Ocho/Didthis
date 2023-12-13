@@ -11,7 +11,8 @@ import Icon from './Icon'
 import CloudinaryImage from './CloudinaryImage'
 import PagePad from './PagePad'
 import Spinner from './Spinner'
-import ListItem from './ListItem'
+import ListItemBtn from './ListItemBtn'
+import ListItemLink from './ListItemLink'
 
 export {
   Button,
@@ -27,5 +28,6 @@ export {
   Icon,
   CloudinaryImage,
   PagePad,
-  ListItem,
+  ListItemBtn,
+  ListItemLink,
 }

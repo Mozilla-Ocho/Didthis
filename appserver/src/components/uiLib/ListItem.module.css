@@ -4,6 +4,7 @@
     padding-top:1em;
     padding-bottom:1em;
     min-height:44px;
+    text-decoration:none;
 }
 .border {
     border-bottom:1px solid lightgray;
@@ -19,4 +20,13 @@
 
 :first-of-type .listitemicon {
     margin-right:.5em;
+}
+
+.listitembtn {
+    display:flex;
+    justify-content: space-between;
+    padding-top:1em;
+    padding-bottom:1em;
+    min-height:44px;
+    text-decoration:none;
 }

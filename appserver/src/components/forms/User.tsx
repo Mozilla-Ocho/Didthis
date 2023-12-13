@@ -11,7 +11,7 @@ import { action, makeAutoObservable } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useState } from 'react'
 import ImageUploadWeb, { UploadCallback } from '../ImageUpload'
-import { Button, CloudinaryImage, Icon, Input, Link, Textarea, ListItem } from '../uiLib'
+import { Button, CloudinaryImage, Icon, Input, Link, Textarea, ListItemLink, ListItemBtn } from '../uiLib'
 import useAppShell, { useAppShellTopBar } from '@/lib/appShellContent'
 import ImageUploadAppShell from '../ImageUploadAppShell'
 import { LogoutButton } from '../auth/LogoutButton'
@@ -615,10 +615,10 @@ const UserForm = observer(() => {
       {appShell.inAppWebView && (
         <div className="my-10">
           <div>
-            <ListItem LegalDoc href={pathBuilder.legal('pp')} textlabel="Privacy Notice"/>
-            <ListItem LegalDoc href={pathBuilder.legal('tos')} textlabel="Terms of service"/>
-            <ListItem LegalDoc href={pathBuilder.legal('cp')} textlabel="Content Policies"/>
-            <ListItem className="mx-4" href='' textlabel="App Info" onClick={handleShowAppInfo} />
+            <ListItemLink LegalDoc href={pathBuilder.legal('pp')} textlabel="Privacy Notice"/>
+            <ListItemLink LegalDoc href={pathBuilder.legal('tos')} textlabel="Terms of service"/>
+            <ListItemLink LegalDoc href={pathBuilder.legal('cp')} textlabel="Content Policies"/>
+            <ListItemBtn textlabel="App Info" onClick={handleShowAppInfo} />
           </div>
 
           <div className="leading-5 text-sm mt-4">
@@ -639,10 +639,6 @@ const UserForm = observer(() => {
           </div>
           <hr className="my-6"/>
           <LogoutButton intent="secondary" />
-          <br></br>
-          <Button className="mx-4" intent="secondary" onClick={handleShowAppInfo}>
-            App info
-          </Button>
         </div>
       )}
     </>
