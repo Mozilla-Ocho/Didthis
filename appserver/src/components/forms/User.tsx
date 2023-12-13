@@ -299,7 +299,7 @@ const ImageField = observer(({ formStore }: { formStore: FormStore }) => {
   return (
     <div>
       <h5 className="text-sm mb-4">Profile picture</h5>
-      <div className="flex">
+      <div className="flex items-center">
         <p className="w-[200px]">
           {formStore.imageAssetId ? (
             <CloudinaryImage assetId={formStore.imageAssetId} intent="avatar" />
@@ -308,7 +308,7 @@ const ImageField = observer(({ formStore }: { formStore: FormStore }) => {
               assetId={specialAssetIds.defaultAvatarID} intent="avatar" />
           )}
         </p>
-        <div className="flex flex-col gap-4 mt-4 ml-4 w-full sm:w-auto">
+        <div className="flex flex-col gap-4 ml-4 w-full sm:w-auto">
           <ImageUpload
             intent="avatar"
             onUploadWithUseCallback={onResult}
