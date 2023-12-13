@@ -40,7 +40,9 @@ const uploadOptions: Record<CldImageIntent, UploadApiOptions> = {
 const commonImagePickerOptions = {
   mediaTypes: ImagePicker.MediaTypeOptions.Images,
   allowsMultipleSelection: false,
-  allowsEditing: true,
+  // until we fix the ability to crop for camera images, we are not forcing
+  // aspect ratios on any user content images. don't initiate cropping.
+  allowsEditing: false,
   quality: 1,
   base64: false,
   exif: true,
