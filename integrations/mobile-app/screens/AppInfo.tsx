@@ -171,17 +171,21 @@ function UpdateEntry({ entry }: { entry: Updates.UpdatesLogEntry }) {
 const styles = StyleSheet.create({
   infoTable: {
     padding: 12,
+    textAlign: "left",
     flexDirection: "column",
   },
   infoTableTitle: {
-    textAlign: "center",
-    textDecorationLine: "underline",
-    fontWeight: "bold",
-    fontSize: 24,
-    marginBottom: 6,
+    textAlign: "left",
+    fontWeight: "600",
+    fontSize: 21,
+    marginBottom: 12,
   },
   infoRow: {
     flexDirection: "row",
+    borderBottomWidth: 1,
+    paddingBottom: 4,
+    paddingTop: 4,
+    borderBottomColor: "lightgray"
   },
   infoColumn: {
     flex: 1,
@@ -191,7 +195,7 @@ const styles = StyleSheet.create({
   },
   infoHeader: {
     fontWeight: "bold",
-    textAlign: "right",
+    textAlign: "left",
   },
   updateLog: {
     padding: 12,
