@@ -1,4 +1,5 @@
 import withRemoveiOSNotificationEntitlement from "./config-plugins/withRemoveiOSNotificationEntitlement";
+import { version } from "./package.json"
 
 const updateChannel = process.env.EXPO_CHANNEL || "development";
 
@@ -28,6 +29,7 @@ export default ({ config }) => {
       },
     },
     extra: {
+      packageVersion: version,
       eas: {
         projectId: "d1216396-7cf9-4a41-9543-ce7e31e0529b",
       },

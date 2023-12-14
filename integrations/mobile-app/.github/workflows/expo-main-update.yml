@@ -29,4 +29,6 @@ jobs:
         run: yarn install
 
       - name: 🚀 Create update
+        env:
+          EXPO_PUBLIC_GIT_TAG: ${{ github.sha }}
         run: eas update --auto --non-interactive
