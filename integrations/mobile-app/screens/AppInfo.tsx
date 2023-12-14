@@ -176,8 +176,8 @@ const styles = StyleSheet.create({
   },
   infoTableTitle: {
     textAlign: "left",
-    fontWeight: "600",
-    fontSize: 21,
+    fontWeight: "700",
+    fontSize: 18,
     marginBottom: 12,
   },
   infoRow: {
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   infoHeader: {
-    fontWeight: "bold",
+    fontWeight: "600",
     textAlign: "left",
   },
   updateLog: {
