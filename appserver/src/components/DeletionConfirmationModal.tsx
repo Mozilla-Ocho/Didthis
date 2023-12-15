@@ -2,20 +2,30 @@ import { useStore } from '@/lib/store'
 import { observer } from 'mobx-react-lite'
 import { useCallback } from 'react'
 import { Modal, Button } from './uiLib'
+import { ConfirmingDelete } from '@/lib/store/store'
+
+type ConfirmingDeleteKind = ConfirmingDelete["kind"]
+
+const confirmingKindLabels: Record<ConfirmingDeleteKind, string> = {
+  post: "update",
+  account: "account",
+  project: "project",
+}
 
 const DeletionConfirmationModal = observer(() => {
   const store = useStore()
   const handleClose = useCallback(() => {
     store.onDeleteResult('no')
   }, [store])
-  const kind: string | undefined = store.confirmingDelete
+  const kind: ConfirmingDeleteKind | undefined = store.confirmingDelete
     ? store.confirmingDelete.kind
     : undefined
+  const kindLabel = kind ? confirmingKindLabels[kind] : ''
   return (
     <Modal
       isOpen={store.showConfirmDeleteModal}
       handleClose={handleClose}
-      srTitle={`Are you sure your want to delete this ${kind || ''}?`}
+      srTitle={`Are you sure you want to delete this ${kindLabel}?`}
       renderTitleHeading
     >
       <p>This action cannot be undone.</p>
