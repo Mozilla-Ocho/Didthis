@@ -2,7 +2,6 @@ import Constants from 'expo-constants';
 import * as Updates from "expo-updates";
 
 // see also: https://docs.expo.dev/guides/environment-variables/
-let buildTag = process.env.EXPO_PUBLIC_GIT_TAG || "development";
 let storybookEnabled = process.env.EXPO_PUBLIC_STORYBOOK_ENABLED === "true";
 
 let siteBaseUrl =
@@ -24,7 +23,7 @@ if (Updates.channel === "production") {
 }
 
 const Config = {
-  buildTag,
+  buildTag: Constants.expoConfig.extra?.buildTag,
   packageVersion: Constants.expoConfig.extra?.packageVersion,
   storybookEnabled,
   siteBaseUrl,

@@ -1,7 +1,12 @@
 import withRemoveiOSNotificationEntitlement from "./config-plugins/withRemoveiOSNotificationEntitlement";
-import { version } from "./package.json"
+import { version } from "./package.json";
 
-const updateChannel = process.env.EXPO_CHANNEL || "development";
+const { EXPO_CHANNEL, EXPO_PUBLIC_GIT_TAG, GITHUB_SHA, BITRISE_GIT_CONFIG } =
+  process.env;
+
+const updateChannel = EXPO_CHANNEL || "development";
+const buildTag =
+  GITHUB_SHA || BITRISE_GIT_CONFIG || EXPO_PUBLIC_GIT_TAG || "development";
 
 export default ({ config }) => {
   return {
@@ -30,6 +35,7 @@ export default ({ config }) => {
     },
     extra: {
       packageVersion: version,
+      buildTag,
       eas: {
         projectId: "d1216396-7cf9-4a41-9543-ce7e31e0529b",
       },
