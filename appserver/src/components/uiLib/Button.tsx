@@ -41,6 +41,17 @@ const buttonCVA = cva('button px-4 py-3 rounded text-sm', {
         'active:text-links-active',
         'p-0',
       ],
+      list: [
+        'underline',
+        'text-md',
+        'text-links',
+        // 'hover:text-links-hover',
+        // 'active:text-links-active',
+        'pl-0',
+        'flex',
+        'w-full',
+        'flex',
+      ],
       headerNav: [
         'underline',
         'text',
