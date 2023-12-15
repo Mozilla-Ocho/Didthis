@@ -62,7 +62,6 @@ const HomeAuth = observer(() => {
 
   const ugcUsername = store.user.userSlug || store.user.profile.name
   const title = ugcUsername ? ugcUsername + '’s projects' : 'My projects'
-
   // TODO: this should probably be extracted into its own component?
   if (appShell.inAppWebView) {
     return (
@@ -74,7 +73,7 @@ const HomeAuth = observer(() => {
             <div className="flex flex-row mb-3 mt-3">
               <div className="flex-column">
                 <div className="font-bold text-sm text-black-500">
-                  {ugcUsername}
+                  {store.user.profile.name || 'Unnamed user'}
                 </div>
                 <h3>My projects</h3>
               </div>
