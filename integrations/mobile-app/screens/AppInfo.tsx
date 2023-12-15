@@ -31,7 +31,7 @@ export default function AppInfoScreen({ navigation }: AppInfoScreenProps) {
   const { contentVersionInfo = {} } = api.state || {};
 
   const checkUpdateDisplay = lastUpdateCheckResult
-    ? ` (${lastUpdateCheckResult.manifest.id} - ${lastUpdateCheckResult.manifest.createdAt})`
+    ? ` (${lastUpdateCheckResult.manifest?.id} - ${lastUpdateCheckResult.manifest?.createdAt})`
     : "...";
 
   const forceUpdateDisplay = lastUpdateFetchResult
