@@ -51,7 +51,6 @@ export default function AppInfoScreen({ navigation }: AppInfoScreenProps) {
     try {
       const result = await Updates.fetchUpdateAsync();
       setLastUpdateFetchResult(result);
-      alert(result);
       await Updates.reloadAsync();
     } catch (reason) {
       alert(reason);
