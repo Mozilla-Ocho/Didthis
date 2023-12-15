@@ -638,7 +638,7 @@ const PostForm = observer((props: Props) => {
                 className="text-red-500"
                 onClick={() => store.promptDeletePost(postStore.getApiPost())}
               >
-                Delete post
+                Delete update
               </Button>
             </div>
           )}

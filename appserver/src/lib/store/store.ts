@@ -32,6 +32,11 @@ export const KEY_TRIAL_ACCOUNT_CLAIMED = 'trialAccountClaimed'
 export type ApiClient = typeof apiClientBase
 export type AmplitudeClient = typeof amplitudeBase
 
+export type ConfirmingDelete =
+  | { kind: 'account'; thing: ApiUser; deleting: boolean }
+  | { kind: 'post'; thing: ApiPost; deleting: boolean }
+  | { kind: 'project'; thing: ApiProject; deleting: boolean }
+
 type UserListenerFn = (user: ApiUser) => void
 
 class Store {
@@ -46,11 +51,7 @@ class Store {
   firebaseModalOpen = false
   loginErrorMode: LoginErrorMode = false
   fullpageLoading = false // used when signing in
-  confirmingDelete:
-    | false
-    | { kind: 'account'; thing: ApiUser; deleting: boolean }
-    | { kind: 'post'; thing: ApiPost; deleting: boolean }
-    | { kind: 'project'; thing: ApiProject; deleting: boolean } = false
+  confirmingDelete: ConfirmingDelete | false = false
   showConfirmDeleteModal = false
   router: NextRouter
   debugObjId = (Math.random() + '').replace('0.', '')
