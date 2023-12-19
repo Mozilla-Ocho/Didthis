@@ -70,9 +70,8 @@ const AppFooter = observer(
           href="https://future.mozilla.org"
           trackEvent={trackingEvents.bcOchoIdea}
         >
-          Mozilla Ocho
-        </Link>{' '}
-        Idea
+          Mozilla Innovation Project
+        </Link>
       </p>
     )
 
