@@ -11,13 +11,24 @@ import { action, makeAutoObservable } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useCallback, useState } from 'react'
 import ImageUploadWeb, { UploadCallback } from '../ImageUpload'
-import { Button, CloudinaryImage, Icon, Input, Link, Textarea, ListItemLink, ListItemBtn } from '../uiLib'
+import {
+  Button,
+  CloudinaryImage,
+  Icon,
+  Input,
+  Link,
+  Textarea,
+  ListItemLink,
+  ListItemBtn,
+} from '../uiLib'
 import useAppShell, { useAppShellTopBar } from '@/lib/appShellContent'
 import ImageUploadAppShell from '../ImageUploadAppShell'
 import { LogoutButton } from '../auth/LogoutButton'
 import pathBuilder from '@/lib/pathBuilder'
+import DiscordAccount from '../connectedAccounts/Discord'
+import { useRouter } from 'next/router'
 
-class FormStore {
+export class FormStore {
   name: string
   nameTouched = false
   bio: string
@@ -34,9 +45,12 @@ class FormStore {
   reddit: string
   instagram: string
   spinning = false
+  discordShareByDefault = false
   apiClient: ApiClient
+  user: ApiUser
 
   constructor(user: ApiUser, apiClient: ApiClient) {
+    this.user = user
     this.apiClient = apiClient
     this.name = user.profile.name || ''
     if (this.name) this.nameTouched = true
@@ -50,6 +64,8 @@ class FormStore {
     if (this.userSlug) this.slugTouched = true
     this.imageAssetId = user.profile.imageAssetId || ''
     this.imageMeta = user.profile.imageMeta
+    this.discordShareByDefault =
+      false !== user.profile.connectedAccounts?.discord?.shareByDefault
     this.doSlugCheckDebounced = debounce(this._doSlugCheck, 500, {
       leading: false,
     })
@@ -95,6 +111,9 @@ class FormStore {
   setSpinning(x: boolean) {
     this.spinning = x
   }
+  setDiscordShareByDefault(x: boolean) {
+    this.discordShareByDefault = x
+  }
 
   setUserSlug(slug: string) {
     this.userSlug = slug
@@ -112,6 +131,18 @@ class FormStore {
       const parsed = c && profileUtils.getParsedUrl(c)
       if (parsed) return parsed.toString()
     }
+
+    let { connectedAccounts } = this.user.profile;
+    if (connectedAccounts?.discord) {
+      connectedAccounts = {
+        ...connectedAccounts,
+        discord: {
+          ...connectedAccounts.discord,
+          shareByDefault: this.discordShareByDefault
+        }
+      }
+    }
+
     return {
       name: contentOrUndef(this.name),
       bio: contentOrUndef(this.bio),
@@ -125,6 +156,7 @@ class FormStore {
         reddit: normUrl(this.reddit),
         instagram: normUrl(this.instagram),
       },
+      connectedAccounts
     }
   }
 
@@ -305,7 +337,9 @@ const ImageField = observer(({ formStore }: { formStore: FormStore }) => {
             <CloudinaryImage assetId={formStore.imageAssetId} intent="avatar" />
           ) : (
             <CloudinaryImage
-              assetId={specialAssetIds.defaultAvatarID} intent="avatar" />
+              assetId={specialAssetIds.defaultAvatarID}
+              intent="avatar"
+            />
           )}
         </p>
         <div className="flex flex-col gap-4 ml-4 w-full sm:w-auto">
@@ -334,7 +368,8 @@ const ImageField = observer(({ formStore }: { formStore: FormStore }) => {
 
 const UserForm = observer(() => {
   const store = useStore()
-  const appShell = useAppShell();
+  const router = useRouter()
+  const appShell = useAppShell()
   const user = store.user
   if (!user) {
     return <></>
@@ -353,13 +388,17 @@ const UserForm = observer(() => {
     e.preventDefault()
     performSubmit()
   }
-  const handleCancel = () => store.goBack()
+  const handleCancel = () => {
+    // Navigate directly to user home, because store.goBack() may take us
+    // back to a connected account page (e.g. Discord OAuth)
+    router.push(pathBuilder.user(user.systemSlug))
+  }
 
   // have to pass the appshell api reference so that it can send the reset sign
   // in signal to the app shell.
   const handleDeleteAccount = () => store.promptDeleteAccount(appShell.api)
 
-  const handleShowAppInfo = () => appShell.api.request("showAppInfo");
+  const handleShowAppInfo = () => appShell.api.request('showAppInfo')
 
   useAppShellTopBar({
     show: true,
@@ -418,10 +457,8 @@ const UserForm = observer(() => {
         method="POST"
         className={'flex flex-col gap-8 ' + (user.isTrial ? 'opacity-60' : '')}
       >
-
-        {/* Avatar */}        
+        {/* Avatar */}
         {!user.isTrial && <ImageField formStore={formStore} />}
-
 
         {/* Display Name */}
         <div>
@@ -473,7 +510,7 @@ const UserForm = observer(() => {
             />
           </label>
         </div>
-     
+
         {/* Short Bio */}
         <div>
           <label htmlFor="bio">
@@ -489,6 +526,18 @@ const UserForm = observer(() => {
               style={{ minHeight: 123 }}
             />
           </label>
+        </div>
+
+        {/* Connected Accounts */}
+        <div>
+          <h5 className="text-sm" id="connect-discord-account">
+            Discord
+          </h5>
+          <DiscordAccount
+            user={user}
+            shareByDefault={formStore.discordShareByDefault}
+            setShareByDefault={v => formStore.setDiscordShareByDefault(v)}
+          />
         </div>
 
         {/* Social Links */}
@@ -584,6 +633,7 @@ const UserForm = observer(() => {
             />
           </label>
         </div>
+
         {!appShell.inAppWebView && (
           <>
             <div className="flex flex-col sm:flex-row gap-4">
@@ -609,24 +659,33 @@ const UserForm = observer(() => {
         )}
       </form>
 
-        
-   
-      {/* Legal + Account actions */}      
+      {/* Legal + Account actions */}
       {appShell.inAppWebView && (
         <div className="my-10">
           <div>
-            <ListItemLink LegalDoc href={pathBuilder.legal('pp')} textlabel="Privacy Notice"/>
-            <ListItemLink LegalDoc href={pathBuilder.legal('tos')} textlabel="Terms of service"/>
-            <ListItemLink LegalDoc href={pathBuilder.legal('cp')} textlabel="Content Policies"/>
+            <ListItemLink
+              LegalDoc
+              href={pathBuilder.legal('pp')}
+              textlabel="Privacy Notice"
+            />
+            <ListItemLink
+              LegalDoc
+              href={pathBuilder.legal('tos')}
+              textlabel="Terms of service"
+            />
+            <ListItemLink
+              LegalDoc
+              href={pathBuilder.legal('cp')}
+              textlabel="Content Policies"
+            />
             <ListItemBtn textlabel="App Info" onClick={handleShowAppInfo} />
           </div>
 
           <div className="leading-5 text-sm mt-4">
-            <h5 className="text-sm">Account deletion:</h5>{' '}
-            If you would like to delete your account, you can do so here. This
-            will permanently destroy all your public and private content, log
-            you out on all devices, and cannot be undone &mdash; not even by
-            customer support.{' '}
+            <h5 className="text-sm">Account deletion:</h5> If you would like to
+            delete your account, you can do so here. This will permanently
+            destroy all your public and private content, log you out on all
+            devices, and cannot be undone &mdash; not even by customer support.{' '}
             <br></br>
             <Button
               intent="secondary"
@@ -637,7 +696,7 @@ const UserForm = observer(() => {
               Delete account
             </Button>
           </div>
-          <hr className="my-6"/>
+          <hr className="my-6" />
           <LogoutButton intent="secondary" />
         </div>
       )}

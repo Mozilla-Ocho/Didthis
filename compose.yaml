@@ -18,11 +18,36 @@ services:
       DATABASE_URL: "postgresql://devuser:devdummypass@pgserver:5432/devdb"
       # XXX_PORTING add this to boilerplate docs for firebase, vars list etc
       GOOGLE_APPLICATION_CREDENTIALS: '/appserver/.firebase-dev-credentials.json'
+      DISCORD_BOT_GRAPHQL_ACCESS_TOKEN: discord-bot:8675309
     command: "yarn dev"
     ports:
       - "3000:3000"
+    healthcheck:
+      test: ["CMD-SHELL", "curl http://appserver:3000/"]
+      interval: 4s
+      timeout: 4s
+      retries: 20
     depends_on:
       pgserver:
+        condition: service_healthy
+
+  discordbot:
+    build:
+      dockerfile: dockerfiles/discordbot
+      target: discordbot_dev
+    command: "yarn dev"
+    networks:
+      - allhosts
+    volumes:
+      - ./integrations/discord:/app
+    working_dir: /app
+    env_file: ./integrations/discord/.env
+    environment:
+      LOG_LEVEL: debug
+      DISCORD_BOT_DIDTHIS_API_URL: http://appserver:3000/api/graphql
+      DISCORD_BOT_GRAPHQL_ACCESS_TOKEN: discord-bot:8675309
+    depends_on:
+      appserver:
         condition: service_healthy
 
   storybook:

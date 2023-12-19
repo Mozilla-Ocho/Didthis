@@ -28,6 +28,7 @@ class ProjectStore {
   imageAssetId: string
   imageMeta: CldImageMetaPrivate | CldImageMetaPublic | undefined
   currentStatus: ApiProjectStatus
+  shareByDefault: boolean
   spinning = false
 
   constructor(
@@ -44,6 +45,9 @@ class ProjectStore {
       this.projectId = r.project.id
       this.imageAssetId = r.project.imageAssetId || ''
       this.currentStatus = r.project.currentStatus
+
+      const defaultShareByDefault = profile.connectedAccounts?.discord?.shareByDefault;
+      this.shareByDefault = false !== defaultShareByDefault
     } else if (project) {
       this.title = project.title
       this.titleTouched = true
@@ -53,6 +57,7 @@ class ProjectStore {
       this.imageAssetId = project.imageAssetId || ''
       this.imageMeta = project.imageMeta
       this.currentStatus = project.currentStatus
+      this.shareByDefault = false !== project.shareByDefault
     } else {
       throw new Error('project is required in constructor if mode != new')
     }
@@ -70,6 +75,7 @@ class ProjectStore {
       description: this.description.trim(),
       imageAssetId: this.imageAssetId || undefined,
       imageMeta: this.imageMeta,
+      shareByDefault: this.shareByDefault,
       posts: {}, // the project api ignores the posts object
     }
   }
@@ -86,6 +92,9 @@ class ProjectStore {
   }
   setScope(x: ApiScope) {
     this.scope = x
+  }
+  setShareByDefault(x: boolean) {
+    this.shareByDefault = x
   }
   setImageAssetId(
     assetId: string,
@@ -153,8 +162,10 @@ const ProjectForm = observer((props: Props) => {
     projectStore.setDescription(e.target.value)
   }
   const setVisibility = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('checkbox', e)
     projectStore.setScope(e.target.checked ? 'public' : 'private')
+  }
+  const setShareByDefault = (e: React.ChangeEvent<HTMLInputElement>) => {
+    projectStore.setShareByDefault(e.target.checked)
   }
   const setStatus = (e: React.ChangeEvent<HTMLSelectElement>) => {
     projectStore.setCurrentStatus(e.target.value as ApiProjectStatus)
@@ -309,6 +320,33 @@ const ProjectForm = observer((props: Props) => {
             </p>
           )}
         </div>
+        {projectStore.scope !== 'private' && (
+          <div>
+            <label className="inline-flex flex-row items-center cursor-pointer">
+              <span className="mr-3 text-sm text-form-labels inline-block cursor-pointer">
+                Automatically share updates by default:
+              </span>
+              <span className="relative inline-flex items-center inline-block">
+                <input
+                  type="checkbox"
+                  id="shareByDefault"
+                  value="private"
+                  className="sr-only peer"
+                  disabled={user.isTrial}
+                  checked={projectStore.shareByDefault}
+                  onChange={setShareByDefault}
+                />
+                {/* https://flowbite.com/docs/forms/toggle/ */}
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-form-toggle-bg peer-disabled:opacity-75"></div>
+              </span>
+            </label>
+            <p className="text-sm my-4">
+              You can decide on a per-update basis to automatically share
+              updates to connected accounts, with this setting as the default
+              choice.
+            </p>
+          </div>
+        )}
         <div className="flex flex-col sm:flex-row gap-4 flex-wrap">
           {!appShell.inAppWebView && (
             <>

@@ -113,6 +113,7 @@ type ApiPost = {
   urlMeta?: ApiUrlMeta
   imageAssetId?: string
   imageMeta?: CldImageMetaPrivate | CldImageMetaPublic
+  autoShare?: boolean
 }
 
 type ApiProject = {
@@ -126,6 +127,7 @@ type ApiProject = {
   description?: string
   imageAssetId?: string
   imageMeta?: CldImageMetaPrivate | CldImageMetaPublic
+  shareByDefault?: boolean
 }
 
 type ApiSocialUrls = {
@@ -133,6 +135,23 @@ type ApiSocialUrls = {
   reddit?: string,
   facebook?: string,
   instagram?: string,
+}
+
+type ApiConnectedAccounts = {
+  discord?: DiscordAccount
+}
+
+type DiscordAccount = {
+  id: string
+  username: string
+  email?: string
+  avatar: string
+  discriminator: string
+  globalName: string
+  accessToken?: string
+  refreshToken?: string
+  expiresIn?: number
+  shareByDefault?: boolean
 }
 
 type ApiProfile = {
@@ -143,6 +162,7 @@ type ApiProfile = {
   imageMeta?: CldImageMetaPrivate | CldImageMetaPublic
   updatedAt: number // updated when user account details are modified (not projects)
   projects: { [key: string]: ApiProject }
+  connectedAccounts?: ApiConnectedAccounts
 }
 
 type PostMediaType = 'text' | 'image' | 'link'

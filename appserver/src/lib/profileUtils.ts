@@ -73,6 +73,20 @@ const privacyFilteredCopy = (original: ApiProfile): ApiProfile => {
       filtered.projects[proj.id] = proj
     }
   })
+  filtered.connectedAccounts = {}
+  if (original.connectedAccounts?.discord) {
+    const { id, username, email, avatar, discriminator, globalName } =
+      original.connectedAccounts?.discord
+    filtered.connectedAccounts.discord = {
+      id,
+      username,
+      email,
+      avatar,
+      discriminator,
+      globalName,
+      // Omit sensitive OAuth token data
+    }
+  }
   return filtered
 }
 
@@ -167,6 +181,7 @@ const mkNewProject = (
     currentStatus: 'active',
     scope: 'private',
     posts: {},
+    shareByDefault: true,
   }
   profile.projects[project.id] = project
   return { profile, projectId, project }
@@ -232,7 +247,9 @@ const hasAllFields = (a: ApiProfile) => {
   return !!(a.imageAssetId && a.bio && a.name && hasAnySocialUrls(a))
 }
 
-const mostRecentPublicProjectImageAssetId = (p: ApiProfile) : string | undefined=> {
+const mostRecentPublicProjectImageAssetId = (
+  p: ApiProfile
+): string | undefined => {
   const projects = Object.values(p.projects)
   projects.sort((a, b) => b.createdAt - a.createdAt)
   for (const proj of projects) {

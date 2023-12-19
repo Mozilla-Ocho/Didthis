@@ -16,6 +16,7 @@ variable "vpc_remote_bucket" { type = string }
 variable "vpc_remote_name" { type = string }
 variable "lb_ssl_domain_names" { type = list(string) }
 variable "lb_cert_domain_change_increment_outage" { type = number }
+variable "graphql_api_url" { type = string }
 
 variable "image_tag" {
   # this var is not defined in the vars file, it's passed in at runtime via the
@@ -138,6 +139,25 @@ module "appserver_main" {
     module.gcp_apis,
     module.docker_repo[0],
     module.db[0]
+  ]
+}
+
+module "discordbot_main" {
+  count = var.flag_destroy ? 0 : 1
+  source = "./modules/discordbot"
+  app_name  = var.app_name
+  env_name = var.env_name
+  svc_name = "discordbot"
+  image_basename = "discordbot"
+  image_tag = var.image_tag
+  image_path_with_slash = module.docker_repo[0].image_path_with_slash
+  region = var.region
+  vpc_id = local.vpc_id
+  vpc_access_connector_id = local.vpc_access_connector_id
+  vpc_access_connector_name = local.vpc_access_connector_name
+  graphql_api_url = var.graphql_api_url
+  depends_on = [
+    module.appserver_main[0],
   ]
 }
 

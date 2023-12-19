@@ -31,6 +31,7 @@ export default async function handler(
   profile.imageAssetId = inputProfile.imageAssetId
   profile.imageMeta = inputProfile.imageMeta
   profile.socialUrls = inputProfile.socialUrls
+  profile.connectedAccounts = inputProfile.connectedAccounts
   profile.updatedAt = millis
   const inputUserSlug = (req.body.userSlug || '').trim()
   let assignUserSlug = user.userSlug

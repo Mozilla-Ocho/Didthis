@@ -1,0 +1,120 @@
+type Query {
+  """
+  Fetch a user by id or slug
+  """
+  user(id: String, slug: String): User
+
+  """
+  Fetch at most limit public updates since the given datetime
+  """
+  publicUpdates(
+    since: DateTime!
+    until: DateTime
+    limit: Int
+    requireDiscordAccount: Boolean
+    requireAutoShare: Boolean
+  ): [Update]
+}
+
+type User {
+  id: String!
+  slug: String
+  url: URL!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  profile: Profile!
+}
+
+type Profile {
+  name: String
+  bio: String
+  updatedAt: Int
+  imageSrc: URL
+  imageMeta: ImageMeta
+  socialUrls: SocialUrls
+  projects: [Project]
+  connectedAccounts: ConnectedAccounts
+}
+
+type ConnectedAccounts {
+  discord: DiscordAccount
+}
+
+type DiscordAccount {
+  id: String!
+  username: String!
+  email: String
+  avatar: String!
+  discriminator: String!
+  globalName: String!
+}
+
+type Project {
+  id: String!
+  url: URL!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  title: String
+  scope: PrivacyScope
+  currentStatus: ProjectStatus
+  description: String
+  imageAssetId: String
+  imageSrc: URL
+  imageMeta: ImageMeta
+  updates: [Update]
+}
+
+type Update {
+  id: String!
+  type: UpdateType!
+  url: URL!
+  user: User!
+  project: Project!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  didThisAt: DateTime
+  scope: String!
+  description: String
+  linkUrl: URL
+  linkMeta: LinkMeta
+  imageSrc: URL
+  imageMeta: ImageMeta
+  autoShare: Boolean
+}
+
+type SocialUrls {
+  twitter: String
+  reddit: String
+  facebook: String
+  instagram: String
+}
+
+type ImageMeta {
+  width: Int!
+  height: Int!
+  format: String!
+}
+
+type LinkMeta {
+  host: String
+  title: String
+  imageUrl: String
+  imageMeta: ImageMeta
+}
+
+enum UpdateType {
+  text
+  image
+  link
+}
+
+enum PrivacyScope {
+  public
+  private
+}
+
+enum ProjectStatus {
+  active
+  complete
+  paused
+}

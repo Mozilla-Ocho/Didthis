@@ -831,6 +831,13 @@ class Store {
       // return wrapper.payload
     })
   }
+
+  async disconnectDiscord() {
+    if (!this.user) throw new Error('must be authed')
+    return this.apiClient.disconnectDiscord().then(wrapper => {
+      this.setUser(wrapper.payload)
+    })
+  }
 }
 
 export default Store
