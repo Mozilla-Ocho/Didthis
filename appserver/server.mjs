@@ -4,6 +4,7 @@ import next from 'next'
 import Cookies from 'cookies'
 import crypto from 'crypto'
 import proxy from 'express-http-proxy'
+import fs from 'fs'
 
 const app = next({ dev: process.env.NODE_ENV !== 'production' })
 const handle = app.getRequestHandler()
@@ -52,14 +53,24 @@ app
             bodyContent instanceof Buffer
               ? bodyContent.toString('utf-8')
               : bodyContent
-          console.log('amplitudeProxy body content:', json)
-          // let parsed
-          // try {
-          //   parsed = JSON.parse(json)
-          // } catch(e) {
-          //   parsed = json
-          // }
-          // console.log('amplitudeProxy body content:', JSON.stringify(parsed,null,2));
+          if (process.env.NODE_ENV === 'development') {
+            try {
+              const parsed = JSON.parse(json)
+              let evtLog = ''
+              parsed["events"].map(e => {
+                evtLog = evtLog + [
+                  e.time,
+                  e.user_id || '-',
+                  e.event_type,
+                  JSON.stringify(e.event_properties || {})
+                ].join(' ') + '\n'
+              })
+              console.log(`amplitude events:\n${evtLog}`)
+              fs.appendFile('dev-tracking-events-log', evtLog, () =>{})
+            } catch(e) {
+              // console.log(e)
+            }
+          }
           return bodyContent
         },
       })
