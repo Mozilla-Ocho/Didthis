@@ -172,6 +172,7 @@ type EventSpec = {
     loseTrialWork?: YorN,
     numProjects?: number,
     numPosts?: number,
+    fromNativeTopNav?: YorN,
   }
 }
 
