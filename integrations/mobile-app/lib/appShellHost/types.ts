@@ -12,7 +12,14 @@ export type AppMessages = {
   topNavRightPress: { label: string };
   topNavSharePress: { label: string };
   topNavEditPress: { label: string };
+  trackNativeEvent: { event: NativeEventNames };
 };
+
+// DRY_76795 native event types handling
+export type NativeEventNames =
+  'bcNtvDrawerOpen' |
+  'bcNtvDrawerCreateProject' |
+  'bcNtvDrawerProject';
 
 export type AppRequestMethods = {
   ping: {
