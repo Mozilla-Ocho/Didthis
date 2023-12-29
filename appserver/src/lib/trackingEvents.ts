@@ -3,7 +3,10 @@
 // so i compose the final object by adding key props down below.
 type KeylessEventSpec = Omit<EventSpec, 'key'>
 const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
-  // note most events will include an isAuthed:y|n parameter by default.
+  // note most events will include:
+  // - isAuthed:y|n
+  // - appPlatform:ios|web
+  // - screenSize:xs...2xl
 
   // pageviews
   // will also contain isAuthed:y|n, slug:string

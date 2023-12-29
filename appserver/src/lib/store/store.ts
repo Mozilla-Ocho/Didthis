@@ -514,6 +514,31 @@ class Store {
     }
   }
 
+  isNativeIOS() {
+    if (typeof window !== 'undefined') {
+      // @ts-ignore: ReactNativeWebView is injected by react native and isn't a known prop of window object by tsserver.
+      if (window.ReactNativeWebView) {
+        // we're in react native. assume this is iOS.
+        // TODO: detect android vs iOS when we do android.
+        return true
+      }
+    }
+    return false
+  }
+
+  screenSize() {
+    // https://tailwindcss.com/docs/responsive-design
+    if (typeof window !== 'undefined') {
+      if (window.innerWidth < 640) { return 'xs' }
+      if (window.innerWidth < 768) { return 'sm' }
+      if (window.innerWidth < 1024) { return 'md' }
+      if (window.innerWidth < 1280) { return 'lg' }
+      if (window.innerWidth < 1536) { return 'xl' }
+      return '2xl'
+    }
+    return ''
+  }
+
   setAmplitudeUserAttrs() {
     if (!this.user) return false
     const identifyOps = new this.amplitude.Identify()
@@ -526,6 +551,7 @@ class Store {
     log.tracking('identify() slugs')
     identifyOps.setOnce('systemSlug', this.user.systemSlug)
     if (this.user.userSlug) identifyOps.set('userSlug', this.user.userSlug)
+    if (this.isNativeIOS()) identifyOps.set('hasIOSLogin','1')
     this.amplitude.identify(identifyOps)
   }
 
@@ -563,6 +589,8 @@ class Store {
       fullEvent.opts.slug = this.user.publicPageSlug
     }
     fullEvent.opts.isTrial = (this.user && this.user.isTrial) ? 'y' : 'n'
+    fullEvent.opts.appPlatform = this.isNativeIOS() ? 'ios' : 'web'
+    fullEvent.opts.screenSize = this.screenSize()
     log.tracking(
       fullEvent.eventName,
       fullEvent.opts.name,
