@@ -516,7 +516,8 @@ class Store {
 
   isNativeIOS() {
     if (typeof window !== 'undefined') {
-      // @ts-ignore: ReactNativeWebView is injected by react native and isn't a known prop of window object by tsserver.
+      /* eslint-disable @typescript-eslint/ban-ts-comment */
+      // @ts-ignore ReactNativeWebView is injected by react native and isn't a known prop of window object by tsserver.
       if (window.ReactNativeWebView) {
         // we're in react native. assume this is iOS.
         // TODO: detect android vs iOS when we do android.
