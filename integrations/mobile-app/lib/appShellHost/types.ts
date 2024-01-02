@@ -17,9 +17,9 @@ export type AppMessages = {
 
 // DRY_76795 native event types handling
 export type NativeEventNames =
-  'bcNtvDrawerOpen' |
-  'bcNtvDrawerCreateProject' |
-  'bcNtvDrawerProject';
+  'bcNativeDrawerOpen' |
+  'bcNativeDrawerCreateProject' |
+  'bcNativeDrawerProject';
 
 export type AppRequestMethods = {
   ping: {
