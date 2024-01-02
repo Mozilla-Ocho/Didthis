@@ -11,7 +11,14 @@ export type AppMessages = {
   topNavRightPress: { label: string };
   topNavSharePress: { label: string };
   topNavEditPress: { label: string };
+  trackNativeEvent: { event: NativeEventNames };
 };
+
+// DRY_76795 native event types handling
+export type NativeEventNames =
+  'bcNativeDrawerOpen' |
+  'bcNativeDrawerCreateProject' |
+  'bcNativeDrawerProject';
 
 export type AppRequestMethods = {
   ping: {
@@ -151,3 +158,4 @@ export type JSONValue =
 export interface JSONObject {
   [k: string]: JSONValue;
 }
+

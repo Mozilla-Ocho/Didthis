@@ -3,7 +3,10 @@
 // so i compose the final object by adding key props down below.
 type KeylessEventSpec = Omit<EventSpec, 'key'>
 const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
-  // note most events will include an isAuthed:y|n parameter by default.
+  // note most events will include:
+  // - isAuthed:y|n
+  // - appPlatform:ios|web
+  // - screenSize:xs...2xl
 
   // pageviews
   // will also contain isAuthed:y|n, slug:string
@@ -157,11 +160,11 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   },
   bcSharePublicProject: {
     eventName: 'buttonClick',
-    opts: { name: 'sharePublicProject' },
+    opts: { name: 'sharePublicProject' }, /* fromNativeTopNav */
   },
   bcSharePrivateProject: {
     eventName: 'buttonClick',
-    opts: { name: 'sharePrivateProject' },
+    opts: { name: 'sharePrivateProject' }, /* fromNativeTopNav */
   },
   bcAddPost: {
     eventName: 'buttonClick',
@@ -177,11 +180,11 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   },
   bcEditProject: {
     eventName: 'buttonClick',
-    opts: { name: 'editProject' },
+    opts: { name: 'editProject' }, /* fromNativeTopNav */
   },
   bcEditPost: {
     eventName: 'buttonClick',
-    opts: { name: 'bcEditPost' },
+    opts: { name: 'bcEditPost' }, /* fromNativeTopNav */
   },
   bcDiscord: {
     eventName: 'buttonClick',
@@ -222,6 +225,20 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   bcTestflightHP: {
     eventName: 'buttonClick',
     opts: { name: 'testflightHP' },
+  },
+
+  // DRY_76795 native event types handling
+  bcNativeDrawerOpen: {
+    eventName: 'buttonClick',
+    opts: { name: 'nativeDrawerOpen' },
+  },
+  bcNativeDrawerCreateProject: {
+    eventName: 'buttonClick',
+    opts: { name: 'nativeDrawerCreateProject' },
+  },
+  bcNativeDrawerProject: {
+    eventName: 'buttonClick',
+    opts: { name: 'nativeDrawerProject' },
   },
 
   // errors

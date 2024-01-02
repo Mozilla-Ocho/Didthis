@@ -6,6 +6,7 @@ import { useRouter } from 'next/router'
 import { useAppShellListener } from './messaging'
 import { useStore } from '../store'
 import pathBuilder from '../pathBuilder'
+import { trackingEvents } from '@/lib/trackingEvents'
 
 const { publicRuntimeConfig } = getConfig()
 const SERVER_VERSION = publicRuntimeConfig?.version
@@ -87,6 +88,19 @@ export default function AppShellContextProvider({
       router.events.off('routeChangeComplete', handleRouteChangeComplete)
     }
   }, [api, router, store, state.appReady])
+
+  useAppShellListener('trackNativeEvent', ({ event }) => {
+    // DRY_76795 native event types handling
+    if (event === 'bcNativeDrawerOpen') {
+      store.trackEvent(trackingEvents.bcNativeDrawerOpen)
+    }
+    if (event === 'bcNativeDrawerCreateProject') {
+      store.trackEvent(trackingEvents.bcNativeDrawerCreateProject)
+    }
+    if (event === 'bcNativeDrawerProject') {
+      store.trackEvent(trackingEvents.bcNativeDrawerProject)
+    }
+  })
 
   useAppShellListener('navigateToPath', ({ path }) => router.push(path))
 

@@ -75,12 +75,12 @@ const ProjectPage = observer(
     const shareUrl = pathBuilder.makeFullUrl(
       pathBuilder.project(targetUser.publicPageSlug, project.id)
     )
-    const handleSharePriv = () => {
-      store.trackEvent(trackingEvents.bcSharePrivateProject)
+    const handleSharePriv = (fromNativeTopNav?: boolean) => {
+      store.trackEvent(trackingEvents.bcSharePrivateProject, {fromNativeTopNav:fromNativeTopNav ? 'y' : 'n'})
       setSharePrivModalOpen(true)
     }
-    const handleShare = () => {
-      store.trackEvent(trackingEvents.bcSharePublicProject)
+    const handleShare = (fromNativeTopNav?: boolean) => {
+      store.trackEvent(trackingEvents.bcSharePublicProject, {fromNativeTopNav:fromNativeTopNav ? 'y' : 'n'})
       copyToClipboard(shareUrl)
       setShareModalOpen(true)
     }
@@ -92,13 +92,17 @@ const ProjectPage = observer(
       e.target.select()
     }
 
-    const handleConditionalShare = () => {
+    const handleConditionalShare = (fromNativeTopNav: boolean) => {
+      // the "conditional" part is whether it's currently public or private.
+      // the "fromNativeTopNav" arg is true when this is fired from a handler of the
+      // top nav native app event message and is used on tracking events.
       if (isPrivate) {
-        handleSharePriv()
+        handleSharePriv(fromNativeTopNav)
       } else {
         if (!appShell.appReady) {
-          handleShare()
+          handleShare(fromNativeTopNav)
         } else {
+          store.trackEvent(trackingEvents.bcSharePublicProject, {fromNativeTopNav:fromNativeTopNav ? 'y' : 'n'})
           appShell.api.request('shareProjectUrl', {
             title: project.title,
             url: window.location.href,
@@ -109,9 +113,9 @@ const ProjectPage = observer(
 
     const handleBack = () => router.push("/")
 
-    const handleEdit = () => {
+    const handleEditFromNativeTopNav = () => {
       if (!store.user) return;
-      store.trackEvent(trackingEvents.bcEditProject);
+      store.trackEvent(trackingEvents.bcEditProject, {fromNativeTopNav:'y'});
       router.push(pathBuilder.projectEdit(
         store.user.systemSlug,
         project.id
@@ -125,8 +129,8 @@ const ProjectPage = observer(
       showShare: true,
       showEdit: true,
       onLeftPress: handleBack,
-      onSharePress: handleConditionalShare,
-      onEditPress: handleEdit,
+      onSharePress: () => handleConditionalShare(true),
+      onEditPress: handleEditFromNativeTopNav,
     })
 
     // the cover image moves position in the native app and gets a gradient at
@@ -251,7 +255,7 @@ const ProjectPage = observer(
                   id="buttonShare"
                   className="w-full sm:w-auto"
                   intent="secondary"
-                  onClick={handleConditionalShare}
+                  onClick={() => handleConditionalShare(false)}
                 >
                   Share project
                 </Button>
@@ -271,6 +275,7 @@ const ProjectPage = observer(
                         project.id
                       )}
                       trackEvent={trackingEvents.bcEditProject}
+                      trackEventOpts={{fromNativeTopNav:'n'}}
                     >
                       Edit project
                     </Link>
@@ -279,7 +284,7 @@ const ProjectPage = observer(
                   id="buttonShare"
                   className="w-full sm:w-auto"
                   intent="secondary"
-                  onClick={handleConditionalShare}
+                  onClick={() => handleConditionalShare(false)}
                 >
                   Share project
                 </Button>

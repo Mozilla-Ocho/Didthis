@@ -155,6 +155,8 @@ type EventSpec = {
   opts: {
     name?: string
     isAuthed?: YorN
+    appPlatform?: 'ios' | 'web'
+    screenSize?: '' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
     slug?: string
     signupCodeName?: string
     id?: string
@@ -170,6 +172,7 @@ type EventSpec = {
     loseTrialWork?: YorN,
     numProjects?: number,
     numPosts?: number,
+    fromNativeTopNav?: YorN,
   }
 }
 

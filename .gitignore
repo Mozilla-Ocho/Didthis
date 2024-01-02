@@ -16,3 +16,6 @@ node_modules
 storybook-static
 appserver/env.development.local
 appserver/firebase-dev-credentials.json
+
+# ignore direct amplitude event logging in dev
+appserver/dev-tracking-events-log
