@@ -34,6 +34,7 @@ function CreateProjectSquare({ requestClose }: { requestClose: VoidFn }) {
   const onCreateProject = () => {
     const path =
       "/user/" + encodeURIComponent(state.user.publicPageSlug) + "/project/new";
+    messaging.postMessage("trackNativeEvent", { event: 'bcNativeDrawerCreateProject' });
     messaging.postMessage("navigateToPath", { path });
     requestClose();
   };
@@ -68,6 +69,7 @@ function ProjectSquare({
       encodeURI(state.user.publicPageSlug) +
       "/post?projectId=" +
       encodeURIComponent(project.id);
+    messaging.postMessage("trackNativeEvent", { event: 'bcNativeDrawerCreateProject' });
     messaging.postMessage("navigateToPath", { path });
     requestClose();
   };
@@ -222,7 +224,9 @@ function ProjectDrawer({
 
 export default function BottomNav({}: BottomNavProps) {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { messaging } = useAppShellHost();
   const onAddPress = () => {
+    messaging.postMessage("trackNativeEvent", { event: 'bcNativeDrawerOpen' });
     setDrawerOpen(true);
   };
   const requestClose = () => {
