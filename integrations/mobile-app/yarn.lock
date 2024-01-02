@@ -6615,10 +6615,10 @@ expo-updates-interface@~0.10.0:
   resolved "https://registry.npmjs.org/expo-updates-interface/-/expo-updates-interface-0.10.1.tgz"
   integrity sha512-I6JMR7EgjXwckrydDmrkBEX/iw750dcqpzQVsjznYWfi0HTEOxajLHB90fBFqQkUV5i5s4Fd3hYQ1Cn0oMzUbA==
 
-expo-updates@~0.18.17:
-  version "0.18.17"
-  resolved "https://registry.npmjs.org/expo-updates/-/expo-updates-0.18.17.tgz"
-  integrity sha512-oyBDR94nYEtVw+iBod3N9LFqTfpLHofmUjh0lP12YZINUI89hvoAyqRe56eSnlpWkzziG6g1y4NGva0D0ViK6w==
+expo-updates@~0.18.19:
+  version "0.18.19"
+  resolved "https://registry.yarnpkg.com/expo-updates/-/expo-updates-0.18.19.tgz#40a69ac25f6fcdde7d9ee76b5a5e4e73eb6cd25d"
+  integrity sha512-dakYQ7XhZtBKMLcim08wum108ZUQcNigurijb/6PKdg3QHn21IzOr/27n6x54DctcoW8w1B8w8y1Xw2svVsx4w==
   dependencies:
     "@expo/code-signing-certificates" "0.0.5"
     "@expo/config" "~8.1.0"
