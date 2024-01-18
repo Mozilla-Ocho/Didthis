@@ -1,11 +1,13 @@
 import { useReducer, Dispatch } from "react";
 import { ApiUser } from "../types";
 import { AppRequestMethods, VersionInfo } from "./types";
+import { WebViewNavigation } from "react-native-webview";
 
 export type State = {
   loading: boolean;
   webContentReady: boolean;
   webContentRouteChanging: boolean;
+  webContentNavigation?: WebViewNavigation;
   user?: ApiUser;
   links: Record<string, string>;
   topNav?: AppRequestMethods["updateTopNav"]["request"];

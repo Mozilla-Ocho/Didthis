@@ -4,7 +4,7 @@ import {
   PlatformPressable,
 } from "@react-navigation/elements";
 import * as React from "react";
-import { useTheme } from "@react-navigation/native";
+import { useNavigation, useTheme } from "@react-navigation/native";
 import {
   View,
   StyleSheet,
@@ -17,6 +17,7 @@ import { SvgProps } from "react-native-svg";
 import useAppShellHost from "../lib/appShellHost";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors as globalColors } from "../styles";
+import Config from "../lib/config";
 
 export type TopNavProps = {
   title?: string;
@@ -256,7 +257,39 @@ export function ConditionalTopNav() {
   const { messaging } = appShellHost;
   const insets = useSafeAreaInsets();
 
-  const { topNav } = appShellHost.state;
+  const { topNav, webContentNavigation } = appShellHost.state;
+
+  // If we're outside the site base URL, we need special navigation to
+  // ensure the user can get back into the app site
+  if (
+    webContentNavigation &&
+    !webContentNavigation?.url.startsWith(Config.siteBaseUrl)
+  ) {
+    const { title } = webContentNavigation;
+    const onLeftPress = () => messaging.webview.goBack();
+    const onRightPress = () => {
+      // HACK: Kind of ugly, but works as a general panic button
+      appShellHost.set("topNav", { show: false });
+      messaging.webview.injectJavaScript(
+        `window.location = "${Config.siteBaseUrl}"`
+      );
+    }
+    return (
+      <TopNav
+        {...{
+          title,
+          leftIsBack: true,
+          leftLabel: "Back",
+          onLeftPress,
+          rightLabel: "Cancel",
+          onRightPress,
+        }}
+      />
+    );
+
+    return <View style={{ height: insets.top }}></View>;
+  }
+
   if (!topNav?.show) {
     // TopNav takes care of top safe inset, so container view doesn't. But,
     // if TopNav is not rendered, we still need to render that margin.

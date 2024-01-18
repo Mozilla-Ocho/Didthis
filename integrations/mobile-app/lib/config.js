@@ -13,6 +13,7 @@ let baseOriginWhitelist = [
   "https://upload-widget.cloudinary.com",
   "https://widget.cloudinary.com",
   "https://res-s.cloudinary.com",
+  "https://discord.com",
 ];
 
 // see eas.json for channel definitions
