@@ -52,6 +52,7 @@ export default ({ config }) => {
     },
     plugins: [
       ...(config.plugins ?? []),
+      "expo-font",
       [withRemoveiOSNotificationEntitlement],
       "expo-apple-authentication",
       [
