@@ -31,11 +31,11 @@ export default function AppInfoScreen({ navigation }: AppInfoScreenProps) {
   const { contentVersionInfo = {} } = api.state || {};
 
   const checkUpdateDisplay = lastUpdateCheckResult
-    ? ` (${lastUpdateCheckResult.manifest?.id} - ${lastUpdateCheckResult.manifest?.createdAt})`
+    ? ` (${lastUpdateCheckResult.manifest?.id})`
     : "...";
 
   const forceUpdateDisplay = lastUpdateFetchResult
-    ? ` (${lastUpdateFetchResult.manifest?.id} - ${lastUpdateFetchResult.manifest?.createdAt})`
+    ? ` (${lastUpdateFetchResult.manifest?.id})`
     : "...";
 
   const handleCheckUpdate = async () => {
