@@ -15,6 +15,7 @@ import branding from '@/lib/branding'
 import useAppShell from '@/lib/appShellContent'
 
 import settingsGear from '@/assets/img/settings-gear.svg'
+import DiscordCard from '../DiscordCard'
 
 const HomeAuth = observer(() => {
   const store = useStore()
@@ -117,6 +118,7 @@ const HomeAuth = observer(() => {
                 <p>You don't have any projects yet. Create a project.</p>
               </>
             )}
+            <DiscordCard />
           </PagePad>
         </PagePad>
       </>
@@ -166,6 +168,7 @@ const HomeAuth = observer(() => {
             tracking your journey!
           </p>
           {addCreatBtns}
+          <DiscordCard />
         </PagePad>
       </>
     )
@@ -185,6 +188,7 @@ const HomeAuth = observer(() => {
             <h3 className="my-2">Your projects</h3>
             {addCreatBtns}
             <ProjectList targetUser={store.user} />
+            <DiscordCard />
           </div>
         </PagePad>
       </PagePad>

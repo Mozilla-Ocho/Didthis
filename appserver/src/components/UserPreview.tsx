@@ -132,7 +132,7 @@ const UserPreview = observer(
               />
             </p>
           )}
-        <h5 className="mt-auto mb-auto">{user.profile.name || 'Unnamed user'}</h5>
+        <h5 className="mt-auto mb-auto ml-4">{user.profile.name || 'Unnamed user'}</h5>
         </div>
 
         {user.profile.bio && (
