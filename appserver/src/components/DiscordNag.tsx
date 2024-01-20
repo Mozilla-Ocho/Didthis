@@ -6,6 +6,9 @@ import Image from 'next/image'
 import branding from '@/lib/branding'
 
 const DiscordNag = () => {
+  // removing for now as we are pushing discord in the projects list
+  return <></>
+  /*
   const store = useStore()
   if (!store.user) return <></>
   // hide discord nag for usertesting users
@@ -14,13 +17,6 @@ const DiscordNag = () => {
     <PagePad wide noPadY>
       <div className={`py-4 px-6 mt-4 bg-discordnag`}>
         <div className="grid grid-cols-[auto_1fr] gap-2 items-start">
-          {/*
-          <Image
-            className="inline w-12 h-12"
-            src={giftcardIcon}
-            alt="gift card icon"
-          />
-          */}
           <div className="text-md">
             See what other folks are doing with {branding.productName} on our{' '}
             <span className="whitespace-nowrap">
@@ -37,6 +33,7 @@ const DiscordNag = () => {
       </div>
     </PagePad>
   )
+  */
 }
 
 export default DiscordNag
