@@ -1,6 +1,8 @@
 import { trackingEvents } from '@/lib/trackingEvents'
 import { observer } from 'mobx-react-lite'
 import { Link } from './uiLib'
+import Image from 'next/image'
+import discordLogo from '@/assets/img/discord-logo.svg'
 
 const DiscordCard = observer(() => {
   return (
@@ -12,23 +14,25 @@ const DiscordCard = observer(() => {
             href="https://discord.gg/Z9f8UjdfJx"
             trackEvent={trackingEvents.bcDiscordNag}
           >
-            Join our Discord community
+            <Image
+              className="inline mr-2"
+              src={discordLogo}
+              alt="discord logo"
+            />
+            Join our Discord
           </Link>
         </h5>
 
         <p className="break-words my-2 whitespace-pre-line min-h-[44px] text-sm mb-4">
           <span className="text-form-labels">
-            Check out what other folks are up to and share your projects on our{' '}
+            Come see other projects from the community and share yours on our{' '}
             <Link
               external
               href="https://discord.gg/Z9f8UjdfJx"
               trackEvent={trackingEvents.bcDiscordNag}
             >
-              private Discord server
+              Discord server
             </Link>
-            . It’s also a great place to ask questions, request features, and
-            share feedback directly with the Didthis team. We’d love to hear
-            from you!
           </span>
         </p>
       </div>
