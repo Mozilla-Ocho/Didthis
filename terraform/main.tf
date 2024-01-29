@@ -158,7 +158,7 @@ output "gcr_image_deployed" {
 }
 
 output "public_lb_ip_address" {
-  value = var.flag_destroy ? "" : var.flag_enable_lb ? module.lb_main.public_lb_ip_address : "(lb not enabled)"
+  value = var.flag_destroy ? "" : var.flag_enable_lb ? module.lb_main[0].public_lb_ip_address : "(lb not enabled)"
 }
 
 # output "dns_records_lb" {
