@@ -76,11 +76,13 @@ export default function WebAppScreen({ route, navigation }: WebAppScreenProps) {
       <WebView
         key={webviewKey}
         source={{ uri: siteBaseUrl }}
+        sharedCookiesEnabled={true}
         originWhitelist={originWhitelist}
         startInLoadingState={true}
         renderLoading={() => <Loader />}
         ref={webviewRef}
         onMessage={appShellHost.onMessage}
+        onNavigationStateChange={appShellHost.onNavigationStateChange}
         onContentProcessDidTerminate={onContentProcessDidTerminate}
       />
       <ConditionalBottomNav />

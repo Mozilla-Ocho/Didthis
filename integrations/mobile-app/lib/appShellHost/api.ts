@@ -5,7 +5,8 @@ import { NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../App";
 import Config from "../../lib/config";
 import MessageHandler from "./messaging";
-import { WebViewMessageEvent } from "react-native-webview";
+import { WebViewMessageEvent, WebViewNavigation } from "react-native-webview";
+import { webviewNavigationStateChange } from "./routes";
 
 const { siteBaseUrl, originWhitelist } = Config;
 
@@ -39,6 +40,11 @@ export default class AppShellHostAPI {
   get onMessage() {
     return (event: WebViewMessageEvent) =>
       this.messaging.handleMessage(this, event);
+  }
+
+  get onNavigationStateChange() {
+    return (event: WebViewNavigation) =>
+      webviewNavigationStateChange(this, event)
   }
 
   setWebView(...args: Parameters<MessageHandler["setWebView"]>) {
