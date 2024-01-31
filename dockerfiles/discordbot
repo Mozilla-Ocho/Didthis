@@ -1,0 +1,65 @@
+FROM node:18-buster as discordbot_base
+
+RUN apt-get update && apt-get install -qq -y build-essential --fix-missing --no-install-recommends
+RUN yarn global add pm2
+
+ARG IMAGE_TAG=development
+ENV IMAGE_TAG=$IMAGE_TAG
+
+ENV LOG_LEVEL=info
+
+WORKDIR /app
+
+# --------------------------------------------------------------
+# dev image
+# --------------------------------------------------------------
+
+FROM discordbot_base as discordbot_dev
+
+ENV NODE_ENV=development
+ENV LOG_LEVEL=debug
+
+CMD yarn dev
+
+# --------------------------------------------------------------
+# prod image
+# --------------------------------------------------------------
+
+FROM discordbot_base as discordbot_prod
+
+ENV NODE_ENV=production
+ENV LOG_LEVEL=info
+
+# copy package.json and yarn.lock files in and do yarn install. we do this
+# before copying the code in to optimize for docker layer caching.
+COPY integrations/discord/package.json /app/package.json
+COPY integrations/discord/yarn.lock /app/yarn.lock
+RUN yarn install
+
+# copy full code in
+COPY integrations/discord /app
+
+WORKDIR /app
+
+ARG DISCORD_CLIENT_ID
+ENV DISCORD_CLIENT_ID=$DISCORD_CLIENT_ID
+ARG DISCORD_CLIENT_SECRET
+ENV DISCORD_CLIENT_SECRET=$DISCORD_CLIENT_SECRET
+ARG DISCORD_SERVER_ID
+ENV DISCORD_SERVER_ID=$DISCORD_SERVER_ID
+ARG DISCORD_CHANNEL_ID
+ENV DISCORD_CHANNEL_ID=$DISCORD_CHANNEL_ID
+ARG DISCORD_BOT_TOKEN
+ENV DISCORD_BOT_TOKEN=$DISCORD_BOT_TOKEN
+ARG DISCORD_BOT_GRAPHQL_ACCESS_TOKEN
+ENV DISCORD_BOT_GRAPHQL_ACCESS_TOKEN=$DISCORD_BOT_GRAPHQL_ACCESS_TOKEN
+ARG DISCORD_BOT_PUBLIC_UPDATES_POLL_PERIOD=5000
+ENV DISCORD_BOT_PUBLIC_UPDATES_POLL_PERIOD=$DISCORD_BOT_PUBLIC_UPDATES_POLL_PERIOD
+ARG DISCORD_BOT_PUBLIC_UPDATES_POST_CATCHUP=300000
+ENV DISCORD_BOT_PUBLIC_UPDATES_POST_CATCHUP=$DISCORD_BOT_PUBLIC_UPDATES_POST_CATCHUP
+ARG DISCORD_BOT_PUBLIC_UPDATES_POST_DELAY=45000
+ENV DISCORD_BOT_PUBLIC_UPDATES_POST_DELAY=$DISCORD_BOT_PUBLIC_UPDATES_POST_DELAY
+
+RUN yarn build
+
+CMD yarn start

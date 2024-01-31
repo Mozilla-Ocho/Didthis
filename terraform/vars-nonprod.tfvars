@@ -20,3 +20,4 @@ vpc_remote_name="common"
 flag_enable_lb=true
 lb_ssl_domain_names=["test.didthis.app","www.test.didthis.app"]
 lb_cert_domain_change_increment_outage=5
+graphql_api_url="https://test.didthis.app/api/graphql"

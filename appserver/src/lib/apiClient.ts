@@ -14,6 +14,7 @@ import type {
   SessionLoginAsTrialUserWrapper,
   ClaimTrialUserWrapper,
   SessionLoginWithAppleIdWrapper,
+  DisconnectDiscordWrapper,
 } from './apiConstants'
 import { AppleAuthenticationCredential } from "./appleAuth";
 
@@ -265,6 +266,14 @@ const claimTrialUser = async ({
   return wrapper
 }
 
+const disconnectDiscord = async (): Promise<DisconnectDiscordWrapper> => {
+  const wrapper = (await wrapFetch({
+    action: 'disconnectDiscord',
+    method: 'POST',
+  })) as DisconnectDiscordWrapper
+  return wrapper
+}
+
 const apiClient = {
   sessionLoginWithAppleId,
   sessionLoginAsTrialUser,
@@ -272,6 +281,7 @@ const apiClient = {
   deleteAccount,
   deletePost,
   deleteProject,
+  disconnectDiscord,
   // getHealthCheck,
   getMe,
   getPublicUser,
