@@ -23,6 +23,11 @@ export default function Document() {
           src="https://upload-widget.cloudinary.com/global/all.js"
           type="text/javascript"
         ></script>
+        <script
+          async
+          type="text/javascript"
+          src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"
+        ></script>
       </body>
     </Html>
   )
