@@ -6,6 +6,7 @@ const branding = {
   claimAccountButtonTxt: 'Sign up',
   supportEmail: 'didthis@mozilla.com',
   testflightURL: 'https://testflight.apple.com/join/y5IlSCsD',
+  iOSAppStoreURL: 'https://apps.apple.com/us/app/mozilla-didthis/id6468680088',
 }
 
 export default branding
