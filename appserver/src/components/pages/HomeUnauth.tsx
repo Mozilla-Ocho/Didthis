@@ -107,11 +107,11 @@ const HomeUnauth = () => {
       <Link
         data-testid="testflightbutton"
         className={`mt-6 px-6 py-4 text-md `}
-        href={branding.testflightURL}
+        href={branding.iOSAppStoreURL}
         intent="primary"
-        trackEvent={trackingEvents.bcTestflightHP}
+        trackEvent={trackingEvents.bcAppStoreHP}
       >
-        <strong>Get {branding.productName} for iOS</strong> via Apple Testflight
+        <strong>Get {branding.productName} for iOS</strong>
       </Link>
       <p className="mt-6 mb-2">
         Interested in our upcoming Android or web apps?

@@ -226,6 +226,10 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
     eventName: 'buttonClick',
     opts: { name: 'testflightHP' },
   },
+  bcAppStoreHP: {
+    eventName: 'buttonClick',
+    opts: { name: 'appStoreHP' },
+  },
 
   // DRY_76795 native event types handling
   bcNativeDrawerOpen: {
