@@ -25,7 +25,7 @@
     "@shopify/flash-list": "1.6.3",
     "@types/set-cookie-parser": "^2.4.5",
     "cloudinary-react-native": "^0.2.0",
-    "expo": "~50.0.4",
+    "expo": "~50.0.5",
     "expo-apple-authentication": "~6.3.0",
     "expo-application": "~5.8.3",
     "expo-asset": "^9.0.2",
