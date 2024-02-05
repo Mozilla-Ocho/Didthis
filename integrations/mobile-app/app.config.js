@@ -11,6 +11,7 @@ const buildTag =
 export default ({ config }) => {
   return {
     ...config,
+    version,
     name: "Didthis",
     slug: "didthis",
     icon: "./assets/didthis-snap-logo.png",

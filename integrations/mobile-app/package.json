@@ -1,4 +1,7 @@
 {
+  "version": "1.0.1",
+  "private": true,
+  "name": "didthis-mobile-app",
   "dependencies": {
     "@cloudinary/url-gen": "^1.12.1",
     "@expo/html-elements": "^0.5.1",
@@ -22,7 +25,7 @@
     "@shopify/flash-list": "1.6.3",
     "@types/set-cookie-parser": "^2.4.5",
     "cloudinary-react-native": "^0.2.0",
-    "expo": "~50.0.4",
+    "expo": "~50.0.5",
     "expo-apple-authentication": "~6.3.0",
     "expo-application": "~5.8.3",
     "expo-asset": "^9.0.2",
@@ -102,8 +105,5 @@
     "transformIgnorePatterns": [
       "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)"
     ]
-  },
-  "version": "0.2.0",
-  "private": true,
-  "name": "didthis-mobile-app"
+  }
 }
