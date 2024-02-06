@@ -44,7 +44,7 @@ const NewPostPage = observer(() => {
       <RemindersAndAlerts/>
       <PagePad>
         {!appShell.inAppWebView && <h3>Add post</h3>}
-        <PostForm mode="new" />
+        <PostForm mode="new" project={project} />
       </PagePad>
     </>
   )

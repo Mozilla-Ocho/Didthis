@@ -119,10 +119,16 @@ interface ClaimTrialUserWrapper extends SuccessWrapper {
   payload: ApiUser
 }
 
+interface DisconnectDiscordWrapper extends SuccessWrapper {
+  action: "disconnectDiscord",
+  payload: ApiUser
+}
+
 export type {
   ClaimTrialUserWrapper,
   DeletePostWrapper,
   DeleteProjectWrapper,
+  DisconnectDiscordWrapper,
   EmptySuccessWrapper,
   ErrorId,
   ErrorWrapper,

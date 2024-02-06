@@ -44,7 +44,7 @@ const PostEditPage = observer(() => {
       <RemindersAndAlerts />
       <PagePad>
         {!appShell.inAppWebView && <h3>Edit update</h3>}
-        <PostForm mode="edit" post={post} />
+        <PostForm mode="edit" project={project} post={post} />
       </PagePad>
     </>
   )

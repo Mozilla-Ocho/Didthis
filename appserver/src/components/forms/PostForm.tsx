@@ -19,7 +19,7 @@ import log from '@/lib/log'
 import { ApiError } from '@/lib/apiCore'
 import LinkPreview from '../LinkPreview'
 import ImageUploadWeb from '../ImageUpload'
-import ImageUploadAppShell from "../ImageUploadAppShell"
+import ImageUploadAppShell from '../ImageUploadAppShell'
 import type { UploadCallback } from '../ImageUpload'
 import profileUtils from '@/lib/profileUtils'
 import { twMerge } from 'tailwind-merge'
@@ -37,6 +37,8 @@ class PostStore {
   // they all show up externally if the project is public.
   scope: ApiScope
   projectId: ApiProjectId
+  project: ApiProject | null
+  editedPost: ApiPost | null
   mediaType: PostMediaType = 'image'
   linkUrl: string
   linkTouched = false
@@ -49,25 +51,32 @@ class PostStore {
   fetchUrlMetaAndUpdateDebounced: () => void
   spinning = false
   didThisAtFormValue: Dayjs | null = null // for the controlled mui element
+  autoShare: boolean
 
   constructor(
     mode: 'edit' | 'new',
+    project: ApiProject | undefined,
     defaultPid: ApiProjectId,
     post: ApiPost | undefined
   ) {
     if (mode === 'new') {
       this.id = 'new' // assigned on save
       this.projectId = defaultPid // assigned on save if "new"
+      this.project = project || null
+      this.editedPost = null
       this.description = ''
       this.scope = 'public'
       this.linkUrl = ''
       this.imageAssetId = ''
       this.urlMeta = false
       this.imageMeta = undefined
+      this.autoShare = project?.shareByDefault !== false
     } else if (post) {
       this.mediaType = 'text'
       this.id = post.id
       this.projectId = post.projectId
+      this.project = null
+      this.editedPost = post
       this.description = post.description || ''
       this.scope = post.scope
       this.linkUrl = post.linkUrl || ''
@@ -78,6 +87,7 @@ class PostStore {
       this.urlMeta = post.urlMeta || false
       if (this.imageAssetId) this.mediaType = 'image'
       this.didThisAtFormValue = dayjs(post.didThisAt)
+      this.autoShare = !!post.autoShare
     } else {
       throw new Error(
         'post store must be initialized with "new", or "edit" and an api post obj'
@@ -107,6 +117,7 @@ class PostStore {
       updatedAt: 0, // ignored / assigned at backend
       projectId: this.projectId,
       scope: this.scope,
+      autoShare: this.autoShare,
       description: this.description.trim(),
       imageAssetId:
         this.mediaType === 'image' ? this.imageAssetId || undefined : undefined,
@@ -166,6 +177,9 @@ class PostStore {
   setProjectId(x: string) {
     this.projectId = x
   }
+  setProject(x: ApiProject) {
+    this.project = x
+  }
   setScope(x: ApiScope) {
     this.scope = x
   }
@@ -183,6 +197,9 @@ class PostStore {
   }
   setDidThisAtDayjs(x: Dayjs | null) {
     this.didThisAtFormValue = x
+  }
+  setAutoShare(x: boolean) {
+    this.autoShare = x
   }
   setSpinning(x: boolean) {
     this.spinning = x
@@ -239,9 +256,6 @@ const ProjectSelector = observer(({ postStore }: { postStore: PostStore }) => {
   const store = useStore()
   if (!store.user) return <></>
   const profile = store.user.profile
-  const handleChangeProject = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    postStore.setProjectId(e.target.value)
-  }
   if (!store.user) return <></>
   const nameAndId: [string, string][] = []
   Object.values(profile.projects).forEach(proj => {
@@ -251,6 +265,11 @@ const ProjectSelector = observer(({ postStore }: { postStore: PostStore }) => {
     return profile.projects[a[1]].createdAt - profile.projects[b[1]].createdAt
   })
   nameAndId.unshift(['Create a new project', 'new'])
+  const handleChangeProject = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const projectId = e.target.value
+    postStore.setProjectId(projectId)
+    postStore.setProject(profile.projects[projectId])
+  }
   return (
     <div>
       <label htmlFor="project-selector" className="text-form-labels text-sm">
@@ -390,9 +409,11 @@ const ImageField = observer(({ postStore }: { postStore: PostStore }) => {
 })
 
 const DateTimeField = observer(({ postStore }: { postStore: PostStore }) => {
-  const appShell = useAppShell();
+  const appShell = useAppShell()
 
-  const handleNativeDateTimePickerOpen: MouseEventHandler<HTMLInputElement> = async (ev) => {
+  const handleNativeDateTimePickerOpen: MouseEventHandler<
+    HTMLInputElement
+  > = async ev => {
     const initialDateTime = postStore.didThisAtFormValue?.toDate().getTime()
     const result = await appShell.api.request('pickDateTime', {
       title: 'Did this when?',
@@ -402,7 +423,7 @@ const DateTimeField = observer(({ postStore }: { postStore: PostStore }) => {
       const { changed, dateTime } = result
       if (changed) handleChange(dayjs(dateTime))
     }
-  };
+  }
 
   const handleChange = (x: Dayjs | null) => {
     postStore.setDidThisAtDayjs(x)
@@ -489,10 +510,13 @@ const DateTimeField = observer(({ postStore }: { postStore: PostStore }) => {
   )
 })
 
-type Props = { mode: 'new' } | { mode: 'edit'; post: ApiPost }
+type Props = { project?: ApiProject } & (
+  | { mode: 'new' }
+  | { mode: 'edit'; post: ApiPost }
+)
 
 const PostForm = observer((props: Props) => {
-  const { mode } = props
+  const { mode, project } = props
   const router = useRouter()
   const store = useStore()
   const appShell = useAppShell()
@@ -503,11 +527,16 @@ const PostForm = observer((props: Props) => {
     defaultPid = 'new'
   const [postStore] = useState(
     () =>
-      new PostStore(mode, defaultPid, mode === 'edit' ? props.post : undefined)
+      new PostStore(
+        mode,
+        project,
+        defaultPid,
+        mode === 'edit' ? props.post : undefined
+      )
   )
   const performSubmit = () => {
     // Bail out of submit if already spinning
-    if (postStore.spinning) return;
+    if (postStore.spinning) return
     postStore.setSpinning(true)
     store
       .savePost(postStore.getApiPost(), mode, postStore.mediaType)
@@ -539,6 +568,21 @@ const PostForm = observer((props: Props) => {
   const handleCancel = () => {
     store.goBack()
   }
+  const setAutoShare = (e: React.ChangeEvent<HTMLInputElement>) => {
+    postStore.setAutoShare(e.target.checked)
+  }
+
+  // Should show auto-share checkbox if an edited post is recent enough,
+  // there's a connected account, and the project is not private
+  const maxAutoShareAge = parseInt(
+    process.env.NEXT_PUBLIC_DISCORD_BOT_PUBLIC_UPDATES_POST_DELAY || '45000',
+    10
+  )
+  const shouldShowAutoShare =
+    (!postStore.editedPost ||
+      postStore.editedPost.updatedAt > Date.now() - maxAutoShareAge) &&
+    store.user?.profile?.connectedAccounts &&
+    postStore.project?.scope !== 'private'
 
   useAppShellTopBar({
     show: true,
@@ -608,6 +652,27 @@ const PostForm = observer((props: Props) => {
         {postStore.mediaType === 'link' && <LinkField postStore={postStore} />}
         <DateTimeField postStore={postStore} />
         <DescriptionField mode={mode} postStore={postStore} />
+
+        {shouldShowAutoShare && (
+          <div>
+            <label className="inline-flex flex-row items-center cursor-pointer">
+              <span className="mr-3 text-sm text-form-labels inline-block cursor-pointer">
+                Automatically share to connected accounts:
+              </span>
+              <span className="relative inline-flex items-center inline-block">
+                <input
+                  type="checkbox"
+                  id="shareByDefault"
+                  className="sr-only peer"
+                  checked={postStore.autoShare !== false}
+                  onChange={setAutoShare}
+                />
+                {/* https://flowbite.com/docs/forms/toggle/ */}
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-form-toggle-bg peer-disabled:opacity-75"></div>
+              </span>
+            </label>
+          </div>
+        )}
 
         <div className="flex flex-col sm:flex-row gap-4 mt-8 flex-wrap">
           {!appShell.inAppWebView && (
