@@ -567,8 +567,9 @@ class Store {
       .then(() => {
         if (this.appShellApiRef) {
           this.appShellApiRef.request('signin')
+        } else {
+          window.location.assign('/')
         }
-        window.location.assign('/')
       })
       .catch(() => {
         this.setGeneralError('_api_fail_')
@@ -710,9 +711,8 @@ class Store {
     this.router.back()
   }
 
-  promptDeleteAccount(appshellapiref: AppShellAPI) {
+  promptDeleteAccount() {
     if (!this.user) return false
-    this.appShellApiRef = appshellapiref // need this to tell app shell to log out
     this.confirmingDelete = {
       kind: 'account',
       thing: this.user,

@@ -47,7 +47,6 @@ const LogoutButton = observer(
         loseTrialWork: store.inTrialWithContent() ? 'y' : 'n',
       })
       await store.logOut()
-      await appShell.api.request("signin");
       onLogout && onLogout()
     }
 
