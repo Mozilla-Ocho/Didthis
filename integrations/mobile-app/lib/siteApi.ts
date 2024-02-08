@@ -41,6 +41,20 @@ export async function signinWithCredential(
   return apiUser;
 }
 
+export async function signinWithSession(
+  sessionCookie: string,
+) {
+  await resetSignin();
+  await Storage.setItem("AUTH_SESSION_COOKIE", sessionCookie);
+  const apiUser = await fetchSignedInUser();
+  if (!apiUser) {
+    throw new Error("Sign-in failed - no signed in user");
+  }
+  await Storage.setObject("SIGNED_IN_USER", apiUser);
+
+  return apiUser;
+}
+
 export async function resetSignin() {
   const storageKeys: Storage.StorageKey[] = [
     "APPLE_ID_CREDENTIAL",

@@ -74,4 +74,14 @@ export const styles = StyleSheet.create({
     borderRadius: 48,
     padding: 24,
   },
+  button: {
+    backgroundColor: colors["yellow-500"],
+    borderRadius: 48,
+    padding: 16,
+  },
+  buttonLabel: {
+    textAlign: "center",
+    fontFamily: fonts.text,
+    fontSize: 22
+  }
 });

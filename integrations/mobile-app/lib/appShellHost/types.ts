@@ -30,6 +30,12 @@ export type AppRequestMethods = {
     request: undefined;
     response: JSONObject;
   };
+  signinWithSession: {
+    request: {
+      sessionCookie: string;
+    },
+    response: Success;
+  }
   showAppInfo: {
     request: undefined;
     response: Success;
