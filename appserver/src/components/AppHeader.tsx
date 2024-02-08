@@ -11,7 +11,7 @@ import useAppShell from '@/lib/appShellContent'
 
 // TODO: isThe404 should be called 'isStatic' and StaticLayout component is misleadingly named.
 
-const AppHeader = observer(({ isThe404 }: { isThe404?: boolean }) => {
+const AppHeader = observer(({ isThe404, hideLogin }: { isThe404?: boolean; hideLogin?: boolean }) => {
   const store = useStore()
   const appShell = useAppShell()
 
@@ -56,7 +56,7 @@ const AppHeader = observer(({ isThe404 }: { isThe404?: boolean }) => {
                 <Image src={LogoWordmarkSvg} alt={branding.productName} />
               </h1>
             </Link>
-            {!isThe404 && (
+            {!(isThe404 || hideLogin) && (
               <div className="basis-2/6 text-right text-sm">
                 <LoginButton intent="link" />
               </div>
