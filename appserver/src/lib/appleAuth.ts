@@ -10,7 +10,7 @@ export const APPLE_JWT_ISSUER = 'https://appleid.apple.com'
 // TODO: make this configurable and constrain for real app vs Expo Go
 export const VALID_JWT_AUDIENCES = [
   'org.mozilla.Didthis',
-  'org.mozilla.Didthis.web',
+  'org.mozilla.didthis.web',
   'host.exp.Exponent',
 ]
 
