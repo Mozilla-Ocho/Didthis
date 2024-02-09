@@ -3,7 +3,7 @@ import { useStore } from '@/lib/store'
 import { useCallback, useEffect, useState } from 'react'
 
 const APPLE_CLIENT_ID =
-  process.env.NEXT_PUBLIC_APPLE_CLIENT_ID || 'org.mozilla.Didthis.web'
+  process.env.NEXT_PUBLIC_APPLE_CLIENT_ID || 'org.mozilla.didthis.web'
 
 // see: https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_js/configuring_your_webpage_for_sign_in_with_apple
 const EVENT_APPLE_ID_SUCCESS = 'AppleIDSignInOnSuccess'
@@ -91,10 +91,7 @@ const AppleSignIn = observer(
       // Figure out a proper redirect URI for Apple ID
       const host = location.host
       const baseUrl = new URL(`https://${host}`)
-      const redirectURI = new URL(
-        `/api/acceptAppleSignInRedirect`,
-        baseUrl
-      ).toString()
+      const redirectURI = new URL(`/connect/apple`, baseUrl).toString()
 
       // Finally, initialize AppleID auth
       AppleID.auth.init({
