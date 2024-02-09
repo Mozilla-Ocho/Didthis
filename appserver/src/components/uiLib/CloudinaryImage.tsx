@@ -28,7 +28,7 @@ const CloudinaryImage = ({
   rounded?: boolean
   isProjectCard?: boolean
   fullW?: boolean
-  photoPaperEdge: boolean,
+  photoPaperEdge?: boolean,
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const store = useStore()
