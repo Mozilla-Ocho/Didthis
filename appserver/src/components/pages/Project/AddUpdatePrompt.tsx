@@ -13,7 +13,7 @@ const AddUpdatePrompt = ({
   const store = useStore()
   if (!store.user || !isSelf) return <></>
   return (
-    <div className="my-6 flex flex-row items-center gap-4">
+    <div className="my-6 flex flex-row justify-center items-center gap-4">
       <Link
         className="grow basis-1 sm:grow-0 sm:basis-auto"
         intent="primary"

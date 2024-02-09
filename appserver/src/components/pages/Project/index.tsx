@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { observer } from 'mobx-react-lite'
-import { Link, Divider, Button, PagePad } from '@/components/uiLib'
+import { HoverCard, Link, Divider, Button, PagePad } from '@/components/uiLib'
 import UserPreview from '@/components/UserPreview'
 import pathBuilder from '@/lib/pathBuilder'
 import { getParamString } from '@/lib/nextUtils'
@@ -130,7 +130,9 @@ const ProjectPage = observer(
 
     return (
       <>
+        {/* not visible: */}
         <HeadStuff project={project} targetUser={targetUser} />
+        {/* not visible until activated: */}
         <ShareModal
           isOpen={shareModalOpen}
           handleClose={handleCloseShare}
@@ -150,105 +152,118 @@ const ProjectPage = observer(
         />
         <RemindersAndAlerts />
 
-        {/* native cover image layout */}
-        {appShell.inAppWebView && (
-          <PagePad noPadY noPadX>
-            <CoverImage
-              inAppWebView={appShell.inAppWebView}
-              project={project}
-            />
-          </PagePad>
-        )}
+        <PagePad wide>
+          <HoverCard>
+            {/* outer padding */}
+            <div className="sm:p-4">
+              <div className="flex flex-col sm:flex-row items-start">
+                <div className="sm:max-w-[400px]">
+                  <CoverImage
+                    inAppWebView={appShell.inAppWebView}
+                    project={project}
+                  />
 
-        <PagePad>
-          <div
-            style={{
-              position: 'relative',
-              marginTop: appShell.inAppWebView ? '-24px' : '0',
-              zIndex: 0,
-            }}
-          >
-            <UserPreview user={targetUser} compact={true} />
-          </div>
+                  {/* inner padding */}
+                  <div className="px-4">
+                    <div
+                      style={{
+                        position: 'relative',
+                        marginTop: '-14px',
+                        zIndex: 0,
+                      }}
+                    >
+                      <UserPreview user={targetUser} compact={true} />
+                    </div>
 
-          <h4 className="mt-4 mb-1">{project.title}</h4>
+                    <h4 className="mt-4 mb-1">{project.title}</h4>
 
-          <div className="grid grid-cols-[66%_34%] my-2">
-            <p className="body-bs uppercase text-sm font-bold">
-              {project.currentStatus === 'active' && <span>In Progress</span>}
-              {project.currentStatus === 'complete' && <span>Completed</span>}
-              {project.currentStatus === 'paused' && <span>Paused</span>}
-              {isPrivate && (
-                <>
-                  {' '}
-                  &mdash; <strong>Private</strong>
-                </>
-              )}
-            </p>
-            <p className="body-bs text-right">
-              {numPosts} update{numPosts === 1 ? '' : 's'}
-            </p>
-          </div>
+                    <div className="grid grid-cols-[66%_34%] my-2">
+                      <p className="body-bs text-sm font-bold">
+                        {project.currentStatus === 'active' && (
+                          <span>In Progress</span>
+                        )}
+                        {project.currentStatus === 'complete' && (
+                          <span>Completed</span>
+                        )}
+                        {project.currentStatus === 'paused' && (
+                          <span>Paused</span>
+                        )}
+                        {isPrivate && (
+                          <>
+                            {' '}
+                            &mdash; <strong>Private</strong>
+                          </>
+                        )}
+                      </p>
+                      <p className="body-bs text-right">
+                        {numPosts} update{numPosts === 1 ? '' : 's'}
+                      </p>
+                    </div>
 
-          {/* mobile web cover image layout */}
-          {!appShell.inAppWebView && (
-            <div className="my-4">
-              <CoverImage
-                inAppWebView={appShell.inAppWebView}
-                project={project}
-              />
-            </div>
-          )}
+                    {project.description && (
+                      <p className="break-words whitespace-pre-line my-2">
+                        {project.description}
+                      </p>
+                    )}
 
-          {project.description && (
-            <p className="break-words whitespace-pre-line my-2">
-              {project.description}
-            </p>
-          )}
-
-          <div className="my-4 flex flex-col sm:flex-row items-center gap-4">
-            {/* in mobile web, if the user owns the project, show an edit
+                    <div className="my-4 flex flex-col sm:flex-row items-center gap-4">
+                      {/* in mobile web, if the user owns the project, show an edit
                 button alongside share button. in native app, editing is via top
                 nav. */}
-            {!appShell.inAppWebView &&
-              store.user && // store.user redundant when isSelf but tsserver needs it
-              isSelf && (
-                <Link
-                  id="buttonEdit"
-                  className="w-full sm:w-auto"
-                  intent="secondary"
-                  href={pathBuilder.projectEdit(
-                    store.user.systemSlug,
-                    project.id
-                  )}
-                  trackEvent={trackingEvents.bcEditProject}
-                  trackEventOpts={{ fromNativeTopNav: 'n' }}
-                >
-                  Edit project
-                </Link>
-              )}
-            <Button
-              id="buttonShare"
-              className="w-full sm:w-auto"
-              intent="secondary"
-              onClick={() => handleConditionalShare(false)}
-            >
-              Share project
-            </Button>
-          </div>
+                      {!appShell.inAppWebView &&
+                        store.user && // store.user redundant when isSelf but tsserver needs it
+                        isSelf && (
+                          <Link
+                            id="buttonEdit"
+                            className="w-full"
+                            intent="secondary"
+                            href={pathBuilder.projectEdit(
+                              store.user.systemSlug,
+                              project.id
+                            )}
+                            trackEvent={trackingEvents.bcEditProject}
+                            trackEventOpts={{ fromNativeTopNav: 'n' }}
+                          >
+                            Edit project
+                          </Link>
+                        )}
+                      <Button
+                        id="buttonShare"
+                        className="w-full"
+                        intent="secondary"
+                        onClick={() => handleConditionalShare(false)}
+                      >
+                        Share project
+                      </Button>
+                    </div>
 
-          <Divider light className="my-6" />
+                    <Divider light className="my-6 sm:hidden" />
+                  </div>
+                  {/* inner padding */}
+                </div>
+                {/* column end */}
+                <div className="w-full">
+                  {/* column start. TODO: why do i need w-full here? */}
+                  <div className="px-4">
+                    {numPosts > 0 && <SortChooser
+                      onChange={changeSort}
+                      actualSort={actualSort}
+                    />}
 
-          <SortChooser onChange={changeSort} actualSort={actualSort} />
+                    <PostList
+                      project={project}
+                      sort={actualSort}
+                      focusPostId={focusPostId}
+                      targetUser={targetUser}
+                    />
 
-          <PostList
-            project={project}
-            sort={actualSort}
-            focusPostId={focusPostId}
-            targetUser={targetUser}
-          />
-
-          <AddUpdatePrompt project={project} isSelf={isSelf} />
+                    <AddUpdatePrompt project={project} isSelf={isSelf} />
+                  </div>
+                </div>
+              </div>
+              {/* outer padding */}
+            </div>
+          </HoverCard>
         </PagePad>
       </>
     )

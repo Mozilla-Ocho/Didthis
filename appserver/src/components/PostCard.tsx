@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { Timestamp, CloudinaryImage, Link, Button } from './uiLib'
+import { Timestamp, CloudinaryImage, Link, Icon } from './uiLib'
 import pathBuilder from '@/lib/pathBuilder'
 import LinkPreview from './LinkPreview'
 import { trackingEvents } from '@/lib/trackingEvents'
@@ -44,6 +44,9 @@ const PostCard = observer(
         }
       }
     }, [focused, setHighlight])
+    let iconType = 'text'
+    if (post.imageAssetId) iconType = 'image'
+    if (post.linkUrl) iconType = 'link'
     return (
       <div
         id={focused ? 'focused-post' : ''}
@@ -55,21 +58,28 @@ const PostCard = observer(
         )}
         tabIndex={-1}
       >
-        <p className="text-sm text-timestamps mb-4">
+        <div className="text-sm text-timestamps mb-4 ml-[-26px]">
+          {iconType === 'link' && <Icon.Link className="inline-block bg-white mr-4 text-black-300" />}
+          {iconType === 'image' && <Icon.Image className="inline-block bg-white mr-4 text-black-300" />}
+          {iconType === 'text' && <Icon.Text className="inline-block bg-white mr-4 text-black-300" />}
           <Timestamp millis={post.didThisAt} />
-        </p>
+        </div>
+        <div className="border rounded-lg border-[#dddddd] bg-[#f7f7f7] p-4 grid grid-cols-1 gap-2">
+
         {post.imageAssetId && (
           <CloudinaryImage
+            photoPaperEdge
             lightbox
             assetId={post.imageAssetId}
             intent="post"
             imageMeta={post.imageMeta}
+            fullW
           />
         )}
         {post.linkUrl && (
           <LinkPreview linkUrl={post.linkUrl} urlMeta={post.urlMeta} />
         )}
-        <p className="my-4 break-words whitespace-pre-line">
+        <p className="break-words whitespace-pre-line">
           {post.description}
         </p>
         {isSelf && (
@@ -88,6 +98,7 @@ const PostCard = observer(
             </Link>
           </div>
         )}
+        </div>
       </div>
     )
   }

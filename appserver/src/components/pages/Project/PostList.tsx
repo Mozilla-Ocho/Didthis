@@ -1,4 +1,6 @@
 import PostCard from '@/components/PostCard'
+import { Link } from '@/components/uiLib'
+import pathBuilder from '@/lib/pathBuilder'
 import { useStore } from '@/lib/store'
 
 const PostList = ({
@@ -19,13 +21,20 @@ const PostList = ({
   )
   if (posts.length === 0)
     return (
-      <>
+      <div className="text-center py-20">
         <p>This project has no updates yet.</p>
-      </>
+        <p>
+          Visit their{' '}
+          <Link href={pathBuilder.user(targetUser.publicPageSlug)}>
+            project page
+          </Link>{' '}
+          to see their other projects!
+        </p>
+      </div>
     )
   return (
     <>
-      <div className="grid grid-cols-1 gap-8">
+      <div className="grid grid-cols-1 gap-8 border-l ml-2 border-#DDDDDD pl-4">
         {/* even though we return above if targetUser is falsy, because map is
            passed a function, typescript can't assert that inside that function
            scope that targetUser is still surely not false. hence "as ApiUser"*/}

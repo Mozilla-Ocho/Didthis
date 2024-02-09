@@ -12,14 +12,14 @@ const SortChooser = ({
     onChange(direction)
   }
   return (
-    <div className="flex flex-row items-baseline gap-4 mt-10 mb-7 text-sm">
+    <div className="flex flex-row items-baseline gap-4 mb-7 text-sm">
       <label htmlFor="block sortby">Sort by:</label>
       <div className="grow sm:grow-0">
         <Select
           id="sortby"
           onChange={changeSort}
           value={actualSort}
-          className="text-bodytext text-sm"
+          className="text-bodytext text-sm border-black-100"
         >
           <option key="desc" value="desc">
             Newest first
