@@ -80,7 +80,7 @@ const AppFooter = observer(
         <div className="bg-white">
           <Divider className="my-0" />
           <PagePad wide={true} noPadY>
-            <div className="py-6 flex flex-col md:flex-row gap-2 md:gap-6 md:justify-between text-sm md:items-center">
+            <div className="py-6 flex flex-col lg:flex-row gap-2 md:gap-6 md:justify-between text-sm md:items-center">
               {discordLink}
               <div className="flex flex-col md:flex-row gap-2 md:gap-3 lg:gap-6 md:justify-end text-sm">
                 {tosLink}
