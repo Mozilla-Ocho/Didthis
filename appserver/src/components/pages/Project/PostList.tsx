@@ -34,7 +34,7 @@ const PostList = ({
     )
   return (
     <>
-      <div className="grid grid-cols-1 gap-8 border-l ml-2 border-#DDDDDD pl-4">
+      <div className="grid grid-cols-1 gap-8 border-l ml-2 border-#DDDDDD pl-4 mb-8">
         {/* even though we return above if targetUser is falsy, because map is
            passed a function, typescript can't assert that inside that function
            scope that targetUser is still surely not false. hence "as ApiUser"*/}

@@ -145,7 +145,8 @@ const ProjectPage = observer(
           project={project}
         />
 
-        <Breadcrumbs crumbs={[{ name: project.title }]} />
+        {store.user && <Breadcrumbs crumbs={[{ name: project.title }]} />}
+
         <ViralityBlurb
           fromPage="project"
           targetUserSlug={targetUser.publicPageSlug}

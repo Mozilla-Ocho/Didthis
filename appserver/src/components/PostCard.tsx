@@ -52,52 +52,53 @@ const PostCard = observer(
         id={focused ? 'focused-post' : ''}
         className={twMerge(
           'transition duration-500',
-          highlight
-            ? 'bg-yellow-300 drop-shadow-[0px_0px_2px_#f4c005]'
-            : ''
+          highlight ? 'bg-yellow-300 drop-shadow-[0px_0px_2px_#f4c005]' : ''
         )}
         tabIndex={-1}
       >
         <div className="text-sm text-timestamps mb-4 ml-[-26px]">
-          {iconType === 'link' && <Icon.Link className="inline-block bg-white mr-4 text-black-300" />}
-          {iconType === 'image' && <Icon.Image className="inline-block bg-white mr-4 text-black-300" />}
-          {iconType === 'text' && <Icon.Text className="inline-block bg-white mr-4 text-black-300" />}
+          {iconType === 'link' && (
+            <Icon.Link className="inline-block bg-white mr-4 text-black-300" />
+          )}
+          {iconType === 'image' && (
+            <Icon.Image className="inline-block bg-white mr-4 text-black-300" />
+          )}
+          {iconType === 'text' && (
+            <Icon.Text className="inline-block bg-white mr-4 text-black-300" />
+          )}
           <Timestamp millis={post.didThisAt} />
         </div>
         <div className="border rounded-lg border-[#dddddd] bg-[#f7f7f7] p-4 grid grid-cols-1 gap-2">
-
-        {post.imageAssetId && (
-          <CloudinaryImage
-            photoPaperEdge
-            lightbox
-            assetId={post.imageAssetId}
-            intent="post"
-            imageMeta={post.imageMeta}
-            fullW
-          />
-        )}
-        {post.linkUrl && (
-          <LinkPreview linkUrl={post.linkUrl} urlMeta={post.urlMeta} />
-        )}
-        <p className="break-words whitespace-pre-line">
-          {post.description}
-        </p>
-        {isSelf && (
-          <div className="grid grid-cols-[auto_1fr] gap-4 items-baseline">
-            <Link
-              intent="secondary"
-              className="px-4 py-1"
-              href={pathBuilder.postEdit(
-                authUser.systemSlug,
-                post.projectId,
-                post.id
-              )}
-              trackEvent={trackingEvents.bcEditPost}
-            >
-              Edit update
-            </Link>
-          </div>
-        )}
+          {post.imageAssetId && (
+            <CloudinaryImage
+              photoPaperEdge
+              lightbox
+              assetId={post.imageAssetId}
+              intent="post"
+              imageMeta={post.imageMeta}
+              fullW
+            />
+          )}
+          {post.linkUrl && (
+            <LinkPreview linkUrl={post.linkUrl} urlMeta={post.urlMeta} />
+          )}
+          <p className="break-words whitespace-pre-line">{post.description}</p>
+          {isSelf && (
+            <div className="grid grid-cols-[auto_1fr] gap-4 items-baseline mt-4">
+              <Link
+                intent="secondary"
+                className="px-4 py-1"
+                href={pathBuilder.postEdit(
+                  authUser.systemSlug,
+                  post.projectId,
+                  post.id
+                )}
+                trackEvent={trackingEvents.bcEditPost}
+              >
+                Edit update
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     )
