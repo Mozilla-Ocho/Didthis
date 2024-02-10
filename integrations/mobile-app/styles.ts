@@ -36,6 +36,7 @@ export const fonts = {
   logo: "Solway-Medium",
   heading: "Rubik-Bold",
   text: "Rubik-Regular",
+  system: "System",
 };
 
 export const styles = StyleSheet.create({
@@ -82,6 +83,6 @@ export const styles = StyleSheet.create({
   buttonLabel: {
     textAlign: "center",
     fontFamily: fonts.text,
-    fontSize: 22
+    fontSize: 16
   }
 });

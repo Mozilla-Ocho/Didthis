@@ -9,13 +9,16 @@ import AppleSigninButton from "../components/AppleSigninButton";
 import { StackScreenProps } from "@react-navigation/stack";
 import { A } from "@expo/html-elements";
 import { RootStackParamList } from "../App";
-import { styles as globalStyles, colors } from "../styles";
+import { styles as globalStyles, fonts, colors } from "../styles";
 import * as AppleAuthentication from "expo-apple-authentication";
 import * as SiteAPI from "../lib/siteApi";
 import config from "../lib/config";
 import { useState } from "react";
 import ActivityIndicator from "../components/ActivityIndicator";
 import { TouchableHighlight } from "react-native-gesture-handler";
+
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faEnvelope } from "@fortawesome/free-solid-svg-icons/faEnvelope";
 
 export type SigninScreenRouteParams = {};
 
@@ -119,7 +122,8 @@ export default function SigninScreen({ navigation }: SigninScreenProps) {
 function EmailSigninButton({ onPress }: { onPress: () => void }) {
   return (
     <TouchableOpacity style={styles.emailSigninButton} onPress={onPress}>
-      <Text style={styles.emailSigninButtonLabel}>✉️ Sign in with Email</Text>
+      <FontAwesomeIcon icon={faEnvelope} style={{ padding: 4 }} />
+      <Text style={styles.emailSigninButtonLabel}>Sign in with Email</Text>
     </TouchableOpacity>
   );
 }
@@ -182,10 +186,19 @@ const styles = StyleSheet.create({
   },
   emailSigninButton: {
     ...globalStyles.button,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    height: 56,
+    borderRadius: 6,
     marginVertical: 8,
+    padding: 14,
   },
   emailSigninButtonLabel: {
     ...globalStyles.buttonLabel,
-    fontWeight: "bold"
+    paddingLeft: 6,
+    fontFamily: fonts.system,
+    fontSize: 24,
+    fontWeight: "600"
   },
 });
