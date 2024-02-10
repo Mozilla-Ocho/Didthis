@@ -6,6 +6,9 @@ import log from '@/lib/log'
 import { PagePad } from '@/components/uiLib'
 import useAppShell from '@/lib/appShellContent'
 import Loading from '@/components/pages/Loading'
+import { Link } from '@/components/uiLib'
+import branding from '@/lib/branding'
+import pathBuilder from '@/lib/pathBuilder'
 
 const SigninWithEmail = observer(
   ({ sessionCookie }: { sessionCookie?: string }) => {
@@ -18,7 +21,7 @@ const SigninWithEmail = observer(
           appShell.api.request('signinWithSession', { sessionCookie })
         } else if (!appShell.inAppWebView) {
           // redirect to home, in case this is viewed outside the app
-          window.location.assign(`/`)
+          setTimeout(() => window.location.assign(`/`), 1000);
         }
       }
     }, [
@@ -79,6 +82,18 @@ const SigninWithEmail = observer(
             uiConfig={firebaseUiConfig}
             firebaseAuth={store.firebaseRefNonReactive.auth()}
           />
+        <p className="p-3 text-center text-sm">
+          By proceeding, you agree to the {branding.productName}
+          <br />
+          <Link newTab href={pathBuilder.legal('tos')}>
+            Terms of Service
+          </Link>{' '}
+          and{' '}
+          <Link newTab href={pathBuilder.legal('pp')}>
+            Privacy Notice
+          </Link>
+        </p>
+
         </PagePad>
       </div>
     )

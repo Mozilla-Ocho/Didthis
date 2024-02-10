@@ -80,9 +80,27 @@ const LoginGlobalOverlay = observer(() => {
           >
             Log in with email
           </Button>
+        </div>
+      </ConfirmationModal>
+      <ConfirmationModal
+        isOpen={store.signinModalOpen}
+        title=" "
+        onNo={store.cancelGlobalLoginOverlay}
+        onClose={store.cancelGlobalLoginOverlay}
+        closeX
+      >
+        <div>
+          <Button
+            intent="primary"
+            className="w-full mt-4 text-lg"
+            onClick={() => store.launchFirebaseLoginOverlay()}
+          >
+            Sign in with email
+          </Button>
           <AppleSignIn
             width="100%"
             height="48"
+            onCancel={store.cancelGlobalLoginOverlay}
             onSuccess={store.cancelGlobalLoginOverlay}
           />
         </div>

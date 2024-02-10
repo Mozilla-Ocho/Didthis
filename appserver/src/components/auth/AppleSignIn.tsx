@@ -19,6 +19,7 @@ type AppleSignInProps = {
   buttonType?: 'sign-in' | 'continue' | 'sign-up'
   logoSize?: 'small' | 'medium' | 'large'
   onSuccess?: (ev: AppleIDSignInSuccessEvent) => void
+  onCancel?: (ev: AppleIDSignInFailureEvent) => void
   onFailure?: (ev: AppleIDSignInFailureEvent) => void
 }
 
@@ -37,6 +38,7 @@ const AppleSignIn = observer(
     buttonType = 'sign-in',
     logoSize = 'small',
     onSuccess,
+    onCancel,
     onFailure,
   }: AppleSignInProps) => {
     const store = useStore()
@@ -60,11 +62,15 @@ const AppleSignIn = observer(
     const handleAuthFailure = useCallback(
       (event: AppleIDSignInFailureEvent) => {
         // TODO: Handle error.
+        if (event.detail?.error === "popup_closed_by_user") {
+          onCancel?.(event);
+          return;
+        }
         onFailure?.(event)
         window.alert('Sign in with Apple failed, please try again later.')
         console.error('FAILURE', event)
       },
-      [onFailure]
+      [onCancel, onFailure]
     )
 
     useEffect(() => {

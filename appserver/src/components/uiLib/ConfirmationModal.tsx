@@ -13,6 +13,7 @@ interface ConfirmationModalProps {
   onNo?: () => void
   onClose: () => void
   spinning?: boolean
+  closeX?: boolean
 }
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
@@ -26,9 +27,10 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   onNo,
   onClose,
   spinning,
+  closeX,
 }) => {
   return (
-    <Modal srTitle={title} fixedSmall renderTitleHeading isOpen={isOpen} handleClose={onClose}>
+    <Modal srTitle={title} fixedSmall renderTitleHeading isOpen={isOpen} handleClose={onClose} closeX={closeX}>
       <div>
         {body && <p id="confirm-modal-body" className="mb-4">{body}</p>}
         {!body && (

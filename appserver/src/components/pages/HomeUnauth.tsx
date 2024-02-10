@@ -97,7 +97,7 @@ const HomeUnauth = () => {
     await store.loginAsNewTrialUser()
   }
 
-  const ctaButton = invited ? (
+  const ctaButton = (invited && store.enableDeferredSignup) ? (
     <DeferredSignupButton
       onClick={handleDeferredLogin}
       className="my-6 px-6 py-4 text-lg"
@@ -119,6 +119,7 @@ const HomeUnauth = () => {
       <WaitlistButton className="mr-4 mt-0" />
     </>
   )
+
   return (
     <div className="grid grid-rows-[auto_1fr_auto] w-full min-h-screen">
       <AppHeader />

@@ -16,7 +16,7 @@ const AppHeader = observer(({ isThe404, hideLogin }: { isThe404?: boolean; hideL
   const appShell = useAppShell()
 
   // Hide this component when viewed in the native app shell.
-  if (appShell.inAppWebView) return <></>
+  if (appShell.inAppWebView || hideLogin) return <></>
 
   return (
     <div>

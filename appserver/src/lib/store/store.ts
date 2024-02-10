@@ -49,6 +49,7 @@ class Store {
   trackedPageEvent: false | EventSpec = false
   generalError: GeneralError = false
   firebaseModalOpen = false
+  signinModalOpen = false
   loginErrorMode: LoginErrorMode = false
   fullpageLoading = false // used when signing in
   confirmingDelete: ConfirmingDelete | false = false
@@ -61,6 +62,7 @@ class Store {
   trialAccountClaimed?: boolean
   userListeners : Array<UserListenerFn> = []
   appShellApiRef: AppShellAPI | false = false
+  enableDeferredSignup = false // crude feature flag to switch between deferred trial signup and full signup
 
   constructor({
     authUser,
@@ -172,7 +174,9 @@ class Store {
         const json = window.sessionStorage.getItem(KEY_SIGNUP_CODE_INFO)
         if (json) {
           const info = JSON.parse(json) as ApiSignupCodeInfo
-          if (!this.signupCodeInfo || this.signupCodeInfo.name === 'opendoor') {
+          if (!this.signupCodeInfo && info.name) {
+            // Only accept the signupCodeInfo from storage if there's not one
+            // incoming from param and the stored info has a name
             this.signupCodeInfo = info
           }
         }
@@ -345,7 +349,6 @@ class Store {
   launchGlobalLoginOverlay(overrideCodeCheck: boolean) {
     this.trackEvent(trackingEvents.bcLoginSignup)
     this.loginErrorMode = false
-    console.log('signupCodeInfo', this.signupCodeInfo)
     // DRY_47693 signup code logic
     if (this.signupCodeInfo === false) {
       // with no code present, we don't show any special case ui, we just let
@@ -380,7 +383,7 @@ class Store {
 
     if (this.signupCodeInfo) {
       if (this.signupCodeInfo.active) {
-        this.firebaseModalOpen = true
+        this.signinModalOpen = true
         return
       } else {
         this.loginErrorMode = '_inactive_code_'
@@ -389,7 +392,13 @@ class Store {
     }
   }
 
+  launchFirebaseLoginOverlay() {
+    this.signinModalOpen = false
+    this.firebaseModalOpen = true
+  }
+
   cancelGlobalLoginOverlay() {
+    this.signinModalOpen = false
     this.firebaseModalOpen = false
     this.loginErrorMode = false
   }
