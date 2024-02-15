@@ -191,9 +191,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    height: 56,
-    borderRadius: 6,
+    height: 54,
+    width: 220,
     marginVertical: 8,
+    borderRadius: 6,
     padding: 14,
   },
   emailSigninButtonLabel: {
