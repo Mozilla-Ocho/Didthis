@@ -95,7 +95,7 @@ const LoginGlobalOverlay = observer(() => {
             className="w-full mt-4 text-lg"
             onClick={() => store.launchFirebaseLoginOverlay()}
           >
-            Sign in with email
+            Sign in with Email
           </Button>
           <AppleSignIn
             width="100%"

@@ -63,6 +63,7 @@ class Store {
   userListeners : Array<UserListenerFn> = []
   appShellApiRef: AppShellAPI | false = false
   enableDeferredSignup = false // crude feature flag to switch between deferred trial signup and full signup
+  appPlatform: AppPlatformType
 
   constructor({
     authUser,
@@ -138,6 +139,13 @@ class Store {
         this.setAmplitudeUserAttrs()
         window.localStorage.removeItem('pendingTrack')
       }
+    }
+    if (this.isNativeIOS()) {
+      this.appPlatform = 'native-ios'
+    } else if (this.isMobile()) {
+      this.appPlatform = 'web-mobile'
+    } else {
+      this.appPlatform = 'web-desktop'
     }
     log.debug('store constructed. id=', this.debugObjId)
   }
@@ -536,6 +544,16 @@ class Store {
     return false
   }
 
+  isMobile() {
+    if (typeof navigator !== 'undefined') {
+      // Not comprehensive, but probably good enough
+      if (/Android|iPhone/i.test(navigator.userAgent)) {
+        return true
+      }
+    }
+    return false
+  }
+
   screenSize() {
     // https://tailwindcss.com/docs/responsive-design
     if (typeof window !== 'undefined') {
@@ -600,7 +618,7 @@ class Store {
       fullEvent.opts.slug = this.user.publicPageSlug
     }
     fullEvent.opts.isTrial = (this.user && this.user.isTrial) ? 'y' : 'n'
-    fullEvent.opts.appPlatform = this.isNativeIOS() ? 'ios' : 'web'
+    fullEvent.opts.appPlatform = this.appPlatform
     fullEvent.opts.screenSize = this.screenSize()
     log.tracking(
       fullEvent.eventName,
@@ -661,6 +679,9 @@ class Store {
     if (!this.user) throw new Error('must be authed')
     const numProjects = Object.keys(this.user.profile.projects).length
     const numPosts = Object.values(this.user.profile.projects).map(p => Object.keys(p.posts).length).reduce((a,b)=>a+b,0)
+    if (mode === 'new') {
+      post.createdPlatform = this.appPlatform
+    }
     return this.apiClient.savePost({ post }).then(wrapper => {
       this.setUser(wrapper.payload.user)
       if (mode === 'new') {
@@ -704,6 +725,9 @@ class Store {
       } else {
         this.trackEvent(trackingEvents.caSetProjectPrivate)
       }
+    }
+    if (mode === 'new') {
+      project.createdPlatform = this.appPlatform
     }
     return this.apiClient.saveProject({ project }).then(wrapper => {
       this.setUser(wrapper.payload.user)

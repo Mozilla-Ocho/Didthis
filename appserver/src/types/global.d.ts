@@ -101,6 +101,8 @@ type CldImageMetaPrivate = {[key:string]: any} & {metaOrigin: 'private' }
 type CldImageMetaUrl = {[key:string]: any} & {metaOrigin: 'urlMeta'}
 type CldImageMetaAny = CldImageMetaPublic | CldImageMetaPrivate | CldImageMetaUrl
 
+type AppPlatformType = 'web' | 'web-desktop' | 'web-mobile' | 'native-ios'
+
 type ApiPost = {
   id: ApiPostId
   projectId: ApiProjectId
@@ -114,6 +116,7 @@ type ApiPost = {
   imageAssetId?: string
   imageMeta?: CldImageMetaPrivate | CldImageMetaPublic
   autoShare?: boolean
+  createdPlatform?: AppPlatformType
 }
 
 type ApiProject = {
@@ -128,6 +131,7 @@ type ApiProject = {
   imageAssetId?: string
   imageMeta?: CldImageMetaPrivate | CldImageMetaPublic
   shareByDefault?: boolean
+  createdPlatform?: AppPlatformType
 }
 
 type ApiSocialUrls = {
@@ -163,6 +167,7 @@ type ApiProfile = {
   updatedAt: number // updated when user account details are modified (not projects)
   projects: { [key: string]: ApiProject }
   connectedAccounts?: ApiConnectedAccounts
+  createdPlatform?: AppPlatformType
 }
 
 type PostMediaType = 'text' | 'image' | 'link'
