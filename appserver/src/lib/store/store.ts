@@ -414,7 +414,7 @@ class Store {
 
   async loginWithAppleId(
     credential: AppleAuthenticationCredential,
-    justCreated: boolean
+    justCreated?: boolean
   ) {
     if (this.user) throw new Error('must be unauthed')
     this.setRecentAuthMethod('apple')
