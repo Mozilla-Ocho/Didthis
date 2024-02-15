@@ -128,7 +128,13 @@ class Store {
       // activity.
       if (pt === 'signup') {
         // DRY_25748 signup tracking
-        this.trackEvent(trackingEvents.caSignup, {
+        let signupEvent = trackingEvents.caSignup
+        if (this.getAppPlatform() === "native-ios") {
+          // this *should* be caSignup, but historically caAppleIDLogin was used.
+          // so, we're keeping caAppleIDLogin so as not to break existing funnel tracking
+          signupEvent = trackingEvents.caAppleIDLogin
+        }
+        this.trackEvent(signupEvent, {
           signupCodeName: authUser ? authUser.signupCodeName : undefined,
         })
         this.trackEvent(trackingEvents.authSession, {
@@ -419,10 +425,17 @@ class Store {
     if (this.user) throw new Error('must be unauthed')
     this.setRecentAuthMethod('apple')
     const wrapper = await this.apiClient.sessionLoginWithAppleId({ credential })
+    this.setUser(wrapper.payload)
+    this.setAmplitudeUserAttrs()
     if (justCreated || wrapper.payload.justCreated) {
-      // this *should* be caSignup, but historically caAppleIDLogin was used.
-      // so, we're keeping caAppleIDLogin so as not to break existing funnel tracking
-      this.trackEvent(trackingEvents.caAppleIDLogin, {})
+      // DRY_25748 signup tracking
+      let signupEvent = trackingEvents.caSignup
+      if (this.getAppPlatform() === "native-ios") {
+        // this *should* be caSignup, but historically caAppleIDLogin was used.
+        // so, we're keeping caAppleIDLogin so as not to break existing funnel tracking
+        signupEvent = trackingEvents.caAppleIDLogin
+      }
+      this.trackEvent(signupEvent, {})
     } else {
       this.trackEvent(trackingEvents.caLogin, {})
     }
