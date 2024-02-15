@@ -59,7 +59,6 @@ export default function AppShellWebView({
       <WebView
         key={webviewKey}
         source={source}
-        sharedCookiesEnabled={true}
         originWhitelist={originWhitelist}
         startInLoadingState={true}
         renderLoading={() => <Loader />}

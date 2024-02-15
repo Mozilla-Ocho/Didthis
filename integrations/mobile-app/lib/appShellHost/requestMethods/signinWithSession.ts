@@ -5,9 +5,10 @@ export const signinWithSession: Methods["signinWithSession"] = async (
   api,
   payload
 ) => {
-  const { sessionCookie } = payload;
+  const { sessionCookie, authMethod = "email" } = payload;
   await SiteAPI.signinWithSession(sessionCookie);
   api.navigation.navigate("WebApp", {
+    authMethod,
     resetWebViewAfter: Date.now(),
   });
   return { success: true };

@@ -17,6 +17,8 @@ const { siteBaseUrl } = Config;
 
 export type WebAppScreenRouteParams = {
   credential?: AppleAuthentication.AppleAuthenticationCredential;
+  authMethod?: "email" | "apple";
+  justCreated?: false;
   resetWebViewAfter?: number;
 };
 
@@ -26,18 +28,29 @@ export type WebAppScreenProps = {} & StackScreenProps<
 >;
 
 export default function WebAppScreen({ route, navigation }: WebAppScreenProps) {
-  const { credential, resetWebViewAfter = 0 } = route.params || {};
+  const {
+    credential,
+    authMethod,
+    justCreated,
+    resetWebViewAfter = 0,
+  } = route.params || {};
+
+  const params = new URLSearchParams();
+  if (authMethod) params.set("authMethod", authMethod);
+  if (justCreated) params.set("justCreated", "1");
+
+  const uri = `${siteBaseUrl}?${params.toString()}`;
 
   return (
     <AppShellWebView
-      source={{ uri: siteBaseUrl }}
+      source={{ uri }}
       resetWebViewAfter={resetWebViewAfter}
       header={() => <ConditionalTopNav />}
       footer={() => (
         <>
           <ConditionalBottomNav />
           <WaitingForUserLoader />
-          <AuthAndOnboardingCheck {...{ credential, navigation }} />
+          <AuthAndOnboardingCheck {...{ credential, justCreated, navigation }} />
         </>
       )}
     />
@@ -48,9 +61,11 @@ export default function WebAppScreen({ route, navigation }: WebAppScreenProps) {
 // shell host with populated webviewRef via useAppShellHost hook
 function AuthAndOnboardingCheck({
   credential,
+  justCreated,
   navigation,
 }: {
   credential?: AppleAuthentication.AppleAuthenticationCredential;
+  justCreated?: boolean;
   navigation: StackNavigationProp<RootStackParamList, "WebApp", undefined>;
 }) {
   const appShellHost = useAppShellHost();
@@ -66,7 +81,7 @@ function AuthAndOnboardingCheck({
 
   // Send Apple credential to web content, so we can trigger loginWithAppleId
   // if we're not already logged in
-  useSendAppleCredentialToWebContent(credential, appShellHost);
+  useSendAppleCredentialToWebContent(credential, justCreated, appShellHost);
 
   return null;
 }
@@ -106,12 +121,13 @@ function WaitingForUserLoader() {
  */
 function useSendAppleCredentialToWebContent(
   credential: AppleAuthentication.AppleAuthenticationCredential,
+  justCreated: boolean,
   appShellHost: AppShellHostAPI
 ) {
   const webContentReady = appShellHost.state?.webContentReady;
   useEffect(() => {
     if (webContentReady && credential) {
-      appShellHost.postMessage("appleCredential", { credential });
+      appShellHost.postMessage("appleCredential", { credential, justCreated });
     }
   }, [webContentReady, appShellHost, credential]);
 }

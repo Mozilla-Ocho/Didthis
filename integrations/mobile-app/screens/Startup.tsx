@@ -9,7 +9,6 @@ import Config from "../lib/config";
 import * as SiteAPI from "../lib/siteApi";
 
 const { siteBaseUrl } = Config;
-const loginApiUrl = `${siteBaseUrl}/api/sessionLoginWithAppleId`;
 
 export type StartupScreenRouteParams = {};
 

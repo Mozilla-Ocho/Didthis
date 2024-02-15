@@ -43,10 +43,12 @@ export default function SigninScreen({ navigation }: SigninScreenProps) {
   ) => {
     try {
       // HACK: Not sharing cookies between app & webview, need to sign-in with both
-      await SiteAPI.signinWithCredential(credential);
+      const apiUser = await SiteAPI.signinWithCredential(credential);
       setSigninStatus("success");
       navigation.navigate("WebApp", {
         credential,
+        authMethod: 'apple',
+        justCreated: apiUser.justCreated,
         resetWebViewAfter: Date.now(),
       });
     } catch (e) {

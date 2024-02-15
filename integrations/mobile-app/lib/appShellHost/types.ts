@@ -7,7 +7,10 @@ export type AppMessages = {
   response: AppRequestMethods[AppRequestMethodNames]["response"];
   request: AppRequestMethods[AppRequestMethodNames]["request"];
   navigateToPath: { path: string };
-  appleCredential: { credential: AppleAuthenticationCredential };
+  appleCredential: {
+    credential: AppleAuthenticationCredential;
+    justCreated: boolean;
+  };
   topNavLeftPress: { label: string };
   topNavRightPress: { label: string };
   topNavSharePress: { label: string };
@@ -17,9 +20,9 @@ export type AppMessages = {
 
 // DRY_76795 native event types handling
 export type NativeEventNames =
-  'bcNativeDrawerOpen' |
-  'bcNativeDrawerCreateProject' |
-  'bcNativeDrawerProject';
+  | "bcNativeDrawerOpen"
+  | "bcNativeDrawerCreateProject"
+  | "bcNativeDrawerProject";
 
 export type AppRequestMethods = {
   ping: {
@@ -33,9 +36,10 @@ export type AppRequestMethods = {
   signinWithSession: {
     request: {
       sessionCookie: string;
-    },
+      authMethod?: "email" | "apple";
+    };
     response: Success;
-  }
+  };
   showAppInfo: {
     request: undefined;
     response: Success;

@@ -32,7 +32,9 @@ export async function signinWithCredential(
   }
   await Storage.setItem("AUTH_SESSION_COOKIE", sessionCookie);
 
-  const apiUser = await fetchSignedInUser();
+  // Use the apiUser returned from session login, it includes the
+  // `justCreated` property on signup
+  const { payload: apiUser } = await resp.json();
   if (!apiUser) {
     throw new Error("Sign-in failed - no signed in user");
   }
