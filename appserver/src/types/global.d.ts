@@ -102,6 +102,7 @@ type CldImageMetaUrl = {[key:string]: any} & {metaOrigin: 'urlMeta'}
 type CldImageMetaAny = CldImageMetaPublic | CldImageMetaPrivate | CldImageMetaUrl
 
 type AppPlatformType = 'web' | 'web-desktop' | 'web-mobile' | 'native-ios'
+type AuthMethodType = 'email' | 'apple'
 
 type ApiPost = {
   id: ApiPostId
@@ -180,7 +181,8 @@ type EventSpec = {
   opts: {
     name?: string
     isAuthed?: YorN
-    appPlatform?: 'ios' | 'web'
+    authMethod?: AuthMethodType
+    appPlatform?: AppPlatformType
     screenSize?: '' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
     slug?: string
     signupCodeName?: string

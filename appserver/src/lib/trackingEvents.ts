@@ -52,7 +52,11 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
     },
   },
   caLogin: { eventName: 'login', opts: {} },
-  caAppleIDLogin: { eventName: 'loginAppleId', opts: {} },
+  caAppleIDLogin: {
+    /* fired on signup in iOS app - it's a historical misnomer to preserve funnel tracking */
+    eventName: 'loginAppleId',
+    opts: {}
+  },
   authSession: { eventName: 'authSession', opts: {} },
   caProfileField: {
     /* fired when a user first saves any content in a given profile field, will be

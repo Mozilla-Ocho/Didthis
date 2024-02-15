@@ -28,6 +28,7 @@ const modalTransitionTime = 200
 
 export const KEY_SIGNUP_CODE_INFO = 'signupCodeInfo'
 export const KEY_TRIAL_ACCOUNT_CLAIMED = 'trialAccountClaimed'
+export const KEY_RECENT_AUTH_METHOD = 'recentAuthMethod'
 
 export type ApiClient = typeof apiClientBase
 export type AmplitudeClient = typeof amplitudeBase
@@ -60,10 +61,11 @@ class Store {
   apiClient: ApiClient
   amplitude: AmplitudeClient
   trialAccountClaimed?: boolean
-  userListeners : Array<UserListenerFn> = []
+  userListeners: Array<UserListenerFn> = []
   appShellApiRef: AppShellAPI | false = false
   enableDeferredSignup = false // crude feature flag to switch between deferred trial signup and full signup
-  appPlatform: AppPlatformType
+  appPlatform: AppPlatformType | false = false
+  authMethod: AuthMethodType | false = false
 
   constructor({
     authUser,
@@ -139,14 +141,18 @@ class Store {
         this.setAmplitudeUserAttrs()
         window.localStorage.removeItem('pendingTrack')
       }
+
+      if (this.isNativeIOS()) {
+        this.appPlatform = 'native-ios'
+      } else if (this.isMobile()) {
+        this.appPlatform = 'web-mobile'
+      } else {
+        this.appPlatform = 'web-desktop'
+      }
+
+      this.authMethod = this.getRecentAuthMethod()
     }
-    if (this.isNativeIOS()) {
-      this.appPlatform = 'native-ios'
-    } else if (this.isMobile()) {
-      this.appPlatform = 'web-mobile'
-    } else {
-      this.appPlatform = 'web-desktop'
-    }
+
     log.debug('store constructed. id=', this.debugObjId)
   }
 
@@ -414,8 +420,29 @@ class Store {
   async loginWithAppleId(credential: AppleAuthenticationCredential) {
     if (this.user) throw new Error('must be unauthed')
     const wrapper = await this.apiClient.sessionLoginWithAppleId({ credential })
-    this.trackEvent(trackingEvents.caAppleIDLogin, {})
+    if (wrapper.payload.justCreated) {
+      // this *should* be caSignup, but historically caAppleIDLogin was used.
+      // so, we're keeping caAppleIDLogin so as not to break existing funnel tracking
+      this.trackEvent(trackingEvents.caAppleIDLogin, {})
+    } else {
+      this.trackEvent(trackingEvents.caLogin, {})
+    }
+    this.setRecentAuthMethod('apple')
     window.location.assign(`/`)
+  }
+
+  setRecentAuthMethod(authType: AuthMethodType) {
+    window.localStorage.setItem(KEY_RECENT_AUTH_METHOD, authType)
+  }
+
+  getRecentAuthMethod(): AuthMethodType | false {
+    if (this.user && typeof window !== 'undefined') {
+      const value = window.localStorage.getItem(KEY_RECENT_AUTH_METHOD)
+      if (value === 'apple') return 'apple'
+      // 'email' is default, since only 'apple' is explicitly set in storage
+      return 'email'
+    }
+    return false
   }
 
   async loginAsNewTrialUser() {
@@ -493,7 +520,7 @@ class Store {
       }
     } catch (e) {
       // TODO: need a better error reporting dialogue
-      window.alert("Sign up failed, please try a different email address.")
+      window.alert('Sign up failed, please try a different email address.')
       log.error('Account claim attempt failed')
       window.location.reload()
     }
@@ -617,8 +644,9 @@ class Store {
     if (!fullEvent.opts.slug && this.user) {
       fullEvent.opts.slug = this.user.publicPageSlug
     }
-    fullEvent.opts.isTrial = (this.user && this.user.isTrial) ? 'y' : 'n'
+    fullEvent.opts.isTrial = this.user && this.user.isTrial ? 'y' : 'n'
     fullEvent.opts.appPlatform = this.appPlatform
+    fullEvent.opts.authMethod = this.authMethod
     fullEvent.opts.screenSize = this.screenSize()
     log.tracking(
       fullEvent.eventName,
@@ -726,7 +754,7 @@ class Store {
         this.trackEvent(trackingEvents.caSetProjectPrivate)
       }
     }
-    if (mode === 'new') {
+    if (mode === 'new' && this.appPlatform) {
       project.createdPlatform = this.appPlatform
     }
     return this.apiClient.saveProject({ project }).then(wrapper => {
