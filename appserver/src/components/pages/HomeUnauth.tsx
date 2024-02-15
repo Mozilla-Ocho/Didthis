@@ -23,7 +23,8 @@ const HomeUnauth = () => {
   const store = useStore()
 
   useAppShellListener('appleCredential', payload => {
-    store.loginWithAppleId(payload.credential)
+    store.setRecentAuthMethod('apple')
+    store.loginWithAppleId(payload.credential, payload.justCreated)
   })
 
   const topicBucket = 'utility' // as of 09/05/23 all users see utility messaging

@@ -12,13 +12,16 @@ import PageTitle from '../PageTitle'
 import OgMeta from '../OgMeta'
 import RemindersAndAlerts from '../RemindersAndAlerts'
 import branding from '@/lib/branding'
-import useAppShell from '@/lib/appShellContent'
+import useAppShell, { useAppShellListener } from '@/lib/appShellContent'
 
 import settingsGear from '@/assets/img/settings-gear.svg'
 import DiscordCard from '../DiscordCard'
 
 const HomeAuth = observer(() => {
   const store = useStore()
+  useAppShellListener('appleCredential', payload => {
+    store.setRecentAuthMethod('apple')
+  })
   const [skipBlankSlate, setSkipBlankSlate] = useLocalStorage(
     'skipBlankSlate', // DRY_26502
     false

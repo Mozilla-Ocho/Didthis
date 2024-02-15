@@ -117,6 +117,10 @@ class Store {
           },
         }
       )
+
+      this.appPlatform = this.getAppPlatform()
+      this.authMethod = this.getRecentAuthMethod()
+
       const pt = window.localStorage.getItem('pendingTrack')
       // in addition to specific login or signup events, its useful in
       // ampltidue to have a meta event that flags this session as
@@ -141,16 +145,6 @@ class Store {
         this.setAmplitudeUserAttrs()
         window.localStorage.removeItem('pendingTrack')
       }
-
-      if (this.isNativeIOS()) {
-        this.appPlatform = 'native-ios'
-      } else if (this.isMobile()) {
-        this.appPlatform = 'web-mobile'
-      } else {
-        this.appPlatform = 'web-desktop'
-      }
-
-      this.authMethod = this.getRecentAuthMethod()
     }
 
     log.debug('store constructed. id=', this.debugObjId)
@@ -308,6 +302,7 @@ class Store {
     // and switch to our own loading state
     this.setFullPageLoading(true)
     this.amplitude.flush()
+    this.setRecentAuthMethod('email')
 
     try {
       const idToken = await firebaseUser.getIdToken()
@@ -417,31 +412,43 @@ class Store {
     this.loginErrorMode = false
   }
 
-  async loginWithAppleId(credential: AppleAuthenticationCredential) {
+  async loginWithAppleId(
+    credential: AppleAuthenticationCredential,
+    justCreated: boolean
+  ) {
     if (this.user) throw new Error('must be unauthed')
+    this.setRecentAuthMethod('apple')
     const wrapper = await this.apiClient.sessionLoginWithAppleId({ credential })
-    if (wrapper.payload.justCreated) {
+    if (justCreated || wrapper.payload.justCreated) {
       // this *should* be caSignup, but historically caAppleIDLogin was used.
       // so, we're keeping caAppleIDLogin so as not to break existing funnel tracking
       this.trackEvent(trackingEvents.caAppleIDLogin, {})
     } else {
       this.trackEvent(trackingEvents.caLogin, {})
     }
-    this.setRecentAuthMethod('apple')
     window.location.assign(`/`)
   }
 
   setRecentAuthMethod(authType: AuthMethodType) {
     window.localStorage.setItem(KEY_RECENT_AUTH_METHOD, authType)
+    this.authMethod = this.getRecentAuthMethod()
   }
 
   getRecentAuthMethod(): AuthMethodType | false {
-    if (this.user && typeof window !== 'undefined') {
+    if (typeof window !== 'undefined') {
+      // react native app may set authMethod via URL parameters in webview
+      const url = new URL(window.location.toString())
+      const urlAuthMethod = url.searchParams.get('authMethod')
+      if (urlAuthMethod) {
+        window.localStorage.setItem(KEY_RECENT_AUTH_METHOD, urlAuthMethod)
+        return urlAuthMethod as AuthMethodType
+      }
+
+      // otherwise, try grabbing the last value in localstorage
       const value = window.localStorage.getItem(KEY_RECENT_AUTH_METHOD)
-      if (value === 'apple') return 'apple'
-      // 'email' is default, since only 'apple' is explicitly set in storage
-      return 'email'
+      if (value) return value as AuthMethodType
     }
+
     return false
   }
 
@@ -581,6 +588,12 @@ class Store {
     return false
   }
 
+  getAppPlatform(): AppPlatformType {
+    if (this.isNativeIOS()) return 'native-ios'
+    if (this.isMobile()) return 'web-mobile'
+    return 'web-desktop'
+  }
+
   screenSize() {
     // https://tailwindcss.com/docs/responsive-design
     if (typeof window !== 'undefined') {
@@ -645,7 +658,7 @@ class Store {
       fullEvent.opts.slug = this.user.publicPageSlug
     }
     fullEvent.opts.isTrial = this.user && this.user.isTrial ? 'y' : 'n'
-    fullEvent.opts.appPlatform = this.appPlatform
+    fullEvent.opts.appPlatform = this.getAppPlatform()
     fullEvent.opts.authMethod = this.authMethod
     fullEvent.opts.screenSize = this.screenSize()
     log.tracking(
@@ -708,7 +721,7 @@ class Store {
     const numProjects = Object.keys(this.user.profile.projects).length
     const numPosts = Object.values(this.user.profile.projects).map(p => Object.keys(p.posts).length).reduce((a,b)=>a+b,0)
     if (mode === 'new') {
-      post.createdPlatform = this.appPlatform
+      post.createdPlatform = this.getAppPlatform()
     }
     return this.apiClient.savePost({ post }).then(wrapper => {
       this.setUser(wrapper.payload.user)
@@ -754,8 +767,8 @@ class Store {
         this.trackEvent(trackingEvents.caSetProjectPrivate)
       }
     }
-    if (mode === 'new' && this.appPlatform) {
-      project.createdPlatform = this.appPlatform
+    if (mode === 'new') {
+      project.createdPlatform = this.getAppPlatform()
     }
     return this.apiClient.saveProject({ project }).then(wrapper => {
       this.setUser(wrapper.payload.user)

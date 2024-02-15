@@ -6,7 +6,10 @@ export type AppMessages = {
   response: AppRequestMethods[AppRequestMethodNames]["response"];
   request: AppRequestMethods[AppRequestMethodNames]["request"];
   navigateToPath: { path: string };
-  appleCredential: { credential: AppleAuthenticationCredential };
+  appleCredential: {
+    credential: AppleAuthenticationCredential;
+    justCreated: boolean;
+  };
   topNavLeftPress: { label: string };
   topNavRightPress: { label: string };
   topNavSharePress: { label: string };
