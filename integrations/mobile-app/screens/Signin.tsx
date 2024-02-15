@@ -187,7 +187,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   emailSigninButton: {
-    ...globalStyles.button,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
@@ -199,9 +198,12 @@ const styles = StyleSheet.create({
   },
   emailSigninButtonLabel: {
     ...globalStyles.buttonLabel,
+    textDecorationColor: "#000",
+    textDecorationLine: "underline",
+
     paddingLeft: 6,
     fontFamily: fonts.system,
-    fontSize: 24,
+    fontSize: 21,
     fontWeight: "600"
   },
 });
