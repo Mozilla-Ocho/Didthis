@@ -1,5 +1,5 @@
 import useAppShellHost from "../lib/appShellHost";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { SafeAreaView, StyleSheet } from "react-native";
 import { StackNavigationProp, StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../App";
@@ -50,7 +50,9 @@ export default function WebAppScreen({ route, navigation }: WebAppScreenProps) {
         <>
           <ConditionalBottomNav />
           <WaitingForUserLoader />
-          <AuthAndOnboardingCheck {...{ credential, justCreated, navigation }} />
+          <AuthAndOnboardingCheck
+            {...{ credential, justCreated, navigation }}
+          />
         </>
       )}
     />
@@ -124,10 +126,12 @@ function useSendAppleCredentialToWebContent(
   justCreated: boolean,
   appShellHost: AppShellHostAPI
 ) {
+  const [sentCredential, setSentCredential] = useState(false);
   const webContentReady = appShellHost.state?.webContentReady;
   useEffect(() => {
-    if (webContentReady && credential) {
+    if (webContentReady && credential && !sentCredential) {
       appShellHost.postMessage("appleCredential", { credential, justCreated });
+      setSentCredential(true);
     }
   }, [webContentReady, appShellHost, credential]);
 }

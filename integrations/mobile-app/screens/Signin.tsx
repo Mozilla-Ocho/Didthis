@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
 
     paddingLeft: 6,
     fontFamily: fonts.system,
-    fontSize: 21,
+    fontSize: 24,
     fontWeight: "600"
   },
 });
