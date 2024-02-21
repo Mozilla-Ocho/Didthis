@@ -21,9 +21,7 @@ import { useAppShellListener } from '@/lib/appShellContent'
 // DRY_20334 outer page width styles
 const HomeUnauth = () => {
   const store = useStore()
-
   useAppShellListener('appleCredential', payload => {
-    store.setRecentAuthMethod('apple')
     store.loginWithAppleId(payload.credential, payload.justCreated)
   })
 

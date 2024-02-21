@@ -20,7 +20,7 @@ import DiscordCard from '../DiscordCard'
 const HomeAuth = observer(() => {
   const store = useStore()
   useAppShellListener('appleCredential', payload => {
-    store.setRecentAuthMethod('apple')
+    store.loginWithAppleId(payload.credential, payload.justCreated)
   })
   const [skipBlankSlate, setSkipBlankSlate] = useLocalStorage(
     'skipBlankSlate', // DRY_26502
