@@ -23,17 +23,19 @@ const Inner = observer(
     children,
     unauthHomepage,
     isThe404,
+    hideLogin,
   }: {
     children: ReactNode
     unauthHomepage?: boolean
     isThe404?: boolean
+    hideLogin?: boolean
   }) => {
     const store = useStore()
     if (store.user && store.user.unsolicited) {
       return (
         <StoreLoadingWrapper>
           <LoginGlobalOverlay />
-          <StaticLayout isThe404={isThe404}>
+          <StaticLayout isThe404={isThe404} hideLogin={hideLogin}>
             <HomeUnsolicited />
           </StaticLayout>
         </StoreLoadingWrapper>
@@ -43,7 +45,7 @@ const Inner = observer(
       <StoreLoadingWrapper>
         <LoginGlobalOverlay />
         <DeletionConfirmationModal />
-        <StaticLayout isThe404={isThe404} unauthHomepage={unauthHomepage}>
+        <StaticLayout isThe404={isThe404} hideLogin={hideLogin} unauthHomepage={unauthHomepage}>
           {children}
         </StaticLayout>
       </StoreLoadingWrapper>
@@ -57,6 +59,7 @@ export default function DefaultLayout({
   children,
   unauthHomepage,
   isThe404,
+  hideLogin,
   testBucket,
 }: {
   authUser: ApiUser | false
@@ -64,6 +67,7 @@ export default function DefaultLayout({
   children: ReactNode // ReactNode not ReactElement
   unauthHomepage?: boolean
   isThe404?: boolean
+  hideLogin?: boolean
   // bucketed tests are not in use everywhere so this is undefined in a bunch
   // of pages.
   testBucket?: TestBucket
@@ -82,7 +86,7 @@ export default function DefaultLayout({
       >
         <AppShellContextProvider>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Inner isThe404={isThe404} unauthHomepage={unauthHomepage}>
+            <Inner isThe404={isThe404} hideLogin={hideLogin} unauthHomepage={unauthHomepage}>
               {children}
             </Inner>
           </LocalizationProvider>

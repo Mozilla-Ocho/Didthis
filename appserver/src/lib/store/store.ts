@@ -28,6 +28,7 @@ const modalTransitionTime = 200
 
 export const KEY_SIGNUP_CODE_INFO = 'signupCodeInfo'
 export const KEY_TRIAL_ACCOUNT_CLAIMED = 'trialAccountClaimed'
+export const KEY_RECENT_AUTH_METHOD = 'recentAuthMethod'
 
 export type ApiClient = typeof apiClientBase
 export type AmplitudeClient = typeof amplitudeBase
@@ -49,6 +50,7 @@ class Store {
   trackedPageEvent: false | EventSpec = false
   generalError: GeneralError = false
   firebaseModalOpen = false
+  signinModalOpen = false
   loginErrorMode: LoginErrorMode = false
   fullpageLoading = false // used when signing in
   confirmingDelete: ConfirmingDelete | false = false
@@ -59,8 +61,11 @@ class Store {
   apiClient: ApiClient
   amplitude: AmplitudeClient
   trialAccountClaimed?: boolean
-  userListeners : Array<UserListenerFn> = []
+  userListeners: Array<UserListenerFn> = []
   appShellApiRef: AppShellAPI | false = false
+  enableDeferredSignup = false // crude feature flag to switch between deferred trial signup and full signup
+  appPlatform: AppPlatformType | false = false
+  authMethod: AuthMethodType | false = false
 
   constructor({
     authUser,
@@ -112,6 +117,10 @@ class Store {
           },
         }
       )
+
+      this.appPlatform = this.getAppPlatform()
+      this.authMethod = this.getRecentAuthMethod()
+
       const pt = window.localStorage.getItem('pendingTrack')
       // in addition to specific login or signup events, its useful in
       // ampltidue to have a meta event that flags this session as
@@ -119,7 +128,13 @@ class Store {
       // activity.
       if (pt === 'signup') {
         // DRY_25748 signup tracking
-        this.trackEvent(trackingEvents.caSignup, {
+        let signupEvent = trackingEvents.caSignup
+        if (this.getAppPlatform() === "native-ios") {
+          // this *should* be caSignup, but historically caAppleIDLogin was used.
+          // so, we're keeping caAppleIDLogin so as not to break existing funnel tracking
+          signupEvent = trackingEvents.caAppleIDLogin
+        }
+        this.trackEvent(signupEvent, {
           signupCodeName: authUser ? authUser.signupCodeName : undefined,
         })
         this.trackEvent(trackingEvents.authSession, {
@@ -137,6 +152,7 @@ class Store {
         window.localStorage.removeItem('pendingTrack')
       }
     }
+
     log.debug('store constructed. id=', this.debugObjId)
   }
 
@@ -172,7 +188,9 @@ class Store {
         const json = window.sessionStorage.getItem(KEY_SIGNUP_CODE_INFO)
         if (json) {
           const info = JSON.parse(json) as ApiSignupCodeInfo
-          if (!this.signupCodeInfo || this.signupCodeInfo.name === 'opendoor') {
+          if (!this.signupCodeInfo && info.name) {
+            // Only accept the signupCodeInfo from storage if there's not one
+            // incoming from param and the stored info has a name
             this.signupCodeInfo = info
           }
         }
@@ -290,6 +308,7 @@ class Store {
     // and switch to our own loading state
     this.setFullPageLoading(true)
     this.amplitude.flush()
+    this.setRecentAuthMethod('email')
 
     try {
       const idToken = await firebaseUser.getIdToken()
@@ -345,7 +364,6 @@ class Store {
   launchGlobalLoginOverlay(overrideCodeCheck: boolean) {
     this.trackEvent(trackingEvents.bcLoginSignup)
     this.loginErrorMode = false
-    console.log('signupCodeInfo', this.signupCodeInfo)
     // DRY_47693 signup code logic
     if (this.signupCodeInfo === false) {
       // with no code present, we don't show any special case ui, we just let
@@ -380,7 +398,7 @@ class Store {
 
     if (this.signupCodeInfo) {
       if (this.signupCodeInfo.active) {
-        this.firebaseModalOpen = true
+        this.signinModalOpen = true
         return
       } else {
         this.loginErrorMode = '_inactive_code_'
@@ -389,16 +407,50 @@ class Store {
     }
   }
 
+  launchFirebaseLoginOverlay() {
+    this.signinModalOpen = false
+    this.firebaseModalOpen = true
+  }
+
   cancelGlobalLoginOverlay() {
+    this.signinModalOpen = false
     this.firebaseModalOpen = false
     this.loginErrorMode = false
   }
 
-  async loginWithAppleId(credential: AppleAuthenticationCredential) {
-    if (this.user) throw new Error('must be unauthed')
+  async loginWithAppleId(
+    credential: AppleAuthenticationCredential,
+    justCreated?: boolean
+  ) {
+    //if (this.user) throw new Error('must be unauthed')
+    this.setRecentAuthMethod('apple')
     const wrapper = await this.apiClient.sessionLoginWithAppleId({ credential })
-    this.trackEvent(trackingEvents.caAppleIDLogin, {})
+    const isSignup = justCreated || wrapper?.payload?.justCreated
+    window.localStorage.setItem('pendingTrack', isSignup ? 'signup' : 'login')
     window.location.assign(`/`)
+  }
+
+  setRecentAuthMethod(authType: AuthMethodType) {
+    window.localStorage.setItem(KEY_RECENT_AUTH_METHOD, authType)
+    this.authMethod = this.getRecentAuthMethod()
+  }
+
+  getRecentAuthMethod(): AuthMethodType | false {
+    if (typeof window !== 'undefined') {
+      // react native app may set authMethod via URL parameters in webview
+      const url = new URL(window.location.toString())
+      const urlAuthMethod = url.searchParams.get('authMethod')
+      if (urlAuthMethod) {
+        window.localStorage.setItem(KEY_RECENT_AUTH_METHOD, urlAuthMethod)
+        return urlAuthMethod as AuthMethodType
+      }
+
+      // otherwise, try grabbing the last value in localstorage
+      const value = window.localStorage.getItem(KEY_RECENT_AUTH_METHOD)
+      if (value) return value as AuthMethodType
+    }
+
+    return false
   }
 
   async loginAsNewTrialUser() {
@@ -476,7 +528,7 @@ class Store {
       }
     } catch (e) {
       // TODO: need a better error reporting dialogue
-      window.alert("Sign up failed, please try a different email address.")
+      window.alert('Sign up failed, please try a different email address.')
       log.error('Account claim attempt failed')
       window.location.reload()
     }
@@ -527,6 +579,22 @@ class Store {
     return false
   }
 
+  isMobile() {
+    if (typeof navigator !== 'undefined') {
+      // Not comprehensive, but probably good enough
+      if (/Android|iPhone/i.test(navigator.userAgent)) {
+        return true
+      }
+    }
+    return false
+  }
+
+  getAppPlatform(): AppPlatformType {
+    if (this.isNativeIOS()) return 'native-ios'
+    if (this.isMobile()) return 'web-mobile'
+    return 'web-desktop'
+  }
+
   screenSize() {
     // https://tailwindcss.com/docs/responsive-design
     if (typeof window !== 'undefined') {
@@ -567,8 +635,9 @@ class Store {
       .then(() => {
         if (this.appShellApiRef) {
           this.appShellApiRef.request('signin')
+        } else {
+          window.location.assign('/')
         }
-        window.location.assign('/')
       })
       .catch(() => {
         this.setGeneralError('_api_fail_')
@@ -589,8 +658,9 @@ class Store {
     if (!fullEvent.opts.slug && this.user) {
       fullEvent.opts.slug = this.user.publicPageSlug
     }
-    fullEvent.opts.isTrial = (this.user && this.user.isTrial) ? 'y' : 'n'
-    fullEvent.opts.appPlatform = this.isNativeIOS() ? 'ios' : 'web'
+    fullEvent.opts.isTrial = this.user && this.user.isTrial ? 'y' : 'n'
+    fullEvent.opts.appPlatform = this.getAppPlatform()
+    fullEvent.opts.authMethod = this.authMethod
     fullEvent.opts.screenSize = this.screenSize()
     log.tracking(
       fullEvent.eventName,
@@ -651,6 +721,9 @@ class Store {
     if (!this.user) throw new Error('must be authed')
     const numProjects = Object.keys(this.user.profile.projects).length
     const numPosts = Object.values(this.user.profile.projects).map(p => Object.keys(p.posts).length).reduce((a,b)=>a+b,0)
+    if (mode === 'new') {
+      post.createdPlatform = this.getAppPlatform()
+    }
     return this.apiClient.savePost({ post }).then(wrapper => {
       this.setUser(wrapper.payload.user)
       if (mode === 'new') {
@@ -695,6 +768,9 @@ class Store {
         this.trackEvent(trackingEvents.caSetProjectPrivate)
       }
     }
+    if (mode === 'new') {
+      project.createdPlatform = this.getAppPlatform()
+    }
     return this.apiClient.saveProject({ project }).then(wrapper => {
       this.setUser(wrapper.payload.user)
       if (mode === 'new') {
@@ -710,9 +786,8 @@ class Store {
     this.router.back()
   }
 
-  promptDeleteAccount(appshellapiref: AppShellAPI) {
+  promptDeleteAccount() {
     if (!this.user) return false
-    this.appShellApiRef = appshellapiref // need this to tell app shell to log out
     this.confirmingDelete = {
       kind: 'account',
       thing: this.user,

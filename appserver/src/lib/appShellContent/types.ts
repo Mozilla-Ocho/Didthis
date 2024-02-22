@@ -6,7 +6,10 @@ export type AppMessages = {
   response: AppRequestMethods[AppRequestMethodNames]["response"];
   request: AppRequestMethods[AppRequestMethodNames]["request"];
   navigateToPath: { path: string };
-  appleCredential: { credential: AppleAuthenticationCredential };
+  appleCredential: {
+    credential: AppleAuthenticationCredential;
+    justCreated: boolean;
+  };
   topNavLeftPress: { label: string };
   topNavRightPress: { label: string };
   topNavSharePress: { label: string };
@@ -29,6 +32,12 @@ export type AppRequestMethods = {
     request: undefined;
     response: JSONObject;
   };
+  signinWithSession: {
+    request: {
+      sessionCookie: string;
+    },
+    response: Success;
+  }
   showAppInfo: {
     request: undefined;
     response: Success;

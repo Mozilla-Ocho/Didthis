@@ -3,13 +3,11 @@ import type {
   SessionLoginWithAppleIdWrapper,
   ErrorWrapper,
 } from '@/lib/apiConstants'
+import { loginSessionForUser } from '@/lib/serverAuth'
 import {
-  getOrCreateUser,
-  SIGNUP_CODE_FOR_APPLEID,
-  loginSessionForUser,
-} from '@/lib/serverAuth'
-import { validateAuthenticationCredential } from '@/lib/appleAuth'
-import knex from '@/knex'
+  validateAuthenticationCredential,
+  autoVivifyAppleUser,
+} from '@/lib/appleAuth'
 
 export default async function handler(
   req: NextApiRequest,
@@ -33,29 +31,8 @@ export default async function handler(
     } as ErrorWrapper)
   }
 
-  // TODO: Simplify and move this account creation stuff into appleAuth.ts? or serverAuth.ts?
-
   // Next, take the valid credential and attempt to get or create a user.
-  const { email, fullName, user: appleUserId } = validCredential
-  const signupCode = SIGNUP_CODE_FOR_APPLEID
-
-  // Check whether we already have an account for this email address
-  const existingDbRow = (await knex('users')
-    .where('email', email)
-    .returning('id')
-    .first()) as UserDbRow | undefined
-
-  // Use the uid of existing account for email, or use a uid derived from Apple credential.
-  const uid = existingDbRow ? existingDbRow.id : `appleid-${appleUserId}`
-
-  // Finally, get or create the user based on Apple credential.
-  const [apiUser, dbRow] = await getOrCreateUser({
-    id: uid,
-    autoVivifyWithEmail: email,
-    signupCode,
-  })
-
-  // TODO: update user profile with fullName?
+  const apiUser = await autoVivifyAppleUser(validCredential)
 
   if (!apiUser) {
     return res.status(401).json({

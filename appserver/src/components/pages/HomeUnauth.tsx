@@ -21,9 +21,8 @@ import { useAppShellListener } from '@/lib/appShellContent'
 // DRY_20334 outer page width styles
 const HomeUnauth = () => {
   const store = useStore()
-
   useAppShellListener('appleCredential', payload => {
-    store.loginWithAppleId(payload.credential)
+    store.loginWithAppleId(payload.credential, payload.justCreated)
   })
 
   const topicBucket = 'utility' // as of 09/05/23 all users see utility messaging
@@ -97,7 +96,7 @@ const HomeUnauth = () => {
     await store.loginAsNewTrialUser()
   }
 
-  const ctaButton = invited ? (
+  const ctaButton = (invited && store.enableDeferredSignup) ? (
     <DeferredSignupButton
       onClick={handleDeferredLogin}
       className="my-6 px-6 py-4 text-lg"
@@ -119,6 +118,7 @@ const HomeUnauth = () => {
       <WaitlistButton className="mr-4 mt-0" />
     </>
   )
+
   return (
     <div className="grid grid-rows-[auto_1fr_auto] w-full min-h-screen">
       <AppHeader />

@@ -6,6 +6,7 @@ import { useStore } from '@/lib/store'
 import { StyledFirebaseAuth } from '@/components/auth/StyledFirebaseAuth'
 import branding from '@/lib/branding'
 import pathBuilder from '@/lib/pathBuilder'
+import AppleSignIn from './AppleSignIn'
 
 const LoginGlobalOverlay = observer(() => {
   const store = useStore()
@@ -77,8 +78,31 @@ const LoginGlobalOverlay = observer(() => {
             className="w-full mt-4"
             onClick={() => store.launchGlobalLoginOverlay(true)}
           >
-            Log in with existing account
+            Log in with email
           </Button>
+        </div>
+      </ConfirmationModal>
+      <ConfirmationModal
+        isOpen={store.signinModalOpen}
+        title=" "
+        onNo={store.cancelGlobalLoginOverlay}
+        onClose={store.cancelGlobalLoginOverlay}
+        closeX
+      >
+        <div>
+          <Button
+            intent="primary"
+            className="w-full mt-4 text-lg"
+            onClick={() => store.launchFirebaseLoginOverlay()}
+          >
+            Sign in with Email
+          </Button>
+          <AppleSignIn
+            width="100%"
+            height="48"
+            onCancel={store.cancelGlobalLoginOverlay}
+            onSuccess={store.cancelGlobalLoginOverlay}
+          />
         </div>
       </ConfirmationModal>
       <Modal
@@ -92,9 +116,15 @@ const LoginGlobalOverlay = observer(() => {
           firebaseAuth={store.firebaseRefNonReactive.auth()}
         />
         <p className="p-3 text-center text-sm">
-          By proceeding, you agree to the {branding.productName}<br/>
-          <Link newTab href={pathBuilder.legal('tos')}>Terms of Service</Link> and{' '}
-          <Link newTab href={pathBuilder.legal('pp')}>Privacy Notice</Link>
+          By proceeding, you agree to the {branding.productName}
+          <br />
+          <Link newTab href={pathBuilder.legal('tos')}>
+            Terms of Service
+          </Link>{' '}
+          and{' '}
+          <Link newTab href={pathBuilder.legal('pp')}>
+            Privacy Notice
+          </Link>
         </p>
       </Modal>
     </div>

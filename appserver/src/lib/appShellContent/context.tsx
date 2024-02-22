@@ -28,6 +28,10 @@ export default function AppShellContextProvider({
 
   const { inAppWebView, api } = state
   const isInWebView = api.isInWebView()
+  if (isInWebView) {
+    // Ensure store has access to the app shell API, if in app web view
+    store.appShellApiRef = api
+  }
 
   // First, make note of whether we're hosted in an app shell webview
   useEffect(() => {

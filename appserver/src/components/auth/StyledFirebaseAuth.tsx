@@ -7,52 +7,63 @@ import { onAuthStateChanged } from 'firebase/auth'
 // import * as firebaseui from 'firebaseui'; // see below, doing dynamic import now for nextjs SSR compat
 import 'firebaseui/dist/firebaseui.css'
 
-const StyledFirebaseAuth = ({
-  uiConfig,
-  firebaseAuth,
-  className,
-  uiCallback,
-}: /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-any) => {
-  const [userSignedIn, setUserSignedIn] = useState(false)
-  /* eslint-disable-next-line @typescript-eslint/ban-types */
-  const [deregisterFn, setDeregisterFn] = useState<false | Function>(false)
-  const elementRef = useRef<HTMLDivElement | null>(null)
+/* eslint-disable @typescript-eslint/no-explicit-any */
+type StyledFirebaseAuthProps = {
+  uiConfig: any
+  firebaseAuth: any
+  className?: string
+  uiCallback?: (authUI: firebaseui.auth.AuthUI) => void
+}
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
-  const loadFirebaseui = useCallback(async () => {
-    // importing firebaseui implicitly assumes we are in browser context. in
-    // nextjs, the code is executed also on the server, and this causes an
-    // exception to be thrown. so we have to dynamically import the firebaseui
-    // library in an async callback.
-    const firebaseui = await import('firebaseui')
+const StyledFirebaseAuth = (props: StyledFirebaseAuthProps) => {
+  const firebaseui = useFirebaseUI()
+  const [userSignedIn, setUserSignedIn] = useState(false)
+  const elementRef = useRef<HTMLDivElement | null>(null)
+  const elementRefCurrent = elementRef.current
+
+  useEffect(() => {
+    const { uiConfig, firebaseAuth, uiCallback } = props
+
+    // Bail out on setting up auth UI until both firebaseui and the target
+    // element are available
+    if (!firebaseui || !elementRefCurrent) return
+
     const firebaseUiWidget =
       firebaseui.auth.AuthUI.getInstance() ||
       new firebaseui.auth.AuthUI(firebaseAuth)
+
     if (uiConfig.signInFlow === 'popup') firebaseUiWidget.reset()
+
     const unregisterAuthObserver = onAuthStateChanged(firebaseAuth, user => {
       if (!user && userSignedIn) firebaseUiWidget.reset()
       setUserSignedIn(!!user)
     })
     if (uiCallback) uiCallback(firebaseUiWidget)
-    elementRef.current && firebaseUiWidget.start(elementRef.current, uiConfig)
-    setDeregisterFn(() => {
-      // because we're in an async callback, deregistration functions require
-      // jumping hoops. store it in a state value.
+    firebaseUiWidget.start(elementRefCurrent, uiConfig)
+
+    return () => {
       unregisterAuthObserver()
       firebaseUiWidget.reset()
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  useEffect(() => {
-    loadFirebaseui()
-    return () => {
-      if (deregisterFn) deregisterFn()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [firebaseui, elementRefCurrent, userSignedIn, props])
 
-  return <div className={className} ref={elementRef} />
+  return <div className={props.className} ref={elementRef} />
 }
+
+// Wrap the async import of firebaseui in tracking state
+function useFirebaseUI() {
+  const [firebaseui, setFirebaseUi] = useState<null | FirebaseUI>(null)
+  useEffect(() => {
+    importFirebaseUI().then(result => setFirebaseUi(result))
+  }, [setFirebaseUi])
+  return firebaseui
+}
+
+async function importFirebaseUI() {
+  return import('firebaseui')
+}
+
+type FirebaseUI = Awaited<ReturnType<typeof importFirebaseUI>>
 
 export { StyledFirebaseAuth }

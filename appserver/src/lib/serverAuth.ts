@@ -124,10 +124,10 @@ export const getValidCodeInfo = (userCode: string | undefined | false) => {
   // for a little while we are going to allow everyone in w/o a signup code,
   // defaulting to a baseline code if they don't have one specifically on the
   // inbound landing page url.
-  // const unmatchedCode = signupCodes['83ad9fa2']
+  const unmatchedCode = signupCodes['83ad9fa2']
   // jsw switch back to code required, so we show the waitlist to collect users
   // for iOS app beta testing.
-  const unmatchedCode = { active: false, value: userCode, name: '', envNames: [] }
+  // const unmatchedCode = { active: false, value: userCode, name: '', envNames: [] }
   if (!userCode) return unmatchedCode
   const check = signupCodes[userCode]
   if (!check) return unmatchedCode

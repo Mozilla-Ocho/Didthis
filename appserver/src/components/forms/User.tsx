@@ -396,7 +396,7 @@ const UserForm = observer(() => {
 
   // have to pass the appshell api reference so that it can send the reset sign
   // in signal to the app shell.
-  const handleDeleteAccount = () => store.promptDeleteAccount(appShell.api)
+  const handleDeleteAccount = () => store.promptDeleteAccount()
 
   const handleShowAppInfo = () => appShell.api.request('showAppInfo')
 
