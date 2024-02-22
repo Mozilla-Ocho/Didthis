@@ -6,6 +6,7 @@ import pickDateTime from "./pickDateTime";
 import shareProjectUrl from "./shareProjectUrl";
 import pickImage from "./pickImage";
 import signin from "./signin";
+import signinWithSession from "./signinWithSession";
 import showAppInfo from "./showAppInfo";
 import ping from "./ping";
 
@@ -60,6 +61,7 @@ export const methods: Methods = {
   shareProjectUrl,
   pickImage,
   signin,
+  signinWithSession,
   showAppInfo,
   ping,
 

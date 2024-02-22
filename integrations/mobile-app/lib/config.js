@@ -1,4 +1,4 @@
-import Constants from 'expo-constants';
+import Constants from "expo-constants";
 import * as Updates from "expo-updates";
 
 // see also: https://docs.expo.dev/guides/environment-variables/
@@ -14,6 +14,8 @@ let baseOriginWhitelist = [
   "https://widget.cloudinary.com",
   "https://res-s.cloudinary.com",
   "https://discord.com",
+  "https://*.discord.com",
+  "https://*.hcaptcha.com",
 ];
 
 // see eas.json for channel definitions

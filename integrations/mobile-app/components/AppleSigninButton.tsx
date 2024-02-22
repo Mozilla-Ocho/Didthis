@@ -52,5 +52,6 @@ const styles = StyleSheet.create({
   button: {
     height: 54,
     width: 220,
+    marginVertical: 8
   },
 });

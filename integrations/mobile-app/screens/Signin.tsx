@@ -1,18 +1,24 @@
-import { View, Text, Image, SafeAreaView, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  SafeAreaView,
+  StyleSheet, TouchableOpacity
+} from "react-native";
 import AppleSigninButton from "../components/AppleSigninButton";
 import { StackScreenProps } from "@react-navigation/stack";
 import { A } from "@expo/html-elements";
 import { RootStackParamList } from "../App";
-import { styles as globalStyles, colors } from "../styles";
+import { styles as globalStyles, fonts, colors } from "../styles";
 import * as AppleAuthentication from "expo-apple-authentication";
-import Config from "../lib/config";
 import * as SiteAPI from "../lib/siteApi";
 import config from "../lib/config";
 import { useState } from "react";
 import ActivityIndicator from "../components/ActivityIndicator";
 import { TouchableHighlight } from "react-native-gesture-handler";
 
-const { siteBaseUrl } = Config;
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faEnvelope } from "@fortawesome/free-solid-svg-icons/faEnvelope";
 
 export type SigninScreenRouteParams = {};
 
@@ -26,19 +32,23 @@ type SigninStatus = undefined | "inprogress" | "success" | "error";
 export default function SigninScreen({ navigation }: SigninScreenProps) {
   const [signinStatus, setSigninStatus] = useState<SigninStatus>();
 
-  const onSigninPress = () => setSigninStatus("inprogress");
+  const onAppleSigninPress = () => setSigninStatus("inprogress");
 
-  const onSigninError = () => setSigninStatus("error");
+  const onAppleSigninError = () => setSigninStatus("error");
 
-  const onSignin = async (
+  const onAppleSigninCancel = () => setSigninStatus(undefined);
+
+  const onAppleSignin = async (
     credential: AppleAuthentication.AppleAuthenticationCredential
   ) => {
     try {
       // HACK: Not sharing cookies between app & webview, need to sign-in with both
-      await SiteAPI.signinWithCredential(credential);
+      const apiUser = await SiteAPI.signinWithCredential(credential);
       setSigninStatus("success");
       navigation.navigate("WebApp", {
         credential,
+        authMethod: 'apple',
+        justCreated: apiUser.justCreated,
         resetWebViewAfter: Date.now(),
       });
     } catch (e) {
@@ -47,9 +57,13 @@ export default function SigninScreen({ navigation }: SigninScreenProps) {
     }
   };
 
+  const onEmailSigninPress = () => {
+    navigation.navigate("WebAppSignin")
+  };
+
   const onAppInfoPress = () => {
     navigation.navigate("AppInfo");
-  }
+  };
 
   return (
     <SafeAreaView style={styles.screen}>
@@ -69,10 +83,12 @@ export default function SigninScreen({ navigation }: SigninScreenProps) {
       </Text>
       <View style={styles.signinContainer}>
         <AppleSigninButton
-          onPress={onSigninPress}
-          onError={onSigninError}
-          onSignin={onSignin}
+          onPress={onAppleSigninPress}
+          onError={onAppleSigninError}
+          onCancel={onAppleSigninCancel}
+          onSignin={onAppleSignin}
         />
+        <EmailSigninButton onPress={onEmailSigninPress} />
       </View>
       <View style={styles.footerLinksContainer}>
         <A href={config.legalUrls.privacy} style={styles.footerLink}>
@@ -102,6 +118,15 @@ export default function SigninScreen({ navigation }: SigninScreenProps) {
         />
       )}
     </SafeAreaView>
+  );
+}
+
+function EmailSigninButton({ onPress }: { onPress: () => void }) {
+  return (
+    <TouchableOpacity style={styles.emailSigninButton} onPress={onPress}>
+      <FontAwesomeIcon icon={faEnvelope} style={{ padding: 4 }} />
+      <Text style={styles.emailSigninButtonLabel}>Sign in with Email</Text>
+    </TouchableOpacity>
   );
 }
 
@@ -150,7 +175,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   signinContainer: {
-    marginVertical: 24,
+    marginTop: 24,
     marginHorizontal: 12,
   },
   footerLinksContainer: {
@@ -160,5 +185,25 @@ const styles = StyleSheet.create({
     ...globalStyles.textLink,
     marginVertical: 6,
     textAlign: "center",
+  },
+  emailSigninButton: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    height: 54,
+    width: 220,
+    marginVertical: 8,
+    borderRadius: 6,
+    padding: 14,
+  },
+  emailSigninButtonLabel: {
+    ...globalStyles.buttonLabel,
+    textDecorationColor: "#000",
+    textDecorationLine: "underline",
+
+    paddingLeft: 6,
+    fontFamily: fonts.system,
+    fontSize: 24,
+    fontWeight: "600"
   },
 });
