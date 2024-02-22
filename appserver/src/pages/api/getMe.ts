@@ -12,17 +12,6 @@ export default async function handler(
 ) {
   const [user] = await getAuthUser(req, res)
   if (user) {
-    const millis = new Date().getTime()
-    // don't need to await this last_read_from_user column write, fire async.
-    // however, you need to attach a then() handler or knex doesn't know to
-    // actually trigger it.
-    knex('users')
-      .update({
-        last_read_from_user: millis,
-        updated_at_millis: millis,
-      })
-      .where('id', user.id)
-    user.updatedAt = millis
     const wrapper: MeWrapper = {
       action: 'getMe',
       status: 200,

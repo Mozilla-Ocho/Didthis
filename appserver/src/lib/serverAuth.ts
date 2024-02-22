@@ -607,4 +607,20 @@ const getAuthUser = async (
 
 const getAuthFirebaseApp = () => getAuth(firebaseApp)
 
-export { getAuthUser, userFromDbRow, getAuthFirebaseApp, mkSessionCookie }
+const trackUserVisit = async (user: ApiUser) => {
+  const millis = new Date().getTime()
+  const [m,d,y] = new Date().toLocaleString('en-US',{timeZone:'America/Los_Angeles'}).split(",")[0].split('/')
+  const ymd = `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`
+  const q1 = knex('users')
+    .update({
+      last_read_from_user: millis,
+      updated_at_millis: millis,
+    })
+    .where('id', user.id)
+  const q2 = knex.raw(`
+    insert into retention (user_id,date) values (?,?) on conflict (user_id,date) do nothing
+    `,[user.id, ymd])
+  await Promise.all([q1,q2])
+}
+
+export { getAuthUser, trackUserVisit, userFromDbRow, getAuthFirebaseApp, mkSessionCookie }
