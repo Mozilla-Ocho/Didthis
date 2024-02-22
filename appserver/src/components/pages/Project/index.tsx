@@ -156,9 +156,9 @@ const ProjectPage = observer(
         <PagePad wide>
           <HoverCard>
             {/* outer padding */}
-            <div className="sm:p-4">
-              <div className="flex flex-col sm:flex-row items-start">
-                <div className="sm:max-w-[400px]">
+            <div className="md:p-4">
+              <div className="flex flex-col md:flex-row items-start">
+                <div className="md:w-[300px] lg:w-[400px] xl:w-[500px] md:flex-none">
                   <CoverImage
                     inAppWebView={appShell.inAppWebView}
                     project={project}
@@ -207,7 +207,7 @@ const ProjectPage = observer(
                       </p>
                     )}
 
-                    <div className="my-4 flex flex-col sm:flex-row items-center gap-4">
+                    <div className="my-4 flex flex-col md:flex-row items-center gap-4">
                       {/* in mobile web, if the user owns the project, show an edit
                 button alongside share button. in native app, editing is via top
                 nav. */}
@@ -238,7 +238,7 @@ const ProjectPage = observer(
                       </Button>
                     </div>
 
-                    <Divider light className="my-6 sm:hidden" />
+                    <Divider light className="my-6 md:hidden" />
                   </div>
                   {/* inner padding */}
                 </div>
