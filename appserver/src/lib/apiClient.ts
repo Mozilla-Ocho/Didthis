@@ -28,17 +28,26 @@ const getMe = async ({
   signupCode,
   expectUnauth,
   idToken,
+  appPlatform,
+  authMethod,
 }: {
   asTestUser?: string
   signupCode?: string | false
   expectUnauth?: boolean
   idToken?: string
+  appPlatform?: AppPlatformType
+  authMethod?: AuthMethodType
 }): Promise<MeWrapper> => {
+  const qparams : { signupCode?: string, appPlatform?: AppPlatformType, authMethod?: AuthMethodType } = {}
+  if (signupCode) qparams.signupCode = signupCode
+  // DRY_27098 tracking app platform in user signups
+  if (appPlatform) qparams.appPlatform = appPlatform
+  if (authMethod) qparams.authMethod = authMethod
   const fetchOpts: FetchArgs = {
     action: 'getMe',
     asTestUser,
     expectErrorIds: expectUnauth ? ['ERR_UNAUTHORIZED'] : undefined,
-    queryParams: signupCode ? { signupCode } : undefined,
+    queryParams: qparams,
   }
   if (idToken) {
     // for our wonky handling for firebase idTokens that generate session
@@ -229,26 +238,38 @@ const flagUser = async({
 
 const sessionLoginWithAppleId = async({
   credential,
+  appPlatform,
 }: {
   credential: AppleAuthenticationCredential
+  appPlatform?: AppPlatformType
 }) => {
+  const queryParams : { appPlatform?: AppPlatformType } = {}
+  // DRY_27098 tracking app platform in user signups
+  if (appPlatform) queryParams.appPlatform = appPlatform
   const wrapper = await wrapFetch({
     action: 'sessionLoginWithAppleId',
     method: 'POST',
     body: { credential: credential as JSONABLE },
+    queryParams,
   }) as SessionLoginWithAppleIdWrapper
   return wrapper
 }
 
 const sessionLoginAsTrialUser = async ({
   signupCode,
+  appPlatform,
 }: {
   signupCode: string
+  appPlatform?: AppPlatformType
 }) => {
+  const queryParams : { appPlatform?: AppPlatformType } = {}
+  // DRY_27098 tracking app platform in user signups
+  if (appPlatform) queryParams.appPlatform = appPlatform
   const wrapper = await wrapFetch({
     action: 'sessionLoginAsTrialUser',
     method: 'POST',
     body: { signupCode },
+    queryParams,
   }) as SessionLoginAsTrialUserWrapper
   return wrapper
 }

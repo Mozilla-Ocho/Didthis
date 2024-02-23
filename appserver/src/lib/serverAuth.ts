@@ -216,10 +216,14 @@ export const getOrCreateUser = async ({
   id,
   autoVivifyWithEmail, // optional. if not provided, will not autovivity
   signupCode,
+  appPlatform,
+  authMethod,
 }: {
   id: string
   autoVivifyWithEmail?: string
   signupCode: string | false
+  appPlatform?: AppPlatformType
+  authMethod?: AuthMethodType
 }): Promise<[ApiUser, UserDbRow] | [false, false]> => {
   const millis = new Date().getTime()
   let dbRow: UserDbRow | undefined
@@ -263,13 +267,17 @@ export const getOrCreateUser = async ({
   }
   log.serverApi('no user found, potentially a new signup, autovivifying')
   const systemSlug = await generateRandomAvailableSystemSlug()
+  const profile = profileUtils.mkDefaultProfile()
+  // DRY_27098 tracking app platform in user signups
+  if (appPlatform) profile.createdPlatform = appPlatform
+  if (authMethod) profile.createdAuthMethod = authMethod
   const columns: UserDbRowForWrite = {
     id,
     email: autoVivifyWithEmail,
     system_slug: systemSlug,
     user_slug: null,
     user_slug_lc: null,
-    profile: profileUtils.mkDefaultProfile(),
+    profile,
     signup_code_name: codeInfo && codeInfo.active ? codeInfo.name : null,
     created_at_millis: millis,
     updated_at_millis: millis,
@@ -288,12 +296,18 @@ export const getOrCreateUser = async ({
 
 export const createTrialUser = async ({
   signupCode,
+  appPlatform,
 }: {
   signupCode: string
+  appPlatform?: AppPlatformType
 }): Promise<[ApiUser, UserDbRow] | [false, false]> => {
   const millis = new Date().getTime()
   const codeInfo = getValidCodeInfo(signupCode)
   const systemSlug = await generateRandomAvailableSystemSlug()
+  const profile = profileUtils.mkDefaultProfile()
+  // DRY_27098 tracking app platform in user signups
+  if (appPlatform) profile.createdPlatform = appPlatform
+  profile.createdAuthMethod = 'trial'
   const id = `trial-${systemSlug}`
   const columns: UserDbRowForWrite = {
     id,
@@ -301,7 +315,7 @@ export const createTrialUser = async ({
     system_slug: systemSlug,
     user_slug: null,
     user_slug_lc: null,
-    profile: profileUtils.mkDefaultProfile(),
+    profile,
     signup_code_name: codeInfo && codeInfo.active ? codeInfo.name : null,
     created_at_millis: millis,
     updated_at_millis: millis,
@@ -570,9 +584,16 @@ const getAuthUser = async (
     return [false, false]
   }
   log.serverApi('session valid, fetching user', validity.uid)
+  // DRY_27098 tracking app platform in user signups
+  // appPlatform is present in the email signup flows in which the web page or
+  // webview creates the user via a call to api get /me 
+  const appPlatform = (getParamString(req, 'appPlatform') as AppPlatformType) || undefined
+  const authMethod = (getParamString(req, 'authMethod') as AuthMethodType) || undefined
   const [apiuser, dbrow] = await getOrCreateUser({
     id: validity.uid,
     signupCode,
+    appPlatform,
+    authMethod,
     // note no email is present on the validity result at this point
   })
   if (apiuser) {
@@ -594,6 +615,9 @@ const getAuthUser = async (
       id: validity.uid,
       autoVivifyWithEmail: validity.email,
       signupCode,
+      // DRY_27098 tracking app platform in user signups
+      appPlatform,
+      authMethod,
     })
     if (apiuser2) {
       // log.debug('cookie set:', validity2.newCookie)
