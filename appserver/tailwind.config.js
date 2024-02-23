@@ -63,7 +63,7 @@ module.exports = {
         'edges': colors['black-300'],
         'edges-light': colors['black-100'],
 
-        'timestamps': '#909090',
+        'timestamps': colors['black-300'],
         'linkpreview-host': '#909090',
 
         'breadcrumbs': '#FFFCE3',

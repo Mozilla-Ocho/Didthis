@@ -13,6 +13,7 @@ import PagePad from './PagePad'
 import Spinner from './Spinner'
 import ListItemBtn from './ListItemBtn'
 import ListItemLink from './ListItemLink'
+import HoverCard from './HoverCard'
 
 export {
   Button,
@@ -30,4 +31,5 @@ export {
   PagePad,
   ListItemBtn,
   ListItemLink,
+  HoverCard,
 }

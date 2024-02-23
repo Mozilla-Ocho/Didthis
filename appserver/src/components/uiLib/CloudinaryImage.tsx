@@ -17,6 +17,7 @@ const CloudinaryImage = ({
   rounded,
   isProjectCard,
   fullW,
+  photoPaperEdge,
 }: {
   assetId: string | undefined | false
   imageMeta?: CldImageMetaAny
@@ -27,6 +28,7 @@ const CloudinaryImage = ({
   rounded?: boolean
   isProjectCard?: boolean
   fullW?: boolean
+  photoPaperEdge?: boolean,
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const store = useStore()
@@ -56,6 +58,8 @@ const CloudinaryImage = ({
 
   const loadingBgColor = intent === 'post' ? 'bg-black-100' : ''
 
+  const photoPaperEdgeClasses = photoPaperEdge ? 'border-2 border-white shadow-[0px_0px_4px_rgba(0,0,0,0.25)]' : ''
+
   const regularImageContent = (
     <>
       <span
@@ -63,6 +67,7 @@ const CloudinaryImage = ({
           'leading-none block text-black-300 [&>img]:text-center [&>img]:leading-10',
           aspect,
           loadingBgColor,
+          photoPaperEdgeClasses,
           intent === 'avatar' && '[&>img]:rounded-full',
           rounded ? '[&>img]:rounded-md' : '',
           className
