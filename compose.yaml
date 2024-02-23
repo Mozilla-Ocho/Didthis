@@ -31,43 +31,43 @@ services:
       pgserver:
         condition: service_healthy
 
-  # discordbot:
-  #   build:
-  #     dockerfile: dockerfiles/discordbot
-  #     target: discordbot_dev
-  #   command: "yarn dev"
-  #   networks:
-  #     - allhosts
-  #   volumes:
-  #     - ./integrations/discord:/app
-  #   working_dir: /app
-  #   env_file: ./integrations/discord/.env
-  #   environment:
-  #     LOG_LEVEL: debug
-  #     DISCORD_BOT_DIDTHIS_API_URL: http://appserver:3000/api/graphql
-  #     DISCORD_BOT_GRAPHQL_ACCESS_TOKEN: discord-bot:8675309
-  #   depends_on:
-  #     appserver:
-  #       condition: service_healthy
+  discordbot:
+    build:
+      dockerfile: dockerfiles/discordbot
+      target: discordbot_dev
+    command: "yarn dev"
+    networks:
+      - allhosts
+    volumes:
+      - ./integrations/discord:/app
+    working_dir: /app
+    env_file: ./integrations/discord/.env
+    environment:
+      LOG_LEVEL: debug
+      DISCORD_BOT_DIDTHIS_API_URL: http://appserver:3000/api/graphql
+      DISCORD_BOT_GRAPHQL_ACCESS_TOKEN: discord-bot:8675309
+    depends_on:
+      appserver:
+        condition: service_healthy
 
-  # storybook:
-  #   build:
-  #     context: '.'
-  #     dockerfile: dockerfiles/appserver
-  #     target: appserver_dev
-  #   networks:
-  #     - allhosts
-  #   volumes:
-  #     - ./appserver:/appserver
-  #   working_dir: /appserver
-  #   env_file: env-dev
-  #   environment:
-  #     PORT: 6006
-  #     DATABASE_URL: "postgresql://devuser:devdummypass@pgserver:5432/devdb"
-  #     GOOGLE_APPLICATION_CREDENTIALS: '/appserver/.firebase-dev-credentials.json'
-  #   command: "yarn storybook"
-  #   ports:
-  #     - "6006:6006"
+  storybook:
+    build:
+      context: '.'
+      dockerfile: dockerfiles/appserver
+      target: appserver_dev
+    networks:
+      - allhosts
+    volumes:
+      - ./appserver:/appserver
+    working_dir: /appserver
+    env_file: env-dev
+    environment:
+      PORT: 6006
+      DATABASE_URL: "postgresql://devuser:devdummypass@pgserver:5432/devdb"
+      GOOGLE_APPLICATION_CREDENTIALS: '/appserver/.firebase-dev-credentials.json'
+    command: "yarn storybook"
+    ports:
+      - "6006:6006"
 
   pgserver:
     image: "postgres:14"
