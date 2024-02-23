@@ -4,7 +4,9 @@ import SetCookie from "set-cookie-parser";
 import * as Storage from "./storage";
 
 const { siteBaseUrl } = Config;
-const apiLoginUrl = `${siteBaseUrl}/api/sessionLoginWithAppleId`;
+
+// DRY_27098 tracking app platform in user signups
+const apiLoginUrl = `${siteBaseUrl}/api/sessionLoginWithAppleId?appPlatform=native-ios&authMethod=apple`;
 const apiGetMeURL = `${siteBaseUrl}/api/getMe`;
 
 const SESSION_COOKIE_NAME = "_h3y_sess";
