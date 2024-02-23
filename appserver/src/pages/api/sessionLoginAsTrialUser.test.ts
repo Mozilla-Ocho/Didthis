@@ -8,6 +8,7 @@ describe('sessionLoginAsTrialUser', () => {
   beforeEach(() => {
     jest.resetAllMocks()
     mockRequest.body = {}
+    mockRequest.query = {}
     mockResponse.status.mockReturnValue(mockResponseStatus)
   })
 
@@ -26,6 +27,7 @@ describe('sessionLoginAsTrialUser', () => {
   it('is unauthorized for anonymous user without valid signup code', async () => {
     mockGetAuthUser.mockReturnValue([false, false])
     mockRequest.body = { signupCode: 'hahasorrybud' }
+    mockRequest.query = {}
     await callHandler()
     expectUnauthorized()
   })
@@ -33,6 +35,7 @@ describe('sessionLoginAsTrialUser', () => {
   it('is unauthorized for anonymous user without valid active signup code', async () => {
     mockGetAuthUser.mockReturnValue([false, false])
     mockRequest.body = { signupCode: '8675309' }
+    mockRequest.query = {}
     await callHandler()
     expectUnauthorized()
   })
@@ -43,6 +46,7 @@ describe('sessionLoginAsTrialUser', () => {
 
     mockGetAuthUser.mockReturnValue([false, false])
     mockRequest.body = { signupCode }
+    mockRequest.query = {}
     mockCreateTrialUser.mockImplementation(async () => {
       return [newUser, false]
     })
@@ -80,7 +84,7 @@ function expectUnauthorized() {
   expect(resultJson.success).toBeFalsy()
 }
 
-const mockRequest = { body: {} }
+const mockRequest = { body: {}, query: {} }
 const mockResponse = { status: jest.fn() }
 const mockResponseStatus = { json: jest.fn() }
 
