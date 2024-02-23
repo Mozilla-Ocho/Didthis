@@ -115,7 +115,7 @@ const HomeUnauth = () => {
       <p className="mt-6 mb-2">
         Interested in our upcoming Android or web apps?
       </p>
-      <WaitlistButton className="mr-4 mt-0" />
+      <WaitlistButton className="mt-0" />
     </>
   )
 
