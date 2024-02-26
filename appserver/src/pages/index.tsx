@@ -3,7 +3,7 @@ import DefaultLayout from '@/components/DefaultLayout'
 import Home from '@/components/pages/Home'
 import { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from 'next'
 import { sessionCookieName, csrfCookieName } from '@/lib/apiConstants'
-import { getAuthUser, getValidCodeInfo } from '@/lib/serverAuth';
+import { getAuthUser, getValidCodeInfo, trackUserVisit } from '@/lib/serverAuth';
 // import log from '@/lib/log'
 
 const Wrapper = ({
@@ -51,6 +51,11 @@ export const getServerSideProps = async (
     // made a fetch call to the api, it would be slower and also we couldn't
     // set cookies.
     [authUser] = await getAuthUser(context.req as NextApiRequest, context.res as NextApiResponse)
+    if (authUser) {
+      // this is an async function but we don't await it, since the results
+      // don't block anything and would just slow down the response.
+      trackUserVisit(authUser)
+    }
   }
   return {
     props: {

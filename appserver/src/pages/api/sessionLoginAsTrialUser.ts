@@ -9,6 +9,7 @@ import {
   createTrialUser,
   loginSessionForUser,
 } from '@/lib/serverAuth'
+import {getParamString} from '@/lib/nextUtils'
 
 export default async function handler(
   req: NextApiRequest,
@@ -29,7 +30,9 @@ export default async function handler(
     } as ErrorWrapper)
   }
 
-  const [newUser, _newUserDbRow] = await createTrialUser({ signupCode })
+  const appPlatform = (getParamString(req, 'appPlatform') as AppPlatformType) || undefined
+
+  const [newUser, _newUserDbRow] = await createTrialUser({ signupCode, appPlatform })
 
   if (!newUser) {
     return res.status(401).json({

@@ -102,7 +102,7 @@ type CldImageMetaUrl = {[key:string]: any} & {metaOrigin: 'urlMeta'}
 type CldImageMetaAny = CldImageMetaPublic | CldImageMetaPrivate | CldImageMetaUrl
 
 type AppPlatformType = 'web' | 'web-desktop' | 'web-mobile' | 'native-ios'
-type AuthMethodType = 'email' | 'apple'
+type AuthMethodType = 'email' | 'apple' | 'trial'
 
 type ApiPost = {
   id: ApiPostId
@@ -169,6 +169,7 @@ type ApiProfile = {
   projects: { [key: string]: ApiProject }
   connectedAccounts?: ApiConnectedAccounts
   createdPlatform?: AppPlatformType
+  createdAuthMethod?: AuthMethodType
 }
 
 type PostMediaType = 'text' | 'image' | 'link'

@@ -327,6 +327,9 @@ class Store {
         // send the signup code because it will also assign that to the
         // user in the backend if they don't have one set yet.
         signupCode: this.signupCodeInfo ? this.signupCodeInfo.value : false,
+        // DRY_27098 tracking app platform in user signups
+        appPlatform: this.getAppPlatform(),
+        authMethod: this.authMethod || 'email', // this will always be email, apple sign ups use a different code path
       })
       log.readiness('acquired getMe user after firebase auth')
       this.setUser(wrapper.payload)
@@ -424,7 +427,11 @@ class Store {
   ) {
     //if (this.user) throw new Error('must be unauthed')
     this.setRecentAuthMethod('apple')
-    const wrapper = await this.apiClient.sessionLoginWithAppleId({ credential })
+    const wrapper = await this.apiClient.sessionLoginWithAppleId({
+      credential,
+      // DRY_27098 tracking app platform in user signups
+      appPlatform: this.getAppPlatform(),
+    })
     const isSignup = justCreated || wrapper?.payload?.justCreated
     window.localStorage.setItem('pendingTrack', isSignup ? 'signup' : 'login')
     window.location.assign(`/`)
@@ -459,8 +466,11 @@ class Store {
       return
     }
     if (this.user) throw new Error('must be unauthed')
+    this.setRecentAuthMethod('trial')
     const wrapper = await this.apiClient.sessionLoginAsTrialUser({
       signupCode: this.signupCodeInfo.value,
+      // DRY_27098 tracking app platform in user signups
+      appPlatform: this.getAppPlatform(),
     })
     this.trackEvent(trackingEvents.caNewTrial, {
       signupCodeName: this.signupCodeInfo

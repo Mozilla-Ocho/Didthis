@@ -79,9 +79,11 @@ export async function validateAuthenticationCredential(
 export async function autoVivifyAppleUser({
   email,
   user,
+  appPlatform,
 }: {
   email: string
   user: string
+  appPlatform?: AppPlatformType
 }) {
   const signupCode = SIGNUP_CODE_FOR_APPLEID
 
@@ -99,6 +101,9 @@ export async function autoVivifyAppleUser({
     id: uid,
     autoVivifyWithEmail: email,
     signupCode,
+    // DRY_27098 tracking app platform in user signups
+    appPlatform,
+    authMethod: 'apple',
   })
 
   return apiUser

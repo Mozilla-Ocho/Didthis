@@ -8,6 +8,7 @@ import {
   validateAuthenticationCredential,
   autoVivifyAppleUser,
 } from '@/lib/appleAuth'
+import { getParamString } from '@/lib/nextUtils'
 
 export default async function handler(
   req: NextApiRequest,
@@ -31,8 +32,13 @@ export default async function handler(
     } as ErrorWrapper)
   }
 
+  // DRY_27098 tracking app platform in user signups.
+  // the default value is native-ios because older versions of the ios app
+  // don't send a param here, but the web signups will have the latest code.
+  const appPlatform = (getParamString(req, 'appPlatform') as AppPlatformType) || 'native-ios'
+
   // Next, take the valid credential and attempt to get or create a user.
-  const apiUser = await autoVivifyAppleUser(validCredential)
+  const apiUser = await autoVivifyAppleUser({...validCredential, appPlatform})
 
   if (!apiUser) {
     return res.status(401).json({
