@@ -88,8 +88,8 @@ export default function SigninScreen({ navigation }: SigninScreenProps) {
           onCancel={onAppleSigninCancel}
           onSignin={onAppleSignin}
         />
-        <EmailSigninButton onPress={onEmailSigninPress} />
       </View>
+      <EmailSigninButton onPress={onEmailSigninPress} />
       <View style={styles.footerLinksContainer}>
         <A href={config.legalUrls.privacy} style={styles.footerLink}>
           Privacy policy
@@ -144,7 +144,6 @@ const styles = StyleSheet.create({
     alignContent: "center",
     justifyContent: "center",
     marginBottom: 9.88,
-    // balances the marginTop in footerLinksContainer
     marginTop: 48,
   },
   logo: { width: 185, height: 185 },
@@ -179,7 +178,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 12,
   },
   footerLinksContainer: {
-    marginTop: 48,
+    marginTop: 20,
   },
   footerLink: {
     ...globalStyles.textLink,
@@ -190,9 +189,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    height: 54,
-    width: 220,
-    marginVertical: 8,
+    height: 70,
+    width: 240,
+    marginVertical: 0,
     borderRadius: 6,
     padding: 14,
   },
