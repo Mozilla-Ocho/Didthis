@@ -57,7 +57,7 @@ resource "google_compute_instance" "bastion" {
 
   network_interface {
     network    = var.vpc_id
-    access_config {}
+    # access_config {}
   }
 
   scheduling {
