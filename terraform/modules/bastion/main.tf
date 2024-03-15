@@ -57,7 +57,10 @@ resource "google_compute_instance" "bastion" {
 
   network_interface {
     network    = var.vpc_id
-    access_config {}
+    # now omitting access_config prevents assignment of a public ip, which we
+    # don't need anymore as we're using IAP tunneling to ssh to it.
+    # https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance#access_config
+    # access_config {}
   }
 
   scheduling {
