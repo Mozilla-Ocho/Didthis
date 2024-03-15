@@ -128,19 +128,20 @@ output "vpc_access_connector_name" {
 
 # }}}
 
-# {{{ open firewall to ssh for resources tagged ssh-enabled (the db proxy jump
-# host) see doc/db-proxy.md
+# {{{ open firewall to ssh for the IAP service to resources tagged ssh-enabled
+# (the bastion host), so we can use the IAP tunnel to access them.
+# https://cloud.google.com/iap/docs/using-tcp-forwarding
 
-resource "google_compute_firewall" "allow_ssh" {
-  name        = "${local.vpc_name}-allow-ssh"
-  description = "Allow SSH traffic to any instance tagged with 'ssh-enabled'"
+resource "google_compute_firewall" "allow_ssh_iap" {
+  name        = "${local.vpc_name}-allow-ssh-iap"
+  description = "Allow SSH traffic via IAP to any instance tagged with 'ssh-enabled'"
   network     = google_compute_network.vpc.id
   direction   = "INGRESS"
   allow {
     protocol = "tcp"
     ports    = ["22"]
   }
-  source_ranges = ["0.0.0.0/0"]
+  source_ranges = ["35.235.240.0/20"]
   target_tags   = ["ssh-enabled"]
 }
 
