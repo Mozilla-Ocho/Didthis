@@ -133,3 +133,12 @@ output "firebase" {
   value = google_project_service.firebase.id
 }
 
+resource "google_project_service" "iap" {
+  service    = "iap.googleapis.com"
+  disable_on_destroy = false
+}
+
+output "iap" {
+  value = google_project_service.iap.id
+}
+
