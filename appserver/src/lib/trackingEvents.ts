@@ -14,11 +14,18 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   // it's logical meaning is views of the homepage that don't contain an invite
   // code. whereas pvHomeUnauth might have an invite code. so pvHomeUnauth
   // always fires, and then either validCodeHomeUnauth or waitlistHomeUnauth fires.
-  pvHomeUnauth: { eventName: 'pageview', opts: { name: 'homeUnauth', /* topicBucket */ } },
-  validCodeHomeUnauth: { eventName: 'validCodeHomeUnauth', opts: { name:
-    'validCodeHomeUnauth', /* signupCodeName, topicBucket */ } },
-  waitlistHomeUnauth: { eventName: 'waitlistHomeUnauth', opts: { name:
-    'waitlistHomeUnauth', /* topicBucket */ } },
+  pvHomeUnauth: {
+    eventName: 'pageview',
+    opts: { name: 'homeUnauth' /* topicBucket */ },
+  },
+  validCodeHomeUnauth: {
+    eventName: 'validCodeHomeUnauth',
+    opts: { name: 'validCodeHomeUnauth' /* signupCodeName, topicBucket */ },
+  },
+  waitlistHomeUnauth: {
+    eventName: 'waitlistHomeUnauth',
+    opts: { name: 'waitlistHomeUnauth' /* topicBucket */ },
+  },
   pvHomeAuth: { eventName: 'pageview', opts: { name: 'homeAuth' } },
   pvUser: { eventName: 'pageview', opts: { name: 'user' } },
   pvUnsolicited: { eventName: 'pageview', opts: { name: 'unsolicited' } },
@@ -38,12 +45,17 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
 
   // completed actions
   caJoinWaitlist: { eventName: 'joinWaitlist', opts: {} },
-  caJoinViralWaitlist: { eventName: 'joinViralWaitlist', opts: { /* fromPage, targetUserSlug */} },
+  caJoinViralWaitlist: {
+    eventName: 'joinViralWaitlist',
+    opts: {
+      /* fromPage, targetUserSlug */
+    },
+  },
   caNewTrial: {
     eventName: 'newTrial',
     opts: {
       /* signupCodeName */
-    }
+    },
   },
   caSignup: {
     eventName: 'signup',
@@ -55,7 +67,7 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   caAppleIDLogin: {
     /* fired on signup in iOS app - it's a historical misnomer to preserve funnel tracking */
     eventName: 'loginAppleId',
-    opts: {}
+    opts: {},
   },
   authSession: { eventName: 'authSession', opts: {} },
   caProfileField: {
@@ -113,7 +125,7 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   },
   caDeleteAccount: {
     eventName: 'deleteAccount',
-    opts: {}
+    opts: {},
   },
 
   // edit actions
@@ -149,26 +161,29 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
     eventName: 'buttonClick',
     opts: { name: 'cancelClaimTrialAccount' },
   },
-  bcLogout: { eventName: 'buttonClick', opts: { name: 'logout' /* loseTrialWork */ } },
+  bcLogout: {
+    eventName: 'buttonClick',
+    opts: { name: 'logout' /* loseTrialWork */ },
+  },
   bcWaitlist: {
     eventName: 'buttonClick',
     opts: { name: 'joinWaitlist' },
   },
   bcViralWaitlist: {
     eventName: 'buttonClick',
-    opts: { name: 'joinViralWaitlist', /* fromPage, targetUserSlug */ },
+    opts: { name: 'joinViralWaitlist' /* fromPage, targetUserSlug */ },
   },
   bcGetYourOwnPage: {
     eventName: 'buttonClick',
-    opts: { name: 'getYourOwnPage', /* fromPage, targetUserSlug */ },
+    opts: { name: 'getYourOwnPage' /* fromPage, targetUserSlug */ },
   },
   bcSharePublicProject: {
     eventName: 'buttonClick',
-    opts: { name: 'sharePublicProject' }, /* fromNativeTopNav */
+    opts: { name: 'sharePublicProject' } /* fromNativeTopNav */,
   },
   bcSharePrivateProject: {
     eventName: 'buttonClick',
-    opts: { name: 'sharePrivateProject' }, /* fromNativeTopNav */
+    opts: { name: 'sharePrivateProject' } /* fromNativeTopNav */,
   },
   bcAddPost: {
     eventName: 'buttonClick',
@@ -184,11 +199,11 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   },
   bcEditProject: {
     eventName: 'buttonClick',
-    opts: { name: 'editProject' }, /* fromNativeTopNav */
+    opts: { name: 'editProject' } /* fromNativeTopNav */,
   },
   bcEditPost: {
     eventName: 'buttonClick',
-    opts: { name: 'bcEditPost' }, /* fromNativeTopNav */
+    opts: { name: 'bcEditPost' } /* fromNativeTopNav */,
   },
   bcDiscord: {
     eventName: 'buttonClick',
@@ -233,6 +248,10 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   bcAppStoreHP: {
     eventName: 'buttonClick',
     opts: { name: 'appStoreHP' },
+  },
+  bcAppStoreAuthed: {
+    eventName: 'buttonClick',
+    opts: { name: 'appStoreAuthed' },
   },
 
   // DRY_76795 native event types handling

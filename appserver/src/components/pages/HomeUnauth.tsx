@@ -107,7 +107,7 @@ const HomeUnauth = () => {
         <Link
           data-testid="testflightbutton"
           className={`px-6 py-4 text-md `}
-          href={branding.iOSAppStoreURL}
+          href={branding.iOSAppStoreURLHomeUnauth}
           intent="primary"
           trackEvent={trackingEvents.bcAppStoreHP}
         >

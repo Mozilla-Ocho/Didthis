@@ -3,10 +3,13 @@ import { observer } from 'mobx-react-lite'
 import { Link } from './uiLib'
 import Image from 'next/image'
 import discordLogo from '@/assets/img/discord-logo.svg'
+import { useStore } from '@/lib/store'
 
 const DiscordCard = observer(() => {
+  const store = useStore()
+  if (store.userHasDiscordConnection()) return null
   return (
-    <div className="mt-12 border border-[#999] border-edges rounded-md overflow-hidden w-full basis-full sm:w-[373px] sm:basis-[373px]">
+    <div className="border border-[#999] border-edges border-dashed rounded-md overflow-hidden">
       <div className="p-6">
         <h5 className="mt-4 mb-2">
           <Link
