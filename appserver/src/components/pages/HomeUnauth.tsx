@@ -1,4 +1,3 @@
-// import { LoginButton } from '@/components/auth/LoginButton'
 import { DeferredSignupButton } from '@/components/auth/DeferredSignupButton'
 import AppHeader from '@/components/AppHeader'
 import AppFooter from '@/components/AppFooter'
@@ -17,6 +16,7 @@ import { useEffect } from 'react'
 import { WaitlistButton } from '../WaitlistButton'
 import { Button, Link, PagePad } from '../uiLib'
 import { useAppShellListener } from '@/lib/appShellContent'
+import { LoginButton } from '../auth/LoginButton'
 
 // DRY_20334 outer page width styles
 const HomeUnauth = () => {
@@ -103,19 +103,29 @@ const HomeUnauth = () => {
     />
   ) : (
     <>
-      <Link
-        data-testid="testflightbutton"
-        className={`mt-6 px-6 py-4 text-md `}
-        href={branding.iOSAppStoreURL}
-        intent="primary"
-        trackEvent={trackingEvents.bcAppStoreHP}
-      >
-        <strong>Get {branding.productName} for iOS</strong>
-      </Link>
-      <p className="mt-6 mb-2">
-        Interested in our upcoming Android or web apps?
+      <div className="grid grid-cols-1 gap-4 w-full lg:grid-cols-[auto_auto_auto] items-center my-6">
+        <Link
+          data-testid="testflightbutton"
+          className={`px-6 py-4 text-md `}
+          href={branding.iOSAppStoreURL}
+          intent="primary"
+          trackEvent={trackingEvents.bcAppStoreHP}
+        >
+          <strong>Get {branding.productName} for iOS</strong><br />
+          <span className="text-sm">(US + Canada)</span>
+        </Link>
+        <div className="text-center">OR</div>
+        <LoginButton
+          className={`px-6 py-4 text-md `}
+          intent="primary"
+          content={<><strong>Try the web app</strong><br /><span className="text-sm">(Any device)</span></>}
+        />
+      </div>
+      <p className="mb-2">
+        The web app works great for Android phones, but you can also{' '}
+        <WaitlistButton mode="viral" className="text-md" />{' '}
+        to be notified when the native Android app is available.
       </p>
-      <WaitlistButton className="mt-0" />
     </>
   )
 
@@ -215,6 +225,7 @@ const HomeUnauth = () => {
                   </p>
                 </div>
               </div>
+              <div className="py-4" />
               {ctaButton}
             </div>
           </div>

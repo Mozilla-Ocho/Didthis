@@ -2,7 +2,6 @@ import { Link, PagePad } from '@/components/uiLib'
 import { useStore } from '@/lib/store'
 import branding from '@/lib/branding'
 import { trackingEvents } from '@/lib/trackingEvents'
-// import { WaitlistButton } from './WaitlistButton'
 
 const ViralityBlurb = ({
   fromPage,
