@@ -14,6 +14,7 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
   // it's logical meaning is views of the homepage that don't contain an invite
   // code. whereas pvHomeUnauth might have an invite code. so pvHomeUnauth
   // always fires, and then either validCodeHomeUnauth or waitlistHomeUnauth fires.
+  // as of around Apr 5 2024 we're now also automatically copying any utm_* query params into the event data, so we can track the source of the user in amplitude if they came from a marketing campaign that has these values instrumented.
   pvHomeUnauth: {
     eventName: 'pageview',
     opts: { name: 'homeUnauth' /* topicBucket */ },

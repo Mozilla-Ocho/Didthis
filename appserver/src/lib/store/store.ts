@@ -719,6 +719,15 @@ class Store {
       )
       return
     }
+    // copy any utm_* args to the page event in amplitude
+    const url = new URL(window.location.toString())
+    url.searchParams.forEach((v, k) => {
+      if (k.startsWith('utm_')) {
+        // note these will violate the trackingEvents schema, but we're just adding them to the opts object.
+        // added 2024-04-04
+        fullEvent.opts[k] = v
+      }
+    })
     if (!isEqual(fullEvent, this.trackedPageEvent)) {
       this.trackEvent(evt, opts)
     }
