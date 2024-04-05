@@ -171,15 +171,19 @@ const HomeAuth = observer(() => {
   if (!hasProjects && !hasProfileEdits && !skipBlankSlate) {
     return (
       <>
-        <PagePad>
-          <h3 className="mt-10 mb-4">Welcome to {branding.productName}!</h3>
-          <p className="mt-6 mb-6">
-            Let’s get started. Are you working on a hobby project right now?
-            Click “Add post”, pick a photo from your camera roll, and start
-            tracking your journey!
-          </p>
-          {addCreatBtns}
-          <InfoGrid />
+        <PagePad yControlOnly>
+          <PagePad noPadY>
+            <h3 className="mt-10 mb-4">Welcome to {branding.productName}!</h3>
+            <p className="mt-6 mb-6">
+              Let’s get started. Are you working on a hobby project right now?
+              Click “Add post”, pick a photo from your camera roll, and start
+              tracking your journey!
+            </p>
+            {addCreatBtns}
+          </PagePad>
+          <PagePad wide noPadY>
+            <InfoGrid />
+          </PagePad>
         </PagePad>
       </>
     )
