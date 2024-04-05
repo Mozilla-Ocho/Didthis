@@ -155,7 +155,7 @@ export class FormStore {
       if (this.customSocialPairState(i).good) {
         customSocial.push({
           name: this.customSocial[i].name,
-          url: this.customSocial[i].url,
+          url: profileUtils.getParsedUrl(this.customSocial[i].url).toString(),
         })
       }
     }

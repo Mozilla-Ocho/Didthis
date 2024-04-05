@@ -159,8 +159,9 @@ const WaitlistButton = observer(
             {!success && (
               <>
                 <p>
-                  If you’re interested in {branding.productName} for Android or
-                  web, join our wait list and we’ll keep you posted!
+                  If you’re interested in {branding.productName}’s upcoming
+                  native app for Android, join our wait list and we’ll keep you
+                  posted!
                 </p>
                 <form
                   method="POST"
