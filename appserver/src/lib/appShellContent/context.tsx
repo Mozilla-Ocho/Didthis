@@ -29,7 +29,10 @@ export default function AppShellContextProvider({
   const { inAppWebView, api } = state
   const isInWebView = api.isInWebView()
   if (isInWebView) {
-    // Ensure store has access to the app shell API, if in app web view
+    // Ensure store has access to the app shell API, if in app web view, for
+    // async handlers on flows like logout, account delete, etc that are
+    // mediated by the store but have to call back to the app shell to reset or
+    // update the high level native app state.
     store.appShellApiRef = api
   }
 

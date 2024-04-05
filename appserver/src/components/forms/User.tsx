@@ -394,8 +394,6 @@ const UserForm = observer(() => {
     router.push(pathBuilder.user(user.systemSlug))
   }
 
-  // have to pass the appshell api reference so that it can send the reset sign
-  // in signal to the app shell.
   const handleDeleteAccount = () => store.promptDeleteAccount()
 
   const handleShowAppInfo = () => appShell.api.request('showAppInfo')
@@ -659,47 +657,49 @@ const UserForm = observer(() => {
         )}
       </form>
 
-      {/* Legal + Account actions */}
+      {/* Legal links for native app. in web, they are in the footer */}
       {appShell.inAppWebView && (
         <div className="my-10">
-          <div>
-            <ListItemLink
-              LegalDoc
-              href={pathBuilder.legal('pp')}
-              textlabel="Privacy Notice"
-            />
-            <ListItemLink
-              LegalDoc
-              href={pathBuilder.legal('tos')}
-              textlabel="Terms of service"
-            />
-            <ListItemLink
-              LegalDoc
-              href={pathBuilder.legal('cp')}
-              textlabel="Content Policies"
-            />
-            <ListItemBtn textlabel="App Info" onClick={handleShowAppInfo} />
-          </div>
-
-          <div className="leading-5 text-sm mt-4">
-            <h5 className="text-sm">Account deletion:</h5> If you would like to
-            delete your account, you can do so here. This will permanently
-            destroy all your public and private content, log you out on all
-            devices, and cannot be undone &mdash; not even by customer support.{' '}
-            <br></br>
-            <Button
-              intent="secondary"
-              onClick={handleDeleteAccount}
-              className="text-sm border-red-500 text-red-500 mt-4"
-              trackEvent={trackingEvents.bcDeleteAccount}
-            >
-              Delete account
-            </Button>
-          </div>
-          <hr className="my-6" />
-          <LogoutButton intent="secondary" />
+          <ListItemLink
+            LegalDoc
+            href={pathBuilder.legal('pp')}
+            textlabel="Privacy Notice"
+          />
+          <ListItemLink
+            LegalDoc
+            href={pathBuilder.legal('tos')}
+            textlabel="Terms of service"
+          />
+          <ListItemLink
+            LegalDoc
+            href={pathBuilder.legal('cp')}
+            textlabel="Content Policies"
+          />
+          <ListItemBtn textlabel="App Info" onClick={handleShowAppInfo} />
         </div>
       )}
+
+      <div className="my-10">
+        <h5 className="text-sm">Account deletion:</h5>
+        <p className="text-form-labels text-sm">
+          If you would like to
+          delete your account, you can do so here. This will permanently
+          destroy all your public and private content, log you out on all
+          devices, and cannot be undone &mdash; not even by customer support.{' '}
+        </p>
+        <Button
+          intent="secondary"
+          onClick={handleDeleteAccount}
+          className="text-sm border-red-500 text-red-500 mt-4"
+          trackEvent={trackingEvents.bcDeleteAccount}
+        >
+          Delete account
+        </Button>
+      </div>
+
+      <hr className="my-6" />
+      <LogoutButton intent="secondary" />
+
     </>
   )
 })

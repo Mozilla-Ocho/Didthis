@@ -28,7 +28,14 @@ const DeletionConfirmationModal = observer(() => {
       srTitle={`Are you sure you want to delete this ${kindLabel}?`}
       renderTitleHeading
     >
-      <p>This action cannot be undone.</p>
+      {kind === 'account' ? (
+        <p className="max-w-[500px]">
+          Deleting your account will truly and permanently remove all your data and
+          projects. You will not be able to recover them, and neither will customer support!
+        </p>
+      ) : (
+        <p>This action cannot be undone.</p>
+      )}
       <div className="grid grid-cols-2 gap-4 mt-4">
         <Button intent="secondary" onClick={() => store.onDeleteResult('no')}>
           Cancel
