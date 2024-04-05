@@ -140,6 +140,7 @@ type ApiSocialUrls = {
   reddit?: string,
   facebook?: string,
   instagram?: string,
+  customSocial?: { name: string, url: string }[]
 }
 
 type ApiConnectedAccounts = {

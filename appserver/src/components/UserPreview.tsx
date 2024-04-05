@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@/lib/store'
-import { CloudinaryImage, Link } from './uiLib'
+import { CloudinaryImage, Link, Icon } from './uiLib'
 import pathBuilder from '@/lib/pathBuilder'
 import { specialAssetIds } from '@/lib/cloudinaryConfig'
 import profileUtils from '@/lib/profileUtils'
@@ -9,6 +9,7 @@ import twIcon from '@/assets/img/twitter_2x.png'
 import rdIcon from '@/assets/img/reddit_2x.png'
 import fbIcon from '@/assets/img/facebook_2x.png'
 import igIcon from '@/assets/img/instagram_2x.png'
+import ExternalLinkIcon from '@/assets/icons/external-link'
 
 export const UserAvatar = observer(({ user }: { user: ApiUser }) => {
   return user.profile.imageAssetId ? (
@@ -31,7 +32,7 @@ export const UserSocialLinks = observer(({ user }: { user: ApiUser }) => {
   return (
     <div className="my-4">
       <p className="text-form-labels text-sm mt-4 mb-2">Find me on:</p>
-      <div className="flex flex-row gap-x-2 gap-y-2 w-[95%] flex-wrap">
+      <div className="flex flex-row gap-x-2 gap-y-2 w-[95%] flex-wrap items-baseline">
         {user.profile.socialUrls.twitter && (
           <p className="whitespace-nowrap">
             <Image
@@ -79,6 +80,16 @@ export const UserSocialLinks = observer(({ user }: { user: ApiUser }) => {
               Instagram
             </Link>
           </p>
+        )}
+        {user.profile.socialUrls.customSocial && (
+          user.profile.socialUrls.customSocial.map((social) => (
+            <p className="whitespace-nowrap">
+              <Icon.Link className="inline-block bg-white mr-2 text-black-300" />
+              <Link className="text-sm" external href={social.url}>
+                {social.name}
+              </Link>
+            </p>
+          ))
         )}
       </div>
     </div>

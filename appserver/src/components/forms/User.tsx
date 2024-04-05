@@ -28,6 +28,13 @@ import pathBuilder from '@/lib/pathBuilder'
 import DiscordAccount from '../connectedAccounts/Discord'
 import { useRouter } from 'next/router'
 
+type customSocialPairValidity = {
+  'empty'?: true
+  'badName'?: true
+  'badUrl'?: true
+  'good'?: true
+}
+
 export class FormStore {
   name: string
   nameTouched = false
@@ -44,6 +51,10 @@ export class FormStore {
   facebook: string
   reddit: string
   instagram: string
+  customSocial1Name: string
+  customSocial1Url: string
+  customSocial2Name: string
+  customSocial2Url: string
   spinning = false
   discordShareByDefault = false
   apiClient: ApiClient
@@ -60,6 +71,11 @@ export class FormStore {
     this.facebook = user.profile.socialUrls?.facebook || ''
     this.reddit = user.profile.socialUrls?.reddit || ''
     this.instagram = user.profile.socialUrls?.instagram || ''
+    const custom = user.profile.socialUrls?.customSocial
+    this.customSocial1Name = custom?.[0]?.name || ''
+    this.customSocial1Url = custom?.[0]?.url || ''
+    this.customSocial2Name = custom?.[1]?.name || ''
+    this.customSocial2Url = custom?.[1]?.url || ''
     this.userSlug = user.userSlug || ''
     if (this.userSlug) this.slugTouched = true
     this.imageAssetId = user.profile.imageAssetId || ''
@@ -108,6 +124,16 @@ export class FormStore {
   setInstagram(x: string) {
     this.instagram = x
   }
+  setCustom(index: 0 | 1, name: string | false, url: string | false) {
+    if (index === 0) {
+      if (name !== false) this.customSocial1Name = name
+      if (url !== false) this.customSocial1Url = url
+    }
+    if (index === 1) {
+      if (name !== false) this.customSocial2Name = name
+      if (url !== false) this.customSocial2Url = url
+    }
+  }
   setSpinning(x: boolean) {
     this.spinning = x
   }
@@ -130,16 +156,32 @@ export class FormStore {
       const c = contentOrUndef(x)
       const parsed = c && profileUtils.getParsedUrl(c)
       if (parsed) return parsed.toString()
+      return undefined
+    }
+    let customSocial : undefined | {name:string,url:string}[] = undefined
+    if (this.customSocialPairState(0).good) {
+      customSocial = customSocial || []
+      customSocial.push({
+        name: this.customSocial1Name,
+        url: this.customSocial1Url,
+      })
+    }
+    if (this.customSocialPairState(1).good) {
+      customSocial = customSocial || []
+      customSocial.push({
+        name: this.customSocial2Name,
+        url: this.customSocial2Url,
+      })
     }
 
-    let { connectedAccounts } = this.user.profile;
+    let { connectedAccounts } = this.user.profile
     if (connectedAccounts?.discord) {
       connectedAccounts = {
         ...connectedAccounts,
         discord: {
           ...connectedAccounts.discord,
-          shareByDefault: this.discordShareByDefault
-        }
+          shareByDefault: this.discordShareByDefault,
+        },
       }
     }
 
@@ -155,8 +197,9 @@ export class FormStore {
         facebook: normUrl(this.facebook),
         reddit: normUrl(this.reddit),
         instagram: normUrl(this.instagram),
+        customSocial,
       },
-      connectedAccounts
+      connectedAccounts,
     }
   }
 
@@ -183,19 +226,45 @@ export class FormStore {
       )
   }
 
+  customSocialPairState(index: 0 | 1) : customSocialPairValidity {
+    const name = index === 0 ? this.customSocial1Name : this.customSocial2Name
+    const url = index === 0 ? this.customSocial1Url : this.customSocial2Url
+    if (!name.trim() && !url.trim()) return {empty: true}
+    const ret : customSocialPairValidity = {}
+    if (!name.trim() || name.length > profileUtils.maxChars.customSocialName) ret.badName = true
+    if (!url.trim() || !profileUtils.getParsedUrl(url.trim())) ret.badUrl = true
+    if (url.trim().length > profileUtils.maxChars.url) ret.badUrl = true
+    return Object.keys(ret).length ? ret : {good: true}
+  }
+
   validOrEmptySocialUrl(
-    network: 'twitter' | 'facebook' | 'reddit' | 'instagram'
+    network: 'twitter' | 'facebook' | 'reddit' | 'instagram' | 'custom',
+    index?: 0 | 1
   ) {
-    const isValid = (x: string) => {
-      if (!x.trim()) return true
+    const isValidUrl = (x: string) => {
+      if (x.trim().length > profileUtils.maxChars.url) return false
       const parsed = profileUtils.getParsedUrl(x.trim())
       return !!parsed
     }
-    if (network === 'twitter') return isValid(this.twitter)
-    if (network === 'facebook') return isValid(this.facebook)
-    if (network === 'reddit') return isValid(this.reddit)
-    if (network === 'instagram') return isValid(this.instagram)
+    const isValidOrEmptyUrl = (x: string) => {
+      if (!x.trim()) return true
+      return isValidUrl(x)
+    }
+    if (network === 'twitter') return isValidOrEmptyUrl(this.twitter)
+    if (network === 'facebook') return isValidOrEmptyUrl(this.facebook)
+    if (network === 'reddit') return isValidOrEmptyUrl(this.reddit)
+    if (network === 'instagram') return isValidOrEmptyUrl(this.instagram)
+    if (network === 'custom') {
+      if (index != 0 && index != 1) return false
+      if (this.customSocialPairState(index).empty) return true
+      if (this.customSocialPairState(index).good) return true
+    }
     return false
+  }
+
+  validCustomName(name: string) {
+    if (!name.trim()) return false
+    return name.length <= profileUtils.maxChars.customSocialName
   }
 
   isPostable() {
@@ -205,22 +274,12 @@ export class FormStore {
     if (this.bio.trim().length > profileUtils.maxChars.blurb) {
       return false
     }
-    if (this.twitter.trim().length > profileUtils.maxChars.url) {
-      return false
-    }
-    if (this.facebook.trim().length > profileUtils.maxChars.url) {
-      return false
-    }
-    if (this.reddit.trim().length > profileUtils.maxChars.url) {
-      return false
-    }
-    if (this.instagram.trim().length > profileUtils.maxChars.url) {
-      return false
-    }
     if (!this.validOrEmptySocialUrl('twitter')) return false
     if (!this.validOrEmptySocialUrl('facebook')) return false
     if (!this.validOrEmptySocialUrl('instagram')) return false
     if (!this.validOrEmptySocialUrl('reddit')) return false
+    if (!this.validOrEmptySocialUrl('custom', 0)) return false
+    if (!this.validOrEmptySocialUrl('custom', 1)) return false
     if (this.hasUserSlug()) {
       if (!profileUtils.slugStringValidation(this.userSlug).valid) {
         return false
@@ -430,6 +489,9 @@ const UserForm = observer(() => {
   const setInstagram = (e: React.ChangeEvent<HTMLInputElement>) => {
     formStore.setInstagram(e.target.value)
   }
+  const setCustom = (index: 0|1, field :'url'|'name', e: React.ChangeEvent<HTMLInputElement>) => {
+    formStore.setCustom(index, field === 'name' ? e.target.value : false, field === 'url' ? e.target.value : false)
+  }
   return (
     <>
       {!appShell.inAppWebView && (
@@ -630,6 +692,90 @@ const UserForm = observer(() => {
               disabled={user.isTrial}
             />
           </label>
+          <label
+            htmlFor="sl_custom1"
+            className="block mt-2 text-form-labels text-sm"
+          >
+            Custom social link 1
+            <Input
+              type="text"
+              id="sl_custom1_name"
+              name="sl_custom1_name"
+              placeholder="Name (e.g. Mastodon, My Blog, LinkedIn)"
+              onChange={(x) => setCustom(0, 'name', x)}
+              value={formStore.customSocial1Name}
+              className="mt-2 text-bodytext"
+              touched
+              maxLen={profileUtils.maxChars.customSocialName}
+              hideLengthUnlessViolated
+              customError={
+                formStore.customSocialPairState(0).badName
+                  ? 'invalid name'
+                  : ''
+              }
+              disabled={user.isTrial}
+            />
+            <Input
+              type="text"
+              id="sl_custom1_url"
+              name="sl_custom1_url"
+              onChange={(x) => setCustom(0, 'url', x)}
+              placeholder="URL"
+              value={formStore.customSocial1Url}
+              className="mt-2 text-bodytext"
+              touched
+              maxLen={profileUtils.maxChars.url}
+              hideLengthUnlessViolated
+              customError={
+                formStore.customSocialPairState(0).badUrl
+                  ? 'invalid URL'
+                  : ''
+              }
+              disabled={user.isTrial}
+            />
+          </label>
+          <label
+            htmlFor="sl_custom2"
+            className="block mt-2 text-form-labels text-sm"
+          >
+            Custom social link 2
+            <Input
+              type="text"
+              id="sl_custom2_name"
+              name="sl_custom2_name"
+              placeholder="Name (e.g. Mastodon, My Blog, LinkedIn)"
+              onChange={(x) => setCustom(1, 'name', x)}
+              value={formStore.customSocial2Name}
+              className="mt-2 text-bodytext"
+              touched
+              maxLen={profileUtils.maxChars.customSocialName}
+              hideLengthUnlessViolated
+              customError={
+                formStore.customSocialPairState(1).badName
+                  ? 'invalid name'
+                  : ''
+              }
+              disabled={user.isTrial}
+            />
+            <Input
+              type="text"
+              id="sl_custom1_url"
+              name="sl_custom1_url"
+              onChange={(x) => setCustom(1, 'url', x)}
+              placeholder="URL"
+              value={formStore.customSocial2Url}
+              className="mt-2 text-bodytext"
+              touched
+              maxLen={profileUtils.maxChars.url}
+              hideLengthUnlessViolated
+              customError={
+                formStore.customSocialPairState(1).badUrl
+                  ? 'invalid URL'
+                  : ''
+              }
+              disabled={user.isTrial}
+            />
+          </label>
         </div>
 
         {!appShell.inAppWebView && (
@@ -682,10 +828,10 @@ const UserForm = observer(() => {
       <div className="my-10">
         <h5 className="text-sm">Account deletion:</h5>
         <p className="text-form-labels text-sm">
-          If you would like to
-          delete your account, you can do so here. This will permanently
-          destroy all your public and private content, log you out on all
-          devices, and cannot be undone &mdash; not even by customer support.{' '}
+          If you would like to delete your account, you can do so here. This
+          will permanently destroy all your public and private content, log you
+          out on all devices, and cannot be undone &mdash; not even by customer
+          support.{' '}
         </p>
         <Button
           intent="secondary"
@@ -699,7 +845,6 @@ const UserForm = observer(() => {
 
       <hr className="my-6" />
       <LogoutButton intent="secondary" />
-
     </>
   )
 })
