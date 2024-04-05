@@ -9,7 +9,6 @@ import twIcon from '@/assets/img/twitter_2x.png'
 import rdIcon from '@/assets/img/reddit_2x.png'
 import fbIcon from '@/assets/img/facebook_2x.png'
 import igIcon from '@/assets/img/instagram_2x.png'
-import ExternalLinkIcon from '@/assets/icons/external-link'
 
 export const UserAvatar = observer(({ user }: { user: ApiUser }) => {
   return user.profile.imageAssetId ? (
@@ -82,8 +81,8 @@ export const UserSocialLinks = observer(({ user }: { user: ApiUser }) => {
           </p>
         )}
         {user.profile.socialUrls.customSocial && (
-          user.profile.socialUrls.customSocial.map((social) => (
-            <p className="whitespace-nowrap">
+          user.profile.socialUrls.customSocial.map((social,idx) => (
+            <p key={idx} className="whitespace-nowrap">
               <Icon.Link className="inline-block bg-white mr-2 text-black-300" />
               <Link className="text-sm" external href={social.url}>
                 {social.name}
