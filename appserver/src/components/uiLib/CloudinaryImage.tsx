@@ -79,7 +79,7 @@ const CloudinaryImage = ({
           height={imageMeta?.height || null}
           src={cloudinaryUrlDirect(assetId, intent, imageMeta)}
           onClick={handleClick}
-          style={fullW ? {width:'100%'} : {}}
+          style={fullW ? { width: '100%' } : {}}
         />
       </span>
     </>
@@ -87,15 +87,13 @@ const CloudinaryImage = ({
 
   const lightboxImageContent = (
     <>
-      <div className="grid p-4 w-screen h-screen items-center justify-center">
-        <div className="flex w-full h-full">
-          <img
-            alt="user uploaded image"
-            src={cloudinaryUrlDirect(assetId, intent, imageMeta)}
-            onClick={handleClose}
-            className="object-contain w-full h-full cursor-pointer"
-          />
-        </div>
+      <div className="flex p-4 w-screen h-screen items-center justify-center">
+        <img
+          alt="user uploaded image"
+          src={cloudinaryUrlDirect(assetId, intent, imageMeta)}
+          onClick={handleClose}
+          className="object-contain w-full h-full cursor-pointer"
+        />
       </div>
     </>
   )
