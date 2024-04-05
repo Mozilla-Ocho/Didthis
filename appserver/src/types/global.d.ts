@@ -135,12 +135,15 @@ type ApiProject = {
   createdPlatform?: AppPlatformType
 }
 
+type ApiCustomSocialPair = { name: string, url: string }
+type ApiCustomSocialList = ApiCustomSocialPair[]
+
 type ApiSocialUrls = {
   twitter?: string,
   reddit?: string,
   facebook?: string,
   instagram?: string,
-  customSocial?: { name: string, url: string }[]
+  customSocial?: ApiCustomSocialList
 }
 
 type ApiConnectedAccounts = {

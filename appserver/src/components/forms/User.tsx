@@ -1,6 +1,5 @@
 import { ApiClient } from '@/lib/apiClient'
 import { SlugCheckWrapper } from '@/lib/apiConstants'
-import branding from '@/lib/branding'
 import { specialAssetIds } from '@/lib/cloudinaryConfig'
 import profileUtils from '@/lib/profileUtils'
 import { useStore } from '@/lib/store'
@@ -14,9 +13,7 @@ import ImageUploadWeb, { UploadCallback } from '../ImageUpload'
 import {
   Button,
   CloudinaryImage,
-  Icon,
   Input,
-  Link,
   Textarea,
   ListItemLink,
   ListItemBtn,
@@ -29,11 +26,13 @@ import DiscordAccount from '../connectedAccounts/Discord'
 import { useRouter } from 'next/router'
 
 type customSocialPairValidity = {
-  'empty'?: true
-  'badName'?: true
-  'badUrl'?: true
-  'good'?: true
+  empty?: true
+  badName?: true
+  badUrl?: true
+  good?: true
 }
+
+const NUM_CUSTOM_SOCIAL = 3
 
 export class FormStore {
   name: string
@@ -51,10 +50,7 @@ export class FormStore {
   facebook: string
   reddit: string
   instagram: string
-  customSocial1Name: string
-  customSocial1Url: string
-  customSocial2Name: string
-  customSocial2Url: string
+  customSocial: { name: string; url: string }[]
   spinning = false
   discordShareByDefault = false
   apiClient: ApiClient
@@ -71,11 +67,12 @@ export class FormStore {
     this.facebook = user.profile.socialUrls?.facebook || ''
     this.reddit = user.profile.socialUrls?.reddit || ''
     this.instagram = user.profile.socialUrls?.instagram || ''
-    const custom = user.profile.socialUrls?.customSocial
-    this.customSocial1Name = custom?.[0]?.name || ''
-    this.customSocial1Url = custom?.[0]?.url || ''
-    this.customSocial2Name = custom?.[1]?.name || ''
-    this.customSocial2Url = custom?.[1]?.url || ''
+    this.customSocial = JSON.parse(
+      JSON.stringify(user.profile.socialUrls?.customSocial || [])
+    )
+    for (let i = 0; i < NUM_CUSTOM_SOCIAL; i++) {
+      if (!this.customSocial[i]) this.customSocial[i] = { name: '', url: '' }
+    }
     this.userSlug = user.userSlug || ''
     if (this.userSlug) this.slugTouched = true
     this.imageAssetId = user.profile.imageAssetId || ''
@@ -124,16 +121,11 @@ export class FormStore {
   setInstagram(x: string) {
     this.instagram = x
   }
-  setCustom(index: 0 | 1, name: string | false, url: string | false) {
-    if (index === 0) {
-      if (name !== false) this.customSocial1Name = name
-      if (url !== false) this.customSocial1Url = url
-    }
-    if (index === 1) {
-      if (name !== false) this.customSocial2Name = name
-      if (url !== false) this.customSocial2Url = url
-    }
+  setCustom(index: number, name: string | false, url: string | false) {
+    if (name !== false) this.customSocial[index].name = name
+    if (url !== false) this.customSocial[index].url = url
   }
+
   setSpinning(x: boolean) {
     this.spinning = x
   }
@@ -158,20 +150,14 @@ export class FormStore {
       if (parsed) return parsed.toString()
       return undefined
     }
-    let customSocial : undefined | {name:string,url:string}[] = undefined
-    if (this.customSocialPairState(0).good) {
-      customSocial = customSocial || []
-      customSocial.push({
-        name: this.customSocial1Name,
-        url: this.customSocial1Url,
-      })
-    }
-    if (this.customSocialPairState(1).good) {
-      customSocial = customSocial || []
-      customSocial.push({
-        name: this.customSocial2Name,
-        url: this.customSocial2Url,
-      })
+    let customSocial: ApiCustomSocialList = []
+    for (let i = 0; i < NUM_CUSTOM_SOCIAL; i++) {
+      if (this.customSocialPairState(i).good) {
+        customSocial.push({
+          name: this.customSocial[i].name,
+          url: this.customSocial[i].url,
+        })
+      }
     }
 
     let { connectedAccounts } = this.user.profile
@@ -197,7 +183,7 @@ export class FormStore {
         facebook: normUrl(this.facebook),
         reddit: normUrl(this.reddit),
         instagram: normUrl(this.instagram),
-        customSocial,
+        customSocial: customSocial.length ? customSocial : undefined,
       },
       connectedAccounts,
     }
@@ -226,20 +212,21 @@ export class FormStore {
       )
   }
 
-  customSocialPairState(index: 0 | 1) : customSocialPairValidity {
-    const name = index === 0 ? this.customSocial1Name : this.customSocial2Name
-    const url = index === 0 ? this.customSocial1Url : this.customSocial2Url
-    if (!name.trim() && !url.trim()) return {empty: true}
-    const ret : customSocialPairValidity = {}
-    if (!name.trim() || name.length > profileUtils.maxChars.customSocialName) ret.badName = true
+  customSocialPairState(index: number): customSocialPairValidity {
+    const name = this.customSocial[index].name
+    const url = this.customSocial[index].url
+    if (!name.trim() && !url.trim()) return { empty: true }
+    const ret: customSocialPairValidity = {}
+    if (!name.trim() || name.length > profileUtils.maxChars.customSocialName)
+      ret.badName = true
     if (!url.trim() || !profileUtils.getParsedUrl(url.trim())) ret.badUrl = true
     if (url.trim().length > profileUtils.maxChars.url) ret.badUrl = true
-    return Object.keys(ret).length ? ret : {good: true}
+    return Object.keys(ret).length ? ret : { good: true }
   }
 
   validOrEmptySocialUrl(
     network: 'twitter' | 'facebook' | 'reddit' | 'instagram' | 'custom',
-    index?: 0 | 1
+    index?: number
   ) {
     const isValidUrl = (x: string) => {
       if (x.trim().length > profileUtils.maxChars.url) return false
@@ -254,8 +241,7 @@ export class FormStore {
     if (network === 'facebook') return isValidOrEmptyUrl(this.facebook)
     if (network === 'reddit') return isValidOrEmptyUrl(this.reddit)
     if (network === 'instagram') return isValidOrEmptyUrl(this.instagram)
-    if (network === 'custom') {
-      if (index != 0 && index != 1) return false
+    if (network === 'custom' && index !== undefined) {
       if (this.customSocialPairState(index).empty) return true
       if (this.customSocialPairState(index).good) return true
     }
@@ -489,8 +475,16 @@ const UserForm = observer(() => {
   const setInstagram = (e: React.ChangeEvent<HTMLInputElement>) => {
     formStore.setInstagram(e.target.value)
   }
-  const setCustom = (index: 0|1, field :'url'|'name', e: React.ChangeEvent<HTMLInputElement>) => {
-    formStore.setCustom(index, field === 'name' ? e.target.value : false, field === 'url' ? e.target.value : false)
+  const setCustom = (
+    index: number,
+    field: 'url' | 'name',
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    formStore.setCustom(
+      index,
+      field === 'name' ? e.target.value : false,
+      field === 'url' ? e.target.value : false
+    )
   }
   return (
     <>
@@ -692,90 +686,62 @@ const UserForm = observer(() => {
               disabled={user.isTrial}
             />
           </label>
+          {/* Custom Social Links */}
           <label
-            htmlFor="sl_custom1"
-            className="block mt-2 text-form-labels text-sm"
+            className="block mt-2 -mb-2 text-form-labels text-sm grid grid-cols-[40%,1fr] gap-2"
           >
-            Custom social link 1
+            <div>
+              Custom:
+            </div>
+            <div/>
+            <div>
+              Name (e.g. Mastodon)
+            </div>
+            <div>
+              URL
+            </div>
+            </label>
+
+          {formStore.customSocial.map((pair, i) => (
+          <label
+            key={i}
+            htmlFor={"sl_custom"+i}
+            className="block mt-2 text-form-labels text-sm grid grid-cols-[40%,1fr] gap-2"
+          >
             <Input
               type="text"
-              id="sl_custom1_name"
-              name="sl_custom1_name"
-              placeholder="Name (e.g. Mastodon, My Blog, LinkedIn)"
-              onChange={(x) => setCustom(0, 'name', x)}
-              value={formStore.customSocial1Name}
+              id={"sl_custom_name"+i}
+              name={"sl_custom_name"+i}
+              placeholder="Site name"
+              onChange={x => setCustom(i, 'name', x)}
+              value={pair.name}
               className="mt-2 text-bodytext"
               touched
               maxLen={profileUtils.maxChars.customSocialName}
               hideLengthUnlessViolated
               customError={
-                formStore.customSocialPairState(0).badName
-                  ? 'invalid name'
-                  : ''
+                formStore.customSocialPairState(i).badName ? 'invalid name' : ''
               }
               disabled={user.isTrial}
             />
             <Input
               type="text"
-              id="sl_custom1_url"
-              name="sl_custom1_url"
-              onChange={(x) => setCustom(0, 'url', x)}
-              placeholder="URL"
-              value={formStore.customSocial1Url}
+              id={"sl_custom_url"+i}
+              name={"sl_custom_url"+i}
+              onChange={x => setCustom(i, 'url', x)}
+              placeholder="https://..."
+              value={pair.url}
               className="mt-2 text-bodytext"
               touched
               maxLen={profileUtils.maxChars.url}
               hideLengthUnlessViolated
               customError={
-                formStore.customSocialPairState(0).badUrl
-                  ? 'invalid URL'
-                  : ''
+                formStore.customSocialPairState(i).badUrl ? 'invalid URL' : ''
               }
               disabled={user.isTrial}
             />
           </label>
-          <label
-            htmlFor="sl_custom2"
-            className="block mt-2 text-form-labels text-sm"
-          >
-            Custom social link 2
-            <Input
-              type="text"
-              id="sl_custom2_name"
-              name="sl_custom2_name"
-              placeholder="Name (e.g. Mastodon, My Blog, LinkedIn)"
-              onChange={(x) => setCustom(1, 'name', x)}
-              value={formStore.customSocial2Name}
-              className="mt-2 text-bodytext"
-              touched
-              maxLen={profileUtils.maxChars.customSocialName}
-              hideLengthUnlessViolated
-              customError={
-                formStore.customSocialPairState(1).badName
-                  ? 'invalid name'
-                  : ''
-              }
-              disabled={user.isTrial}
-            />
-            <Input
-              type="text"
-              id="sl_custom1_url"
-              name="sl_custom1_url"
-              onChange={(x) => setCustom(1, 'url', x)}
-              placeholder="URL"
-              value={formStore.customSocial2Url}
-              className="mt-2 text-bodytext"
-              touched
-              maxLen={profileUtils.maxChars.url}
-              hideLengthUnlessViolated
-              customError={
-                formStore.customSocialPairState(1).badUrl
-                  ? 'invalid URL'
-                  : ''
-              }
-              disabled={user.isTrial}
-            />
-          </label>
+          ))}
         </div>
 
         {!appShell.inAppWebView && (
