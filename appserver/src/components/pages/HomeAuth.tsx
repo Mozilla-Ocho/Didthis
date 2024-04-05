@@ -16,6 +16,14 @@ import useAppShell, { useAppShellListener } from '@/lib/appShellContent'
 
 import settingsGear from '@/assets/img/settings-gear.svg'
 import DiscordCard from '../DiscordCard'
+import IOSCard from '../IOSCard'
+
+const InfoGrid = () => (
+  <div className="grid mt-24 gap-4 grid-cols-1 md:grid-cols-2 w-auto">
+    <DiscordCard />
+    <IOSCard />
+  </div>
+)
 
 const HomeAuth = observer(() => {
   const store = useStore()
@@ -121,7 +129,7 @@ const HomeAuth = observer(() => {
                 <p>You don't have any projects yet. Create a project.</p>
               </>
             )}
-            <DiscordCard />
+            <InfoGrid />
           </PagePad>
         </PagePad>
       </>
@@ -163,15 +171,19 @@ const HomeAuth = observer(() => {
   if (!hasProjects && !hasProfileEdits && !skipBlankSlate) {
     return (
       <>
-        <PagePad>
-          <h3 className="mt-10 mb-4">Welcome to {branding.productName}!</h3>
-          <p className="mt-6 mb-6">
-            Let’s get started. Are you working on a hobby project right now?
-            Click “Add post”, pick a photo from your camera roll, and start
-            tracking your journey!
-          </p>
-          {addCreatBtns}
-          <DiscordCard />
+        <PagePad yControlOnly>
+          <PagePad noPadY>
+            <h3 className="mt-10 mb-4">Welcome to {branding.productName}!</h3>
+            <p className="mt-6 mb-6">
+              Let’s get started. Are you working on a hobby project right now?
+              Click “Add post”, pick a photo from your camera roll, and start
+              tracking your journey!
+            </p>
+            {addCreatBtns}
+          </PagePad>
+          <PagePad wide noPadY>
+            <InfoGrid />
+          </PagePad>
         </PagePad>
       </>
     )
@@ -191,7 +203,7 @@ const HomeAuth = observer(() => {
             <h3 className="my-2">Your projects</h3>
             {addCreatBtns}
             <ProjectList targetUser={store.user} />
-            <DiscordCard />
+            <InfoGrid />
           </div>
         </PagePad>
       </PagePad>

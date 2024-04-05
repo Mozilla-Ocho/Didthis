@@ -1,6 +1,5 @@
 import { ApiClient } from '@/lib/apiClient'
 import { SlugCheckWrapper } from '@/lib/apiConstants'
-import branding from '@/lib/branding'
 import { specialAssetIds } from '@/lib/cloudinaryConfig'
 import profileUtils from '@/lib/profileUtils'
 import { useStore } from '@/lib/store'
@@ -14,9 +13,7 @@ import ImageUploadWeb, { UploadCallback } from '../ImageUpload'
 import {
   Button,
   CloudinaryImage,
-  Icon,
   Input,
-  Link,
   Textarea,
   ListItemLink,
   ListItemBtn,
@@ -27,6 +24,15 @@ import { LogoutButton } from '../auth/LogoutButton'
 import pathBuilder from '@/lib/pathBuilder'
 import DiscordAccount from '../connectedAccounts/Discord'
 import { useRouter } from 'next/router'
+
+type customSocialPairValidity = {
+  empty?: true
+  badName?: true
+  badUrl?: true
+  good?: true
+}
+
+const NUM_CUSTOM_SOCIAL = 3
 
 export class FormStore {
   name: string
@@ -44,6 +50,7 @@ export class FormStore {
   facebook: string
   reddit: string
   instagram: string
+  customSocial: { name: string; url: string }[]
   spinning = false
   discordShareByDefault = false
   apiClient: ApiClient
@@ -60,6 +67,12 @@ export class FormStore {
     this.facebook = user.profile.socialUrls?.facebook || ''
     this.reddit = user.profile.socialUrls?.reddit || ''
     this.instagram = user.profile.socialUrls?.instagram || ''
+    this.customSocial = JSON.parse(
+      JSON.stringify(user.profile.socialUrls?.customSocial || [])
+    )
+    for (let i = 0; i < NUM_CUSTOM_SOCIAL; i++) {
+      if (!this.customSocial[i]) this.customSocial[i] = { name: '', url: '' }
+    }
     this.userSlug = user.userSlug || ''
     if (this.userSlug) this.slugTouched = true
     this.imageAssetId = user.profile.imageAssetId || ''
@@ -108,6 +121,11 @@ export class FormStore {
   setInstagram(x: string) {
     this.instagram = x
   }
+  setCustom(index: number, name: string | false, url: string | false) {
+    if (name !== false) this.customSocial[index].name = name
+    if (url !== false) this.customSocial[index].url = url
+  }
+
   setSpinning(x: boolean) {
     this.spinning = x
   }
@@ -130,16 +148,26 @@ export class FormStore {
       const c = contentOrUndef(x)
       const parsed = c && profileUtils.getParsedUrl(c)
       if (parsed) return parsed.toString()
+      return undefined
+    }
+    let customSocial: ApiCustomSocialList = []
+    for (let i = 0; i < NUM_CUSTOM_SOCIAL; i++) {
+      if (this.customSocialPairState(i).good) {
+        customSocial.push({
+          name: this.customSocial[i].name,
+          url: this.customSocial[i].url,
+        })
+      }
     }
 
-    let { connectedAccounts } = this.user.profile;
+    let { connectedAccounts } = this.user.profile
     if (connectedAccounts?.discord) {
       connectedAccounts = {
         ...connectedAccounts,
         discord: {
           ...connectedAccounts.discord,
-          shareByDefault: this.discordShareByDefault
-        }
+          shareByDefault: this.discordShareByDefault,
+        },
       }
     }
 
@@ -155,8 +183,9 @@ export class FormStore {
         facebook: normUrl(this.facebook),
         reddit: normUrl(this.reddit),
         instagram: normUrl(this.instagram),
+        customSocial: customSocial.length ? customSocial : undefined,
       },
-      connectedAccounts
+      connectedAccounts,
     }
   }
 
@@ -183,19 +212,45 @@ export class FormStore {
       )
   }
 
+  customSocialPairState(index: number): customSocialPairValidity {
+    const name = this.customSocial[index].name
+    const url = this.customSocial[index].url
+    if (!name.trim() && !url.trim()) return { empty: true }
+    const ret: customSocialPairValidity = {}
+    if (!name.trim() || name.length > profileUtils.maxChars.customSocialName)
+      ret.badName = true
+    if (!url.trim() || !profileUtils.getParsedUrl(url.trim())) ret.badUrl = true
+    if (url.trim().length > profileUtils.maxChars.url) ret.badUrl = true
+    return Object.keys(ret).length ? ret : { good: true }
+  }
+
   validOrEmptySocialUrl(
-    network: 'twitter' | 'facebook' | 'reddit' | 'instagram'
+    network: 'twitter' | 'facebook' | 'reddit' | 'instagram' | 'custom',
+    index?: number
   ) {
-    const isValid = (x: string) => {
-      if (!x.trim()) return true
+    const isValidUrl = (x: string) => {
+      if (x.trim().length > profileUtils.maxChars.url) return false
       const parsed = profileUtils.getParsedUrl(x.trim())
       return !!parsed
     }
-    if (network === 'twitter') return isValid(this.twitter)
-    if (network === 'facebook') return isValid(this.facebook)
-    if (network === 'reddit') return isValid(this.reddit)
-    if (network === 'instagram') return isValid(this.instagram)
+    const isValidOrEmptyUrl = (x: string) => {
+      if (!x.trim()) return true
+      return isValidUrl(x)
+    }
+    if (network === 'twitter') return isValidOrEmptyUrl(this.twitter)
+    if (network === 'facebook') return isValidOrEmptyUrl(this.facebook)
+    if (network === 'reddit') return isValidOrEmptyUrl(this.reddit)
+    if (network === 'instagram') return isValidOrEmptyUrl(this.instagram)
+    if (network === 'custom' && index !== undefined) {
+      if (this.customSocialPairState(index).empty) return true
+      if (this.customSocialPairState(index).good) return true
+    }
     return false
+  }
+
+  validCustomName(name: string) {
+    if (!name.trim()) return false
+    return name.length <= profileUtils.maxChars.customSocialName
   }
 
   isPostable() {
@@ -205,22 +260,12 @@ export class FormStore {
     if (this.bio.trim().length > profileUtils.maxChars.blurb) {
       return false
     }
-    if (this.twitter.trim().length > profileUtils.maxChars.url) {
-      return false
-    }
-    if (this.facebook.trim().length > profileUtils.maxChars.url) {
-      return false
-    }
-    if (this.reddit.trim().length > profileUtils.maxChars.url) {
-      return false
-    }
-    if (this.instagram.trim().length > profileUtils.maxChars.url) {
-      return false
-    }
     if (!this.validOrEmptySocialUrl('twitter')) return false
     if (!this.validOrEmptySocialUrl('facebook')) return false
     if (!this.validOrEmptySocialUrl('instagram')) return false
     if (!this.validOrEmptySocialUrl('reddit')) return false
+    if (!this.validOrEmptySocialUrl('custom', 0)) return false
+    if (!this.validOrEmptySocialUrl('custom', 1)) return false
     if (this.hasUserSlug()) {
       if (!profileUtils.slugStringValidation(this.userSlug).valid) {
         return false
@@ -394,8 +439,6 @@ const UserForm = observer(() => {
     router.push(pathBuilder.user(user.systemSlug))
   }
 
-  // have to pass the appshell api reference so that it can send the reset sign
-  // in signal to the app shell.
   const handleDeleteAccount = () => store.promptDeleteAccount()
 
   const handleShowAppInfo = () => appShell.api.request('showAppInfo')
@@ -431,6 +474,17 @@ const UserForm = observer(() => {
   }
   const setInstagram = (e: React.ChangeEvent<HTMLInputElement>) => {
     formStore.setInstagram(e.target.value)
+  }
+  const setCustom = (
+    index: number,
+    field: 'url' | 'name',
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    formStore.setCustom(
+      index,
+      field === 'name' ? e.target.value : false,
+      field === 'url' ? e.target.value : false
+    )
   }
   return (
     <>
@@ -632,6 +686,62 @@ const UserForm = observer(() => {
               disabled={user.isTrial}
             />
           </label>
+          {/* Custom Social Links */}
+          <label
+            className="block mt-2 -mb-2 text-form-labels text-sm grid grid-cols-[40%,1fr] gap-2"
+          >
+            <div>
+              Custom:
+            </div>
+            <div/>
+            <div>
+              Name (e.g. Mastodon)
+            </div>
+            <div>
+              URL
+            </div>
+            </label>
+
+          {formStore.customSocial.map((pair, i) => (
+          <label
+            key={i}
+            htmlFor={"sl_custom"+i}
+            className="block mt-2 text-form-labels text-sm grid grid-cols-[40%,1fr] gap-2"
+          >
+            <Input
+              type="text"
+              id={"sl_custom_name"+i}
+              name={"sl_custom_name"+i}
+              placeholder="Site name"
+              onChange={x => setCustom(i, 'name', x)}
+              value={pair.name}
+              className="mt-2 text-bodytext"
+              touched
+              maxLen={profileUtils.maxChars.customSocialName}
+              hideLengthUnlessViolated
+              customError={
+                formStore.customSocialPairState(i).badName ? 'invalid name' : ''
+              }
+              disabled={user.isTrial}
+            />
+            <Input
+              type="text"
+              id={"sl_custom_url"+i}
+              name={"sl_custom_url"+i}
+              onChange={x => setCustom(i, 'url', x)}
+              placeholder="https://..."
+              value={pair.url}
+              className="mt-2 text-bodytext"
+              touched
+              maxLen={profileUtils.maxChars.url}
+              hideLengthUnlessViolated
+              customError={
+                formStore.customSocialPairState(i).badUrl ? 'invalid URL' : ''
+              }
+              disabled={user.isTrial}
+            />
+          </label>
+          ))}
         </div>
 
         {!appShell.inAppWebView && (
@@ -659,47 +769,48 @@ const UserForm = observer(() => {
         )}
       </form>
 
-      {/* Legal + Account actions */}
+      {/* Legal links for native app. in web, they are in the footer */}
       {appShell.inAppWebView && (
         <div className="my-10">
-          <div>
-            <ListItemLink
-              LegalDoc
-              href={pathBuilder.legal('pp')}
-              textlabel="Privacy Notice"
-            />
-            <ListItemLink
-              LegalDoc
-              href={pathBuilder.legal('tos')}
-              textlabel="Terms of service"
-            />
-            <ListItemLink
-              LegalDoc
-              href={pathBuilder.legal('cp')}
-              textlabel="Content Policies"
-            />
-            <ListItemBtn textlabel="App Info" onClick={handleShowAppInfo} />
-          </div>
-
-          <div className="leading-5 text-sm mt-4">
-            <h5 className="text-sm">Account deletion:</h5> If you would like to
-            delete your account, you can do so here. This will permanently
-            destroy all your public and private content, log you out on all
-            devices, and cannot be undone &mdash; not even by customer support.{' '}
-            <br></br>
-            <Button
-              intent="secondary"
-              onClick={handleDeleteAccount}
-              className="text-sm border-red-500 text-red-500 mt-4"
-              trackEvent={trackingEvents.bcDeleteAccount}
-            >
-              Delete account
-            </Button>
-          </div>
-          <hr className="my-6" />
-          <LogoutButton intent="secondary" />
+          <ListItemLink
+            LegalDoc
+            href={pathBuilder.legal('pp')}
+            textlabel="Privacy Notice"
+          />
+          <ListItemLink
+            LegalDoc
+            href={pathBuilder.legal('tos')}
+            textlabel="Terms of service"
+          />
+          <ListItemLink
+            LegalDoc
+            href={pathBuilder.legal('cp')}
+            textlabel="Content Policies"
+          />
+          <ListItemBtn textlabel="App Info" onClick={handleShowAppInfo} />
         </div>
       )}
+
+      <div className="my-10">
+        <h5 className="text-sm">Account deletion:</h5>
+        <p className="text-form-labels text-sm">
+          If you would like to delete your account, you can do so here. This
+          will permanently destroy all your public and private content, log you
+          out on all devices, and cannot be undone &mdash; not even by customer
+          support.{' '}
+        </p>
+        <Button
+          intent="secondary"
+          onClick={handleDeleteAccount}
+          className="text-sm border-red-500 text-red-500 mt-4"
+          trackEvent={trackingEvents.bcDeleteAccount}
+        >
+          Delete account
+        </Button>
+      </div>
+
+      <hr className="my-6" />
+      <LogoutButton intent="secondary" />
     </>
   )
 })

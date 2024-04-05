@@ -15,6 +15,7 @@ const PostList = ({
   focusPostId: string
 }) => {
   const store = useStore()
+  const isSelf = store.user && store.user.id === targetUser.id
   const posts = Object.values(project.posts)
   posts.sort((a, b) =>
     sort === 'desc' ? b.didThisAt - a.didThisAt : a.didThisAt - b.didThisAt
@@ -23,13 +24,15 @@ const PostList = ({
     return (
       <div className="text-center py-20">
         <p>This project has no updates yet.</p>
-        <p>
-          Visit their{' '}
-          <Link href={pathBuilder.user(targetUser.publicPageSlug)}>
-            project page
-          </Link>{' '}
-          to see their other projects!
-        </p>
+        {!isSelf && (
+          <p>
+            Visit their{' '}
+            <Link href={pathBuilder.user(targetUser.publicPageSlug)}>
+              project page
+            </Link>{' '}
+            to see their other projects!
+          </p>
+        )}
       </div>
     )
   return (

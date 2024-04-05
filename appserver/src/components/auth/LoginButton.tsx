@@ -9,12 +9,14 @@ const LoginButton = observer(
   ({
     intent,
     text,
+    content,
     'data-testid': dataTestid,
     className,
   }: {
     overrideCodeCheck?: boolean
     overrideCodeCheckIfNoSignupCode?: boolean
     intent?: React.ComponentProps<typeof Button>['intent']
+    content?: React.ReactNode
     text?: string
     'data-testid'?: string
     className?: string
@@ -37,7 +39,7 @@ const LoginButton = observer(
         data-testid={dataTestid || 'loginButton'}
         className={className}
       >
-        {text || defaultText}
+        {content || text || defaultText}
       </Button>
     )
   }

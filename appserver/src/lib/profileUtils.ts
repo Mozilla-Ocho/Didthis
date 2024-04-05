@@ -25,6 +25,7 @@ const maxChars = {
   title: 140,
   blurb: 1000,
   slug: 50,
+  customSocialName: 50,
 }
 
 const minChars = {
@@ -219,15 +220,24 @@ const slugStringValidation = (
 
 const hasAnySocialUrls = (profile: ApiProfile) => {
   if (!profile.socialUrls) return false
-  return !!(
+  if (!!(
     profile.socialUrls.twitter ||
     profile.socialUrls.facebook ||
     profile.socialUrls.reddit ||
     profile.socialUrls.instagram
-  )
+  )) return true
+  if (profile.socialUrls.customSocial) {
+    for (const social of profile.socialUrls.customSocial) {
+      if (social.url) return true
+    }
+  }
+  return false
 }
 
 const newFieldCompare = (a: ApiProfile, b: ApiProfile) => {
+  // what this does is identify which fields are new in b compared to a so that
+  // we can fire amplitude tracking events to say the user has completed that
+  // field.
   const newFields = []
   if (a.imageAssetId && !b.imageAssetId) newFields.push('avatar')
   if (a.bio && !b.bio) newFields.push('bio')
@@ -236,7 +246,8 @@ const newFieldCompare = (a: ApiProfile, b: ApiProfile) => {
     (a.socialUrls?.twitter && !b.socialUrls?.twitter) ||
     (a.socialUrls?.facebook && !b.socialUrls?.facebook) ||
     (a.socialUrls?.instagram && !b.socialUrls?.instagram) ||
-    (a.socialUrls?.reddit && !b.socialUrls?.reddit)
+    (a.socialUrls?.reddit && !b.socialUrls?.reddit) ||
+    (a.socialUrls?.customSocial && !b.socialUrls?.customSocial)
   ) {
     newFields.push('socialUrls')
   }

@@ -201,8 +201,8 @@ const WaitlistButton = observer(
           </div>
         </Modal>
         {mode === 'viral' ? (
-          <Button intent="link" onClick={handleClick}>
-            <strong>Join our wait list</strong>
+          <Button intent="link" onClick={handleClick} className={className}>
+            <strong>join our wait list</strong>
           </Button>
         ) : (
           <Button

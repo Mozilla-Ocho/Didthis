@@ -129,7 +129,7 @@ class Store {
       if (pt === 'signup') {
         // DRY_25748 signup tracking
         let signupEvent = trackingEvents.caSignup
-        if (this.getAppPlatform() === "native-ios") {
+        if (this.getAppPlatform() === 'native-ios') {
           // this *should* be caSignup, but historically caAppleIDLogin was used.
           // so, we're keeping caAppleIDLogin so as not to break existing funnel tracking
           signupEvent = trackingEvents.caAppleIDLogin
@@ -599,6 +599,19 @@ class Store {
     return false
   }
 
+  isAppleUserAgentOnWebApp() {
+    // when true, we tell the user there is an iOS app they should try
+    if (this.isNativeIOS()) return false
+    if (typeof navigator !== 'undefined') {
+      // Not comprehensive, but probably good enough.
+      // iPad seems to present like safari desktop (matches Macintosh)
+      if (/Macintosh|iPhone/i.test(navigator.userAgent)) {
+        return true
+      }
+    }
+    return false
+  }
+
   getAppPlatform(): AppPlatformType {
     if (this.isNativeIOS()) return 'native-ios'
     if (this.isMobile()) return 'web-mobile'
@@ -608,11 +621,21 @@ class Store {
   screenSize() {
     // https://tailwindcss.com/docs/responsive-design
     if (typeof window !== 'undefined') {
-      if (window.innerWidth < 640) { return 'xs' }
-      if (window.innerWidth < 768) { return 'sm' }
-      if (window.innerWidth < 1024) { return 'md' }
-      if (window.innerWidth < 1280) { return 'lg' }
-      if (window.innerWidth < 1536) { return 'xl' }
+      if (window.innerWidth < 640) {
+        return 'xs'
+      }
+      if (window.innerWidth < 768) {
+        return 'sm'
+      }
+      if (window.innerWidth < 1024) {
+        return 'md'
+      }
+      if (window.innerWidth < 1280) {
+        return 'lg'
+      }
+      if (window.innerWidth < 1536) {
+        return 'xl'
+      }
       return '2xl'
     }
     return ''
@@ -630,7 +653,7 @@ class Store {
     log.tracking('identify() slugs')
     identifyOps.setOnce('systemSlug', this.user.systemSlug)
     if (this.user.userSlug) identifyOps.set('userSlug', this.user.userSlug)
-    if (this.isNativeIOS()) identifyOps.set('hasIOSLogin','1')
+    if (this.isNativeIOS()) identifyOps.set('hasIOSLogin', '1')
     this.amplitude.identify(identifyOps)
   }
 
@@ -696,6 +719,15 @@ class Store {
       )
       return
     }
+    // copy any utm_* args to the page event in amplitude
+    const url = new URL(window.location.toString())
+    url.searchParams.forEach((v, k) => {
+      if (k.startsWith('utm_')) {
+        // note these will violate the trackingEvents schema, but we're just adding them to the opts object.
+        // added 2024-04-04
+        fullEvent.opts[k] = v
+      }
+    })
     if (!isEqual(fullEvent, this.trackedPageEvent)) {
       this.trackEvent(evt, opts)
     }
@@ -730,7 +762,9 @@ class Store {
   ): Promise<ApiPost> {
     if (!this.user) throw new Error('must be authed')
     const numProjects = Object.keys(this.user.profile.projects).length
-    const numPosts = Object.values(this.user.profile.projects).map(p => Object.keys(p.posts).length).reduce((a,b)=>a+b,0)
+    const numPosts = Object.values(this.user.profile.projects)
+      .map(p => Object.keys(p.posts).length)
+      .reduce((a, b) => a + b, 0)
     if (mode === 'new') {
       post.createdPlatform = this.getAppPlatform()
     }
@@ -831,21 +865,19 @@ class Store {
         // i'm firing the caDeleteAccount event here before the api call,
         // because i'm not trusting amplitude to track this event if we follow
         // it right with a setUserId(undef) and flush() call, not sure.
-        this.trackEvent(trackingEvents.caDeleteAccount, { })
-        this.apiClient
-          .deleteAccount()
-          .then(() => {
-            this.showConfirmDeleteModal = false
-            setTimeout(() => {
-              this.confirmingDelete = false
-            }, modalTransitionTime)
-            this.amplitude.setUserId(undefined)
-            this.amplitude.flush()
-            if (this.appShellApiRef) {
-              this.appShellApiRef.request('signin')
-            }
-            window.location.assign('/')
-          })
+        this.trackEvent(trackingEvents.caDeleteAccount, {})
+        this.apiClient.deleteAccount().then(() => {
+          this.showConfirmDeleteModal = false
+          setTimeout(() => {
+            this.confirmingDelete = false
+          }, modalTransitionTime)
+          this.amplitude.setUserId(undefined)
+          this.amplitude.flush()
+          if (this.appShellApiRef) {
+            this.appShellApiRef.request('signin')
+          }
+          window.location.assign('/')
+        })
       }
       if (this.confirmingDelete.kind === 'post') {
         this.apiClient
@@ -922,6 +954,11 @@ class Store {
     return this.apiClient.disconnectDiscord().then(wrapper => {
       this.setUser(wrapper.payload)
     })
+  }
+
+  userHasDiscordConnection(): boolean {
+    if (!this.user) return false
+    return !!this.user.profile.connectedAccounts?.discord
   }
 }
 
