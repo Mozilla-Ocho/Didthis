@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Button, ConfirmationModal, Link } from '../uiLib'
 import { useStore } from '@/lib/store'
-import branding from '@/lib/branding'
-import { FormStore } from '../forms/User'
 
 const csrfCookieName = '_h3y_csrf' // DRY_86325 crsf cookie name. TODO: put this in a non-typescript shared const file?
 const DISCORD_BASE_AUTHORIZE_URL = 'https://discord.com/oauth2/authorize'
@@ -12,16 +10,19 @@ export type DiscordAccountProps = {
   user: ApiUser
   shareByDefault: boolean
   setShareByDefault: (state: boolean) => void
+  hasUnsavedFormChanges: boolean
 }
 
 export default function DiscordAccount({
   user,
   shareByDefault,
   setShareByDefault,
+  hasUnsavedFormChanges,
 }: DiscordAccountProps) {
   const store = useStore()
 
   const [modalOpen, setModalOpen] = useState(false)
+  const [confirmOpen, setConfirmOpen] = useState(false) // State for confirmation modal
 
   // HACK: clientLoaded will be true only on client-side, avoiding a hydration error
   const [clientLoaded, setClientLoaded] = useState(false)
@@ -137,11 +138,37 @@ export default function DiscordAccount({
     `${DISCORD_BASE_AUTHORIZE_URL}?${authorizeParams.toString()}`
   )
 
+  const handleConnectLinkClick = (event : React.MouseEvent<HTMLAnchorElement>) => {
+    if (hasUnsavedFormChanges) {
+      event.preventDefault();
+      event.stopPropagation();
+      setConfirmOpen(true);
+    }
+    // otherwise pass through to the link
+  }
+  const handleConnectConfirmUnsaved = () => {
+    setConfirmOpen(false);
+    window.location.href = authorizeUrl.toString();
+  }
+
   return (
     <p className="text-base">
-      <Link intent="primary" href={authorizeUrl.toString()}>
+      <Link intent="primary" href={authorizeUrl.toString()} onClick={handleConnectLinkClick}>
         Connect to Discord
       </Link>
+      <ConfirmationModal
+        isOpen={confirmOpen}
+        title={'You have unsaved changes'}
+        yesText="Continue anyway"
+        noText="Cancel"
+        onYes={handleConnectConfirmUnsaved}
+        onNo={() => setConfirmOpen(false)}
+        onClose={() => setConfirmOpen(false)}
+      >
+        <p className="mt-6 mb-6">
+          Unsaved edits to your account details will be lost if you continue to Discord. We recommend saving your changes first.
+        </p>
+      </ConfirmationModal>
     </p>
   )
 }

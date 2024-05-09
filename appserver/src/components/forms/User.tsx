@@ -142,6 +142,36 @@ export class FormStore {
     }
   }
 
+  getHasUnsavedFieldName() : string | false {
+    // returns the name of the first field that has unsaved changes, or false if none. used to show a warning when navigating away on discord pairing if unsaved changes exist.
+    if ((this.name || '').trim() !== (this.user.profile.name || '').trim())
+      return 'name'
+    if ((this.bio || '').trim() !== (this.user.profile.bio || '').trim())
+      return 'bio'
+    if ((this.userSlug || '').trim() !== (this.user.userSlug || '').trim())
+      return 'userSlug'
+    if ((this.imageAssetId || '').trim() !== (this.user.profile.imageAssetId || '').trim())
+      return 'imageAssetId'
+    if ((this.twitter || '').trim() !== (this.user.profile.socialUrls?.twitter || '').trim())
+      return 'twitter'
+    if ((this.facebook || '').trim() !== (this.user.profile.socialUrls?.facebook || '').trim())
+      return 'facebook'
+    if ((this.reddit || '').trim() !== (this.user.profile.socialUrls?.reddit || '').trim())
+      return 'reddit'
+    if ((this.instagram || '').trim() !== (this.user.profile.socialUrls?.instagram || '').trim())
+      return 'instagram'
+    if (this.customSocial.some(
+        (pair, i) =>
+          pair.name !== this.user.profile.socialUrls?.customSocial?.[i]?.name ||
+          pair.url !== this.user.profile.socialUrls?.customSocial?.[i]?.url
+      )) return 'customSocial'
+    if (this.user.profile.connectedAccounts?.discord) {
+      if (this.discordShareByDefault !== (this.user.profile.connectedAccounts?.discord?.shareByDefault || false))
+        return 'discordShareByDefault'
+    }
+    return false
+  }
+
   getApiProfile(): ApiProfile {
     const contentOrUndef = (x: string) => (x && x.trim() ? x.trim() : undefined)
     const normUrl = (x: string) => {
@@ -591,6 +621,7 @@ const UserForm = observer(() => {
             user={user}
             shareByDefault={formStore.discordShareByDefault}
             setShareByDefault={v => formStore.setDiscordShareByDefault(v)}
+            hasUnsavedFormChanges={!!formStore.getHasUnsavedFieldName()}
           />
         </div>
 
