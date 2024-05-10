@@ -142,7 +142,7 @@ export class FormStore {
     }
   }
 
-  getHasUnsavedFieldName() : string | false {
+  getFirstUnsavedFieldName() : string | false {
     // returns the name of the first field that has unsaved changes, or false if none. used to show a warning when navigating away on discord pairing if unsaved changes exist.
     if ((this.name || '').trim() !== (this.user.profile.name || '').trim())
       return 'name'
@@ -162,45 +162,15 @@ export class FormStore {
       return 'instagram'
     if (this.customSocial.some(
         (pair, i) =>
-          pair.name !== this.user.profile.socialUrls?.customSocial?.[i]?.name ||
-          pair.url !== this.user.profile.socialUrls?.customSocial?.[i]?.url
+          // note that customSocial has NUM_CUSTOM_SOCIAL entries always, but profile.socialUrls might have 0-NUM_CUSTOM_SOCIAL
+          pair.name !== (this.user.profile.socialUrls?.customSocial?.[i]?.name || '') ||
+          pair.url !== (this.user.profile.socialUrls?.customSocial?.[i]?.url || '')
       )) return 'customSocial'
     if (this.user.profile.connectedAccounts?.discord) {
       if (!!this.discordShareByDefault !== !!(this.user.profile.connectedAccounts?.discord?.shareByDefault))
         return 'discordShareByDefault'
     }
     return false
-  }
-
-  dbgUnsaved() : string | false {
-    // for some reason this field check behaves differently in dev and in prod. this is a debug function to help figure out why.
-    const fieldName = this.getHasUnsavedFieldName()
-    if (fieldName) {
-      console.log('unsaved field:', fieldName)
-      console.log('form data', {
-        name: this.name,
-        profileName: this.user.profile.name,
-        bio: this.bio,
-        profileBio: this.user.profile.bio,
-        userSlug: this.userSlug,
-        profileUserSlug: this.user.userSlug,
-        imageAssetId: this.imageAssetId,
-        profileImageAssetId: this.user.profile.imageAssetId,
-        twitter: this.twitter,
-        profileTwitter: this.user.profile.socialUrls?.twitter,
-        facebook: this.facebook,
-        profileFacebook: this.user.profile.socialUrls?.facebook,
-        reddit: this.reddit,
-        profileReddit: this.user.profile.socialUrls?.reddit,
-        instagram: this.instagram,
-        profileInstagram: this.user.profile.socialUrls?.instagram,
-        customSocial: toJS(this.customSocial),
-        profileCustomSocial: toJS(this.user.profile.socialUrls?.customSocial),
-        discordShareByDefault: this.discordShareByDefault,
-        profileDiscordShareByDefault: toJS(this.user.profile.connectedAccounts?.discord?.shareByDefault),
-        })
-    }
-    return fieldName
   }
 
   getApiProfile(): ApiProfile {
@@ -652,7 +622,7 @@ const UserForm = observer(() => {
             user={user}
             shareByDefault={formStore.discordShareByDefault}
             setShareByDefault={v => formStore.setDiscordShareByDefault(v)}
-            hasUnsavedFormChanges={!!formStore.dbgUnsaved()}
+            hasUnsavedFormChanges={!!formStore.getFirstUnsavedFieldName()}
           />
         </div>
 
