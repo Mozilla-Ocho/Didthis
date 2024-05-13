@@ -2,9 +2,10 @@ import {
   Client,
   MessageCreateOptions,
   TextBasedChannel,
+  GuildBasedChannel,
+  GuildMember,
   blockQuote,
   hyperlink,
-  quote,
   userMention,
 } from 'discord.js'
 import { BotContext } from '.'
@@ -43,10 +44,10 @@ async function pollPublicUpdates(context: PublicUpdatesWatcherContext) {
   let untilUpdatedAt = new Date(Date.now() - postDelay)
 
   try {
-    // Check to ensure we have a proper text-based channel configured
+    // Check to ensure we have a proper text-based guild channel configured
     const discordChannelId = config.get('channelId')
     const channel = await discordClient.channels.fetch(discordChannelId)
-    if (channel && channel.isTextBased()) {
+    if (channel && channel.isTextBased() && 'guild' in channel) {
       // Fetch relevant updates since last poll for discord users
       const since = lastPublicUpdatesPoll.toISOString()
       const until = untilUpdatedAt.toISOString()
@@ -56,6 +57,12 @@ async function pollPublicUpdates(context: PublicUpdatesWatcherContext) {
         until,
         requireDiscordAccount: true,
         requireAutoShare: true,
+      })
+      log.info({
+        msg: 'Polled for public updates',
+        count: updates.length,
+        since,
+        until,
       })
 
       // Share the updates, if we found any
@@ -91,12 +98,34 @@ const UPDATE_TYPE_LABELS = {
 async function postPublicUpdateToChannel(
   context: PublicUpdatesWatcherContext,
   update: UpdateFragmentFragment,
-  channel: TextBasedChannel
+  channel: TextBasedChannel & GuildBasedChannel
 ) {
   const { log } = context
 
   const user = update.user
   const discordAccount = user.profile.connectedAccounts!.discord!
+  const discordGuild = await channel.guild.fetch()
+
+  // Check if the user is a member of the server to which we want to post
+  let discordGuildMember: GuildMember | undefined
+  try {
+    discordGuildMember = await discordGuild.members.fetch({
+      user: discordAccount.id!,
+      force: true, // Skip cache, so we can react to moderation actions immediately
+    })
+    if (!discordGuildMember) {
+      throw new Error('User is not a member of the server')
+    }
+  } catch (err) {
+    log.warn({
+      msg: `Could not verify user as a member of the server: ${err}`,
+      discordUserId: discordAccount.id,
+      discordUserName: discordAccount.username,
+      discordGuildId: discordGuild.id,
+      discordGuildName: discordGuild.name,
+    })
+    return
+  }
 
   // Link to the discord user for more relevant context in channel
   const userDisplay = userMention(discordAccount.id!)
@@ -170,7 +199,14 @@ async function postPublicUpdateToChannel(
 
   message.content = content.join('\n')
 
-  log.info({ msg: 'Posted project update', url: update.url })
+  log.info({
+    msg: 'Posted project update',
+    url: update.url,
+    discordUserId: discordAccount.id,
+    discordUserName: discordAccount.username,
+    discordGuildId: discordGuild.id,
+    discordGuildName: discordGuild.name,
+  })
 
   return channel.send(message)
 }
