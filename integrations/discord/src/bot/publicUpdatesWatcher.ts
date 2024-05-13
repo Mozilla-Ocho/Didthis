@@ -4,6 +4,7 @@ import {
   TextBasedChannel,
   GuildBasedChannel,
   GuildMember,
+  PermissionsBitField,
   blockQuote,
   hyperlink,
   userMention,
@@ -107,18 +108,32 @@ async function postPublicUpdateToChannel(
   const discordGuild = await channel.guild.fetch()
 
   // Check if the user is a member of the server to which we want to post
+  // and whether they have permission to post to the showcase channel
   let discordGuildMember: GuildMember | undefined
   try {
+    // Attempt member fetch...
     discordGuildMember = await discordGuild.members.fetch({
       user: discordAccount.id!,
       force: true, // Skip cache, so we can react to moderation actions immediately
     })
+    // Bail if the user is not a member of the server
     if (!discordGuildMember) {
       throw new Error('User is not a member of the server')
     }
+    // Check whether the member has permission to post to the channel
+    if (
+      !discordGuildMember
+        .permissionsIn(channel)
+        .has(PermissionsBitField.Flags.SendMessages)
+    ) {
+      throw new Error(
+        'User does not have permission to send messages to the channel'
+      )
+    }
   } catch (err) {
+    // Catch-all for any issues in verifying the user's access
     log.warn({
-      msg: `Could not verify user as a member of the server: ${err}`,
+      msg: `Could not verify user as a member of the server with permission to post: ${err}`,
       discordUserId: discordAccount.id,
       discordUserName: discordAccount.username,
       discordGuildId: discordGuild.id,
