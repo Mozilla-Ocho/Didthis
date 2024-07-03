@@ -5,6 +5,8 @@
 // the UID can be obtained from the web console under the authentication area:
 // https://console.firebase.google.com/u/0/project/moz-fx-future-products-prod/authentication/users
 
+/* eslint-disable @typescript-eslint/no-var-requires */
+
 const admin = require('firebase-admin');
 const readline = require('readline');
 
