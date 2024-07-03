@@ -1,4 +1,4 @@
-import {Select} from "@/components/uiLib"
+import { Select } from '@/components/uiLib'
 
 const SortChooser = ({
   onChange,
@@ -12,7 +12,7 @@ const SortChooser = ({
     onChange(direction)
   }
   return (
-    <div className="flex flex-row items-baseline gap-4 mb-7 text-sm">
+    <div className="flex flex-row items-baseline gap-4 text-sm">
       <label htmlFor="block sortby">Sort by:</label>
       <div className="grow sm:grow-0">
         <Select

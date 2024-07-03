@@ -246,10 +246,23 @@ const ProjectPage = observer(
                 <div className="w-full">
                   {/* column start. TODO: why do i need w-full here? */}
                   <div className="px-4">
-                    {numPosts > 0 && <SortChooser
-                      onChange={changeSort}
-                      actualSort={actualSort}
-                    />}
+                    <div className="grid grid-cols-[1fr_auto] gap-4 mb-7">
+                      {numPosts > 0 && (
+                        <SortChooser
+                          onChange={changeSort}
+                          actualSort={actualSort}
+                        />
+                      )}
+                      {numPosts > 1 && (
+                        <div className="opacity-80">
+                          <AddUpdatePrompt
+                            noWrapper
+                            project={project}
+                            isSelf={isSelf}
+                          />
+                        </div>
+                      )}
+                    </div>
 
                     <PostList
                       project={project}
