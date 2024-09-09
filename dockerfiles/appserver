@@ -2,7 +2,7 @@
 # base image, shared for dev+prod
 # --------------------------------------------------------------
 
-FROM node:18-buster as appserver_base
+FROM node:20-bookworm as appserver_base
 
 # general apt update
 RUN apt-get update && apt-get install -qq -y build-essential --fix-missing --no-install-recommends
