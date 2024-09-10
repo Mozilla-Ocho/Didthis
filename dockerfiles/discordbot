@@ -1,4 +1,4 @@
-FROM node:18-buster as discordbot_base
+FROM node:20-bookworm as discordbot_base
 
 RUN apt-get update && apt-get install -qq -y build-essential --fix-missing --no-install-recommends
 RUN yarn global add pm2
