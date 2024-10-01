@@ -1,5 +1,6 @@
 import { createYoga } from 'graphql-yoga'
-import { schema, plugins } from '../../graphql/index'
+import { schema, createPlugins, createContext } from '../../graphql/index'
+import { NextApiRequest, NextApiResponse } from 'next'
 
 export const config = {
   api: {
@@ -8,8 +9,12 @@ export const config = {
   },
 }
 
-export default createYoga({
+export default createYoga<{
+  req: NextApiRequest
+  res: NextApiResponse
+}>({
   graphqlEndpoint: '/api/graphql',
-  plugins,
+  context: createContext,
+  plugins: createPlugins(),
   schema,
 })

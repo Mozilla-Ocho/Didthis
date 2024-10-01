@@ -1,10 +1,13 @@
 import { createSchema, Plugin } from 'graphql-yoga'
 import { typeDefs } from './typeDefs'
-import { resolvers, CustomContext } from './resolvers'
+import { resolvers } from './resolvers'
+import { GraphQLContext } from "./context"
 
-export { plugins } from './plugins'
+export { createPlugins } from './plugins'
 
-export const schema = createSchema<CustomContext>({
+export { createContext } from './context'
+
+export const schema = createSchema<GraphQLContext>({
   typeDefs,
   resolvers,
 })

@@ -62,6 +62,12 @@ variable "vpc_access_connector_name" {
 variable "vpc_access_connector_id" {
   type = string
 }
+variable "gcp_project_id" {
+  type = string
+}
+variable "gcp_exporter_job_id" {
+  type = string
+}
 
 locals {
   # the cloud run server, and all the jobs, all get the same env vars. keep it
@@ -106,6 +112,14 @@ locals {
     {
       name = "FLAG_USE_DB"
       value = var.flag_use_db ? "true" : "false"
+    },
+    {
+      name = "GCP_PROJECT_ID"
+      value = var.gcp_project_id
+    },
+    {
+      name = "GCP_EXPORTER_JOB_ID"
+      value = var.gcp_exporter_job_id
     }
   ]
 }

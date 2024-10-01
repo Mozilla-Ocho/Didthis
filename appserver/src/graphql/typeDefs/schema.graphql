@@ -16,6 +16,13 @@ type Query {
   ): [Update]
 }
 
+type Mutation {
+  updateUserExportStatus(
+    id: String!,
+    status: ExportStatusInput!,
+  ): ExportStatus
+}
+
 type User {
   id: String!
   slug: String
@@ -28,12 +35,43 @@ type User {
 type Profile {
   name: String
   bio: String
-  updatedAt: Int
+  updatedAt: DateTime!
+  imageAssetId: String
   imageSrc: URL
   imageMeta: ImageMeta
   socialUrls: SocialUrls
   projects: [Project]
   connectedAccounts: ConnectedAccounts
+  exportStatus: ExportStatus
+}
+
+input ExportStatusInput {
+  state: ExportStatusState
+  requestedAt: DateTime
+  startedAt: DateTime
+  finishedAt: DateTime
+  expiresAt: DateTime
+  jobId: String
+  error: String
+  url: String
+}
+
+type ExportStatus {
+  state: ExportStatusState
+  requestedAt: DateTime
+  startedAt: DateTime
+  finishedAt: DateTime
+  expiresAt: DateTime
+  jobId: String
+  error: String
+  url: String
+}
+
+enum ExportStatusState {
+  pending
+  started
+  complete
+  error
 }
 
 type ConnectedAccounts {
@@ -66,19 +104,20 @@ type Project {
 
 type Update {
   id: String!
+  createdAt: DateTime!
+  didThisAt: DateTime
+  updatedAt: DateTime!
+  scope: String!
+  description: String
   type: UpdateType!
   url: URL!
   user: User!
   project: Project!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  didThisAt: DateTime
-  scope: String!
-  description: String
   linkUrl: URL
   linkMeta: LinkMeta
   imageSrc: URL
   imageMeta: ImageMeta
+  imageAssetId: String
   autoShare: Boolean
 }
 
@@ -87,6 +126,12 @@ type SocialUrls {
   reddit: String
   facebook: String
   instagram: String
+  customSocial: [CustomSocialPair]
+}
+
+type CustomSocialPair {
+  name: String!
+  url: String!
 }
 
 type ImageMeta {

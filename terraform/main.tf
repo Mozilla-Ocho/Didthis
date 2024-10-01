@@ -115,6 +115,27 @@ module "firebase" {
   depends_on = [module.gcp_apis]
 }
 
+module "exporter_main" {
+  count = var.flag_destroy ? 0 : 1
+  source = "./modules/exporter"
+  app_name  = var.app_name
+  env_name = var.env_name
+  svc_name = "exporter"
+  image_basename = "exporter"
+  image_tag = var.image_tag
+  image_path_with_slash = module.docker_repo[0].image_path_with_slash
+  region = var.region
+  vpc_id = local.vpc_id
+  vpc_access_connector_id = local.vpc_access_connector_id
+  vpc_access_connector_name = local.vpc_access_connector_name
+  graphql_api_url = var.graphql_api_url
+  gcp_project_id = var.gcp_project_id
+  depends_on = [
+    module.gcp_apis,
+    module.docker_repo[0],
+  ]
+}
+
 module "appserver_main" {
   count = var.flag_destroy ? 0 : 1
   source = "./modules/gcr_appserver"
@@ -135,10 +156,13 @@ module "appserver_main" {
   vpc_access_connector_name = local.vpc_access_connector_name
   autoscaling_min = var.autoscaling_min
   autoscaling_max = var.autoscaling_max
+  gcp_project_id = var.gcp_project_id
+  gcp_exporter_job_id = module.exporter_main[0].export_job_id
   depends_on = [
     module.gcp_apis,
     module.docker_repo[0],
-    module.db[0]
+    module.db[0],
+    module.exporter_main[0]
   ]
 }
 
@@ -160,6 +184,7 @@ module "discordbot_main" {
     module.appserver_main[0],
   ]
 }
+
 
 module "lb_main" {
   # count = var.flag_destroy ? 0 : var.flag_enable_lb ? 1 : 0

@@ -1,0 +1,53 @@
+FROM node:20-bookworm as exporter_base
+
+RUN apt-get update && apt-get install -qq -y build-essential --fix-missing --no-install-recommends
+RUN yarn global add pm2
+
+ARG IMAGE_TAG=development
+ENV IMAGE_TAG=$IMAGE_TAG
+
+ENV LOG_LEVEL=info
+
+WORKDIR /app
+
+# --------------------------------------------------------------
+# dev image
+# --------------------------------------------------------------
+
+FROM exporter_base as exporter_dev
+
+ENV NODE_ENV=development
+ENV LOG_LEVEL=debug
+
+CMD yarn dev
+
+# --------------------------------------------------------------
+# prod image
+# --------------------------------------------------------------
+
+FROM exporter_base as exporter_prod
+
+ENV NODE_ENV=production
+ENV LOG_LEVEL=info
+
+# copy package.json and yarn.lock files in and do yarn install. we do this
+# before copying the code in to optimize for docker layer caching.
+COPY integrations/exporter/package.json /app/package.json
+COPY integrations/exporter/yarn.lock /app/yarn.lock
+RUN yarn install
+
+# copy full code in
+COPY integrations/exporter /app
+
+WORKDIR /app
+
+ARG EXPORTER_DIDTHIS_API_URL
+ENV EXPORTER_DIDTHIS_API_URL=$EXPORTER_DIDTHIS_API_URL
+ARG EXPORTER_GRAPHQL_ACCESS_TOKEN
+ENV EXPORTER_GRAPHQL_ACCESS_TOKEN=$EXPORTER_GRAPHQL_ACCESS_TOKEN
+ARG CLOUDINARY_JSON_SECRET_B64
+ENV CLOUDINARY_JSON_SECRET_B64=$CLOUDINARY_JSON_SECRET_B64
+
+RUN yarn build
+
+CMD yarn start
