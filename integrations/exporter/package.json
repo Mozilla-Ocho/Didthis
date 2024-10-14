@@ -1,0 +1,52 @@
+{
+  "name": "didthis-discord-bot",
+  "version": "0.0.1",
+  "description": "A bot for Didthis-flavored show-and-tell on Discord",
+  "private": true,
+  "license": "MPL-2.0",
+  "scripts": {
+    "build": "tsc",
+    "cli": "node build/index.js",
+    "export": "node build/index.js export",
+    "generate": "graphql-codegen",
+    "dev": "npm-run-all -p watch:*",
+    "dev:cli": "ts-node src/index.ts",
+    "watch:render": "onchange -v -p 100 -i 'src/templates/**/*.ts' -i 'assets/**/*' -- npm run dev:cli -- export --render-only",
+    "watch:generate": "graphql-codegen --watch",
+    "prettier-check": "prettier --ignore-path .gitignore -c **/*.{mjs,js,jsx,ts,tsx}",
+    "prettier-fix": "prettier --ignore-path .gitignore --write **/*.{mjs,js,jsx,ts,tsx}",
+    "lint:tsc": "tsc --noEmit",
+    "lint": "npm-run-all lint:*"
+  },
+  "dependencies": {
+    "@google-cloud/storage": "^7.13.0",
+    "@graphql-typed-document-node/core": "^3.2.0",
+    "@urql/core": "^4.2.2",
+    "archiver": "^7.0.1",
+    "axios": "^1.7.7",
+    "cloudinary": "^2.5.0",
+    "commander": "^11.1.0",
+    "convict": "^6.2.4",
+    "dotenv": "^16.3.1",
+    "escape-html": "^1.0.3",
+    "graphql": "^16.8.1",
+    "graphql-tag": "^2.12.6",
+    "p-queue": "^6.6.2",
+    "pino": "^8.17.1",
+    "pino-pretty": "^10.3.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.0",
+    "@graphql-codegen/client-preset": "^4.1.0",
+    "@parcel/watcher": "^2.3.0",
+    "@types/archiver": "^6.0.2",
+    "@types/convict": "^6.1.6",
+    "@types/node": "^22.7.4",
+    "nodemon": "^3.0.2",
+    "npm-run-all": "^4.1.5",
+    "onchange": "^7.1.0",
+    "prettier": "^3.1.1"
+  }
+}

@@ -174,6 +174,18 @@ type ApiProfile = {
   connectedAccounts?: ApiConnectedAccounts
   createdPlatform?: AppPlatformType
   createdAuthMethod?: AuthMethodType
+  exportStatus?: ExportStatus
+}
+
+type ExportStatus = {
+  state?: 'pending' | 'started' | 'complete' | 'error'
+  requestedAt?: number
+  startedAt?: number
+  finishedAt?: number
+  expiresAt?: number
+  jobId?: string
+  error?: string
+  url?: string
 }
 
 type PostMediaType = 'text' | 'image' | 'link'

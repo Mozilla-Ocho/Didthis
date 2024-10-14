@@ -242,6 +242,10 @@ const keylessTrackingEvents: { [key: string]: KeylessEventSpec } = {
     eventName: 'deleteAccount',
     opts: { name: 'bcDeleteAccount' },
   },
+  bcExportAccount: {
+    eventName: 'exportAccount',
+    opts: { name: 'bcExportAccount' },
+  },
   bcTestflightHP: {
     eventName: 'buttonClick',
     opts: { name: 'testflightHP' },

@@ -19,6 +19,8 @@ services:
       # XXX_PORTING add this to boilerplate docs for firebase, vars list etc
       GOOGLE_APPLICATION_CREDENTIALS: '/appserver/.firebase-dev-credentials.json'
       DISCORD_BOT_GRAPHQL_ACCESS_TOKEN: discord-bot:8675309
+      EXPORTER_GRAPHQL_ACCESS_TOKEN: exporter:1234567
+      GCP_EXPORTER_JOB_ID: "projects/moz-fx-future-products-nonprod/locations/us-central1/jobs/h3y-nonprod-exporter-perform-content-export"
     command: "yarn dev"
     ports:
       - "3000:3000"

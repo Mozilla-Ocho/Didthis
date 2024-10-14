@@ -1,0 +1,2 @@
+EXPORTER_DIDTHIS_API_URL=http://localhost:3000/api/graphql
+EXPORTER_GRAPHQL_ACCESS_TOKEN=exporter:1234567

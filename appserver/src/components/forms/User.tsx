@@ -24,6 +24,7 @@ import { LogoutButton } from '../auth/LogoutButton'
 import pathBuilder from '@/lib/pathBuilder'
 import DiscordAccount from '../connectedAccounts/Discord'
 import { useRouter } from 'next/router'
+import { Timestamp } from '../uiLib'
 
 type customSocialPairValidity = {
   empty?: true
@@ -450,6 +451,8 @@ const UserForm = observer(() => {
   if (!user) {
     return <></>
   }
+  const { exportStatus } = user.profile
+
   const [formStore] = useState(() => new FormStore(user, store.apiClient))
   const performSubmit = () => {
     // leave it spinning through the page nav
@@ -471,6 +474,8 @@ const UserForm = observer(() => {
   }
 
   const handleDeleteAccount = () => store.promptDeleteAccount()
+
+  const handleExportAccount = () => store.exportAccount()
 
   const handleShowAppInfo = () => appShell.api.request('showAppInfo')
 
@@ -719,60 +724,54 @@ const UserForm = observer(() => {
             />
           </label>
           {/* Custom Social Links */}
-          <label
-            className="block mt-2 -mb-2 text-form-labels text-sm grid grid-cols-[40%,1fr] gap-2"
-          >
-            <div>
-              Custom:
-            </div>
-            <div/>
-            <div>
-              Name (e.g. Mastodon)
-            </div>
-            <div>
-              URL
-            </div>
-            </label>
+          <label className="block mt-2 -mb-2 text-form-labels text-sm grid grid-cols-[40%,1fr] gap-2">
+            <div>Custom:</div>
+            <div />
+            <div>Name (e.g. Mastodon)</div>
+            <div>URL</div>
+          </label>
 
           {formStore.customSocial.map((pair, i) => (
-          <label
-            key={i}
-            htmlFor={"sl_custom"+i}
-            className="block mt-2 text-form-labels text-sm grid grid-cols-[40%,1fr] gap-2"
-          >
-            <Input
-              type="text"
-              id={"sl_custom_name"+i}
-              name={"sl_custom_name"+i}
-              placeholder="Site name"
-              onChange={x => setCustom(i, 'name', x)}
-              value={pair.name}
-              className="mt-2 text-bodytext"
-              touched
-              maxLen={profileUtils.maxChars.customSocialName}
-              hideLengthUnlessViolated
-              customError={
-                formStore.customSocialPairState(i).badName ? 'invalid name' : ''
-              }
-              disabled={user.isTrial}
-            />
-            <Input
-              type="text"
-              id={"sl_custom_url"+i}
-              name={"sl_custom_url"+i}
-              onChange={x => setCustom(i, 'url', x)}
-              placeholder="https://..."
-              value={pair.url}
-              className="mt-2 text-bodytext"
-              touched
-              maxLen={profileUtils.maxChars.url}
-              hideLengthUnlessViolated
-              customError={
-                formStore.customSocialPairState(i).badUrl ? 'invalid URL' : ''
-              }
-              disabled={user.isTrial}
-            />
-          </label>
+            <label
+              key={i}
+              htmlFor={'sl_custom' + i}
+              className="block mt-2 text-form-labels text-sm grid grid-cols-[40%,1fr] gap-2"
+            >
+              <Input
+                type="text"
+                id={'sl_custom_name' + i}
+                name={'sl_custom_name' + i}
+                placeholder="Site name"
+                onChange={x => setCustom(i, 'name', x)}
+                value={pair.name}
+                className="mt-2 text-bodytext"
+                touched
+                maxLen={profileUtils.maxChars.customSocialName}
+                hideLengthUnlessViolated
+                customError={
+                  formStore.customSocialPairState(i).badName
+                    ? 'invalid name'
+                    : ''
+                }
+                disabled={user.isTrial}
+              />
+              <Input
+                type="text"
+                id={'sl_custom_url' + i}
+                name={'sl_custom_url' + i}
+                onChange={x => setCustom(i, 'url', x)}
+                placeholder="https://..."
+                value={pair.url}
+                className="mt-2 text-bodytext"
+                touched
+                maxLen={profileUtils.maxChars.url}
+                hideLengthUnlessViolated
+                customError={
+                  formStore.customSocialPairState(i).badUrl ? 'invalid URL' : ''
+                }
+                disabled={user.isTrial}
+              />
+            </label>
           ))}
         </div>
 
@@ -822,6 +821,73 @@ const UserForm = observer(() => {
           <ListItemBtn textlabel="App Info" onClick={handleShowAppInfo} />
         </div>
       )}
+
+      <div className="my-10">
+        <h5 className="text-sm">Account data export:</h5>
+        <p className="text-form-labels text-sm">
+          If you would like to export the content and data from your account,
+          you can do so here. This will create a zip file containing all your
+          public and private content, available here for download when it is
+          ready. Note: this process may take some time to complete.
+        </p>
+        <div className="flex flex-row gap-4 justify-items-center items-center">
+          <Button
+            intent="secondary"
+            onClick={handleExportAccount}
+            className="text-sm mt-4"
+            trackEvent={trackingEvents.bcExportAccount}
+          >
+            Export account
+          </Button>
+          {exportStatus && (
+            <span className="text-sm mt-3 ml-1 text-form-labels">
+              {exportStatus.state === 'pending' && (
+                <>
+                  Export requested
+                  {exportStatus.requestedAt && <>
+                    : <Timestamp millis={exportStatus.requestedAt} />
+                  </>}
+                </>
+              )}
+              {exportStatus.state === 'started' && (
+                <>
+                  Export started
+                  {exportStatus.startedAt && <>
+                    : <Timestamp millis={exportStatus.startedAt} />
+                  </>}
+                </>
+              )}
+              {exportStatus.state === 'error' && (
+                <>
+                  Export failed
+                  {exportStatus.finishedAt && <>
+                    : <Timestamp millis={exportStatus.finishedAt} />
+                  </>}
+                  <br />
+                  Please try again later.
+                </>
+              )}
+              {exportStatus.state === 'complete' && (
+                <>
+                  Export completed
+                  {exportStatus.finishedAt && <>
+                    : <Timestamp millis={exportStatus.finishedAt} />
+                  </>}
+                  <br />
+                  <a
+                    href={exportStatus.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-blue-500 underline font-extrabold"
+                  >
+                    Click here to download
+                  </a>
+                </>
+              )}
+            </span>
+          )}
+        </div>
+      </div>
 
       <div className="my-10">
         <h5 className="text-sm">Account deletion:</h5>

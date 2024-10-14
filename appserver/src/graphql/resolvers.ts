@@ -1,21 +1,14 @@
-import { YogaInitialContext } from 'graphql-yoga'
-import type { NextApiRequest, NextApiResponse } from 'next'
 import { GraphQLError, GraphQLFieldResolver } from 'graphql'
 import knex from '@/knex'
 import { cloudinaryUrlDirect } from '@/lib/cloudinaryConfig'
 import { userFromDbRow } from '@/lib/serverAuth'
 import { resolvers as scalarResolvers } from 'graphql-scalars'
-
-export type CustomContext = {
-  req: NextApiRequest
-  res: NextApiResponse
-  baseUrl: URL
-  parentUser: ApiUser
-}
+import { GraphQLContext } from './context'
+import { AuthRole } from './plugins'
 
 export type FieldResolver<TSource, TArgs> = GraphQLFieldResolver<
   TSource,
-  CustomContext & YogaInitialContext,
+  GraphQLContext,
   TArgs
 >
 export type RootQueryFieldResolver<TArgs> = FieldResolver<undefined, TArgs>
@@ -26,7 +19,6 @@ export const queryUser: RootQueryFieldResolver<{
   slug: string
 }> = async (obj, args, context, info) => {
   const { id, slug } = args
-  context.baseUrl = getBaseUrlFromRequest(context.req)
 
   if (!id && !slug) {
     throw new GraphQLError(`User lookup requires id or slug`)
@@ -43,9 +35,14 @@ export const queryUser: RootQueryFieldResolver<{
   }
   if (!dbRow) return null
 
+  // TODO: need to implement user-based token auth in pluginAuth
+  const isOwner = context.authUser?.id === dbRow.id
+
+  const publicFilter = !hasAdminRole(context) && !isOwner
+
   const user = userFromApiUser(
     context.baseUrl,
-    userFromDbRow(dbRow, { publicFilter: true })
+    userFromDbRow(dbRow, { publicFilter })
   )
   context.parentUser = user
   return user
@@ -63,8 +60,6 @@ export const queryPublicUpdates: RootQueryFieldResolver<{
   const limit = args.limit || 10
   const requireDiscordAccount = args.requireDiscordAccount || false
   const requireAutoShare = args.requireAutoShare || false
-
-  context.baseUrl = getBaseUrlFromRequest(context.req)
 
   const userRows = (await knex('users')
     .where('updated_at_millis', '>', since.getTime())
@@ -100,15 +95,80 @@ export const queryPublicUpdates: RootQueryFieldResolver<{
   return updates.slice(0, limit)
 }
 
+export const mutationUpdateUserExportStatus = async (
+  _obj: unknown,
+  args: {
+    id: string
+    status: {
+      state?: string
+      startedAt?: number
+      finishedAt?: number
+      expiresAt?: number
+      error?: string
+      url?: string
+    }
+  },
+  context: GraphQLContext
+) => {
+  if (!hasAdminRole(context)) throw new GraphQLError(`Unauthorized`)
+
+  const { id, status } = args
+
+  const dbRow = await knex('users').where('id', id).first()
+  if (!dbRow) return null
+  const user = userFromDbRow(dbRow, { publicFilter: false })
+  const profile = { ...user.profile }
+
+  const { state: stateIn } = status
+
+  let state
+  if (
+    stateIn &&
+    ['pending', 'started', 'complete', 'error'].includes(stateIn)
+  ) {
+    state = stateIn as ExportStatus['state']
+  }
+
+  profile.exportStatus = {
+    ...profile.exportStatus,
+    ...status,
+    state,
+  }
+
+  const millis = new Date().getTime()
+  await knex('users')
+    .update({
+      last_read_from_user: millis,
+      last_write_from_user: millis,
+      updated_at_millis: millis,
+      profile: profile,
+    })
+    .where('id', user.id)
+
+  return profile.exportStatus
+}
+
+function hasAdminRole(context: GraphQLContext) {
+  return (
+    context.authRole &&
+    [AuthRole.Admin, AuthRole.DiscordBot, AuthRole.Exporter].includes(
+      context?.authRole
+    )
+  )
+}
+
 export const profileProjects: LeafFieldResolver<ApiProfile> = async (
   obj,
   _args,
   context
 ) => {
-  if (obj.projects) {
-    return Object.values(obj.projects).map(project =>
-      projectFromApiProject(context.baseUrl, project, context.parentUser)
-    )
+  const { parentUser } = context
+  if (parentUser) {
+    if (obj.projects) {
+      return Object.values(obj.projects).map(project =>
+        projectFromApiProject(context.baseUrl, project, parentUser)
+      )
+    }
   }
   return []
 }
@@ -118,18 +178,15 @@ export const projectUpdates: LeafFieldResolver<ApiProject> = async (
   _args,
   context
 ) => {
-  if (obj?.posts) {
-    return Object.values(obj.posts).map(post =>
-      updateFromApiPost(context.baseUrl, post, context.parentUser, obj)
-    )
+  const { parentUser } = context
+  if (parentUser) {
+    if (obj?.posts) {
+      return Object.values(obj.posts).map(post =>
+        updateFromApiPost(context.baseUrl, post, parentUser, obj)
+      )
+    }
   }
   return []
-}
-
-function getBaseUrlFromRequest(req: NextApiRequest) {
-  const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https'
-  const host = req.headers.host
-  return new URL(`${protocol}://${host}`)
 }
 
 const urlFromUser = (baseUrl: URL, user: ApiUser) => {
@@ -159,6 +216,8 @@ const projectFromApiProject = (
   return {
     ...project,
     url: urlFromProject(baseUrl, project, user),
+    imageAssetId: project.imageAssetId,
+    imageMeta: project.imageMeta,
     imageSrc:
       project.imageAssetId &&
       cloudinaryUrlDirect(project.imageAssetId, 'project', project.imageMeta),
@@ -191,6 +250,8 @@ const updateFromApiPost = (
     user: userFromApiUser(baseUrl, user),
     project: projectFromApiProject(baseUrl, project, user),
     linkMeta: post.urlMeta,
+    imageAssetId: post.imageAssetId,
+    imageMeta: post.imageMeta,
     imageSrc:
       post.imageAssetId &&
       cloudinaryUrlDirect(post.imageAssetId, 'post', post.imageMeta),
@@ -202,6 +263,9 @@ export const resolvers = {
   Query: {
     user: queryUser,
     publicUpdates: queryPublicUpdates,
+  },
+  Mutation: {
+    updateUserExportStatus: mutationUpdateUserExportStatus,
   },
   Profile: {
     projects: profileProjects,
