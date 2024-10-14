@@ -9,6 +9,7 @@ import PageTitle from '../PageTitle'
 import OgMeta from '../OgMeta'
 import RemindersAndAlerts from '../RemindersAndAlerts'
 import ViralityBlurb from '../ViralityBlurb'
+import SunsetAlert from '../SunsetAlert'
 
 // TODO: rename this to NonAuthUser or something, it's shown even in auth but
 // when looking at someone else's page
@@ -21,6 +22,7 @@ const UnauthUser = observer(
     })
     return (
       <>
+        <SunsetAlert />
         <ViralityBlurb fromPage='user' targetUserSlug={targetUser.publicPageSlug} />
         <RemindersAndAlerts />
         <PagePad>
