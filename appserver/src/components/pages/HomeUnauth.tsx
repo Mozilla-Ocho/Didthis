@@ -17,6 +17,7 @@ import { WaitlistButton } from '../WaitlistButton'
 import { Button, Link, PagePad } from '../uiLib'
 import { useAppShellListener } from '@/lib/appShellContent'
 import { LoginButton } from '../auth/LoginButton'
+import SunsetAlert from '../SunsetAlert'
 
 // DRY_20334 outer page width styles
 const HomeUnauth = () => {
@@ -96,7 +97,7 @@ const HomeUnauth = () => {
     await store.loginAsNewTrialUser()
   }
 
-  const ctaButton = (invited && store.enableDeferredSignup) ? (
+  let ctaButton = (invited && store.enableDeferredSignup) ? (
     <DeferredSignupButton
       onClick={handleDeferredLogin}
       className="my-6 px-6 py-4 text-lg"
@@ -128,6 +129,10 @@ const HomeUnauth = () => {
       </p>
     </>
   )
+
+  // cta is now a shutdown notice
+  ctaButton = <div className="p-3 border-4 bg-white rounded mt-4 mb-4"><p>
+  <strong>Important update: Didthis will be shutting down on November 15th.</strong> Please make sure to export your data before the sunset. <Link href="/sunset">Learn more here</Link>. </p></div>
 
   return (
     <div className="grid grid-rows-[auto_1fr_auto] w-full min-h-screen">
