@@ -143,7 +143,7 @@ export class FormStore {
     }
   }
 
-  getFirstUnsavedFieldName() : string | false {
+  getFirstUnsavedFieldName(): string | false {
     // returns the name of the first field that has unsaved changes, or false if none. used to show a warning when navigating away on discord pairing if unsaved changes exist.
     if ((this.name || '').trim() !== (this.user.profile.name || '').trim())
       return 'name'
@@ -151,24 +151,47 @@ export class FormStore {
       return 'bio'
     if ((this.userSlug || '').trim() !== (this.user.userSlug || '').trim())
       return 'userSlug'
-    if ((this.imageAssetId || '').trim() !== (this.user.profile.imageAssetId || '').trim())
+    if (
+      (this.imageAssetId || '').trim() !==
+      (this.user.profile.imageAssetId || '').trim()
+    )
       return 'imageAssetId'
-    if ((this.twitter || '').trim() !== (this.user.profile.socialUrls?.twitter || '').trim())
+    if (
+      (this.twitter || '').trim() !==
+      (this.user.profile.socialUrls?.twitter || '').trim()
+    )
       return 'twitter'
-    if ((this.facebook || '').trim() !== (this.user.profile.socialUrls?.facebook || '').trim())
+    if (
+      (this.facebook || '').trim() !==
+      (this.user.profile.socialUrls?.facebook || '').trim()
+    )
       return 'facebook'
-    if ((this.reddit || '').trim() !== (this.user.profile.socialUrls?.reddit || '').trim())
+    if (
+      (this.reddit || '').trim() !==
+      (this.user.profile.socialUrls?.reddit || '').trim()
+    )
       return 'reddit'
-    if ((this.instagram || '').trim() !== (this.user.profile.socialUrls?.instagram || '').trim())
+    if (
+      (this.instagram || '').trim() !==
+      (this.user.profile.socialUrls?.instagram || '').trim()
+    )
       return 'instagram'
-    if (this.customSocial.some(
+    if (
+      this.customSocial.some(
         (pair, i) =>
           // note that customSocial has NUM_CUSTOM_SOCIAL entries always, but profile.socialUrls might have 0-NUM_CUSTOM_SOCIAL
-          pair.name !== (this.user.profile.socialUrls?.customSocial?.[i]?.name || '') ||
-          pair.url !== (this.user.profile.socialUrls?.customSocial?.[i]?.url || '')
-      )) return 'customSocial'
+          pair.name !==
+            (this.user.profile.socialUrls?.customSocial?.[i]?.name || '') ||
+          pair.url !==
+            (this.user.profile.socialUrls?.customSocial?.[i]?.url || '')
+      )
+    )
+      return 'customSocial'
     if (this.user.profile.connectedAccounts?.discord) {
-      if (!!this.discordShareByDefault !== !!(this.user.profile.connectedAccounts?.discord?.shareByDefault))
+      if (
+        !!this.discordShareByDefault !==
+        !!this.user.profile.connectedAccounts?.discord?.shareByDefault
+      )
         return 'discordShareByDefault'
     }
     return false
@@ -826,9 +849,13 @@ const UserForm = observer(() => {
         <h5 className="text-sm">Account data export:</h5>
         <p className="text-form-labels text-sm">
           If you would like to export the content and data from your account,
-          you can do so here. This will create a zip file containing all your
-          public and private content, available here for download when it is
-          ready. Note: this process may take some time to complete.
+          you can do so here. This will begin a system background job to create
+          a zip file containing all your public and private content, which will
+          be made available here for download when it is ready.
+        </p>
+        <p className="text-form-labels text-sm mt-3">
+          Note: this process may take some time to complete. Refresh this page
+          periodically to check status.
         </p>
         <div className="flex flex-row gap-4 justify-items-center items-center">
           <Button
@@ -844,25 +871,31 @@ const UserForm = observer(() => {
               {exportStatus.state === 'pending' && (
                 <>
                   Export requested
-                  {exportStatus.requestedAt && <>
-                    : <Timestamp millis={exportStatus.requestedAt} />
-                  </>}
+                  {exportStatus.requestedAt && (
+                    <>
+                      : <Timestamp millis={exportStatus.requestedAt} />
+                    </>
+                  )}
                 </>
               )}
               {exportStatus.state === 'started' && (
                 <>
                   Export started
-                  {exportStatus.startedAt && <>
-                    : <Timestamp millis={exportStatus.startedAt} />
-                  </>}
+                  {exportStatus.startedAt && (
+                    <>
+                      : <Timestamp millis={exportStatus.startedAt} />
+                    </>
+                  )}
                 </>
               )}
               {exportStatus.state === 'error' && (
                 <>
                   Export failed
-                  {exportStatus.finishedAt && <>
-                    : <Timestamp millis={exportStatus.finishedAt} />
-                  </>}
+                  {exportStatus.finishedAt && (
+                    <>
+                      : <Timestamp millis={exportStatus.finishedAt} />
+                    </>
+                  )}
                   <br />
                   Please try again later.
                 </>
@@ -870,9 +903,11 @@ const UserForm = observer(() => {
               {exportStatus.state === 'complete' && (
                 <>
                   Export completed
-                  {exportStatus.finishedAt && <>
-                    : <Timestamp millis={exportStatus.finishedAt} />
-                  </>}
+                  {exportStatus.finishedAt && (
+                    <>
+                      : <Timestamp millis={exportStatus.finishedAt} />
+                    </>
+                  )}
                   <br />
                   <a
                     href={exportStatus.url}
