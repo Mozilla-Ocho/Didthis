@@ -21,6 +21,7 @@ import PostList from './PostList'
 import ProjNotFound from './ProjNotFound'
 import AddUpdatePrompt from './AddUpdatePrompt'
 import SortChooser from './SortChooser'
+import SunsetAlert from '@/components/SunsetAlert'
 
 const ProjectPage = observer(
   ({ targetUser }: { targetUser: ApiUser | false }) => {
@@ -147,6 +148,7 @@ const ProjectPage = observer(
 
         {store.user && <Breadcrumbs crumbs={[{ name: project.title }]} />}
 
+        <SunsetAlert />
         <ViralityBlurb
           fromPage="project"
           targetUserSlug={targetUser.publicPageSlug}

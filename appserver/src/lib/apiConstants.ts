@@ -124,6 +124,11 @@ interface DisconnectDiscordWrapper extends SuccessWrapper {
   payload: ApiUser
 }
 
+interface ExportAccountWrapper extends SuccessWrapper {
+  action: "exportAccount",
+  payload: ApiUser
+}
+
 export type {
   ClaimTrialUserWrapper,
   DeletePostWrapper,
@@ -132,6 +137,7 @@ export type {
   EmptySuccessWrapper,
   ErrorId,
   ErrorWrapper,
+  ExportAccountWrapper,
   MeWrapper,
   PublicUserWrapper,
   SaveProfileWrapper,

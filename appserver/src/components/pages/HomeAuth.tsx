@@ -17,6 +17,7 @@ import useAppShell, { useAppShellListener } from '@/lib/appShellContent'
 import settingsGear from '@/assets/img/settings-gear.svg'
 import DiscordCard from '../DiscordCard'
 import IOSCard from '../IOSCard'
+import SunsetAlert from '@/components/SunsetAlert'
 
 const InfoGrid = () => (
   <div className="grid mt-24 gap-4 grid-cols-1 md:grid-cols-2 w-auto">
@@ -80,6 +81,7 @@ const HomeAuth = observer(() => {
       <>
         <PageTitle title={title} />
         <OgMeta user={store.user} />
+        <SunsetAlert />
         <PagePad yControlOnly>
           <PagePad wide noPadY>
             <div className="flex flex-row mb-3 mt-3">
@@ -192,6 +194,7 @@ const HomeAuth = observer(() => {
     <>
       <PageTitle title={title} />
       <OgMeta user={store.user} />
+      <SunsetAlert />
       <RemindersAndAlerts />
       <PagePad yControlOnly>
         <PagePad noPadY>

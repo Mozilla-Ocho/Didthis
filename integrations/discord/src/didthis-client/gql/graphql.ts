@@ -191,6 +191,12 @@ export type ConnectedAccounts = {
   discord?: Maybe<DiscordAccount>;
 };
 
+export type CustomSocialPair = {
+  __typename?: 'CustomSocialPair';
+  name: Scalars['String']['output'];
+  url: Scalars['String']['output'];
+};
+
 export type DiscordAccount = {
   __typename?: 'DiscordAccount';
   avatar: Scalars['String']['output'];
@@ -200,6 +206,36 @@ export type DiscordAccount = {
   id: Scalars['String']['output'];
   username: Scalars['String']['output'];
 };
+
+export type ExportStatus = {
+  __typename?: 'ExportStatus';
+  error?: Maybe<Scalars['String']['output']>;
+  expiresAt?: Maybe<Scalars['DateTime']['output']>;
+  finishedAt?: Maybe<Scalars['DateTime']['output']>;
+  jobId?: Maybe<Scalars['String']['output']>;
+  requestedAt?: Maybe<Scalars['DateTime']['output']>;
+  startedAt?: Maybe<Scalars['DateTime']['output']>;
+  state?: Maybe<ExportStatusState>;
+  url?: Maybe<Scalars['String']['output']>;
+};
+
+export type ExportStatusInput = {
+  error?: InputMaybe<Scalars['String']['input']>;
+  expiresAt?: InputMaybe<Scalars['DateTime']['input']>;
+  finishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  jobId?: InputMaybe<Scalars['String']['input']>;
+  requestedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  startedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  state?: InputMaybe<ExportStatusState>;
+  url?: InputMaybe<Scalars['String']['input']>;
+};
+
+export enum ExportStatusState {
+  Complete = 'complete',
+  Error = 'error',
+  Pending = 'pending',
+  Started = 'started'
+}
 
 export type ImageMeta = {
   __typename?: 'ImageMeta';
@@ -216,6 +252,17 @@ export type LinkMeta = {
   title?: Maybe<Scalars['String']['output']>;
 };
 
+export type Mutation = {
+  __typename?: 'Mutation';
+  updateUserExportStatus?: Maybe<ExportStatus>;
+};
+
+
+export type MutationUpdateUserExportStatusArgs = {
+  id: Scalars['String']['input'];
+  status: ExportStatusInput;
+};
+
 export enum PrivacyScope {
   Private = 'private',
   Public = 'public'
@@ -225,12 +272,14 @@ export type Profile = {
   __typename?: 'Profile';
   bio?: Maybe<Scalars['String']['output']>;
   connectedAccounts?: Maybe<ConnectedAccounts>;
+  exportStatus?: Maybe<ExportStatus>;
+  imageAssetId?: Maybe<Scalars['String']['output']>;
   imageMeta?: Maybe<ImageMeta>;
   imageSrc?: Maybe<Scalars['URL']['output']>;
   name?: Maybe<Scalars['String']['output']>;
   projects?: Maybe<Array<Maybe<Project>>>;
   socialUrls?: Maybe<SocialUrls>;
-  updatedAt?: Maybe<Scalars['Int']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
 };
 
 export type Project = {
@@ -280,6 +329,7 @@ export type QueryUserArgs = {
 
 export type SocialUrls = {
   __typename?: 'SocialUrls';
+  customSocial?: Maybe<Array<Maybe<CustomSocialPair>>>;
   facebook?: Maybe<Scalars['String']['output']>;
   instagram?: Maybe<Scalars['String']['output']>;
   reddit?: Maybe<Scalars['String']['output']>;
@@ -293,6 +343,7 @@ export type Update = {
   description?: Maybe<Scalars['String']['output']>;
   didThisAt?: Maybe<Scalars['DateTime']['output']>;
   id: Scalars['String']['output'];
+  imageAssetId?: Maybe<Scalars['String']['output']>;
   imageMeta?: Maybe<ImageMeta>;
   imageSrc?: Maybe<Scalars['URL']['output']>;
   linkMeta?: Maybe<LinkMeta>;

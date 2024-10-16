@@ -840,6 +840,13 @@ class Store {
     this.showConfirmDeleteModal = true
   }
 
+  async exportAccount() {
+    if (!this.user) throw new Error('must be authed')
+    return this.apiClient.exportAccount().then(wrapper => {
+      this.setUser(wrapper.payload)
+    })
+  }
+
   promptDeletePost(post: ApiPost) {
     this.confirmingDelete = {
       kind: 'post',

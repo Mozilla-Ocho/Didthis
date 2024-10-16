@@ -22,6 +22,7 @@
     "@cloudinary/url-gen": "^1.10.1",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
+    "@google-cloud/run": "^1.4.0",
     "@graphql-tools/load": "^8.0.1",
     "@graphql-tools/load-files": "^7.0.0",
     "@mui/material": "^5.14.3",

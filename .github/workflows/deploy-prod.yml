@@ -107,6 +107,7 @@ jobs:
           --build-arg DISCORD_CLIENT_ID="${{vars.DISCORD_CLIENT_ID}}" \
           --build-arg DISCORD_CLIENT_SECRET="${{secrets.DISCORD_CLIENT_SECRET}}" \
           --build-arg DISCORD_BOT_GRAPHQL_ACCESS_TOKEN="${{secrets.DISCORD_BOT_GRAPHQL_ACCESS_TOKEN}}" \
+          --build-arg EXPORTER_GRAPHQL_ACCESS_TOKEN="${{secrets.EXPORTER_GRAPHQL_ACCESS_TOKEN}}" \
           --build-arg IMAGE_TAG="$IMAGE_TAG" \
           .
         docker push $IMAGE_PATH/appserver:$IMAGE_TAG
@@ -136,6 +137,26 @@ jobs:
           .
         docker push $IMAGE_PATH/discordbot:$IMAGE_TAG
         docker push $IMAGE_PATH/discordbot:latest
+
+    - name: pull latest exporter image for cache
+      # continue on error because the first run will not have a docker repo.
+      continue-on-error: true
+      run: docker pull $IMAGE_PATH/exporter:latest
+
+    - name: build and push exporter image
+      run: |-
+        docker build \
+          --file=dockerfiles/exporter \
+          --target exporter_prod \
+          -t $IMAGE_PATH/exporter:$IMAGE_TAG \
+          -t $IMAGE_PATH/exporter:latest \
+          --cache-from $IMAGE_PATH/exporter:latest \
+          --build-arg CLOUDINARY_JSON_SECRET_B64="${{secrets.CLOUDINARY_JSON_SECRET_B64}}" \
+          --build-arg EXPORTER_GRAPHQL_ACCESS_TOKEN="${{secrets.EXPORTER_GRAPHQL_ACCESS_TOKEN}}" \
+          --build-arg IMAGE_TAG="$IMAGE_TAG" \
+          .
+        docker push $IMAGE_PATH/exporter:$IMAGE_TAG
+        docker push $IMAGE_PATH/exporter:latest
 
     - uses: trstringer/manual-approval@v1
       with:

@@ -10,6 +10,9 @@ const ViralityBlurb = ({
   fromPage: string
   targetUserSlug: string
 }) => {
+  // per sunset plan, we are no longer showing this CTA
+  return <></>
+  /*
   const store = useStore()
   if (store.user) return <></> // unauth only
   return (
@@ -33,6 +36,7 @@ const ViralityBlurb = ({
       </div>
     </PagePad>
   )
+  */
 }
 
 export default ViralityBlurb
