@@ -60,9 +60,10 @@ const Sunset = () => {
           </p>
 
           <p>
-            As we prepare to close this chapter, we want to ensure that you have
-            time to export your data before the shutdown. To download a copy of
-            your data, simply navigate to {settingsLink}, find the “Account data
+            We plan to delete all user data when we shut the product down, so
+            as we prepare to close this chapter, we want to ensure that you
+            have time to export your data. To download a copy of it simply
+            navigate to {settingsLink}, find the “Account data
             export” section at the bottom of this page, and click “Export
             account”. Your data will then be packaged up and made available as a
             link to a ZIP file on that same page.
@@ -75,12 +76,11 @@ const Sunset = () => {
             <li>
               Your profile and project data, public & private, in JSON form
             </li>
-            <li>The Didthis logo in SVG form</li>
           </ul>
           <p>
             Please note that this data is provided in a raw format (JSON and
             HTML) which can be opened directly with your web-browser of choice,
-            but may require technical skills to use for any other purpose.{' '}
+            but may require technical skills to use for any other purpose.
           </p>
 
           <p>
