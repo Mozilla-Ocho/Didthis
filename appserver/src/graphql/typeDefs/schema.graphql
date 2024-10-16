@@ -113,7 +113,7 @@ type Update {
   url: URL!
   user: User!
   project: Project!
-  linkUrl: URL
+  linkUrl: String
   linkMeta: LinkMeta
   imageSrc: URL
   imageMeta: ImageMeta
