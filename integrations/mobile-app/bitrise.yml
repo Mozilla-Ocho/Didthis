@@ -1,0 +1,100 @@
+---
+format_version: '13'
+default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
+project_type: react-native
+trigger_map:
+- push_branch: main
+  workflow: apple-appstore-deploy
+- pull_request_source_branch: "*"
+  workflow: development-build
+app:
+  envs:
+  - opts:
+      is_expand: false
+    PLATFORM: ios
+  - opts:
+      is_expand: false
+    BITRISE_PROJECT_PATH: ios/Didthis.xcworkspace
+  - opts:
+      is_expand: false
+    BITRISE_SCHEME: Didthis
+  - opts:
+      is_expand: false
+    APPLE_APP_STORE_APP_ID: '6468680088'
+  - opts:
+      is_expand: false
+    APPLE_APP_STORE_BUNDLE_ID: org.mozilla.Didthis
+  - opts:
+      is_expand: false
+    APPLE_IOS_INFO_PLIST_PATH: ios/Didthis/Info.plist
+meta:
+  bitrise.io:
+    stack: osx-xcode-14.3.x-ventura
+    machine_type_id: g2-m1.8core
+workflows:
+  apple-appstore-deploy:
+    description: Build and upload to App Store
+    before_run:
+    - common-setup
+    steps:
+    - xcode-archive@5:
+        inputs:
+        - automatic_code_signing: 'off'
+        - distribution_method: app-store
+        - xcconfig_content: |-
+            CODE_SIGN_STYLE = Manual
+            DEVELOPMENT_TEAM = 43AQ936H96
+            CODE_SIGN_IDENTITY = iPhone Distribution
+            PROVISIONING_PROFILE_SPECIFIER = efbc4a6b-9d74-459d-82bb-bb436650fa76
+    - deploy-to-itunesconnect-application-loader@1:
+        inputs:
+        - password: "$APPLE_DEV_ACCOUNT_PASSWORD"
+        - app_password: "$APPLE_DEV_ACCOUNT_APP_SPECIFIC_PASSWORD"
+        - itunescon_user: "$APPLE_DEV_ACCOUNT_ID"
+    after_run:
+    - common-cleanup
+  common-cleanup:
+    description: Common cleanup steps after main workflow
+    steps:
+    - save-cocoapods-cache@1: {}
+    - save-npm-cache@1: {}
+    - deploy-to-bitrise-io@2: {}
+  common-setup:
+    description: Common setup steps before workflow
+    steps:
+    - activate-ssh-key@4: {}
+    - git-clone@8: {}
+    - restore-npm-cache@1: {}
+    - restore-cocoapods-cache@1: {}
+    - yarn@0:
+        inputs:
+        - command: install
+    - yarn@0:
+        inputs:
+        - command: test
+    - script@1:
+        inputs:
+        - content: |-
+            set -ex
+            npx expo prebuild
+        title: Generate Native Code with Expo
+    - script@1:
+        inputs:
+        - content: |-
+            set -ex
+            envman add --key SPACESHIP_AVOID_XCODE_API --value "0"
+        title: Hack to address Xcode 7.3 error https://github.com/bitrise-steplib/steps-xcode-archive/issues/287
+    - set-xcode-build-number@1:
+        inputs:
+        - plist_path: "$APPLE_IOS_INFO_PLIST_PATH"
+    - certificate-and-profile-installer@1: {}
+  development-build:
+    description: Perform development app build
+    before_run:
+    - common-setup
+    steps:
+    - xcode-archive@5:
+        inputs:
+        - automatic_code_signing: apple-id
+    after_run:
+    - common-cleanup

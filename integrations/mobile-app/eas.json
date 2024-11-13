@@ -1,0 +1,46 @@
+{
+  "cli": {
+    "version": ">= 5.4.0",
+    "promptToConfigurePushNotifications": false
+  },
+  "build": {
+    "base": {},
+    "development": {
+      "extends": "base",
+      "developmentClient": true,
+      "distribution": "internal",
+      "channel": "development"
+    },
+    "storybook": {
+      "extends": "base",
+      "developmentClient": true,
+      "distribution": "internal",
+      "channel": "storybook"
+    },
+    "preview": {
+      "extends": "base",
+      "distribution": "internal",
+      "channel": "preview"
+    },
+    "preview-production": {
+      "extends": "base",
+      "distribution": "internal",
+      "channel": "production"
+    },
+    "preview-simulator": {
+      "extends": "base",
+      "distribution": "internal",
+      "channel": "preview",
+      "ios": {
+        "simulator": true
+      }
+    },
+    "production": {
+      "extends": "base",
+      "channel": "production"
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
