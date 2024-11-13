@@ -7,11 +7,12 @@ as their knowledge and resources.
 
 This repository has been made open source as part of sunsetting Didthis, which
 was announced on Oct 15th, 2025 and took place on Nov 15th 2025. Read more
-here (link to tombstone TODO).
+[here](https://future.mozilla.org/didthis-has-shut-down/).
 
 It contains the code for the Didthis web application. The iOS mobile
-application is in a separate repository (link TODO), but principally is a
-webview around this web application.
+application is also included in the `integrations/mobile-app` folder, and
+principally is a webview around this web application using Expo and React
+Native.
 
 This code is provided as-is for posterity and good will, and is not actively
 maintained.
@@ -30,7 +31,7 @@ code).
 
 In addition to the client and application server are a Discord bot, which
 integrated Didthis to our Discord and allowed users to post content there
-automatically, and an exports job system.
+automatically, and an exports job system, and the iOS app.
 
 Didthis communicated with third party services for the following purposes:
 * Firebase, for authentication
