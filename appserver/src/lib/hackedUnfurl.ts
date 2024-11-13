@@ -3,19 +3,48 @@
 
 
 /*
- *
- * this is a version of
+ * This is a modified version of
  * https://github.com/jacktuck/unfurl/blob/v6.1.0/src/index.ts
  *
- * that i have modified in the following ways:
+ * Which we have modified in the following ways:
  * - added unfurlFromHtmlContent() that takes an html payload instead of
- *   fetching the html. we feed this the output of the zyte api call.
+ *   fetching the html. we feed this the output of the Zyte api call.
  * - removed the typescript annotations so it will compile as a regular
  *   appserver module.
  * - modified slightly to work as a direct es module import without any
- *   transpilation (he and iconv imports syntax changed etc)
+ *   transpilation (imports syntax changed)
  * - brought in some imported modules as direct code, like the 'schema'
  *   constant, UnexpectedError, etc.
+ *
+ * For expediency, and because the library is essentually just this one file, we
+ * chose to include it whole-cloth and modify it here instead of creating a
+ * much more complex separate project and NPM package that supported our needs.
+ *
+ * The original code is MIT licensed. Our modifications are licensed according
+ * to those in the repository root. The original license and copyright from
+ * Jack Tuck's unfurl project is below:
+ *
+ * MIT License
+ * 
+ * Copyright (c) 2018 Jack Tuck
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  *
  */
 import { URL } from "url";
