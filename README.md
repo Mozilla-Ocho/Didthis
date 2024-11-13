@@ -1,6 +1,6 @@
 # Didthis (archived)
 
-Didthis was an experimental project of the Mozilla Innovation Studio. It's aim
+Didthis was an experimental project of the Mozilla Innovation Studio. Its aim
 was to provide a useful hobby project journaling and sharing tool, and a social
 platform for hobbyists to share and celebrate their works in progress, as well
 as their knowledge and resources.
@@ -52,7 +52,7 @@ included, especially for VPC setup and DNS configurations. This repository
 instead contains dangling references to those resources.
 
 Furthermore, the Github actions expect a setup that is no longer complete and
-depended on an environmen, including variables and secrets, that are no longer
+depended on an environment, including variables and secrets, that are no longer
 present. For example, Firebase credentials, GCP provisioning credentials, a
 prod and nonprod GCP project pair, repository contributor permissions, Github
 issues for deployment approval workflows, the VPC and DNS per above, and so on.
@@ -72,7 +72,7 @@ Didthis was developed by the Mozilla Innovation Studio with principal
 contributions from a number of individuals:
 
 * Stephen Hood, product manager
-* Josh Whiting, engineering
-* Les Orchard, engineering
+* Josh Whiting, engineer
+* Les Orchard, engineer
 * Amy Chiu, designer
 * Kate Taylor, designer and engineer
