@@ -90,7 +90,7 @@
     "mobx": "^6.9.0",
     "mobx-react-lite": "^3.4.3",
     "morgan": "^1.10.0",
-    "next": "13.3.0",
+    "next": "14.2.10",
     "node-fetch": "^3.3.2",
     "nodemon": "^2.0.22",
     "normalize-url": "^8.0.0",
