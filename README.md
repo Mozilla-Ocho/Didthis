@@ -6,7 +6,7 @@ platform for hobbyists to share and celebrate their works in progress, as well
 as their knowledge and resources.
 
 This repository has been made open source as part of sunsetting Didthis, which
-was announced on Oct 15th, 2025 and took place on Nov 15th 2025. Read more
+was announced on Oct 15th, 2024 and took place on Nov 15th 2024. Read more
 [here](https://future.mozilla.org/didthis-has-shut-down/).
 
 It contains the code for the Didthis web application. The iOS mobile
